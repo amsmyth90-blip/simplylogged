@@ -3,6 +3,8 @@ import {
   getDocuments as getLocalDocuments,
   getDocumentsByRoom as getLocalDocumentsByRoom,
   saveDocument as saveLocalDocument,
+  updateDocument as updateLocalDocument,
+  deleteDocument as deleteLocalDocument,
   type StoredDocument,
 } from "@/lib/storage";
 
@@ -82,6 +84,48 @@ export async function saveDocument(document: StoredDocument) {
   if (error) {
     console.error("Supabase saveDocument failed", error);
     saveLocalDocument(document);
+  }
+}
+
+export async function updateDocument(document: StoredDocument) {
+  const supabase = getSupabaseClient();
+  const userId = await getCurrentUserId();
+
+  if (!supabase || !userId) {
+    updateLocalDocument(document);
+    return;
+  }
+
+  const { error } = await supabase
+    .from("documents")
+    .update(toRow(document, userId))
+    .eq("id", document.id)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Supabase updateDocument failed", error);
+    updateLocalDocument(document);
+  }
+}
+
+export async function deleteDocument(documentId: string) {
+  const supabase = getSupabaseClient();
+  const userId = await getCurrentUserId();
+
+  if (!supabase || !userId) {
+    deleteLocalDocument(documentId);
+    return;
+  }
+
+  const { error } = await supabase
+    .from("documents")
+    .delete()
+    .eq("id", documentId)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Supabase deleteDocument failed", error);
+    deleteLocalDocument(documentId);
   }
 }
 

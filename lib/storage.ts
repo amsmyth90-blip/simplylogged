@@ -41,6 +41,17 @@ export function saveDocument(document: StoredDocument) {
   write(documentsKey, [document, ...documents.filter((item) => item.id !== document.id)]);
 }
 
+export function updateDocument(document: StoredDocument) {
+  saveDocument(document);
+}
+
+export function deleteDocument(documentId: string) {
+  write(
+    documentsKey,
+    getDocuments().filter((document) => document.id !== documentId),
+  );
+}
+
 export function getReminders(): StoredReminder[] {
   return read<StoredReminder[]>(remindersKey, []);
 }

@@ -73,7 +73,7 @@ export const hotspots = [
   {
     id: "mailbox",
     name: "Mailbox",
-    href: "/dashboard?panel=mailbox",
+    href: "/mailbox",
     left: "11%",
     top: "78%",
     icon: Mail,
