@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { DrivewayPage } from "@/components/DrivewayPage";
 import { RoomPage } from "@/components/RoomPage";
 import { rooms } from "@/lib/mock-data";
 
@@ -14,6 +15,10 @@ export default async function EstateRoomPage({
 
   if (!room) {
     notFound();
+  }
+
+  if (roomId === "driveway") {
+    return <DrivewayPage />;
   }
 
   return <RoomPage roomId={roomId} room={room} />;
