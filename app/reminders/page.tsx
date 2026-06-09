@@ -2,17 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Bell, CheckCircle2, Clock3, FileText, TimerReset } from "lucide-react";
+import { CheckCircle2, Clock3, FileText, TimerReset } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { getReminders, updateReminder } from "@/lib/supabase/reminders";
 import type { StoredReminder } from "@/lib/storage";
 
-const defaultMilestones = [
-  { title: "Home Insurance Renewal", roomName: "Family Room", dueDate: "2026-08-14", priority: "medium" as const },
-  { title: "MOT Due", roomName: "Garage", dueDate: "2026-10-18", priority: "high" as const },
-  { title: "Boiler Service", roomName: "Family Room", dueDate: "2027-01-10", priority: "medium" as const },
-  { title: "Passport Expiry", roomName: "Bedroom", dueDate: "2031-02-14", priority: "low" as const },
-  { title: "Travel Insurance Renewal", roomName: "Driveway", dueDate: "2026-08-16", priority: "medium" as const },
+const defaultMilestones: StoredReminder[] = [
+  { id: "default-1", title: "Home Insurance Renewal", roomId: "family-room", roomName: "Family Room", dueDate: "2026-08-14", priority: "medium", linkedDocumentId: "", completed: false },
+  { id: "default-2", title: "MOT Due", roomId: "garage", roomName: "Garage", dueDate: "2026-10-18", priority: "high", linkedDocumentId: "", completed: false },
+  { id: "default-3", title: "Boiler Service", roomId: "family-room", roomName: "Family Room", dueDate: "2027-01-10", priority: "medium", linkedDocumentId: "", completed: false },
+  { id: "default-4", title: "Passport Expiry", roomId: "bedroom", roomName: "Bedroom", dueDate: "2031-02-14", priority: "low", linkedDocumentId: "", completed: false },
 ];
 
 export default function RemindersPage() {
@@ -32,22 +31,16 @@ export default function RemindersPage() {
     };
   }, []);
 
-  const milestones = reminders.length ? reminders : defaultMilestones.map((item, index) => ({
-    id: `default-${index}`,
-    title: item.title,
-    roomId: "vault",
-    roomName: item.roomName,
-    dueDate: item.dueDate,
-    priority: item.priority,
-    linkedDocumentId: "",
-    completed: false,
-  }));
+  const milestones = reminders.length ? reminders : defaultMilestones;
 
-  const counts = useMemo(() => {
+  const grouped = useMemo(() => {
     const today = startOfDay(new Date());
+    const soon = new Date(today);
+    soon.setDate(soon.getDate() + 45);
     return {
-      overdue: milestones.filter((item) => !item.completed && item.dueDate && startOfDay(new Date(`${item.dueDate}T00:00:00`)) < today).length,
-      complete: milestones.filter((item) => item.completed).length,
+      overdue: milestones.filter((item) => !item.completed && item.dueDate && startOfDay(new Date(`${item.dueDate}T00:00:00`)) < today),
+      soon: milestones.filter((item) => !item.completed && item.dueDate && startOfDay(new Date(`${item.dueDate}T00:00:00`)) >= today && startOfDay(new Date(`${item.dueDate}T00:00:00`)) <= soon),
+      future: milestones.filter((item) => !item.completed && (!item.dueDate || startOfDay(new Date(`${item.dueDate}T00:00:00`)) > soon)),
     };
   }, [milestones]);
 
@@ -66,108 +59,94 @@ export default function RemindersPage() {
   }
 
   return (
-    <main className="min-h-svh overflow-hidden bg-[#0d1117] px-4 pb-28 pt-5 text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(251,191,36,0.22),transparent_32%),linear-gradient(180deg,#172033,#0b0f16)]" />
-      <div className="relative mx-auto max-w-md">
-        <header>
-          <p className="text-sm font-bold text-amber-200">Estate Timeline</p>
-          <h1 className="text-3xl font-bold">Reminders</h1>
-        </header>
+    <main className="min-h-svh bg-[#f5efe6] pb-28 text-[#261c14]">
+      <section className="relative min-h-[21rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_50%_22%,rgba(190,242,100,0.14),transparent_18%),linear-gradient(135deg,#162015,#354528_48%,#11100b)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.64))]" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute bottom-6 left-1/2 h-56 w-20 -translate-x-1/2 rounded-t-full bg-white/12 blur-sm" />
+        <div className="relative z-10">
+          <p className="text-sm font-semibold text-white/82">Your important dates</p>
+          <h1 className="mt-2 text-4xl font-bold">Reminders</h1>
+        </div>
+      </section>
 
-        <section className="mt-5 rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl shadow-black/25 backdrop-blur-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">Readiness</p>
-              <h2 className="mt-2 text-4xl font-bold">{Math.max(28, 92 - counts.overdue * 12)}%</h2>
-            </div>
-            <div className="grid h-20 w-20 place-items-center rounded-full bg-[conic-gradient(from_180deg,#34d399,#fbbf24,#fb7185,#34d399)] p-1">
-              <div className="grid h-full w-full place-items-center rounded-full bg-slate-950">
-                <Bell className="h-8 w-8 text-amber-200" />
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-            <MiniStat label="Overdue" value={String(counts.overdue)} tone="red" />
-            <MiniStat label="Open" value={String(milestones.length - counts.complete)} tone="amber" />
-            <MiniStat label="Done" value={String(counts.complete)} tone="green" />
+      <div className="relative z-20 mx-auto -mt-12 max-w-md px-4">
+        <section className="rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <Stat label="Overdue" value={String(grouped.overdue.length)} tone="red" />
+            <Stat label="Due Soon" value={String(grouped.soon.length)} tone="amber" />
+            <Stat label="Future" value={String(grouped.future.length)} tone="green" />
           </div>
         </section>
 
-        <section className="relative mt-6 space-y-4 pl-6">
-          <div className="absolute bottom-8 left-[1.18rem] top-2 w-px bg-gradient-to-b from-amber-200 via-white/20 to-transparent" />
-          {milestones.map((reminder) => (
-            <TimelineMilestone
-              key={reminder.id}
-              reminder={reminder}
-              onComplete={completeReminder}
-              onSnooze={snoozeReminder}
-            />
-          ))}
-        </section>
+        <ReminderGroup title="Overdue" reminders={grouped.overdue} tone="red" onComplete={completeReminder} onSnooze={snoozeReminder} />
+        <ReminderGroup title="Due Soon" reminders={grouped.soon} tone="amber" onComplete={completeReminder} onSnooze={snoozeReminder} />
+        <ReminderGroup title="Future" reminders={grouped.future} tone="green" onComplete={completeReminder} onSnooze={snoozeReminder} />
       </div>
       <BottomNav />
     </main>
   );
 }
 
-function TimelineMilestone({
-  reminder,
+function ReminderGroup({
+  title,
+  reminders,
+  tone,
   onComplete,
   onSnooze,
 }: {
-  reminder: StoredReminder;
+  title: string;
+  reminders: StoredReminder[];
+  tone: "red" | "amber" | "green";
   onComplete: (reminder: StoredReminder) => void;
   onSnooze: (reminder: StoredReminder) => void;
 }) {
-  const tone = reminder.completed ? "green" : getTone(reminder.dueDate);
-  const dot = tone === "red" ? "bg-rose-500" : tone === "amber" ? "bg-amber-400" : "bg-emerald-400";
-
   return (
-    <article className="relative rounded-[1.5rem] border border-white/14 bg-white/10 p-4 backdrop-blur-2xl">
-      <span className={`absolute -left-[1.57rem] top-5 h-4 w-4 rounded-full border-2 border-slate-950 ${dot}`} />
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="truncate text-base font-bold">{reminder.title}</h2>
-          <p className="mt-1 text-xs text-white/55">
-            {reminder.roomName} · {formatDate(reminder.dueDate)}
-          </p>
-        </div>
-        <Clock3 className={`h-5 w-5 ${tone === "red" ? "text-rose-300" : tone === "amber" ? "text-amber-200" : "text-emerald-300"}`} />
+    <section className="mt-5">
+      <h2 className={`text-sm font-bold uppercase tracking-[0.12em] ${tone === "red" ? "text-rose-600" : tone === "amber" ? "text-amber-700" : "text-emerald-700"}`}>{title}</h2>
+      <div className="mt-3 space-y-3">
+        {reminders.length ? reminders.map((reminder) => (
+          <article key={reminder.id} className="rounded-[1.35rem] bg-white p-4 shadow-sm shadow-stone-200">
+            <div className="flex items-center gap-3">
+              <span className={`grid h-12 w-12 place-items-center rounded-2xl ${toneClass(tone)}`}>
+                <Clock3 className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-bold">{reminder.title}</h3>
+                <p className="text-sm text-stone-500">{reminder.roomName} · {formatDate(reminder.dueDate)}</p>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <button onClick={() => onComplete(reminder)} className="min-h-11 rounded-xl bg-[#fbf7ef] text-sm font-bold">
+                <CheckCircle2 className="mx-auto h-5 w-5" />
+              </button>
+              <button onClick={() => onSnooze(reminder)} className="min-h-11 rounded-xl bg-[#fbf7ef] text-sm font-bold">
+                <TimerReset className="mx-auto h-5 w-5" />
+              </button>
+              <Link href={reminder.roomId === "vault" ? "/vault" : `/room/${reminder.roomId}`} className="grid min-h-11 place-items-center rounded-xl bg-[#fbf7ef]">
+                <FileText className="h-5 w-5" />
+              </Link>
+            </div>
+          </article>
+        )) : <p className="rounded-[1.2rem] bg-white p-4 text-sm font-semibold text-stone-500 shadow-sm shadow-stone-200">Nothing here.</p>}
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <button onClick={() => onComplete(reminder)} className="rounded-full bg-white px-3 py-2 text-xs font-bold text-zinc-950">
-          <CheckCircle2 className="mx-auto h-4 w-4" />
-        </button>
-        <button onClick={() => onSnooze(reminder)} className="rounded-full bg-white/10 px-3 py-2 text-xs font-bold text-white">
-          <TimerReset className="mx-auto h-4 w-4" />
-        </button>
-        <Link href={reminder.roomId === "vault" ? "/vault" : `/room/${reminder.roomId}`} className="rounded-full bg-white/10 px-3 py-2 text-center text-xs font-bold text-white">
-          <FileText className="mx-auto h-4 w-4" />
-        </Link>
-      </div>
-    </article>
+    </section>
   );
 }
 
-function MiniStat({ label, value, tone }: { label: string; value: string; tone: "red" | "amber" | "green" }) {
-  const color = tone === "red" ? "text-rose-300" : tone === "amber" ? "text-amber-200" : "text-emerald-300";
+function Stat({ label, value, tone }: { label: string; value: string; tone: "red" | "amber" | "green" }) {
   return (
-    <div className="rounded-2xl bg-white/10 p-3">
-      <p className={`text-xl font-bold ${color}`}>{value}</p>
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/45">{label}</p>
+    <div className="rounded-2xl bg-[#fbf7ef] p-3">
+      <p className={`text-2xl font-bold ${tone === "red" ? "text-rose-600" : tone === "amber" ? "text-amber-700" : "text-emerald-700"}`}>{value}</p>
+      <p className="text-sm font-bold text-stone-500">{label}</p>
     </div>
   );
 }
 
-function getTone(value: string) {
-  if (!value) return "green";
-  const today = startOfDay(new Date());
-  const dueDate = startOfDay(new Date(`${value}T00:00:00`));
-  const soon = new Date(today);
-  soon.setDate(soon.getDate() + 30);
-  if (dueDate < today) return "red";
-  if (dueDate <= soon) return "amber";
-  return "green";
+function toneClass(tone: "red" | "amber" | "green") {
+  if (tone === "red") return "bg-rose-100 text-rose-700";
+  if (tone === "amber") return "bg-amber-100 text-amber-700";
+  return "bg-emerald-100 text-emerald-700";
 }
 
 function startOfDay(date: Date) {
