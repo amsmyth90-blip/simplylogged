@@ -3,15 +3,15 @@ import { Bell, House } from "lucide-react";
 
 export function AppHeader() {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 px-4 pt-4 sm:px-6">
-      <div className="glass pointer-events-auto mx-auto flex max-w-md items-center justify-between rounded-[1.75rem] px-3 py-3 text-zinc-950">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 px-3 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-6">
+      <div className="glass pointer-events-auto mx-auto flex max-w-md items-center justify-between rounded-[1.5rem] px-2.5 py-2 text-zinc-950">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/70 text-violet-700 shadow-sm">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/70 text-violet-700 shadow-sm">
             <House className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-zinc-600">Good morning, Amy</p>
-            <h1 className="truncate text-base font-bold tracking-normal">
+            <p className="text-[11px] font-medium text-zinc-600">Good morning, Amy</p>
+            <h1 className="truncate text-sm font-bold tracking-normal">
               Simply Logged
             </h1>
           </div>
@@ -22,7 +22,7 @@ export function AppHeader() {
           </span>
           <Link
             href="/reminders"
-            className="relative grid h-10 w-10 place-items-center rounded-full bg-white/70 shadow-sm"
+            className="relative grid h-9 w-9 place-items-center rounded-full bg-white/70 shadow-sm"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 text-zinc-800" />

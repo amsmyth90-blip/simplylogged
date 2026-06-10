@@ -17,7 +17,7 @@ export function BottomNav() {
 
   return (
     <nav className="safe-area-bottom pointer-events-none fixed inset-x-0 bottom-0 z-30 px-4">
-      <div className="glass pointer-events-auto mx-auto grid max-w-md grid-cols-5 items-center rounded-[2rem] px-3 py-2 text-zinc-800">
+      <div className="glass pointer-events-auto mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.75rem] px-3 py-1.5 text-zinc-800">
         {[home, vault].map((item) => {
           const active = pathname === item.href;
           return (
@@ -35,10 +35,10 @@ export function BottomNav() {
         })}
         <Link
           href="/add"
-          className="mx-auto -mt-8 grid h-16 w-16 place-items-center rounded-full bg-violet-600 text-white shadow-[0_18px_40px_rgba(109,40,217,0.45)] ring-4 ring-white/55"
+          className="mx-auto -mt-7 grid h-14 w-14 place-items-center rounded-full bg-violet-600 text-white shadow-[0_18px_40px_rgba(109,40,217,0.45)] ring-4 ring-white/55"
           aria-label="Add"
         >
-          <Plus className="h-7 w-7" strokeWidth={2.6} />
+          <Plus className="h-6 w-6" strokeWidth={2.6} />
         </Link>
         {[reminders, family].map((item) => {
           const active = pathname === item.href;

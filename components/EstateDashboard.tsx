@@ -94,22 +94,38 @@ export function EstateDashboard({ panel }: EstateDashboardProps) {
     <main className="relative min-h-svh overflow-hidden bg-zinc-950">
       <Image
         src="/images/estate-map-light.png"
-        alt="Simply Logged digital estate"
+        alt=""
         fill
         unoptimized
         priority
         sizes="100vw"
-        className="object-cover"
+        className="scale-105 object-cover opacity-70 blur-md"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/18 via-transparent to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/18 via-black/5 to-black/28" />
       <AppHeader />
-      <section className="absolute inset-0">
-        {dynamicHotspots.map((hotspot) => (
-          <EstateHotspot key={hotspot.id} {...hotspot} />
-        ))}
+      <section className="absolute inset-x-0 bottom-[calc(6.35rem+env(safe-area-inset-bottom))] top-[max(3.9rem,calc(env(safe-area-inset-top)+3.4rem))] z-10 flex items-center justify-center px-1">
+        <div
+          className="relative aspect-[1086/1449] max-h-full w-full overflow-visible"
+          style={{
+            maxWidth: "min(100vw, calc((100svh - 10.5rem - env(safe-area-inset-bottom)) * 0.7495))",
+          }}
+        >
+          <Image
+            src="/images/estate-map-light.png"
+            alt="Simply Logged digital estate"
+            fill
+            unoptimized
+            priority
+            sizes="(max-width: 768px) 100vw, 430px"
+            className="object-contain drop-shadow-[0_18px_45px_rgba(0,0,0,0.28)]"
+          />
+          {dynamicHotspots.map((hotspot) => (
+            <EstateHotspot key={hotspot.id} {...hotspot} />
+          ))}
+        </div>
       </section>
       {panel === "mailbox" ? (
-        <aside className="glass absolute bottom-28 left-4 right-4 z-30 mx-auto max-w-md rounded-[1.75rem] p-4 text-zinc-950">
+        <aside className="glass absolute bottom-[calc(6.5rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-md rounded-[1.75rem] p-4 text-zinc-950">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">
             Mailbox
           </p>
