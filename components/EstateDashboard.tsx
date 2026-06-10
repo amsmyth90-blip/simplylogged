@@ -113,9 +113,9 @@ export function EstateDashboard({ panel }: EstateDashboardProps) {
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">
             Mailbox
           </p>
-          <h2 className="mt-1 text-lg font-bold">3 items need a glance</h2>
+          <h2 className="mt-1 text-lg font-bold">{badgeState.newDocuments} items need a glance</h2>
           <p className="mt-1 text-sm text-zinc-700">
-            New council tax letter, insurance renewal, and a school form are waiting to be filed.
+            New uploads are waiting in the mailbox before they are filed into estate rooms.
           </p>
         </aside>
       ) : null}

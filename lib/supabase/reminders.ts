@@ -4,6 +4,7 @@ import {
   getRemindersByRoom as getLocalRemindersByRoom,
   saveReminder as saveLocalReminder,
   updateReminder as updateLocalReminder,
+  deleteReminder as deleteLocalReminder,
   type StoredReminder,
 } from "@/lib/storage";
 
@@ -35,7 +36,7 @@ export async function getReminders() {
     .order("due_date", { ascending: true });
 
   if (error) {
-    console.error("Supabase getReminders failed", error);
+    console.warn("Supabase getReminders failed", error);
     return getLocalReminders();
   }
 
@@ -58,7 +59,7 @@ export async function getRemindersByRoom(roomId: string) {
     .order("due_date", { ascending: true });
 
   if (error) {
-    console.error("Supabase getRemindersByRoom failed", error);
+    console.warn("Supabase getRemindersByRoom failed", error);
     return getLocalRemindersByRoom(roomId);
   }
 
@@ -71,14 +72,16 @@ export async function saveReminder(reminder: StoredReminder) {
 
   if (!supabase || !userId) {
     saveLocalReminder(reminder);
+    notifyStorageChanged();
     return;
   }
 
   const { error } = await supabase.from("reminders").upsert(toRow(reminder, userId));
   if (error) {
-    console.error("Supabase saveReminder failed", error);
+    console.warn("Supabase saveReminder failed", error);
     saveLocalReminder(reminder);
   }
+  notifyStorageChanged();
 }
 
 export async function updateReminder(reminder: StoredReminder) {
@@ -87,19 +90,44 @@ export async function updateReminder(reminder: StoredReminder) {
 
   if (!supabase || !userId) {
     updateLocalReminder(reminder);
+    notifyStorageChanged();
     return;
   }
 
   const { error } = await supabase
     .from("reminders")
-    .update({ completed: reminder.completed })
+    .update(toRow(reminder, userId))
     .eq("id", reminder.id)
     .eq("user_id", userId);
 
   if (error) {
-    console.error("Supabase updateReminder failed", error);
+    console.warn("Supabase updateReminder failed", error);
     updateLocalReminder(reminder);
   }
+  notifyStorageChanged();
+}
+
+export async function deleteReminder(reminderId: string) {
+  const supabase = getSupabaseClient();
+  const userId = await getCurrentUserId();
+
+  if (!supabase || !userId) {
+    deleteLocalReminder(reminderId);
+    notifyStorageChanged();
+    return;
+  }
+
+  const { error } = await supabase
+    .from("reminders")
+    .delete()
+    .eq("id", reminderId)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.warn("Supabase deleteReminder failed", error);
+    deleteLocalReminder(reminderId);
+  }
+  notifyStorageChanged();
 }
 
 function fromRow(row: ReminderRow): StoredReminder {
@@ -130,4 +158,10 @@ function toRow(reminder: StoredReminder, userId: string) {
     completed: reminder.completed,
     created_at: reminder.createdAt ?? new Date().toISOString(),
   };
+}
+
+function notifyStorageChanged() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("simplyLoggedStorage"));
+  }
 }

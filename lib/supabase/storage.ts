@@ -38,3 +38,21 @@ export async function uploadDocumentFile(file: File, documentId: string) {
     fileUrl: data?.signedUrl ?? "",
   } satisfies UploadedDocumentFile;
 }
+
+export async function deleteDocumentFile(filePath: string) {
+  const supabase = getSupabaseClient();
+  const userId = await getCurrentUserId();
+
+  if (!supabase || !userId || !filePath) {
+    return;
+  }
+
+  if (!filePath.startsWith(`${userId}/`)) {
+    return;
+  }
+
+  const { error } = await supabase.storage.from(documentsBucket).remove([filePath]);
+  if (error) {
+    throw error;
+  }
+}

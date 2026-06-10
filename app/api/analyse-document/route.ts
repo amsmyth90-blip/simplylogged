@@ -100,11 +100,11 @@ export async function POST(request: Request) {
       const analysis = await analyseImageWithOpenAI(file, apiKey);
       return analysisResponse(normalizeAnalysis(analysis, file.name), "real-ai");
     } catch (error) {
-      console.error("OpenAI document analysis failed", error);
+      console.warn("OpenAI document analysis failed; using mock fallback", error);
       return analysisResponse(analyseDocument(file.name), "mock-fallback");
     }
   } catch (error) {
-    console.error("Document analysis route failed", error);
+    console.warn("Document analysis route failed", error);
     return NextResponse.json(
       { error: "The document could not be analysed. Please try again." },
       { status: 500 },

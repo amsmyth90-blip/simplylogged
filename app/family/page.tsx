@@ -1,13 +1,12 @@
-import Link from "next/link";
-import { Activity, Crown, ShieldCheck, UserPlus, Users } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+"use client";
 
-const family = [
-  { name: "Amy Smith", role: "You", access: "Owner", tone: "violet" },
-  { name: "James Smith", role: "Husband", access: "Admin", tone: "amber" },
-  { name: "Emily Smith", role: "Daughter", access: "Member", tone: "green" },
-  { name: "Daniel Smith", role: "Son", access: "Member", tone: "green" },
-];
+import { useEffect, useMemo, useState } from "react";
+import { Activity, Crown, ShieldCheck, Trash2, UserPlus, Users } from "lucide-react";
+import { BottomNav } from "@/components/BottomNav";
+import { Toast } from "@/components/Toast";
+import { confirmDelete } from "@/lib/confirmations";
+import { deleteFamilyMember, getFamilyMembers, saveFamilyMember } from "@/lib/supabase/family";
+import type { StoredFamilyMember } from "@/lib/storage";
 
 const activity = [
   "Amy uploaded Home Insurance",
@@ -15,59 +14,188 @@ const activity = [
   "Emily added Passport",
 ];
 
+const defaultMembers: StoredFamilyMember[] = [
+  { id: "default-owner", name: "Amy Smith", email: "amy@example.com", role: "You", access: "Owner", createdAt: "2026-01-01T00:00:00.000Z" },
+];
+
 export default function FamilyPage() {
+  const [members, setMembers] = useState<StoredFamilyMember[]>([]);
+  const [showInvite, setShowInvite] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("Family member");
+  const [access, setAccess] = useState<StoredFamilyMember["access"]>("Member");
+  const [toast, setToast] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
+  const [busyMemberId, setBusyMemberId] = useState("");
+
+  async function refresh() {
+    setMembers(await getFamilyMembers());
+  }
+
+  useEffect(() => {
+    queueMicrotask(refresh);
+    window.addEventListener("storage", refresh);
+    window.addEventListener("simplyLoggedStorage", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("simplyLoggedStorage", refresh);
+    };
+  }, []);
+
+  const visibleMembers = members.length ? members : defaultMembers;
+  const hasSavedMembers = members.length > 0;
+
+  const memberCountLabel = useMemo(
+    () => `${visibleMembers.length} ${visibleMembers.length === 1 ? "member" : "members"}`,
+    [visibleMembers.length],
+  );
+
+  async function inviteMember(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      setIsInviting(true);
+      await saveFamilyMember({
+        id: createId(),
+        name: name.trim(),
+        email: email.trim(),
+        role: role.trim(),
+        access,
+        createdAt: new Date().toISOString(),
+      });
+      setName("");
+      setEmail("");
+      setRole("Family member");
+      setAccess("Member");
+      setShowInvite(false);
+      await refresh();
+      setToast("Invite saved.");
+    } catch {
+      setToast("Could not save invite. Please try again.");
+    } finally {
+      setIsInviting(false);
+    }
+  }
+
+  async function changeAccess(member: StoredFamilyMember, nextAccess: StoredFamilyMember["access"]) {
+    if (member.id.startsWith("default-")) return;
+    try {
+      setBusyMemberId(member.id);
+      await saveFamilyMember({ ...member, access: nextAccess });
+      await refresh();
+      setToast("Permissions updated.");
+    } catch {
+      setToast("Could not update permissions. Please try again.");
+    } finally {
+      setBusyMemberId("");
+    }
+  }
+
+  async function removeMember(member: StoredFamilyMember) {
+    if (member.id.startsWith("default-")) return;
+    if (!confirmDelete(member.name)) return;
+    try {
+      setBusyMemberId(member.id);
+      await deleteFamilyMember(member.id);
+      await refresh();
+      setToast("Family member removed.");
+    } catch {
+      setToast("Could not remove family member. Please try again.");
+    } finally {
+      setBusyMemberId("");
+    }
+  }
+
   return (
-    <main className="min-h-svh bg-[#f5efe6] pb-28 text-[#261c14]">
+    <main className="min-h-svh bg-[#f5efe6] pb-[calc(8rem+env(safe-area-inset-bottom))] text-[#261c14]">
       <section className="relative min-h-[21rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_72%_24%,rgba(251,191,36,0.18),transparent_20%),linear-gradient(135deg,#21160f,#57331f_52%,#12100d)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.62))]" />
-        <div className="absolute bottom-10 left-8 h-24 w-40 rounded-t-[2rem] bg-white/12 ring-1 ring-white/10" />
-        <div className="absolute right-10 top-16 grid grid-cols-3 gap-2">
-          {Array.from({ length: 9 }).map((_, index) => (
-            <span key={index} className="h-7 w-7 rounded bg-amber-100/12" />
-          ))}
-        </div>
         <div className="relative z-10 flex items-start justify-between">
           <div>
             <p className="text-sm font-semibold text-white/82">Your team, your estate</p>
             <h1 className="mt-2 text-4xl font-bold">Family Hub</h1>
+            <p className="mt-3 text-sm font-semibold text-white/75">{memberCountLabel}</p>
           </div>
-          <Link href="/account" className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md" aria-label="Invite family">
+          <button
+            onClick={() => setShowInvite((current) => !current)}
+            className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md"
+            aria-label="Invite family"
+          >
             <UserPlus className="h-5 w-5" />
-          </Link>
+          </button>
         </div>
       </section>
 
       <div className="relative z-20 mx-auto -mt-12 max-w-md px-4">
+        {showInvite ? (
+          <form onSubmit={inviteMember} className="mb-4 grid gap-2 rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
+            <h2 className="font-bold">Invite family member</h2>
+            <input value={name} onChange={(event) => setName(event.target.value)} required placeholder="Name" className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-sm font-bold outline-none" />
+            <input value={email} onChange={(event) => setEmail(event.target.value)} required type="email" placeholder="Email" className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-sm font-bold outline-none" />
+            <input value={role} onChange={(event) => setRole(event.target.value)} required placeholder="Role" className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-sm font-bold outline-none" />
+            <select value={access} onChange={(event) => setAccess(event.target.value as StoredFamilyMember["access"])} className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-sm font-bold outline-none">
+              <option value="Admin">Admin</option>
+              <option value="Member">Member</option>
+              <option value="Viewer">Viewer</option>
+            </select>
+            <button
+              disabled={isInviting}
+              className="min-h-12 rounded-full bg-stone-950 px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-stone-300"
+            >
+              {isInviting ? "Saving..." : "Save invite"}
+            </button>
+          </form>
+        ) : null}
+
         <section className="rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-bold">Family Members</h2>
-            <Link href="/account" className="text-sm font-bold text-violet-700">+ Invite</Link>
+            <button onClick={() => setShowInvite(true)} className="min-h-11 rounded-full px-3 text-sm font-bold text-violet-700">+ Invite</button>
           </div>
           <div className="space-y-3">
-            {family.map((person) => (
-              <article key={person.name} className="flex min-h-14 items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className={`grid h-11 w-11 place-items-center rounded-full ${avatarTone(person.tone)} text-white`}>
+            {visibleMembers.map((person) => (
+              <article key={person.id} className="flex min-h-16 items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className={`grid h-11 w-11 place-items-center rounded-full ${avatarTone(person.access)} text-white`}>
                     {person.access === "Owner" ? <Crown className="h-5 w-5" /> : <Users className="h-5 w-5" />}
                   </span>
-                  <div>
-                    <h3 className="text-sm font-bold">{person.name}</h3>
-                    <p className="text-sm text-stone-500">{person.role}</p>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-bold">{person.name}</h3>
+                    <p className="truncate text-sm text-stone-500">{person.role}</p>
                   </div>
                 </div>
-                <span className="rounded-full bg-violet-50 px-3 py-1 text-sm font-bold text-violet-700">{person.access}</span>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={person.access}
+                    onChange={(event) => changeAccess(person, event.target.value as StoredFamilyMember["access"])}
+                    disabled={person.access === "Owner" || person.id.startsWith("default-") || busyMemberId === person.id}
+                    className="min-h-11 rounded-full bg-violet-50 px-3 text-sm font-bold text-violet-700 outline-none disabled:opacity-80"
+                  >
+                    <option value="Owner">Owner</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Member">Member</option>
+                    <option value="Viewer">Viewer</option>
+                  </select>
+                  {person.access !== "Owner" && !person.id.startsWith("default-") ? (
+                    <button disabled={busyMemberId === person.id} onClick={() => removeMember(person)} className="grid h-11 w-11 place-items-center rounded-full bg-rose-50 text-rose-700 disabled:opacity-50" aria-label={`Remove ${person.name}`}>
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  ) : null}
+                </div>
               </article>
             ))}
           </div>
+          {!hasSavedMembers ? (
+            <p className="mt-3 rounded-2xl bg-[#fbf7ef] p-3 text-sm font-semibold text-stone-500">
+              Local family sharing is ready. Invite someone to store your first mock family member.
+            </p>
+          ) : null}
         </section>
 
         <section className="mt-4 rounded-[1.35rem] bg-white p-4 shadow-sm shadow-stone-200">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-amber-700" />
-              <h2 className="font-bold">Recent Activity</h2>
-            </div>
-            <Link href="/account" className="text-sm font-bold text-violet-700">View all</Link>
+          <div className="mb-3 flex items-center gap-2">
+            <Activity className="h-5 w-5 text-amber-700" />
+            <h2 className="font-bold">Recent Activity</h2>
           </div>
           <div className="space-y-3">
             {activity.map((item, index) => (
@@ -83,19 +211,24 @@ export default function FamilyPage() {
             ))}
           </div>
         </section>
-
-        <Link href="/account" className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-white text-base font-bold shadow-sm shadow-stone-200">
-          <UserPlus className="h-5 w-5 text-violet-700" />
-          Manage permissions
-        </Link>
       </div>
+      <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
       <BottomNav />
     </main>
   );
 }
 
-function avatarTone(tone: string) {
-  if (tone === "amber") return "bg-amber-600";
-  if (tone === "green") return "bg-emerald-600";
+function avatarTone(access: StoredFamilyMember["access"]) {
+  if (access === "Admin") return "bg-amber-600";
+  if (access === "Member") return "bg-emerald-600";
+  if (access === "Viewer") return "bg-stone-600";
   return "bg-violet-600";
+}
+
+function createId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `family-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }

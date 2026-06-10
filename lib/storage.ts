@@ -29,8 +29,18 @@ export type StoredReminder = {
   createdAt?: string;
 };
 
+export type StoredFamilyMember = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  access: "Owner" | "Admin" | "Member" | "Viewer";
+  createdAt: string;
+};
+
 const documentsKey = "simplyLoggedDocuments";
 const remindersKey = "simplyLoggedReminders";
+const familyMembersKey = "simplyLoggedFamilyMembers";
 
 export function getDocuments(): StoredDocument[] {
   return read<StoredDocument[]>(documentsKey, []);
@@ -71,6 +81,29 @@ export function getRemindersByRoom(roomId: string) {
 
 export function updateReminder(reminder: StoredReminder) {
   saveReminder(reminder);
+}
+
+export function deleteReminder(reminderId: string) {
+  write(
+    remindersKey,
+    getReminders().filter((reminder) => reminder.id !== reminderId),
+  );
+}
+
+export function getFamilyMembers(): StoredFamilyMember[] {
+  return read<StoredFamilyMember[]>(familyMembersKey, []);
+}
+
+export function saveFamilyMember(member: StoredFamilyMember) {
+  const members = getFamilyMembers();
+  write(familyMembersKey, [member, ...members.filter((item) => item.id !== member.id)]);
+}
+
+export function deleteFamilyMember(memberId: string) {
+  write(
+    familyMembersKey,
+    getFamilyMembers().filter((member) => member.id !== memberId),
+  );
 }
 
 function read<T>(key: string, fallback: T): T {

@@ -1,4 +1,5 @@
 import { getCurrentUserId, getSupabaseClient } from "@/lib/supabase/client";
+import { deleteDocumentFile } from "@/lib/supabase/storage";
 import {
   getDocuments as getLocalDocuments,
   getDocumentsByRoom as getLocalDocumentsByRoom,
@@ -41,7 +42,7 @@ export async function getDocuments() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Supabase getDocuments failed", error);
+    console.warn("Supabase getDocuments failed", error);
     return getLocalDocuments();
   }
 
@@ -64,7 +65,7 @@ export async function getDocumentsByRoom(roomId: string) {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Supabase getDocumentsByRoom failed", error);
+    console.warn("Supabase getDocumentsByRoom failed", error);
     return getLocalDocumentsByRoom(roomId);
   }
 
@@ -77,14 +78,16 @@ export async function saveDocument(document: StoredDocument) {
 
   if (!supabase || !userId) {
     saveLocalDocument(document);
+    notifyStorageChanged();
     return;
   }
 
   const { error } = await supabase.from("documents").upsert(toRow(document, userId));
   if (error) {
-    console.error("Supabase saveDocument failed", error);
+    console.warn("Supabase saveDocument failed", error);
     saveLocalDocument(document);
   }
+  notifyStorageChanged();
 }
 
 export async function updateDocument(document: StoredDocument) {
@@ -93,6 +96,7 @@ export async function updateDocument(document: StoredDocument) {
 
   if (!supabase || !userId) {
     updateLocalDocument(document);
+    notifyStorageChanged();
     return;
   }
 
@@ -103,9 +107,10 @@ export async function updateDocument(document: StoredDocument) {
     .eq("user_id", userId);
 
   if (error) {
-    console.error("Supabase updateDocument failed", error);
+    console.warn("Supabase updateDocument failed", error);
     updateLocalDocument(document);
   }
+  notifyStorageChanged();
 }
 
 export async function deleteDocument(documentId: string) {
@@ -114,8 +119,22 @@ export async function deleteDocument(documentId: string) {
 
   if (!supabase || !userId) {
     deleteLocalDocument(documentId);
+    notifyStorageChanged();
     return;
   }
+
+  const { data: document, error: lookupError } = await supabase
+    .from("documents")
+    .select("file_path")
+    .eq("id", documentId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.warn("Supabase deleteDocument lookup failed", lookupError);
+  }
+
+  const filePath = typeof document?.file_path === "string" ? document.file_path : "";
 
   const { error } = await supabase
     .from("documents")
@@ -124,9 +143,18 @@ export async function deleteDocument(documentId: string) {
     .eq("user_id", userId);
 
   if (error) {
-    console.error("Supabase deleteDocument failed", error);
+    console.warn("Supabase deleteDocument failed", error);
     deleteLocalDocument(documentId);
   }
+
+  if (!error && filePath) {
+    try {
+      await deleteDocumentFile(filePath);
+    } catch (storageError) {
+      console.warn("Supabase deleteDocumentFile failed", storageError);
+    }
+  }
+  notifyStorageChanged();
 }
 
 function fromRow(row: DocumentRow): StoredDocument {
@@ -167,4 +195,10 @@ function toRow(document: StoredDocument, userId: string) {
     status: document.status,
     created_at: document.uploadedAt,
   };
+}
+
+function notifyStorageChanged() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("simplyLoggedStorage"));
+  }
 }

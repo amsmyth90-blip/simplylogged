@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarDays, Check, FileText, Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
+import { Toast } from "@/components/Toast";
 import type { DocumentAnalysis } from "@/lib/mock-ai";
 import { roomOptions } from "@/lib/mock-data";
 import { saveDocument } from "@/lib/supabase/documents";
@@ -17,6 +18,7 @@ type PendingAnalysis = {
   fileType: string;
   filePath?: string;
   fileUrl?: string;
+  preferredRoomId?: string;
   analysedAt: string;
   source?: "real-ai" | "mock-fallback";
   analysis: DocumentAnalysis;
@@ -26,6 +28,8 @@ export default function AddReviewPage() {
   const router = useRouter();
   const [pending, setPending] = useState<PendingAnalysis | null>(null);
   const [roomId, setRoomId] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const raw = window.localStorage.getItem("simplyLoggedPendingAnalysis");
@@ -37,7 +41,7 @@ export default function AddReviewPage() {
     queueMicrotask(() => {
       const parsed = normalizePendingAnalysis(JSON.parse(raw) as PendingAnalysis);
       setPending(parsed);
-      setRoomId(parsed.analysis.suggestedRoomId);
+      setRoomId(parsed.preferredRoomId || parsed.analysis.suggestedRoomId);
     });
   }, [router]);
 
@@ -61,46 +65,55 @@ export default function AddReviewPage() {
       return;
     }
 
-    const documentId = pending.documentId ?? createId("doc");
-    const document: StoredDocument = {
-      id: documentId,
-      title: analysis.title,
-      roomId,
-      roomName,
-      category: analysis.category,
-      provider: analysis.provider,
-      policyNumber: analysis.policyNumber,
-      issueDate: analysis.issueDate,
-      expiryDate: analysis.expiryDate,
-      fileUrl: pending.fileUrl ?? "",
-      filePath: pending.filePath ?? "",
-      uploadedAt: new Date().toISOString(),
-      status: "new",
-      summary: analysis.extractedSummary,
-    };
+    setIsSaving(true);
+    setMessage("");
 
-    await saveDocument(document);
+    try {
+      const documentId = pending.documentId ?? createId("doc");
+      const document: StoredDocument = {
+        id: documentId,
+        title: analysis.title,
+        roomId,
+        roomName,
+        category: analysis.category,
+        provider: analysis.provider,
+        policyNumber: analysis.policyNumber,
+        issueDate: analysis.issueDate,
+        expiryDate: analysis.expiryDate,
+        fileUrl: pending.fileUrl ?? "",
+        filePath: pending.filePath ?? "",
+        uploadedAt: new Date().toISOString(),
+        status: "new",
+        summary: analysis.extractedSummary,
+      };
 
-    if (addReminders && analysis.reminderDate) {
-      await Promise.all(
-        analysis.suggestedReminders.map((title, index) =>
-          saveReminder({
-          id: createId(`rem-${index}`),
-          title: title.title,
-          roomId,
-          roomName,
-          dueDate: title.dueDate || analysis.reminderDate,
-          priority: title.priority,
-          linkedDocumentId: documentId,
-          completed: false,
-          createdAt: new Date().toISOString(),
-        }),
-        ),
-      );
+      await saveDocument(document);
+
+      if (addReminders && analysis.reminderDate) {
+        await Promise.all(
+          analysis.suggestedReminders.map((title, index) =>
+            saveReminder({
+            id: createId(`rem-${index}`),
+            title: title.title,
+            roomId,
+            roomName,
+            dueDate: title.dueDate || analysis.reminderDate,
+            priority: title.priority,
+            linkedDocumentId: documentId,
+            completed: false,
+            createdAt: new Date().toISOString(),
+          }),
+          ),
+        );
+      }
+
+      window.localStorage.removeItem("simplyLoggedPendingAnalysis");
+      setMessage(addReminders ? "Document and reminder saved." : "Document saved.");
+      router.push(roomId === "vault" ? "/vault" : `/room/${roomId}`);
+    } catch {
+      setMessage("Could not save this document. Please try again.");
+      setIsSaving(false);
     }
-
-    window.localStorage.removeItem("simplyLoggedPendingAnalysis");
-    router.push(roomId === "vault" ? "/vault" : `/room/${roomId}`);
   }
 
   function analyseAnother() {
@@ -109,7 +122,7 @@ export default function AddReviewPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[radial-gradient(circle_at_top,#f5f3ff_0,#f8fafc_34%,#e7eef9_100%)] px-4 pb-28 pt-4 text-zinc-950">
+    <main className="min-h-svh bg-[radial-gradient(circle_at_top,#f5f3ff_0,#f8fafc_34%,#e7eef9_100%)] px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-4 text-zinc-950">
       <div className="mx-auto max-w-md">
         <header className="glass sticky top-4 z-20 flex items-center gap-3 rounded-[1.5rem] px-3 py-3">
           <Link
@@ -217,24 +230,28 @@ export default function AddReviewPage() {
         <div className="mt-5 grid gap-3">
           <button
             onClick={() => save(false)}
-            className="rounded-full bg-zinc-950 px-5 py-4 text-sm font-bold text-white"
+            disabled={isSaving}
+            className="rounded-full bg-zinc-950 px-5 py-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-zinc-300"
           >
-            Save document
+            {isSaving ? "Saving..." : "Save document"}
           </button>
           <button
             onClick={() => save(true)}
-            className="rounded-full bg-violet-600 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-violet-600/25"
+            disabled={isSaving}
+            className="rounded-full bg-violet-600 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-violet-600/25 disabled:cursor-not-allowed disabled:bg-zinc-300"
           >
-            Save & add reminder
+            {isSaving ? "Saving..." : "Save & add reminder"}
           </button>
           <button
             onClick={analyseAnother}
+            disabled={isSaving}
             className="rounded-full bg-white px-5 py-4 text-sm font-bold text-zinc-800 shadow-sm"
           >
             Analyse another
           </button>
         </div>
       </div>
+      <Toast message={message} tone={message.startsWith("Could") ? "error" : "success"} />
       <BottomNav />
     </main>
   );

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Bell, House } from "lucide-react";
 
 export function AppHeader() {
@@ -19,13 +20,14 @@ export function AppHeader() {
           <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-bold text-emerald-700">
             Ready 94%
           </span>
-          <button
+          <Link
+            href="/reminders"
             className="relative grid h-10 w-10 place-items-center rounded-full bg-white/70 shadow-sm"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 text-zinc-800" />
             <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border border-white bg-rose-500" />
-          </button>
+          </Link>
         </div>
       </div>
     </header>

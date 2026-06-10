@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, ClipboardCheck, Database, XCircle } from "lucide-react";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getDocuments } from "@/lib/supabase/documents";
+import { getFamilyMembers } from "@/lib/supabase/family";
 import { getReminders } from "@/lib/supabase/reminders";
 
 type ChecklistState = Record<string, "pass" | "fail" | "unset">;
@@ -86,6 +87,29 @@ const steps = [
   },
 ];
 
+const routes = [
+  "/dashboard",
+  "/room/attic",
+  "/room/bedroom",
+  "/room/office",
+  "/room/family-room",
+  "/room/safe-room",
+  "/room/garage",
+  "/room/garden",
+  "/room/driveway",
+  "/vault",
+  "/reminders",
+  "/family",
+  "/settings",
+  "/account",
+  "/login",
+  "/signup",
+  "/add",
+  "/add/review",
+  "/mailbox",
+  "/dev/test-flow",
+];
+
 export default function DevTestFlowPage() {
   const [checks, setChecks] = useState<ChecklistState>({});
   const [diagnostics, setDiagnostics] = useState({
@@ -93,6 +117,10 @@ export default function DevTestFlowPage() {
     email: "",
     documentCount: 0,
     reminderCount: 0,
+    familyCount: 0,
+    signedIn: false,
+    uploadFlowReady: false,
+    routeCount: routes.length,
     storageMode: "localStorage fallback",
   });
 
@@ -112,12 +140,18 @@ export default function DevTestFlowPage() {
         : { data: { user: null } };
       const documents = await getDocuments();
       const reminders = await getReminders();
+      const familyMembers = await getFamilyMembers();
+      const uploadFlowReady = Boolean(window.localStorage.getItem("simplyLoggedPendingAnalysis"));
 
       setDiagnostics({
         configured,
         email: data.user?.email ?? "Not signed in",
+        signedIn: Boolean(data.user),
         documentCount: documents.length,
         reminderCount: reminders.length,
+        familyCount: familyMembers.length,
+        uploadFlowReady,
+        routeCount: routes.length,
         storageMode: configured && data.user ? "Supabase" : "localStorage fallback",
       });
     }
@@ -171,10 +205,25 @@ export default function DevTestFlowPage() {
           </div>
           <div className="grid gap-2 text-sm sm:grid-cols-2">
             <Metric label="Supabase configured" value={diagnostics.configured ? "yes" : "no"} />
+            <Metric label="User signed in" value={diagnostics.signedIn ? "yes" : "no"} />
             <Metric label="Current auth user email" value={diagnostics.email} />
             <Metric label="Number of documents" value={String(diagnostics.documentCount)} />
             <Metric label="Number of reminders" value={String(diagnostics.reminderCount)} />
+            <Metric label="Family members" value={String(diagnostics.familyCount)} />
+            <Metric label="Upload flow pending review" value={diagnostics.uploadFlowReady ? "yes" : "no"} />
             <Metric label="Storage mode" value={diagnostics.storageMode} />
+            <Metric label="Routes checked" value={String(diagnostics.routeCount)} />
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[1.5rem] bg-white p-4 shadow-sm ring-1 ring-slate-200">
+          <h2 className="text-sm font-bold">Route coverage</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {routes.map((route) => (
+              <Link key={route} href={route} className="min-h-11 rounded-2xl bg-zinc-50 px-3 py-3 text-sm font-bold text-zinc-800">
+                {route}
+              </Link>
+            ))}
           </div>
         </section>
 

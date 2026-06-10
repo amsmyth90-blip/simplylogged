@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Camera, FileText, Sparkles, Upload } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { analyseDocument, type DocumentAnalysis } from "@/lib/mock-ai";
@@ -12,7 +12,17 @@ const maxClientFileSize = 12 * 1024 * 1024;
 const supportedTypes = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
 export default function AddPage() {
+  return (
+    <Suspense fallback={<AddLoading />}>
+      <AddPageContent />
+    </Suspense>
+  );
+}
+
+function AddPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const preferredRoomId = searchParams.get("roomId") ?? "";
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [error, setError] = useState("");
@@ -102,10 +112,11 @@ export default function AddPage() {
         documentId,
         filePath: upload?.filePath ?? "",
         fileUrl: upload?.fileUrl ?? "",
+        preferredRoomId,
       });
       router.push("/add/review");
     } catch (apiError) {
-      console.error("Document analysis failed", apiError);
+      console.warn("Document analysis fell back to mock mode", apiError);
       try {
         const fallbackAnalysis = analyseDocument(file.name);
         const documentId = createId();
@@ -114,6 +125,7 @@ export default function AddPage() {
           documentId,
           filePath: upload?.filePath ?? "",
           fileUrl: upload?.fileUrl ?? "",
+          preferredRoomId,
         });
         router.push("/add/review");
       } catch {
@@ -125,12 +137,12 @@ export default function AddPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[radial-gradient(circle_at_top,#f5f3ff_0,#f8fafc_36%,#e9eef8_100%)] px-4 pb-28 pt-5 text-zinc-950">
+    <main className="min-h-svh bg-[radial-gradient(circle_at_top,#f5f3ff_0,#f8fafc_36%,#e9eef8_100%)] px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-5 text-zinc-950">
       <div className="mx-auto max-w-md">
         <p className="text-sm font-bold text-violet-700">Simply Logged</p>
         <h1 className="text-3xl font-bold tracking-normal">Add to Simply Logged</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-600">
-          Capture a life admin document and let the mock analyser file it into the right room.
+          Capture a life admin document and let Simply Logged file it into the right room.
         </p>
 
         <section className="mt-6 rounded-[1.75rem] bg-white p-4 shadow-xl shadow-slate-300/40">
@@ -216,11 +228,19 @@ export default function AddPage() {
   );
 }
 
+function AddLoading() {
+  return (
+    <main className="grid min-h-svh place-items-center bg-[#f5efe6] px-4 text-zinc-950">
+      <p className="text-sm font-bold text-zinc-600">Opening document capture...</p>
+    </main>
+  );
+}
+
 async function tryUploadFile(file: File, documentId: string) {
   try {
     return await uploadDocumentFile(file, documentId);
   } catch (error) {
-    console.error("Supabase upload failed; continuing with metadata only", error);
+    console.warn("Supabase upload failed; continuing with metadata only", error);
     return null;
   }
 }
@@ -229,7 +249,7 @@ function savePendingAnalysis(
   file: File,
   analysis: DocumentAnalysis,
   source: string,
-  upload: UploadedDocumentFile,
+  upload: UploadedDocumentFile & { preferredRoomId?: string },
 ) {
   window.localStorage.setItem(
     "simplyLoggedPendingAnalysis",
@@ -239,6 +259,7 @@ function savePendingAnalysis(
       fileType: file.type,
       filePath: upload.filePath,
       fileUrl: upload.fileUrl,
+      preferredRoomId: upload.preferredRoomId,
       analysedAt: new Date().toISOString(),
       source: source === "real-ai" ? "real-ai" : "mock-fallback",
       analysis,

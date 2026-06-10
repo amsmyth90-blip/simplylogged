@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, ShieldCheck } from "lucide-react";
+import { BottomNav } from "@/components/BottomNav";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function AccountPage() {
@@ -35,7 +36,7 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-svh bg-zinc-950 px-4 py-6 text-white">
+    <main className="min-h-svh bg-zinc-950 px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-6 text-white">
       <section className="mx-auto max-w-md rounded-[1.75rem] bg-white/10 p-5 ring-1 ring-white/15">
         <ShieldCheck className="h-9 w-9 text-violet-300" />
         <h1 className="mt-4 text-3xl font-bold">Account</h1>
@@ -69,6 +70,7 @@ export default function AccountPage() {
           </Link>
         </div>
       </section>
+      <BottomNav />
     </main>
   );
 }

@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Bell, CalendarClock, CheckCircle2 } from "lucide-react";
-import { CoverageList } from "@/components/internal/CoverageList";
-import { DocumentShelf } from "@/components/internal/DocumentShelf";
-import { EstateBottomNav } from "@/components/internal/EstateBottomNav";
-import { FloatingAddButton } from "@/components/internal/FloatingAddButton";
-import { PageShell } from "@/components/internal/PageShell";
-import { ReadinessCard } from "@/components/internal/ReadinessCard";
-import { RoomHero, type HeroScene } from "@/components/internal/RoomHero";
+import {
+  Archive,
+  BriefcaseBusiness,
+  Car,
+  DoorOpen,
+  Flower2,
+  KeyRound,
+  ShieldCheck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+import { RoomLayout } from "@/components/RoomLayout";
 import type { StoredDocument, StoredReminder } from "@/lib/storage";
 import { getDocumentsByRoom } from "@/lib/supabase/documents";
 import { getRemindersByRoom } from "@/lib/supabase/reminders";
@@ -24,116 +28,95 @@ type RoomPageProps = {
   };
 };
 
-const roomDesigns = {
-  garage: {
-    eyebrow: "Vehicles & Transport",
-    subtitle: "MOT, insurance, tax and service history",
-    scene: "garage",
-    readiness: 92,
-    covered: [
-      ["MOT", "Valid until 12 Sep 2026", "ok"],
-      ["Insurance", "Expires 1 Jun 2027", "ok"],
-      ["Service History", "Attention soon", "warn"],
+type RoomConfig = {
+  icon: LucideIcon;
+  readiness: number;
+  coverage: {
+    label: string;
+    status: string;
+    tone: "ok" | "warn" | "neutral";
+  }[];
+};
+
+const roomConfigs: Record<string, RoomConfig> = {
+  bedroom: {
+    icon: KeyRound,
+    readiness: 80,
+    coverage: [
+      { label: "Identity", status: "Complete", tone: "ok" },
+      { label: "Medical", status: "Review", tone: "warn" },
+      { label: "Qualifications", status: "Good", tone: "ok" },
     ],
-    shelves: ["Insurance Documents", "MOT & Road Tax", "Service History", "Vehicle Records"],
   },
   office: {
-    eyebrow: "Finance & Investments",
-    subtitle: "Mortgage, pension, investments and contracts",
-    scene: "office",
+    icon: BriefcaseBusiness,
     readiness: 78,
-    covered: [
-      ["Mortgage", "On track", "ok"],
-      ["Pension", "Review needed", "warn"],
-      ["Investments", "On track", "ok"],
-      ["Tax", "Up to date", "ok"],
+    coverage: [
+      { label: "Mortgage", status: "On track", tone: "ok" },
+      { label: "Pension", status: "Review", tone: "warn" },
+      { label: "Finance", status: "Good", tone: "ok" },
     ],
-    shelves: ["Mortgage & Property", "Pensions & Retirement", "Investments", "Tax & Accounts"],
   },
   "family-room": {
-    eyebrow: "Home & Household",
-    subtitle: "Home cover, utilities, warranties and shared information",
-    scene: "lounge",
+    icon: Users,
     readiness: 88,
-    covered: [
-      ["Home Insurance", "Valid", "ok"],
-      ["Utilities", "All up to date", "ok"],
-      ["Warranties", "2 expiring soon", "warn"],
-      ["Household Docs", "Good", "ok"],
+    coverage: [
+      { label: "Family records", status: "Good", tone: "ok" },
+      { label: "Home cover", status: "Valid", tone: "ok" },
+      { label: "Warranties", status: "Soon", tone: "warn" },
     ],
-    shelves: ["Family Records", "Home Insurance", "Utilities", "Warranties"],
   },
   "safe-room": {
-    eyebrow: "Security & Legacy",
-    subtitle: "Will, life cover, power of attorney and wishes",
-    scene: "vault",
+    icon: ShieldCheck,
     readiness: 90,
-    covered: [
-      ["Will", "On file", "ok"],
-      ["Life Insurance", "Active", "ok"],
-      ["Power of Attorney", "Review", "warn"],
-      ["Funeral Wishes", "On file", "ok"],
+    coverage: [
+      { label: "Will", status: "On file", tone: "ok" },
+      { label: "Life cover", status: "Active", tone: "ok" },
+      { label: "Power of attorney", status: "Review", tone: "warn" },
     ],
-    shelves: ["Will", "Life Insurance", "Power of Attorney", "Emergency Contacts"],
+  },
+  garage: {
+    icon: Car,
+    readiness: 92,
+    coverage: [
+      { label: "MOT", status: "Valid", tone: "ok" },
+      { label: "Insurance", status: "Valid", tone: "ok" },
+      { label: "Service history", status: "Soon", tone: "warn" },
+    ],
   },
   garden: {
-    eyebrow: "Outdoor & Pets",
-    subtitle: "Pets, outdoor equipment and gardening records",
-    scene: "garden",
+    icon: Flower2,
     readiness: 75,
-    covered: [
-      ["Pets", "Up to date", "ok"],
-      ["Outdoor Equipment", "Service due", "warn"],
-      ["Gardening Records", "Good", "ok"],
-      ["Landscaping", "Good", "ok"],
+    coverage: [
+      { label: "Pets", status: "Good", tone: "ok" },
+      { label: "Outdoor kit", status: "Service", tone: "warn" },
+      { label: "Garden records", status: "Good", tone: "ok" },
     ],
-    shelves: ["Pets", "Outdoor Equipment", "Gardening Records", "Greenhouse Notes"],
   },
   driveway: {
-    eyebrow: "Travel & Adventures",
-    subtitle: "Holidays, travel insurance and bookings",
-    scene: "driveway",
+    icon: DoorOpen,
     readiness: 82,
-    covered: [
-      ["Travel Insurance", "Valid", "ok"],
-      ["Passports", "All valid", "ok"],
-      ["Holiday Bookings", "No upcoming", "neutral"],
-      ["Travel Documents", "Good", "ok"],
+    coverage: [
+      { label: "Travel insurance", status: "Valid", tone: "ok" },
+      { label: "Passports", status: "Valid", tone: "ok" },
+      { label: "Bookings", status: "None", tone: "neutral" },
     ],
-    shelves: ["Holidays", "Travel Insurance", "Passports", "Booking Confirmations"],
-  },
-  bedroom: {
-    eyebrow: "Personal Suite",
-    subtitle: "Identity, medical records and qualifications",
-    scene: "bedroom",
-    readiness: 80,
-    covered: [
-      ["Identity Documents", "Complete", "ok"],
-      ["Medical Records", "Review", "warn"],
-      ["Qualifications", "Good", "ok"],
-      ["Personal Info", "Complete", "ok"],
-    ],
-    shelves: ["Personal Records", "Identity Documents", "Medical Records", "Qualifications"],
   },
   attic: {
-    eyebrow: "Memories Archive",
-    subtitle: "Historical documents, archived records and old photos",
-    scene: "attic",
+    icon: Archive,
     readiness: 60,
-    covered: [
-      ["Memories", "120 items", "neutral"],
-      ["Historical Docs", "Review", "warn"],
-      ["Archived Records", "Organised", "ok"],
-      ["Old Photos", "200+ items", "neutral"],
+    coverage: [
+      { label: "Memories", status: "Stored", tone: "neutral" },
+      { label: "Historical docs", status: "Review", tone: "warn" },
+      { label: "Archive", status: "Good", tone: "ok" },
     ],
-    shelves: ["Memories Archive", "Historical Documents", "Archived Records"],
   },
-} as const;
+};
 
 export function RoomPage({ roomId, room }: RoomPageProps) {
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [reminders, setReminders] = useState<StoredReminder[]>([]);
-  const design = roomDesigns[roomId as keyof typeof roomDesigns] ?? roomDesigns.attic;
+  const config = roomConfigs[roomId] ?? roomConfigs.attic;
 
   useEffect(() => {
     async function refresh() {
@@ -151,84 +134,45 @@ export function RoomPage({ roomId, room }: RoomPageProps) {
     };
   }, [roomId]);
 
-  const readinessScore = useMemo(
-    () => Math.min(99, design.readiness + Math.min(documents.length, 3) * 2),
-    [design.readiness, documents.length],
+  const openReminderCount = reminders.filter((reminder) => !reminder.completed).length;
+  const readiness = useMemo(
+    () => Math.min(99, config.readiness + Math.min(documents.length, 3) * 2),
+    [config.readiness, documents.length],
   );
 
-  const openReminders = reminders.filter((reminder) => !reminder.completed);
+  const summaries = [
+    {
+      label: "Filed documents",
+      value: String(documents.length || room.documents.length),
+      tone: "green" as const,
+    },
+    {
+      label: "Open reminders",
+      value: String(openReminderCount || room.reminders.length),
+      tone: openReminderCount ? ("amber" as const) : ("stone" as const),
+    },
+    {
+      label: "Room readiness",
+      value: `${readiness}%`,
+      tone: "green" as const,
+    },
+    {
+      label: "Quick actions",
+      value: "3",
+      tone: "stone" as const,
+    },
+  ];
 
   return (
-    <PageShell>
-      <RoomHero
-        title={room.title}
-        subtitle={design.subtitle}
-        eyebrow={design.eyebrow}
-        scene={design.scene as HeroScene}
-      />
-
-      <div className="relative z-20 mx-auto -mt-14 max-w-md px-4">
-        <ReadinessCard score={readinessScore} />
-        <div className="mt-4 space-y-4">
-          <CoverageList items={design.covered} />
-          <DocumentShelf shelves={design.shelves} documents={documents} fallbackItems={room.documents} />
-          {openReminders.length || room.reminders.length ? (
-            <RemindersCard reminders={openReminders} fallbackItems={room.reminders} />
-          ) : null}
-        </div>
-      </div>
-
-      <FloatingAddButton label={`Add to ${room.title}`} />
-      <EstateBottomNav />
-    </PageShell>
+    <RoomLayout
+      roomId={roomId}
+      room={room}
+      icon={config.icon}
+      readiness={readiness}
+      summaries={summaries}
+      coverage={config.coverage}
+      documents={documents}
+      reminders={reminders}
+    />
   );
-}
-
-function RemindersCard({
-  reminders,
-  fallbackItems,
-}: {
-  reminders: StoredReminder[];
-  fallbackItems: readonly string[];
-}) {
-  return (
-    <section className="rounded-[1.35rem] bg-white p-4 shadow-sm shadow-stone-200">
-      <div className="mb-3 flex items-center gap-2">
-        <Bell className="h-5 w-5 text-amber-600" />
-        <h2 className="text-base font-bold">Reminders</h2>
-      </div>
-      <div className="space-y-2">
-        {reminders.length
-          ? reminders.map((reminder) => (
-              <div
-                key={reminder.id}
-                className="flex min-h-12 items-center justify-between rounded-2xl bg-[#fbf7ef] px-3 py-2"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold">{reminder.title}</p>
-                  <p className="text-sm text-stone-500">{formatDate(reminder.dueDate)}</p>
-                </div>
-                <CalendarClock className="h-5 w-5 text-amber-600" />
-              </div>
-            ))
-          : fallbackItems.map((reminder) => (
-              <div
-                key={reminder}
-                className="flex min-h-12 items-center justify-between rounded-2xl bg-[#fbf7ef] px-3 py-2 text-sm font-semibold"
-              >
-                <span>{reminder}</span>
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              </div>
-            ))}
-      </div>
-    </section>
-  );
-}
-
-function formatDate(value: string) {
-  if (!value) return "No date";
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-  }).format(new Date(`${value}T00:00:00`));
 }
