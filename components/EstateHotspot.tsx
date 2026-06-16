@@ -23,12 +23,12 @@ export function EstateHotspot({
   return (
     <Link
       href={href}
-      className="glass absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-semibold text-zinc-900 shadow transition duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/80"
+      className="glass absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full px-2 py-1.5 text-[clamp(8px,2.45vw,10px)] font-semibold text-zinc-900 shadow transition duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/80"
       style={{ left, top }}
       aria-label={name}
     >
-      <Icon className="h-3 w-3 text-violet-700" strokeWidth={2.4} />
-      <span className="max-w-[5.4rem] truncate">{name}</span>
+      <Icon className="h-[1.05em] w-[1.05em] text-violet-700" strokeWidth={2.4} />
+      <span className="max-w-[min(5.4rem,24vw)] truncate">{name}</span>
       {count ? (
         <span className="ml-0.5 grid min-h-3.5 min-w-3.5 place-items-center rounded-full bg-rose-500 px-1 text-[8px] font-bold leading-none text-white">
           {count}
