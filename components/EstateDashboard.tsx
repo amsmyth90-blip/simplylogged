@@ -91,29 +91,23 @@ export function EstateDashboard({ panel }: EstateDashboardProps) {
   );
 
   return (
-    <main className="relative flex min-h-svh overflow-hidden bg-[#f5efe6]">
+    <main className="relative min-h-svh overflow-hidden bg-black">
+      <Image
+        src="/images/estate-map-light.png"
+        alt="Simply Logged home"
+        fill
+        unoptimized
+        priority
+        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ objectPosition: "center center" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/18" />
       <AppHeader />
-      <section className="absolute inset-x-0 bottom-[calc(5.95rem+env(safe-area-inset-bottom))] top-[max(3.85rem,calc(env(safe-area-inset-top)+3.35rem))] z-10 flex items-center justify-center overflow-hidden px-2">
-        <div
-          className="relative aspect-[1086/1449] max-h-full max-w-full overflow-visible"
-          style={{
-            height: "min(100%, calc((100vw - 1rem) * 1.3343))",
-            width: "min(calc(100% - 1rem), calc((100svh - 9.8rem - env(safe-area-inset-bottom)) * 0.7495))",
-          }}
-        >
-          <Image
-            src="/images/estate-map-light.png"
-            alt="Simply Logged digital estate"
-            fill
-            unoptimized
-            priority
-            sizes="(max-width: 768px) 100vw, 430px"
-            className="object-contain"
-          />
-          {dynamicHotspots.map((hotspot) => (
-            <EstateHotspot key={hotspot.id} {...hotspot} />
-          ))}
-        </div>
+      <section className="absolute inset-0 z-10">
+        {dynamicHotspots.map((hotspot) => (
+          <EstateHotspot key={hotspot.id} {...hotspot} />
+        ))}
       </section>
       {panel === "mailbox" ? (
         <aside className="glass absolute bottom-[calc(6.15rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-md rounded-[1.75rem] p-4 text-zinc-950">
