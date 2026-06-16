@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Archive, ChevronDown, FileText, LockKeyhole, Plus, Search, Trash2 } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+import { EstateCard, InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
 import { roomOptions } from "@/lib/mock-data";
@@ -73,26 +73,18 @@ export default function VaultPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[#f5efe6] pb-[calc(8rem+env(safe-area-inset-bottom))] text-[#261c14]">
-      <section className="relative min-h-[22rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_50%_44%,rgba(245,158,11,0.18),transparent_22%),linear-gradient(135deg,#17120e,#352719_48%,#080706)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.66))]" />
-        <div className="absolute bottom-14 left-1/2 h-52 w-44 -translate-x-1/2 rounded-[2rem] border border-amber-200/20 bg-[radial-gradient(circle,#7c6447_0,#2b2118_45%,#080706_100%)] shadow-2xl shadow-black">
-          <div className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-amber-200/35" />
-          <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-200/30" />
-        </div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white/80">The Vault</p>
-            <h1 className="mt-2 max-w-48 text-3xl font-bold leading-tight">Everything in its place, protected.</h1>
-          </div>
-          <Link href="/add" className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md" aria-label="Add document">
+    <InternalPageShell
+      icon={Archive}
+      eyebrow="Estate safe"
+      title="Vault"
+      subtitle="Protected documents, drawers, and recently filed estate records."
+      action={
+        <Link href="/add" className="grid h-11 w-11 place-items-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-300" aria-label="Add document">
             <Plus className="h-5 w-5" />
           </Link>
-        </div>
-      </section>
-
-      <div className="relative z-20 mx-auto -mt-14 max-w-md px-4">
-        <section className="rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
+      }
+    >
+        <EstateCard>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold text-stone-500">Estate Readiness</p>
@@ -103,7 +95,7 @@ export default function VaultPage() {
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100">
             <div className="h-full rounded-full bg-emerald-600" style={{ width: `${readiness}%` }} />
           </div>
-        </section>
+        </EstateCard>
 
         <section className="mt-4 grid gap-3">
           <label className="flex min-h-12 items-center gap-2 rounded-[1.2rem] bg-white px-4 shadow-sm shadow-stone-200">
@@ -194,7 +186,7 @@ export default function VaultPage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-[1.25rem] bg-[#28231d] p-4 text-white shadow-lg shadow-stone-300/40">
+        <EstateCard className="bg-[#28231d] text-white">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-bold">Recently Added</h2>
@@ -220,8 +212,7 @@ export default function VaultPage() {
               </div>
             ) : null}
           </div>
-        </section>
-      </div>
+        </EstateCard>
 
       {selectedDocument ? (
         <DocumentModal
@@ -231,8 +222,7 @@ export default function VaultPage() {
         />
       ) : null}
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
-      <BottomNav />
-    </main>
+    </InternalPageShell>
   );
 }
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Archive, CheckCircle2, Mail, MoveRight, Plus, Trash2 } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+import { EstateCard, InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
 import { roomOptions } from "@/lib/mock-data";
@@ -80,31 +80,22 @@ export default function MailboxPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[#f5efe6] pb-[calc(8rem+env(safe-area-inset-bottom))] text-[#261c14]">
-      <section className="relative min-h-[21rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_68%_42%,rgba(248,113,113,0.14),transparent_18%),linear-gradient(135deg,#182015,#42522d_48%,#1b130d)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.68))]" />
-        <div className="absolute bottom-20 right-8 h-28 w-32 rounded-t-[3rem] bg-[linear-gradient(180deg,#233320,#0f1710)] shadow-2xl shadow-black/40 ring-1 ring-white/10" />
-        <div className="absolute bottom-20 right-8 h-12 w-32 rounded-b-2xl bg-black/30" />
-        <div className="absolute bottom-24 right-4 h-2 w-20 bg-red-500" />
-        <div className="absolute bottom-28 right-2 h-12 w-2 rounded-full bg-red-600" />
-        <div className="relative z-10 flex items-start justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white/82">Mailbox</p>
-            <h1 className="mt-2 max-w-52 text-4xl font-bold">Unfiled items & suggestions</h1>
-            <p className="mt-3 text-sm font-medium text-white/78">{documents.length} items need your review</p>
-          </div>
-          <Link href="/add" className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md" aria-label="Add upload">
+    <InternalPageShell
+      icon={Mail}
+      eyebrow="Estate inbox"
+      title="Mailbox"
+      subtitle={`${documents.length} new upload${documents.length === 1 ? "" : "s"} waiting to be filed.`}
+      action={
+        <Link href="/add" className="grid h-11 w-11 place-items-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-300" aria-label="Add upload">
             <Plus className="h-5 w-5" />
           </Link>
-        </div>
-      </section>
-
-      <div className="relative z-20 mx-auto -mt-12 max-w-md px-4">
-        <section className="rounded-[1.35rem] bg-white p-4 text-center shadow-xl shadow-stone-300/50">
+      }
+    >
+        <EstateCard className="text-center">
           <p className="text-sm font-bold">{documents.length} items need your review</p>
-        </section>
+        </EstateCard>
 
-        <section className="mt-4 space-y-3">
+        <section className="space-y-3">
           {documents.length ? (
             documents.map((document) => (
               <article key={document.id} className="rounded-[1.35rem] bg-white p-4 shadow-sm shadow-stone-200">
@@ -152,9 +143,7 @@ export default function MailboxPage() {
             </section>
           )}
         </section>
-      </div>
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
-      <BottomNav />
-    </main>
+    </InternalPageShell>
   );
 }

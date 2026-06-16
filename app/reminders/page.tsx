@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Clock3, FileText, Plus, TimerReset, Trash2 } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+import { EstateCard, InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
 import { getDocuments } from "@/lib/supabase/documents";
@@ -117,36 +117,32 @@ export default function RemindersPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[#f5efe6] pb-[calc(8rem+env(safe-area-inset-bottom))] text-[#261c14]">
-      <section className="relative min-h-[21rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_50%_22%,rgba(190,242,100,0.14),transparent_18%),linear-gradient(135deg,#162015,#354528_48%,#11100b)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.64))]" />
-        <div className="relative z-10 flex items-start justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white/82">Your important dates</p>
-            <h1 className="mt-2 text-4xl font-bold">Reminders</h1>
-          </div>
-          <button
+    <InternalPageShell
+      icon={Clock3}
+      eyebrow="Estate timeline"
+      title="Reminders"
+      subtitle="Renewals, reviews, and important dates across the estate."
+      action={
+        <button
             onClick={() => setShowForm((current) => !current)}
-            className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md"
+            className="grid h-11 w-11 place-items-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-300"
             aria-label="Create reminder"
           >
             <Plus className="h-5 w-5" />
           </button>
-        </div>
-      </section>
-
-      <div className="relative z-20 mx-auto -mt-12 max-w-md px-4">
-        <section className="rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
+      }
+    >
+        <EstateCard>
           <div className="grid grid-cols-4 gap-2 text-center">
             <Stat label="Overdue" value={String(grouped.overdue.length)} tone="red" />
             <Stat label="Soon" value={String(grouped.soon.length)} tone="amber" />
             <Stat label="Future" value={String(grouped.future.length)} tone="green" />
             <Stat label="Done" value={String(grouped.completed.length)} tone="stone" />
           </div>
-        </section>
+        </EstateCard>
 
         {showForm ? (
-          <form onSubmit={createReminder} className="mt-4 grid gap-2 rounded-[1.35rem] bg-white p-4 shadow-sm shadow-stone-200">
+          <form onSubmit={createReminder} className="grid gap-2 rounded-[1.5rem] bg-white p-4 shadow-sm shadow-stone-200">
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
@@ -182,12 +178,10 @@ export default function RemindersPage() {
         <ReminderGroup title="Due Soon" reminders={grouped.soon} tone="amber" busyReminderId={busyReminderId} onComplete={completeReminder} onSnooze={snoozeReminder} onDelete={removeReminder} onOpenDocument={openLinkedDocument} />
         <ReminderGroup title="Future" reminders={grouped.future} tone="green" busyReminderId={busyReminderId} onComplete={completeReminder} onSnooze={snoozeReminder} onDelete={removeReminder} onOpenDocument={openLinkedDocument} />
         <ReminderGroup title="Completed" reminders={grouped.completed} tone="stone" busyReminderId={busyReminderId} onComplete={completeReminder} onSnooze={snoozeReminder} onDelete={removeReminder} onOpenDocument={openLinkedDocument} />
-      </div>
 
       {selectedDocument ? <DocumentModal document={selectedDocument} onClose={() => setSelectedDocument(null)} /> : null}
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
-      <BottomNav />
-    </main>
+    </InternalPageShell>
   );
 }
 

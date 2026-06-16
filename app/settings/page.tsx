@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, LogOut, Settings, UserCircle } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+import { Lock, LogOut, Settings, UserCircle } from "lucide-react";
+import { InternalPageShell } from "@/components/InternalPageShell";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 const preferenceKey = "simplyLoggedPreferences";
@@ -53,20 +53,13 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[#f5efe6] px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-5 text-[#261c14]">
-      <div className="mx-auto max-w-md">
-        <Link href="/dashboard" className="inline-grid h-11 w-11 place-items-center rounded-full bg-white shadow-sm" aria-label="Back">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div className="mt-6">
-          <Settings className="h-9 w-9 text-violet-700" />
-          <h1 className="mt-4 text-3xl font-bold">Front Gate</h1>
-          <p className="mt-2 text-sm leading-6 text-stone-600">
-            Security, readiness, trusted access, and account preferences for the estate.
-          </p>
-        </div>
-
-        <section className="mt-6 rounded-[1.75rem] bg-white p-5 shadow-sm shadow-stone-200">
+    <InternalPageShell
+      icon={Settings}
+      eyebrow="Front gate"
+      title="Settings"
+      subtitle="Security, readiness, trusted access, and account preferences for the estate."
+    >
+        <section className="rounded-[1.75rem] bg-white p-5 shadow-sm shadow-stone-200">
           <Lock className="h-6 w-6 text-emerald-600" />
           <h2 className="mt-3 font-bold">Estate security</h2>
           <p className="mt-1 text-sm text-stone-600">
@@ -132,8 +125,6 @@ export default function SettingsPage() {
         {message ? (
           <p className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">{message}</p>
         ) : null}
-      </div>
-      <BottomNav />
-    </main>
+    </InternalPageShell>
   );
 }

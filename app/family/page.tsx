@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Activity, Crown, ShieldCheck, Trash2, UserPlus, Users } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
+import { InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
 import { deleteFamilyMember, getFamilyMembers, saveFamilyMember } from "@/lib/supabase/family";
@@ -107,26 +107,21 @@ export default function FamilyPage() {
   }
 
   return (
-    <main className="min-h-svh bg-[#f5efe6] pb-[calc(8rem+env(safe-area-inset-bottom))] text-[#261c14]">
-      <section className="relative min-h-[21rem] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(circle_at_72%_24%,rgba(251,191,36,0.18),transparent_20%),linear-gradient(135deg,#21160f,#57331f_52%,#12100d)] px-5 pb-20 pt-5 text-white shadow-2xl shadow-stone-400/40">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.62))]" />
-        <div className="relative z-10 flex items-start justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white/82">Your team, your estate</p>
-            <h1 className="mt-2 text-4xl font-bold">Family Hub</h1>
-            <p className="mt-3 text-sm font-semibold text-white/75">{memberCountLabel}</p>
-          </div>
-          <button
+    <InternalPageShell
+      icon={Users}
+      eyebrow="Command centre"
+      title="Family"
+      subtitle={`${memberCountLabel} connected to the estate, with access and activity in one place.`}
+      action={
+        <button
             onClick={() => setShowInvite((current) => !current)}
-            className="grid h-11 w-11 place-items-center rounded-full bg-black/24 backdrop-blur-md"
+            className="grid h-11 w-11 place-items-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-300"
             aria-label="Invite family"
           >
             <UserPlus className="h-5 w-5" />
           </button>
-        </div>
-      </section>
-
-      <div className="relative z-20 mx-auto -mt-12 max-w-md px-4">
+      }
+    >
         {showInvite ? (
           <form onSubmit={inviteMember} className="mb-4 grid gap-2 rounded-[1.35rem] bg-white p-4 shadow-xl shadow-stone-300/50">
             <h2 className="font-bold">Invite family member</h2>
@@ -211,10 +206,8 @@ export default function FamilyPage() {
             ))}
           </div>
         </section>
-      </div>
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
-      <BottomNav />
-    </main>
+    </InternalPageShell>
   );
 }
 
