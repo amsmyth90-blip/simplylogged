@@ -13,6 +13,7 @@ type DocumentRow = {
   id: string;
   user_id: string;
   title: string;
+  document_type: string | null;
   room_id: string;
   room_name: string;
   category: string;
@@ -21,6 +22,11 @@ type DocumentRow = {
   issue_date: string | null;
   expiry_date: string | null;
   file_path: string | null;
+  file_name: string | null;
+  mime_type: string | null;
+  file_size: number | null;
+  analysis_source: "openai" | "mock" | "manual" | null;
+  analysis_confidence: number | null;
   summary: string;
   status: "new" | "filed";
   created_at: string;
@@ -185,11 +191,17 @@ function fromRow(row: DocumentRow): StoredDocument {
     roomName: row.room_name,
     category: row.category,
     provider: row.provider,
+    documentType: row.document_type ?? "",
     policyNumber: row.policy_number ?? "",
     issueDate: row.issue_date ?? "",
     expiryDate: row.expiry_date ?? "",
     fileUrl: "",
     filePath: row.file_path ?? "",
+    fileName: row.file_name ?? "",
+    mimeType: row.mime_type ?? "",
+    fileSize: row.file_size ?? 0,
+    analysisSource: row.analysis_source ?? undefined,
+    analysisConfidence: row.analysis_confidence ?? undefined,
     uploadedAt: row.created_at,
     status: row.status,
     summary: row.summary,
@@ -201,6 +213,7 @@ function toRow(document: StoredDocument, userId: string) {
     id: document.id,
     user_id: userId,
     title: document.title,
+    document_type: document.documentType || null,
     room_id: document.roomId,
     room_name: document.roomName,
     category: document.category,
@@ -209,6 +222,11 @@ function toRow(document: StoredDocument, userId: string) {
     issue_date: document.issueDate || null,
     expiry_date: document.expiryDate || null,
     file_path: document.filePath || null,
+    file_name: document.fileName || null,
+    mime_type: document.mimeType || null,
+    file_size: document.fileSize || null,
+    analysis_source: document.analysisSource || null,
+    analysis_confidence: document.analysisConfidence ?? null,
     summary: document.summary,
     status: document.status,
     created_at: document.uploadedAt,

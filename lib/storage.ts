@@ -6,11 +6,17 @@ export type StoredDocument = {
   roomName: string;
   category: string;
   provider: string;
+  documentType?: string;
   policyNumber?: string;
   issueDate?: string;
   expiryDate: string;
   fileUrl?: string;
   filePath?: string;
+  fileName?: string;
+  mimeType?: string;
+  fileSize?: number;
+  analysisSource?: "openai" | "mock" | "manual";
+  analysisConfidence?: number;
   uploadedAt: string;
   status: "new" | "filed";
   summary: string;

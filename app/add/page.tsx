@@ -4,8 +4,10 @@ import Image from "next/image";
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Camera, FileText, Sparkles, Upload } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
 import { BottomNav } from "@/components/BottomNav";
 import { analyseDocument, type DocumentAnalysis } from "@/lib/mock-ai";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { uploadDocumentFile, type UploadedDocumentFile } from "@/lib/supabase/storage";
 
 const maxClientFileSize = 12 * 1024 * 1024;
@@ -13,9 +15,11 @@ const supportedTypes = ["application/pdf", "image/jpeg", "image/png", "image/web
 
 export default function AddPage() {
   return (
-    <Suspense fallback={<AddLoading />}>
-      <AddPageContent />
-    </Suspense>
+    <AuthGate>
+      <Suspense fallback={<AddLoading />}>
+        <AddPageContent />
+      </Suspense>
+    </AuthGate>
   );
 }
 
@@ -91,6 +95,27 @@ function AddPageContent() {
     setError("");
 
     try {
+      const documentId = createId();
+      const { analysis, source } = await analyseWithFallback(file);
+      const upload = await uploadRequiredFile(file, documentId);
+
+      savePendingAnalysis(file, analysis, source, {
+        documentId,
+        filePath: upload?.filePath ?? "",
+        fileUrl: upload?.fileUrl ?? "",
+        preferredRoomId,
+      });
+      router.push("/add/review");
+    } catch (error) {
+      console.warn("Document analysis/upload failed", error);
+      setError(error instanceof Error ? error.message : "The document could not be analysed. Please try another file.");
+    } finally {
+      setIsAnalysing(false);
+    }
+  }
+
+  async function analyseWithFallback(file: File) {
+    try {
       const formData = new FormData();
       formData.append("file", file);
 
@@ -106,33 +131,16 @@ function AddPageContent() {
 
       const analysis = (await response.json()) as DocumentAnalysis;
       validateAnalysis(analysis);
-      const documentId = createId();
-      const upload = await tryUploadFile(file, documentId);
-      savePendingAnalysis(file, analysis, response.headers.get("x-analysis-source") ?? "real-ai", {
-        documentId,
-        filePath: upload?.filePath ?? "",
-        fileUrl: upload?.fileUrl ?? "",
-        preferredRoomId,
-      });
-      router.push("/add/review");
+      return {
+        analysis,
+        source: response.headers.get("x-analysis-source") ?? "real-ai",
+      };
     } catch (apiError) {
       console.warn("Document analysis fell back to mock mode", apiError);
-      try {
-        const fallbackAnalysis = analyseDocument(file.name);
-        const documentId = createId();
-        const upload = await tryUploadFile(file, documentId);
-        savePendingAnalysis(file, fallbackAnalysis, "mock-fallback", {
-          documentId,
-          filePath: upload?.filePath ?? "",
-          fileUrl: upload?.fileUrl ?? "",
-          preferredRoomId,
-        });
-        router.push("/add/review");
-      } catch {
-        setError("The document could not be analysed. Please try another file.");
-      }
-    } finally {
-      setIsAnalysing(false);
+      return {
+        analysis: analyseDocument(file.name),
+        source: "mock-fallback",
+      };
     }
   }
 
@@ -236,11 +244,15 @@ function AddLoading() {
   );
 }
 
-async function tryUploadFile(file: File, documentId: string) {
+async function uploadRequiredFile(file: File, documentId: string) {
   try {
     return await uploadDocumentFile(file, documentId);
   } catch (error) {
-    console.warn("Supabase upload failed; continuing with metadata only", error);
+    console.warn("Supabase upload failed", error);
+    if (isSupabaseConfigured()) {
+      throw new Error("The file could not be uploaded securely. Please check your connection and try again.");
+    }
+
     return null;
   }
 }
@@ -257,6 +269,7 @@ function savePendingAnalysis(
       documentId: upload.documentId,
       fileName: file.name,
       fileType: file.type,
+      fileSize: file.size,
       filePath: upload.filePath,
       fileUrl: upload.fileUrl,
       preferredRoomId: upload.preferredRoomId,

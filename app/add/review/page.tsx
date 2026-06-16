@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarDays, Check, FileText, Sparkles } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
 import { BottomNav } from "@/components/BottomNav";
 import { Toast } from "@/components/Toast";
 import type { DocumentAnalysis } from "@/lib/mock-ai";
@@ -16,6 +17,7 @@ type PendingAnalysis = {
   documentId?: string;
   fileName: string;
   fileType: string;
+  fileSize?: number;
   filePath?: string;
   fileUrl?: string;
   preferredRoomId?: string;
@@ -25,6 +27,14 @@ type PendingAnalysis = {
 };
 
 export default function AddReviewPage() {
+  return (
+    <AuthGate>
+      <AddReviewContent />
+    </AuthGate>
+  );
+}
+
+function AddReviewContent() {
   const router = useRouter();
   const [pending, setPending] = useState<PendingAnalysis | null>(null);
   const [roomId, setRoomId] = useState("");
@@ -77,11 +87,17 @@ export default function AddReviewPage() {
         roomName,
         category: analysis.category,
         provider: analysis.provider,
+        documentType: analysis.documentType,
         policyNumber: analysis.policyNumber,
         issueDate: analysis.issueDate,
         expiryDate: analysis.expiryDate,
         fileUrl: pending.fileUrl ?? "",
         filePath: pending.filePath ?? "",
+        fileName: pending.fileName,
+        mimeType: pending.fileType,
+        fileSize: pending.fileSize ?? 0,
+        analysisSource: pending.source === "real-ai" ? "openai" : "mock",
+        analysisConfidence: analysis.confidence,
         uploadedAt: new Date().toISOString(),
         status: "new",
         summary: analysis.extractedSummary,
@@ -285,6 +301,7 @@ function normalizePendingAnalysis(pending: PendingAnalysis): PendingAnalysis {
   return {
     ...pending,
     documentId: pending.documentId ?? createId("doc"),
+    fileSize: pending.fileSize ?? 0,
     source: pending.source ?? "mock-fallback",
     analysis: {
       ...pending.analysis,

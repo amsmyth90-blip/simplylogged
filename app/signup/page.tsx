@@ -33,10 +33,17 @@ export default function SignupPage() {
     }
 
     if (data.user) {
-      await supabase.from("profiles").upsert({
+      const { error: profileError } = await supabase.from("profiles").upsert({
         id: data.user.id,
         email,
       });
+
+      if (profileError) {
+        console.warn("Profile upsert failed after signup; database trigger remains source of truth.", profileError);
+        setMessage("Account created. Supabase will finish setting up your profile automatically.");
+        window.setTimeout(() => router.push("/account"), 900);
+        return;
+      }
     }
 
     router.push("/account");
