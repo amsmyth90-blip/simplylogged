@@ -6,39 +6,33 @@ import { useRouter } from "next/navigation";
 import { Lock, LogOut, Settings, UserCircle } from "lucide-react";
 import { InternalPageShell } from "@/components/InternalPageShell";
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
-
-const preferenceKey = "simplyLoggedPreferences";
-
-type Preferences = {
-  theme: "system" | "light" | "dark";
-  season: "spring" | "summer" | "autumn" | "winter";
-  emergencyAccess: boolean;
-};
-
-const defaultPreferences: Preferences = {
-  theme: "system",
-  season: "summer",
-  emergencyAccess: false,
-};
+import { defaultPreferences, getPreferences, savePreferences, type UserPreferences } from "@/lib/supabase/preferences";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(preferenceKey);
-    if (raw) {
-      queueMicrotask(() => {
-        setPreferences({ ...defaultPreferences, ...(JSON.parse(raw) as Partial<Preferences>) });
-      });
+    async function loadPreferences() {
+      try {
+        setPreferences(await getPreferences());
+      } catch {
+        setMessage("Could not load preferences.");
+      }
     }
+
+    loadPreferences();
   }, []);
 
-  function updatePreferences(next: Preferences) {
+  async function updatePreferences(next: UserPreferences) {
     setPreferences(next);
-    window.localStorage.setItem(preferenceKey, JSON.stringify(next));
-    setMessage("Preferences saved.");
+    try {
+      await savePreferences(next);
+      setMessage("Preferences saved.");
+    } catch {
+      setMessage("Could not save preferences. Please sign in and try again.");
+    }
   }
 
   async function signOut() {
@@ -83,7 +77,7 @@ export default function SettingsPage() {
             Theme
             <select
               value={preferences.theme}
-              onChange={(event) => updatePreferences({ ...preferences, theme: event.target.value as Preferences["theme"] })}
+              onChange={(event) => updatePreferences({ ...preferences, theme: event.target.value as UserPreferences["theme"] })}
               className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-stone-950 outline-none"
             >
               <option value="system">System</option>
@@ -95,7 +89,7 @@ export default function SettingsPage() {
             Estate season
             <select
               value={preferences.season}
-              onChange={(event) => updatePreferences({ ...preferences, season: event.target.value as Preferences["season"] })}
+              onChange={(event) => updatePreferences({ ...preferences, season: event.target.value as UserPreferences["season"] })}
               className="min-h-12 rounded-2xl bg-[#fbf7ef] px-4 text-stone-950 outline-none"
             >
               <option value="spring">Spring</option>
@@ -110,7 +104,7 @@ export default function SettingsPage() {
           <div className="flex min-h-12 items-center justify-between gap-3">
             <div>
               <h2 className="font-bold">Emergency access</h2>
-              <p className="mt-1 text-sm text-stone-500">Store preference locally for this prototype.</p>
+              <p className="mt-1 text-sm text-stone-500">Controls trusted access preferences for this estate.</p>
             </div>
             <button
               onClick={() => updatePreferences({ ...preferences, emergencyAccess: !preferences.emergencyAccess })}

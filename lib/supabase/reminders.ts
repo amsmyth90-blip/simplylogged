@@ -25,8 +25,12 @@ export async function getReminders() {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return getLocalReminders();
+  }
+
+  if (!userId) {
+    return [];
   }
 
   const { data, error } = await supabase
@@ -37,7 +41,7 @@ export async function getReminders() {
 
   if (error) {
     console.warn("Supabase getReminders failed", error);
-    return getLocalReminders();
+    throw error;
   }
 
   return (data as ReminderRow[]).map(fromRow);
@@ -47,8 +51,12 @@ export async function getRemindersByRoom(roomId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return getLocalRemindersByRoom(roomId);
+  }
+
+  if (!userId) {
+    return [];
   }
 
   const { data, error } = await supabase
@@ -60,7 +68,7 @@ export async function getRemindersByRoom(roomId: string) {
 
   if (error) {
     console.warn("Supabase getRemindersByRoom failed", error);
-    return getLocalRemindersByRoom(roomId);
+    throw error;
   }
 
   return (data as ReminderRow[]).map(fromRow);
@@ -70,16 +78,20 @@ export async function saveReminder(reminder: StoredReminder) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     saveLocalReminder(reminder);
     notifyStorageChanged();
     return;
   }
 
+  if (!userId) {
+    throw new Error("Sign in required to save reminders.");
+  }
+
   const { error } = await supabase.from("reminders").upsert(toRow(reminder, userId));
   if (error) {
     console.warn("Supabase saveReminder failed", error);
-    saveLocalReminder(reminder);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -88,10 +100,14 @@ export async function updateReminder(reminder: StoredReminder) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     updateLocalReminder(reminder);
     notifyStorageChanged();
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to update reminders.");
   }
 
   const { error } = await supabase
@@ -102,7 +118,7 @@ export async function updateReminder(reminder: StoredReminder) {
 
   if (error) {
     console.warn("Supabase updateReminder failed", error);
-    updateLocalReminder(reminder);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -111,10 +127,14 @@ export async function deleteReminder(reminderId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     deleteLocalReminder(reminderId);
     notifyStorageChanged();
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to delete reminders.");
   }
 
   const { error } = await supabase
@@ -125,7 +145,7 @@ export async function deleteReminder(reminderId: string) {
 
   if (error) {
     console.warn("Supabase deleteReminder failed", error);
-    deleteLocalReminder(reminderId);
+    throw error;
   }
   notifyStorageChanged();
 }

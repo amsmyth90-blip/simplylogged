@@ -20,7 +20,6 @@ type DocumentRow = {
   policy_number: string | null;
   issue_date: string | null;
   expiry_date: string | null;
-  file_url: string | null;
   file_path: string | null;
   summary: string;
   status: "new" | "filed";
@@ -31,8 +30,12 @@ export async function getDocuments() {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return getLocalDocuments();
+  }
+
+  if (!userId) {
+    return [];
   }
 
   const { data, error } = await supabase
@@ -43,7 +46,7 @@ export async function getDocuments() {
 
   if (error) {
     console.warn("Supabase getDocuments failed", error);
-    return getLocalDocuments();
+    throw error;
   }
 
   return (data as DocumentRow[]).map(fromRow);
@@ -53,8 +56,12 @@ export async function getDocumentsByRoom(roomId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return getLocalDocumentsByRoom(roomId);
+  }
+
+  if (!userId) {
+    return [];
   }
 
   const { data, error } = await supabase
@@ -66,7 +73,7 @@ export async function getDocumentsByRoom(roomId: string) {
 
   if (error) {
     console.warn("Supabase getDocumentsByRoom failed", error);
-    return getLocalDocumentsByRoom(roomId);
+    throw error;
   }
 
   return (data as DocumentRow[]).map(fromRow);
@@ -76,16 +83,20 @@ export async function saveDocument(document: StoredDocument) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     saveLocalDocument(document);
     notifyStorageChanged();
     return;
   }
 
+  if (!userId) {
+    throw new Error("Sign in required to save documents.");
+  }
+
   const { error } = await supabase.from("documents").upsert(toRow(document, userId));
   if (error) {
     console.warn("Supabase saveDocument failed", error);
-    saveLocalDocument(document);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -94,10 +105,14 @@ export async function updateDocument(document: StoredDocument) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     updateLocalDocument(document);
     notifyStorageChanged();
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to update documents.");
   }
 
   const { error } = await supabase
@@ -108,7 +123,7 @@ export async function updateDocument(document: StoredDocument) {
 
   if (error) {
     console.warn("Supabase updateDocument failed", error);
-    updateLocalDocument(document);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -117,10 +132,14 @@ export async function deleteDocument(documentId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     deleteLocalDocument(documentId);
     notifyStorageChanged();
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to delete documents.");
   }
 
   const { data: document, error: lookupError } = await supabase
@@ -144,7 +163,7 @@ export async function deleteDocument(documentId: string) {
 
   if (error) {
     console.warn("Supabase deleteDocument failed", error);
-    deleteLocalDocument(documentId);
+    throw error;
   }
 
   if (!error && filePath) {
@@ -169,7 +188,7 @@ function fromRow(row: DocumentRow): StoredDocument {
     policyNumber: row.policy_number ?? "",
     issueDate: row.issue_date ?? "",
     expiryDate: row.expiry_date ?? "",
-    fileUrl: row.file_url ?? "",
+    fileUrl: "",
     filePath: row.file_path ?? "",
     uploadedAt: row.created_at,
     status: row.status,
@@ -189,7 +208,6 @@ function toRow(document: StoredDocument, userId: string) {
     policy_number: document.policyNumber || null,
     issue_date: document.issueDate || null,
     expiry_date: document.expiryDate || null,
-    file_url: document.fileUrl || null,
     file_path: document.filePath || null,
     summary: document.summary,
     status: document.status,

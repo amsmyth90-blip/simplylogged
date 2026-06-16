@@ -32,7 +32,7 @@ export default function AddReviewPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const raw = window.localStorage.getItem("simplyLoggedPendingAnalysis");
+    const raw = window.sessionStorage.getItem("simplyLoggedPendingAnalysis");
     if (!raw) {
       router.replace("/add");
       return;
@@ -107,7 +107,7 @@ export default function AddReviewPage() {
         );
       }
 
-      window.localStorage.removeItem("simplyLoggedPendingAnalysis");
+      window.sessionStorage.removeItem("simplyLoggedPendingAnalysis");
       setMessage(addReminders ? "Document and reminder saved." : "Document saved.");
       router.push(roomId === "vault" ? "/vault" : `/room/${roomId}`);
     } catch {
@@ -117,7 +117,7 @@ export default function AddReviewPage() {
   }
 
   function analyseAnother() {
-    window.localStorage.removeItem("simplyLoggedPendingAnalysis");
+    window.sessionStorage.removeItem("simplyLoggedPendingAnalysis");
     router.push("/add");
   }
 

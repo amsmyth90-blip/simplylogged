@@ -141,7 +141,7 @@ export default function DevTestFlowPage() {
       const documents = await getDocuments();
       const reminders = await getReminders();
       const familyMembers = await getFamilyMembers();
-      const uploadFlowReady = Boolean(window.localStorage.getItem("simplyLoggedPendingAnalysis"));
+      const uploadFlowReady = Boolean(window.sessionStorage.getItem("simplyLoggedPendingAnalysis"));
 
       setDiagnostics({
         configured,

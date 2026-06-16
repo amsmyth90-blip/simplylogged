@@ -10,8 +10,12 @@ export async function uploadDocumentFile(file: File, documentId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return null;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to upload documents.");
   }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
@@ -43,8 +47,12 @@ export async function deleteDocumentFile(filePath: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId || !filePath) {
+  if (!supabase || !filePath) {
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to delete document files.");
   }
 
   if (!filePath.startsWith(`${userId}/`)) {

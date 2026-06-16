@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { AuthGate } from "@/components/AuthGate";
 import { RoomPage } from "@/components/RoomPage";
 import { rooms } from "@/lib/mock-data";
 
@@ -16,5 +17,9 @@ export default async function EstateRoomPage({
     notFound();
   }
 
-  return <RoomPage roomId={roomId} room={room} />;
+  return (
+    <AuthGate>
+      <RoomPage roomId={roomId} room={room} />
+    </AuthGate>
+  );
 }

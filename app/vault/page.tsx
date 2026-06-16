@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Archive, ChevronDown, FileText, LockKeyhole, Plus, Search, Trash2 } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
 import { EstateCard, InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
@@ -73,6 +74,7 @@ export default function VaultPage() {
   }
 
   return (
+    <AuthGate>
     <InternalPageShell
       icon={Archive}
       eyebrow="Estate safe"
@@ -223,6 +225,7 @@ export default function VaultPage() {
       ) : null}
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
     </InternalPageShell>
+    </AuthGate>
   );
 }
 

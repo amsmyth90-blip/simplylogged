@@ -11,7 +11,8 @@ type FamilyMemberRow = {
   user_id: string;
   name: string;
   email: string;
-  role: string;
+  relationship: string | null;
+  access_level: StoredFamilyMember["access"];
   created_at: string;
 };
 
@@ -19,8 +20,12 @@ export async function getFamilyMembers() {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     return getLocalFamilyMembers();
+  }
+
+  if (!userId) {
+    return [];
   }
 
   const { data, error } = await supabase
@@ -31,7 +36,7 @@ export async function getFamilyMembers() {
 
   if (error) {
     console.warn("Supabase getFamilyMembers failed", error);
-    return getLocalFamilyMembers();
+    throw error;
   }
 
   return (data as FamilyMemberRow[]).map(fromRow);
@@ -41,16 +46,20 @@ export async function saveFamilyMember(member: StoredFamilyMember) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     saveLocalFamilyMember(member);
     notifyStorageChanged();
     return;
   }
 
+  if (!userId) {
+    throw new Error("Sign in required to save family members.");
+  }
+
   const { error } = await supabase.from("family_members").upsert(toRow(member, userId));
   if (error) {
     console.warn("Supabase saveFamilyMember failed", error);
-    saveLocalFamilyMember(member);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -59,10 +68,14 @@ export async function deleteFamilyMember(memberId: string) {
   const supabase = getSupabaseClient();
   const userId = await getCurrentUserId();
 
-  if (!supabase || !userId) {
+  if (!supabase) {
     deleteLocalFamilyMember(memberId);
     notifyStorageChanged();
     return;
+  }
+
+  if (!userId) {
+    throw new Error("Sign in required to delete family members.");
   }
 
   const { error } = await supabase
@@ -73,7 +86,7 @@ export async function deleteFamilyMember(memberId: string) {
 
   if (error) {
     console.warn("Supabase deleteFamilyMember failed", error);
-    deleteLocalFamilyMember(memberId);
+    throw error;
   }
   notifyStorageChanged();
 }
@@ -83,8 +96,8 @@ function fromRow(row: FamilyMemberRow): StoredFamilyMember {
     id: row.id,
     name: row.name,
     email: row.email,
-    role: row.role,
-    access: toAccess(row.role),
+    role: row.relationship ?? "Family member",
+    access: toAccess(row.access_level),
     createdAt: row.created_at,
   };
 }
@@ -95,7 +108,9 @@ function toRow(member: StoredFamilyMember, userId: string) {
     user_id: userId,
     name: member.name,
     email: member.email,
-    role: member.access,
+    relationship: member.role,
+    access_level: member.access,
+    status: "invited",
     created_at: member.createdAt,
   };
 }

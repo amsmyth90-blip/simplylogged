@@ -251,7 +251,7 @@ function savePendingAnalysis(
   source: string,
   upload: UploadedDocumentFile & { preferredRoomId?: string },
 ) {
-  window.localStorage.setItem(
+  window.sessionStorage.setItem(
     "simplyLoggedPendingAnalysis",
     JSON.stringify({
       documentId: upload.documentId,

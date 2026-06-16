@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Activity, Crown, ShieldCheck, Trash2, UserPlus, Users } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
 import { InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
@@ -107,6 +108,7 @@ export default function FamilyPage() {
   }
 
   return (
+    <AuthGate>
     <InternalPageShell
       icon={Users}
       eyebrow="Command centre"
@@ -208,6 +210,7 @@ export default function FamilyPage() {
         </section>
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
     </InternalPageShell>
+    </AuthGate>
   );
 }
 

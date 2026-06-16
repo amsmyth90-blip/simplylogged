@@ -32,7 +32,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/account");
+    const next = new URLSearchParams(window.location.search).get("next") || "/dashboard";
+    router.push(next);
   }
 
   return (

@@ -9,6 +9,10 @@ export function isSupabaseConfigured() {
   );
 }
 
+export function canUseLocalStorageFallback() {
+  return !isSupabaseConfigured();
+}
+
 export function getSupabaseClient() {
   if (!isSupabaseConfigured()) {
     return null;
@@ -32,4 +36,13 @@ export async function getCurrentUserId() {
   }
 
   return data.user.id;
+}
+
+export async function requireCurrentUserId() {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Authentication is required when Supabase is configured.");
+  }
+
+  return userId;
 }

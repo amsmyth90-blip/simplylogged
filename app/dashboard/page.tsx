@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { EstateDashboard } from "@/components/EstateDashboard";
 
 export default async function DashboardPage({
@@ -6,5 +7,9 @@ export default async function DashboardPage({
   searchParams: Promise<{ panel?: string }>;
 }) {
   const { panel } = await searchParams;
-  return <EstateDashboard panel={panel} />;
+  return (
+    <AuthGate>
+      <EstateDashboard panel={panel} />
+    </AuthGate>
+  );
 }

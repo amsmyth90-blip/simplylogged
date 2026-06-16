@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Archive, CheckCircle2, Mail, MoveRight, Plus, Trash2 } from "lucide-react";
+import { AuthGate } from "@/components/AuthGate";
 import { EstateCard, InternalPageShell } from "@/components/InternalPageShell";
 import { Toast } from "@/components/Toast";
 import { confirmDelete } from "@/lib/confirmations";
@@ -80,6 +81,7 @@ export default function MailboxPage() {
   }
 
   return (
+    <AuthGate>
     <InternalPageShell
       icon={Mail}
       eyebrow="Estate inbox"
@@ -145,5 +147,6 @@ export default function MailboxPage() {
         </section>
       <Toast message={toast} tone={toast.startsWith("Could") ? "error" : "success"} />
     </InternalPageShell>
+    </AuthGate>
   );
 }
