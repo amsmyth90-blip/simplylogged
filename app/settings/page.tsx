@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, LogOut, Settings, UserCircle } from "lucide-react";
 import { InternalPageShell } from "@/components/InternalPageShell";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigurationError, isSupabaseConfigured } from "@/lib/supabase/client";
 import { defaultPreferences, getPreferences, savePreferences, type UserPreferences } from "@/lib/supabase/preferences";
 
 export default function SettingsPage() {
@@ -36,6 +36,13 @@ export default function SettingsPage() {
   }
 
   async function signOut() {
+    const configError = getSupabaseConfigurationError();
+    if (configError) {
+      setMessage(configError);
+      router.push("/setup");
+      return;
+    }
+
     const supabase = getSupabaseClient();
     if (supabase) {
       await supabase.auth.signOut();

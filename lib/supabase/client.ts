@@ -1,12 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
+import { assertSupabaseClientConfig, documentsBucket, getSupabaseConfigStatus } from "@/lib/supabase/config";
 
-export const documentsBucket = "documents";
+export { documentsBucket };
 
 export function isSupabaseConfigured() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  return getSupabaseConfigStatus().supabaseConfigured;
+}
+
+export function getSupabaseConfigurationError() {
+  const status = getSupabaseConfigStatus();
+  return status.clientError;
 }
 
 export function canUseLocalStorageFallback() {
@@ -14,6 +17,8 @@ export function canUseLocalStorageFallback() {
 }
 
 export function getSupabaseClient() {
+  assertSupabaseClientConfig();
+
   if (!isSupabaseConfigured()) {
     return null;
   }

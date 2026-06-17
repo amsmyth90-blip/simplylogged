@@ -5,15 +5,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { InternalPageShell } from "@/components/InternalPageShell";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigurationError, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function AccountPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [configured] = useState(isSupabaseConfigured());
+  const [configError] = useState(getSupabaseConfigurationError);
 
   useEffect(() => {
     async function loadUser() {
+      if (configError) {
+        return;
+      }
+
       const supabase = getSupabaseClient();
       if (!supabase) {
         return;
@@ -24,9 +29,14 @@ export default function AccountPage() {
     }
 
     loadUser();
-  }, []);
+  }, [configError]);
 
   async function signOut() {
+    if (configError) {
+      router.push("/setup");
+      return;
+    }
+
     const supabase = getSupabaseClient();
     if (supabase) {
       await supabase.auth.signOut();
@@ -46,7 +56,7 @@ export default function AccountPage() {
         <p className="text-sm leading-6 text-stone-600">
           {configured
             ? email || "No signed-in user found."
-            : "Supabase is not configured. Local fallback storage is active."}
+            : configError || "Supabase is not configured. Local fallback storage is active."}
         </p>
         <div className="mt-6 grid gap-3">
           {email ? (

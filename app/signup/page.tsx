@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigurationError, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,6 +16,12 @@ export default function SignupPage() {
   async function signUp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+
+    const configError = getSupabaseConfigurationError();
+    if (configError) {
+      setMessage(configError);
+      return;
+    }
 
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -82,8 +88,8 @@ export default function SignupPage() {
             {isSubmitting ? "Creating account..." : "Sign up"}
           </button>
         </form>
-        {message ? (
-          <p className="mt-4 rounded-2xl bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-800">{message}</p>
+        {message || getSupabaseConfigurationError() ? (
+          <p className="mt-4 rounded-2xl bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-800">{message || getSupabaseConfigurationError()}</p>
         ) : !isSupabaseConfigured() ? (
           <p className="mt-4 rounded-2xl bg-zinc-100 px-4 py-3 text-sm text-zinc-600">Supabase env vars are missing, so the app is using local fallback storage.</p>
         ) : null}

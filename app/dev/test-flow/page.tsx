@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, ClipboardCheck, Database, XCircle } from "lucide-react";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigurationError, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getDocuments } from "@/lib/supabase/documents";
 import { getFamilyMembers } from "@/lib/supabase/family";
 import { getReminders } from "@/lib/supabase/reminders";
@@ -134,7 +134,8 @@ export default function DevTestFlowPage() {
   useEffect(() => {
     async function loadDiagnostics() {
       const configured = isSupabaseConfigured();
-      const supabase = getSupabaseClient();
+      const configError = getSupabaseConfigurationError();
+      const supabase = configError ? null : getSupabaseClient();
       const { data } = supabase
         ? await supabase.auth.getUser()
         : { data: { user: null } };

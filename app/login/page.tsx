@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, getSupabaseConfigurationError, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,6 +16,12 @@ export default function LoginPage() {
   async function signIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+
+    const configError = getSupabaseConfigurationError();
+    if (configError) {
+      setMessage(configError);
+      return;
+    }
 
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -46,7 +52,7 @@ export default function LoginPage() {
           {isSubmitting ? "Signing in..." : "Log in"}
         </button>
       </form>
-      <FooterMessage message={message} configured={isSupabaseConfigured()} />
+      <FooterMessage message={message || getSupabaseConfigurationError()} configured={isSupabaseConfigured()} />
       <p className="mt-5 text-center text-sm text-zinc-600">
         New here?{" "}
         <Link href="/signup" className="font-bold text-violet-700">
