@@ -47,5 +47,26 @@
     "expectedCategory": "Pet",
     "expectedRoomId": "garden",
     "expectedDocumentType": "Pet record"
+  },
+  {
+    "name": "hospital appointment letter",
+    "fileName": "hospital-appointment-letter.pdf",
+    "expectedCategory": "Medical",
+    "expectedRoomId": "safe-room",
+    "expectedDocumentType": "Hospital Appointment"
+  },
+  {
+    "name": "NHS appointment letter",
+    "fileName": "nhs-clinic-appointment-letter.pdf",
+    "expectedCategory": "Medical",
+    "expectedRoomId": "safe-room",
+    "expectedDocumentType": "Hospital Appointment"
+  },
+  {
+    "name": "GP referral letter",
+    "fileName": "gp-referral-letter.pdf",
+    "expectedCategory": "Medical",
+    "expectedRoomId": "safe-room",
+    "expectedDocumentType": "Medical Letter"
   }
 ]

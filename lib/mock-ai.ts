@@ -12,6 +12,10 @@ export type DocumentAnalysis = {
   confidence: number;
   extractedSummary: string;
   suggestedReminders: SuggestedReminder[];
+  analysisMethod?: "image_vision" | "pdf_text" | "pdf_vision" | "fallback";
+  pagesAnalysed?: number;
+  extractedTextLength?: number;
+  failureReason?: string;
 };
 
 export type SuggestedReminder = {
@@ -231,11 +235,36 @@ const templates: AnalysisTemplate[] = [
     reminders: [{ title: "Review vehicle document before due date", dueDate: "2026-10-18", priority: "high" }],
   },
   {
+    keywords: [
+      "hospital appointment",
+      "clinic appointment",
+      "gp letter",
+      "nhs letter",
+      "referral letter",
+      "prescription letter",
+      "test result letter",
+      "dental appointment",
+      "optician appointment",
+    ],
+    title: "Hospital Appointment Letter",
+    documentType: "Hospital Appointment",
+    suggestedRoomId: "safe-room",
+    suggestedRoomName: "Safe Room",
+    category: "Medical",
+    provider: "Healthcare provider",
+    policyNumber: "Not detected",
+    issueDate: "2026-06-09",
+    expiryDate: "",
+    reminderDate: "",
+    summary: "Medical appointment or healthcare letter with appointment details and action required.",
+    reminders: [],
+  },
+  {
     keywords: ["medical", "nhs", "prescription", "hospital", "clinic", "diagnosis", "vaccination record"],
-    title: "Medical Record",
-    documentType: "Medical document",
-    suggestedRoomId: "bedroom",
-    suggestedRoomName: "Bedroom",
+    title: "Medical Letter",
+    documentType: "Medical Letter",
+    suggestedRoomId: "safe-room",
+    suggestedRoomName: "Safe Room",
     category: "Medical",
     provider: "Healthcare provider",
     policyNumber: "NHS-0000",

@@ -14,6 +14,7 @@ const pdfVisionImageQuality = 72;
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 const roomIds = ["bedroom", "safe-room", "garage", "office", "family-room", "garden", "driveway", "vault"];
 type AnalysisSource = "real-ai" | "mock-fallback" | "low-confidence";
+type AnalysisMethod = NonNullable<DocumentAnalysis["analysisMethod"]>;
 
 export const runtime = "nodejs";
 
@@ -83,7 +84,14 @@ export async function POST(request: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      return analysisResponse(analyseDocument(file.name), "mock-fallback", "AI unavailable");
+      return analysisResponse(
+        withMetadata(analyseDocument(file.name), {
+          analysisMethod: "fallback",
+          failureReason: "AI unavailable",
+        }),
+        "mock-fallback",
+        "AI unavailable",
+      );
     }
 
     if (file.type === "application/pdf") {
@@ -99,13 +107,21 @@ export async function POST(request: Request) {
 
     try {
       const analysis = await analyseImageWithOpenAI(file, apiKey);
-      return analysisResponse(normalizeAnalysis(analysis, file.name, "image"), "real-ai");
-    } catch (error) {
-      console.warn("OpenAI image analysis failed; using explicit mock fallback", error);
       return analysisResponse(
-        lowConfidenceFallback(file.name, "AI unavailable. OpenAI image analysis failed. Please review before saving."),
-        "mock-fallback",
-        "AI unavailable",
+        normalizeAnalysis(analysis, file.name, "image_vision", {
+          analysisMethod: "image_vision",
+          pagesAnalysed: 1,
+          extractedTextLength: 0,
+        }),
+        "real-ai",
+        "Analysed with image vision",
+      );
+    } catch (error) {
+      console.warn("OpenAI image analysis failed", error);
+      return analysisResponse(
+        lowConfidenceFallback(file.name, "Could not read document clearly. OpenAI image vision failed. Please try a clearer photo."),
+        "low-confidence",
+        "Could not read document clearly",
       );
     }
   } catch (error) {
@@ -119,32 +135,51 @@ export async function POST(request: Request) {
 
 async function analysePdf(file: File, apiKey: string) {
   let text = "";
+  let textExtractionFailed = false;
 
   try {
     text = await extractPdfText(file);
   } catch (error) {
     console.warn("PDF text extraction failed", { fileName: file.name, error });
+    textExtractionFailed = true;
   }
 
-  if (hasUsefulText(text)) {
+  const extractedTextLength = getTextLength(text);
+  const shouldUseVision = !hasUsefulText(text) || shouldPreferVisionForPdf(text);
+
+  if (hasUsefulText(text) && !shouldUseVision) {
     try {
       const analysis = await analyseTextWithOpenAI(text, file.name, apiKey);
-      return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-text"), "real-ai", "Analysed with PDF text");
+      return analysisResponse(
+        normalizeAnalysis(analysis, file.name, "pdf_text", {
+          analysisMethod: "pdf_text",
+          pagesAnalysed: 0,
+          extractedTextLength,
+        }),
+        "real-ai",
+        "Analysed with PDF text",
+      );
     } catch (error) {
       console.warn("OpenAI PDF text analysis failed; returning explicit low-confidence result", {
         fileName: file.name,
         error,
       });
       return analysisResponse(
-        lowConfidencePdfResult(file.name, "AI unavailable. PDF text was extracted, but OpenAI could not analyse it. Please try again."),
-        "mock-fallback",
+        lowConfidencePdfResult(file.name, "Could not read document clearly. PDF text was extracted, but OpenAI could not analyse it. Please try again.", {
+          analysisMethod: "fallback",
+          extractedTextLength,
+          failureReason: "AI unavailable",
+        }),
+        "low-confidence",
         "AI unavailable",
       );
     }
   } else {
     console.warn("PDF text extraction returned too little text", {
       fileName: file.name,
-      textLength: text.length,
+      textLength: extractedTextLength,
+      textExtractionFailed,
+      shouldUseVision,
     });
   }
 
@@ -158,6 +193,11 @@ async function analysePdf(file: File, apiKey: string) {
       lowConfidencePdfResult(
         file.name,
         "This PDF appears to be scanned, but we could not convert it for visual analysis.",
+        {
+          analysisMethod: "fallback",
+          extractedTextLength,
+          failureReason: "PDF vision conversion failed",
+        },
       ),
       "low-confidence",
       "PDF vision conversion failed",
@@ -169,6 +209,11 @@ async function analysePdf(file: File, apiKey: string) {
       lowConfidencePdfResult(
         file.name,
         "This PDF appears to be scanned, but we could not convert it for visual analysis.",
+        {
+          analysisMethod: "fallback",
+          extractedTextLength,
+          failureReason: "PDF vision conversion failed",
+        },
       ),
       "low-confidence",
       "PDF vision conversion failed",
@@ -176,16 +221,30 @@ async function analysePdf(file: File, apiKey: string) {
   }
 
   try {
-    const analysis = await analysePdfImagesWithOpenAI(pageImages, file.name, apiKey);
-    return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-vision"), "real-ai", "Analysed with PDF vision");
+    const analysis = await analysePdfImagesWithOpenAI(pageImages, file.name, apiKey, text);
+    return analysisResponse(
+      normalizeAnalysis(analysis, file.name, "pdf_vision", {
+        analysisMethod: "pdf_vision",
+        pagesAnalysed: pageImages.length,
+        extractedTextLength,
+        failureReason: textExtractionFailed ? "PDF text extraction failed; vision used" : "",
+      }),
+      "real-ai",
+      "Analysed with PDF vision",
+    );
   } catch (error) {
     console.warn("OpenAI PDF vision analysis failed; returning explicit low-confidence result", {
       fileName: file.name,
       error,
     });
     return analysisResponse(
-      lowConfidencePdfResult(file.name, "AI unavailable. PDF pages were converted, but OpenAI could not analyse them. Please try again."),
-      "mock-fallback",
+      lowConfidencePdfResult(file.name, "Could not read document clearly. PDF pages were converted, but OpenAI could not analyse them. Please try again.", {
+        analysisMethod: "fallback",
+        pagesAnalysed: pageImages.length,
+        extractedTextLength,
+        failureReason: "AI unavailable",
+      }),
+      "low-confidence",
       "AI unavailable",
     );
   }
@@ -210,7 +269,7 @@ async function analyseImageWithOpenAI(file: File, apiKey: string): Promise<Docum
   return requestOpenAIAnalysis(apiKey, [
     {
       type: "input_text",
-      text: buildPrompt("image", file.name),
+      text: buildPrompt("image_vision", file.name),
     },
     {
       type: "input_image",
@@ -223,16 +282,27 @@ async function analyseTextWithOpenAI(text: string, fileName: string, apiKey: str
   return requestOpenAIAnalysis(apiKey, [
     {
       type: "input_text",
-      text: `${buildPrompt("pdf-text", fileName)}\n\nExtracted PDF text:\n${text}`,
+      text: `${buildPrompt("pdf_text", fileName)}\n\nExtracted PDF text:\n${text}`,
     },
   ]);
 }
 
-async function analysePdfImagesWithOpenAI(pageImages: string[], fileName: string, apiKey: string): Promise<DocumentAnalysis> {
+async function analysePdfImagesWithOpenAI(
+  pageImages: string[],
+  fileName: string,
+  apiKey: string,
+  extractedText: string,
+): Promise<DocumentAnalysis> {
   return requestOpenAIAnalysis(apiKey, [
     {
       type: "input_text",
-      text: `${buildPrompt("pdf-vision", fileName)}\n\nThe attached images are rendered pages from a scanned/image-only PDF. Analyse up to ${maxPdfVisionPages} pages.`,
+      text: [
+        buildPrompt("pdf_vision", fileName),
+        `The attached images are rendered pages from a PDF. Analyse up to ${maxPdfVisionPages} pages visually.`,
+        extractedText
+          ? `Some PDF text was also extracted but may be incomplete or badly ordered. Use it only as supporting context:\n${extractedText.slice(0, 8000)}`
+          : "No useful PDF text was extracted, so rely on the rendered page images.",
+      ].join("\n\n"),
     },
     ...pageImages.map((imageUrl) => ({
       type: "input_image" as const,
@@ -322,16 +392,18 @@ async function requestOpenAIAnalysis(
   return JSON.parse(text) as DocumentAnalysis;
 }
 
-function buildPrompt(mode: "image" | "pdf-text" | "pdf-vision", fileName: string) {
+function buildPrompt(mode: AnalysisMethod, fileName: string) {
   return [
     "You are analysing a life admin document for Simply Logged, a family vault app.",
-    mode === "image" || mode === "pdf-vision"
-      ? "Read the visible text in the uploaded image. Do not classify from filename alone."
+    mode === "image_vision" || mode === "pdf_vision"
+      ? "You are reading the document visually. Use all visible text. Do not guess. Do not classify from filename alone."
       : "Classify using the extracted PDF text. Use the filename only as a weak hint if the text is unclear.",
     `Filename: ${fileName}`,
     "Return only JSON matching the schema.",
+    "If the document is a letter, identify the sender, purpose, key dates, and action required.",
     "Extract these fields: document title, document_type, category, provider/company, policy/account/serial/reference number, issue date, expiry/renewal/due date, suggested room, one useful reminder, confidence, and a short plain-English summary.",
     "For bank, card, mortgage, or loan statements, extract the bank/provider name, account holder name if visible, masked account number or last 4 digits only, statement period, statement date, and balance if visible. Include those details in the plain-English summary.",
+    "For medical or hospital letters, extract hospital/clinic/provider name, appointment date, appointment time, department/clinic name, doctor or consultant name, location/address, patient name if visible, reference number if visible, action required, suggested reminder date/time, and a plain-English summary.",
     "Privacy rule: never return a full bank account number. If a bank account number is visible, return only a masked value such as 'ending 1234' or '****1234' in policyNumber.",
     `Category must be one of: ${documentCategories.join(", ")}.`,
     "Classification guidance:",
@@ -344,14 +416,14 @@ function buildPrompt(mode: "image" | "pdf-text" | "pdf-vision", fileName: string
     "- Tax: HMRC, self assessment, P60, P45, tax calculation.",
     "- Vehicle: MOT, V5C/log book, vehicle tax, service history, breakdown cover.",
     "- Pet: vet record, vaccination, microchip, pet insurance.",
-    "- Medical: NHS, clinic, hospital, prescription, medical record.",
+    "- Medical: hospital appointment letter, clinic appointment, GP letter, NHS letter, private healthcare letter, referral letter, prescription letter, test result letter, dental appointment, optician appointment, medical record.",
     "- School: school/nursery records, reports, exam or qualification documents.",
     "- Legal: will, power of attorney, solicitor, funeral wishes, contracts.",
     "- ID / Certificate: passport, driving licence, birth/marriage/death certificate.",
     "- Home Maintenance: boiler service, gas safety, repairs, maintenance contracts.",
     "Room mapping:",
-    "- bedroom: ID / Certificate, Medical, School, personal records.",
-    "- safe-room: Legal, life insurance, power of attorney, funeral wishes, highly sensitive bank/legacy documents.",
+    "- bedroom: ID / Certificate, School, personal records.",
+    "- safe-room: Medical, Legal, life insurance, power of attorney, funeral wishes, highly sensitive bank/legacy documents.",
     "- garage: Vehicle, car insurance, MOT, vehicle tax, service history.",
     "- office: Bank Statement, Mortgage / Rent, Tax, finance, pension, routine bank documents.",
     "- family-room: Insurance for home, Utility Bill, Warranty, Appliance Manual, Home Maintenance.",
@@ -363,6 +435,8 @@ function buildPrompt(mode: "image" | "pdf-text" | "pdf-vision", fileName: string
     "- 0.50-0.79 if some key fields are visible but classification is partly inferred.",
     "- 0.00-0.49 if mostly guessed, filename-based, or text is unclear.",
     "Use ISO dates in YYYY-MM-DD format when visible. Use empty strings for missing dates/numbers/providers.",
+    "For appointment times, include the time in the reminder title or extractedSummary if visible. The dueDate must remain YYYY-MM-DD.",
+    "If a medical appointment date is upcoming, create a high priority reminder for that date.",
     "If no useful reminder exists, return an empty reminder array and empty reminderDate.",
   ].join("\n");
 }
@@ -406,7 +480,12 @@ function extractOutputText(data: unknown): string {
   return "";
 }
 
-function normalizeAnalysis(analysis: DocumentAnalysis, fileName: string, mode: "image" | "pdf-text" | "pdf-vision"): DocumentAnalysis {
+function normalizeAnalysis(
+  analysis: DocumentAnalysis,
+  fileName: string,
+  mode: Exclude<AnalysisMethod, "fallback">,
+  metadata: Partial<Pick<DocumentAnalysis, "analysisMethod" | "pagesAnalysed" | "extractedTextLength" | "failureReason">>,
+): DocumentAnalysis {
   const fallback = analyseDocument(fileName);
   const category = documentCategories.includes(analysis.category as (typeof documentCategories)[number])
     ? analysis.category
@@ -427,6 +506,7 @@ function normalizeAnalysis(analysis: DocumentAnalysis, fileName: string, mode: "
   return {
     ...normalized,
     reminderDate: normalized.reminderDate || reminders[0]?.dueDate || "",
+    ...metadata,
   };
 }
 
@@ -445,7 +525,7 @@ function normalizeReminders(reminders: SuggestedReminder[], reminderDate: string
     }));
 }
 
-function applyConfidenceRules(analysis: DocumentAnalysis, mode: "image" | "pdf-text" | "pdf-vision") {
+function applyConfidenceRules(analysis: DocumentAnalysis, mode: Exclude<AnalysisMethod, "fallback">) {
   let confidence = clampConfidence(analysis.confidence);
   const hasTitle = hasDetectedValue(analysis.title);
   const hasType = hasDetectedValue(analysis.documentType);
@@ -464,7 +544,7 @@ function applyConfidenceRules(analysis: DocumentAnalysis, mode: "image" | "pdf-t
     confidence = Math.min(confidence, 0.74);
   }
 
-  if ((mode === "pdf-text" || mode === "pdf-vision") && confidence > 0.9 && (!hasProvider || !hasDateOrNumber)) {
+  if ((mode === "pdf_text" || mode === "pdf_vision") && confidence > 0.9 && (!hasProvider || !hasDateOrNumber)) {
     confidence = 0.72;
   }
 
@@ -476,7 +556,7 @@ function hasDetectedValue(value: string) {
 }
 
 function hasUsefulText(text: string) {
-  return text.replace(/\s+/g, "").length >= 40;
+  return getTextLength(text) >= 40;
 }
 
 function lowConfidenceFallback(fileName: string, reason: string): DocumentAnalysis {
@@ -487,10 +567,16 @@ function lowConfidenceFallback(fileName: string, reason: string): DocumentAnalys
     extractedSummary: reason,
     suggestedReminders: [],
     reminderDate: "",
+    analysisMethod: "fallback",
+    failureReason: reason,
   };
 }
 
-function lowConfidencePdfResult(fileName: string, reason: string): DocumentAnalysis {
+function lowConfidencePdfResult(
+  fileName: string,
+  reason: string,
+  metadata: Partial<Pick<DocumentAnalysis, "analysisMethod" | "pagesAnalysed" | "extractedTextLength" | "failureReason">> = {},
+): DocumentAnalysis {
   return {
     title: tidyFileName(fileName),
     documentType: "PDF document",
@@ -505,6 +591,50 @@ function lowConfidencePdfResult(fileName: string, reason: string): DocumentAnaly
     confidence: 0.12,
     extractedSummary: reason,
     suggestedReminders: [],
+    analysisMethod: "fallback",
+    failureReason: reason,
+    ...metadata,
+  };
+}
+
+function shouldPreferVisionForPdf(text: string) {
+  if (!text) {
+    return true;
+  }
+
+  const normalized = text.toLowerCase();
+  const letterSignals = [
+    "dear ",
+    "appointment",
+    "clinic",
+    "hospital",
+    "nhs",
+    "consultant",
+    "department",
+    "referral",
+    "patient",
+    "gp ",
+    "surgery",
+    "prescription",
+    "test result",
+    "dental",
+    "optician",
+  ];
+
+  return letterSignals.some((signal) => normalized.includes(signal));
+}
+
+function getTextLength(text: string) {
+  return text.replace(/\s+/g, "").length;
+}
+
+function withMetadata(
+  analysis: DocumentAnalysis,
+  metadata: Partial<Pick<DocumentAnalysis, "analysisMethod" | "pagesAnalysed" | "extractedTextLength" | "failureReason">>,
+) {
+  return {
+    ...analysis,
+    ...metadata,
   };
 }
 

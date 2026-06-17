@@ -200,6 +200,16 @@ function AddReviewContent() {
         ) : null}
 
         <section className="mt-4 rounded-[1.5rem] bg-white/88 p-4 shadow-lg shadow-slate-300/30 ring-1 ring-white">
+          <h3 className="text-sm font-bold">Analysis details</h3>
+          <dl className="mt-3 grid gap-2 text-sm">
+            <Detail label="Method" value={getAnalysisMethodLabel(analysis.analysisMethod)} />
+            <Detail label="Pages analysed" value={String(analysis.pagesAnalysed ?? 0)} />
+            <Detail label="PDF text length" value={String(analysis.extractedTextLength ?? 0)} />
+            <Detail label="Issue" value={analysis.failureReason || "None"} />
+          </dl>
+        </section>
+
+        <section className="mt-4 rounded-[1.5rem] bg-white/88 p-4 shadow-lg shadow-slate-300/30 ring-1 ring-white">
           <label className="text-sm font-bold" htmlFor="room-select">
             Suggested room
           </label>
@@ -299,6 +309,10 @@ function getConfidenceLevel(confidence: number) {
 }
 
 function getAnalysisLabel(pending: PendingAnalysis) {
+  if (pending.analysis.analysisMethod === "image_vision") {
+    return "Analysed with image vision";
+  }
+
   if (pending.analysisReason === "Analysed with PDF text") {
     return "Analysed with PDF text";
   }
@@ -311,10 +325,18 @@ function getAnalysisLabel(pending: PendingAnalysis) {
     return "OpenAI analysis";
   }
 
+  if (pending.analysisReason === "Could not read document clearly") {
+    return "Could not read document clearly";
+  }
+
   return pending.analysisReason || "Low confidence result";
 }
 
 function getAnalysisBadge(pending: PendingAnalysis) {
+  if (pending.analysis.analysisMethod === "image_vision") {
+    return "Analysed with image vision";
+  }
+
   if (pending.analysisReason === "Analysed with PDF text") {
     return "Analysed with PDF text";
   }
@@ -339,7 +361,19 @@ function getAnalysisBadge(pending: PendingAnalysis) {
     return "PDF vision conversion failed";
   }
 
+  if (pending.analysisReason === "Could not read document clearly") {
+    return "Could not read document clearly";
+  }
+
   return "Low confidence result";
+}
+
+function getAnalysisMethodLabel(method: DocumentAnalysis["analysisMethod"]) {
+  if (method === "image_vision") return "Image vision";
+  if (method === "pdf_text") return "PDF text";
+  if (method === "pdf_vision") return "PDF vision";
+  if (method === "fallback") return "Fallback";
+  return "Not recorded";
 }
 
 function createId(prefix: string) {
