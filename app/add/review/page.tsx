@@ -22,7 +22,8 @@ type PendingAnalysis = {
   fileUrl?: string;
   preferredRoomId?: string;
   analysedAt: string;
-  source?: "real-ai" | "mock-fallback";
+  source?: "real-ai" | "mock-fallback" | "low-confidence";
+  analysisReason?: string;
   analysis: DocumentAnalysis;
 };
 
@@ -151,7 +152,7 @@ function AddReviewContent() {
           </Link>
           <div>
             <p className="text-xs font-semibold text-violet-700">
-              {pending.source === "real-ai" ? "OpenAI analysis" : "Mock fallback analysis"}
+              {getAnalysisLabel(pending)}
             </p>
             <h1 className="text-lg font-bold">AI has reviewed your document</h1>
           </div>
@@ -169,10 +170,12 @@ function AddReviewContent() {
                 className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${
                   pending.source === "real-ai"
                     ? "bg-emerald-100 text-emerald-700"
+                    : pending.source === "low-confidence"
+                      ? "bg-amber-100 text-amber-700"
                     : "bg-amber-100 text-amber-700"
                 }`}
               >
-                {pending.source === "real-ai" ? "Real AI result" : "Mock fallback result"}
+                {getAnalysisBadge(pending)}
               </span>
               <p className="mt-2 text-sm leading-6 text-zinc-600">{analysis.extractedSummary}</p>
             </div>
@@ -295,6 +298,30 @@ function getConfidenceLevel(confidence: number) {
   return "Low";
 }
 
+function getAnalysisLabel(pending: PendingAnalysis) {
+  if (pending.source === "real-ai") {
+    return "OpenAI analysis";
+  }
+
+  return pending.analysisReason || "Low confidence result";
+}
+
+function getAnalysisBadge(pending: PendingAnalysis) {
+  if (pending.source === "real-ai") {
+    return "Real AI result";
+  }
+
+  if (pending.analysisReason === "PDF text could not be extracted") {
+    return "PDF text could not be extracted";
+  }
+
+  if (pending.analysisReason === "AI unavailable") {
+    return "AI unavailable";
+  }
+
+  return "Low confidence result";
+}
+
 function createId(prefix: string) {
   void prefix;
 
@@ -316,6 +343,7 @@ function normalizePendingAnalysis(pending: PendingAnalysis): PendingAnalysis {
     documentId: pending.documentId ?? createId("doc"),
     fileSize: pending.fileSize ?? 0,
     source: pending.source ?? "mock-fallback",
+    analysisReason: pending.analysisReason ?? "",
     analysis: {
       ...pending.analysis,
       suggestedReminders: pending.analysis.suggestedReminders.map((reminder) => {

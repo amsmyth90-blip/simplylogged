@@ -10,6 +10,7 @@ import {
 const maxFileSize = 12 * 1024 * 1024;
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 const roomIds = ["bedroom", "safe-room", "garage", "office", "family-room", "garden", "driveway", "vault"];
+type AnalysisSource = "real-ai" | "mock-fallback" | "low-confidence";
 
 const analysisSchema = {
   type: "object",
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      return analysisResponse(analyseDocument(file.name), "mock-fallback");
+      return analysisResponse(analyseDocument(file.name), "mock-fallback", "AI unavailable");
     }
 
     if (file.type === "application/pdf") {
@@ -96,7 +97,11 @@ export async function POST(request: Request) {
       return analysisResponse(normalizeAnalysis(analysis, file.name, "image"), "real-ai");
     } catch (error) {
       console.warn("OpenAI image analysis failed; using explicit mock fallback", error);
-      return analysisResponse(lowConfidenceFallback(file.name, "OpenAI image analysis failed. Please review before saving."), "mock-fallback");
+      return analysisResponse(
+        lowConfidenceFallback(file.name, "AI unavailable. OpenAI image analysis failed. Please review before saving."),
+        "mock-fallback",
+        "AI unavailable",
+      );
     }
   } catch (error) {
     console.warn("Document analysis route failed", error);
@@ -108,22 +113,49 @@ export async function POST(request: Request) {
 }
 
 async function analysePdf(file: File, apiKey: string) {
-  try {
-    const text = await extractPdfText(file);
-    if (!hasUsefulText(text)) {
-      return analysisResponse(
-        lowConfidenceFallback(file.name, "We could not extract enough readable text from this PDF. Please review before saving."),
-        "mock-fallback",
-      );
-    }
+  let text = "";
 
+  try {
+    text = await extractPdfText(file);
+  } catch (error) {
+    console.warn("PDF text extraction failed", { fileName: file.name, error });
+    return analysisResponse(
+      lowConfidencePdfResult(
+        file.name,
+        "PDF text could not be extracted. This PDF appears to be scanned. Please upload a photo/screenshot or enable OCR.",
+      ),
+      "low-confidence",
+      "PDF text could not be extracted",
+    );
+  }
+
+  if (!hasUsefulText(text)) {
+    console.warn("PDF text extraction returned too little text", {
+      fileName: file.name,
+      textLength: text.length,
+    });
+    return analysisResponse(
+      lowConfidencePdfResult(
+        file.name,
+        "PDF text could not be extracted. This PDF appears to be scanned. Please upload a photo/screenshot or enable OCR.",
+      ),
+      "low-confidence",
+      "PDF text could not be extracted",
+    );
+  }
+
+  try {
     const analysis = await analyseTextWithOpenAI(text, file.name, apiKey);
     return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-text"), "real-ai");
   } catch (error) {
-    console.warn("PDF text analysis failed; returning low confidence result", error);
+    console.warn("OpenAI PDF text analysis failed; returning explicit low-confidence result", {
+      fileName: file.name,
+      error,
+    });
     return analysisResponse(
-      lowConfidenceFallback(file.name, "PDF text extraction or analysis failed. Please review before saving."),
+      lowConfidencePdfResult(file.name, "AI unavailable. PDF text was extracted, but OpenAI could not analyse it. Please try again."),
       "mock-fallback",
+      "AI unavailable",
     );
   }
 }
@@ -217,12 +249,15 @@ function buildPrompt(mode: "image" | "pdf-text", fileName: string) {
     `Filename: ${fileName}`,
     "Return only JSON matching the schema.",
     "Extract these fields: document title, document_type, category, provider/company, policy/account/serial/reference number, issue date, expiry/renewal/due date, suggested room, one useful reminder, confidence, and a short plain-English summary.",
+    "For bank, card, mortgage, or loan statements, extract the bank/provider name, account holder name if visible, masked account number or last 4 digits only, statement period, statement date, and balance if visible. Include those details in the plain-English summary.",
+    "Privacy rule: never return a full bank account number. If a bank account number is visible, return only a masked value such as 'ending 1234' or '****1234' in policyNumber.",
     `Category must be one of: ${documentCategories.join(", ")}.`,
     "Classification guidance:",
     "- Insurance: home, car, pet, travel, life, buildings, contents, policy schedule, certificate of insurance.",
     "- Warranty: guarantee, appliance/boiler/product warranty, serial number, coverage period.",
     "- Appliance Manual: instruction manual, user guide, installation guide.",
     "- Utility Bill: energy, gas, electricity, water, council tax, broadband, phone bill.",
+    "- Bank Statement: bank statement, current account statement, savings statement, credit card statement, mortgage statement, loan statement.",
     "- Mortgage / Rent: mortgage offer/statement, rent agreement, tenancy, lease.",
     "- Tax: HMRC, self assessment, P60, P45, tax calculation.",
     "- Vehicle: MOT, V5C/log book, vehicle tax, service history, breakdown cover.",
@@ -236,7 +271,7 @@ function buildPrompt(mode: "image" | "pdf-text", fileName: string) {
     "- bedroom: ID / Certificate, Medical, School, personal records.",
     "- safe-room: Legal, life insurance, power of attorney, funeral wishes.",
     "- garage: Vehicle, car insurance, MOT, vehicle tax, service history.",
-    "- office: Mortgage / Rent, Tax, finance, pension, bank documents.",
+    "- office: Bank Statement, Mortgage / Rent, Tax, finance, pension, bank documents.",
     "- family-room: Insurance for home, Utility Bill, Warranty, Appliance Manual, Home Maintenance.",
     "- garden: Pet records, garden/outdoor equipment.",
     "- driveway: travel insurance, flights, visas, holiday bookings.",
@@ -302,6 +337,7 @@ function normalizeAnalysis(analysis: DocumentAnalysis, fileName: string, mode: "
     category,
     suggestedRoomId: roomIds.includes(analysis.suggestedRoomId) ? analysis.suggestedRoomId : fallback.suggestedRoomId,
     suggestedRoomName: analysis.suggestedRoomName || fallback.suggestedRoomName,
+    policyNumber: maskSensitiveReference(analysis.policyNumber),
     confidence: applyConfidenceRules(analysis, mode),
     suggestedReminders: reminders,
   };
@@ -372,6 +408,49 @@ function lowConfidenceFallback(fileName: string, reason: string): DocumentAnalys
   };
 }
 
+function lowConfidencePdfResult(fileName: string, reason: string): DocumentAnalysis {
+  return {
+    title: tidyFileName(fileName),
+    documentType: "PDF document",
+    suggestedRoomId: "vault",
+    suggestedRoomName: "Vault",
+    category: "Other",
+    provider: "Not detected",
+    policyNumber: "Not detected",
+    issueDate: "",
+    expiryDate: "",
+    reminderDate: "",
+    confidence: 0.12,
+    extractedSummary: reason,
+    suggestedReminders: [],
+  };
+}
+
+function tidyFileName(fileName: string) {
+  return fileName
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function maskSensitiveReference(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  const trimmed = value.trim();
+  if (/^(unknown|not detected|n\/a|none)$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length >= 6) {
+    return `ending ${digits.slice(-4)}`;
+  }
+
+  return trimmed;
+}
+
 function clampConfidence(value: number) {
   if (!Number.isFinite(value)) {
     return 0.35;
@@ -380,10 +459,11 @@ function clampConfidence(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
-function analysisResponse(analysis: DocumentAnalysis, source: "real-ai" | "mock-fallback") {
+function analysisResponse(analysis: DocumentAnalysis, source: AnalysisSource, reason?: string) {
   return NextResponse.json(analysis, {
     headers: {
       "x-analysis-source": source,
+      ...(reason ? { "x-analysis-reason": reason } : {}),
     },
   });
 }

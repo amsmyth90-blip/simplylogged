@@ -96,7 +96,7 @@ function AddPageContent() {
 
     try {
       const documentId = createId();
-      const { analysis, source } = await analyseWithFallback(file);
+      const { analysis, source, reason } = await analyseWithFallback(file);
       const upload = await uploadRequiredFile(file, documentId);
 
       savePendingAnalysis(file, analysis, source, {
@@ -104,6 +104,7 @@ function AddPageContent() {
         filePath: upload?.filePath ?? "",
         fileUrl: upload?.fileUrl ?? "",
         preferredRoomId,
+        analysisReason: reason,
       });
       router.push("/add/review");
     } catch (error) {
@@ -134,12 +135,20 @@ function AddPageContent() {
       return {
         analysis,
         source: response.headers.get("x-analysis-source") ?? "real-ai",
+        reason: response.headers.get("x-analysis-reason") ?? "",
       };
     } catch (apiError) {
       console.warn("Document analysis fell back to mock mode", apiError);
+      if (isSupabaseConfigured()) {
+        throw new Error(
+          apiError instanceof Error ? apiError.message : "AI analysis failed. Please try again.",
+        );
+      }
+
       return {
         analysis: analyseDocument(file.name),
         source: "mock-fallback",
+        reason: "AI unavailable",
       };
     }
   }
@@ -261,7 +270,7 @@ function savePendingAnalysis(
   file: File,
   analysis: DocumentAnalysis,
   source: string,
-  upload: UploadedDocumentFile & { preferredRoomId?: string },
+  upload: UploadedDocumentFile & { preferredRoomId?: string; analysisReason?: string },
 ) {
   window.sessionStorage.setItem(
     "simplyLoggedPendingAnalysis",
@@ -274,7 +283,8 @@ function savePendingAnalysis(
       fileUrl: upload.fileUrl,
       preferredRoomId: upload.preferredRoomId,
       analysedAt: new Date().toISOString(),
-      source: source === "real-ai" ? "real-ai" : "mock-fallback",
+      source,
+      analysisReason: upload.analysisReason ?? "",
       analysis,
     }),
   );

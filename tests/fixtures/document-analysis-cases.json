@@ -28,6 +28,13 @@
     "expectedDocumentType": "Utility bill"
   },
   {
+    "name": "bank statement",
+    "fileName": "current-account-bank-statement-6-months.pdf",
+    "expectedCategory": "Bank Statement",
+    "expectedRoomId": "office",
+    "expectedDocumentType": "Bank statement"
+  },
+  {
     "name": "appliance manual",
     "fileName": "dishwasher-appliance-manual.pdf",
     "expectedCategory": "Appliance Manual",
