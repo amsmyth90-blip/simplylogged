@@ -299,6 +299,14 @@ function getConfidenceLevel(confidence: number) {
 }
 
 function getAnalysisLabel(pending: PendingAnalysis) {
+  if (pending.analysisReason === "Analysed with PDF text") {
+    return "Analysed with PDF text";
+  }
+
+  if (pending.analysisReason === "Analysed with PDF vision") {
+    return "Analysed with PDF vision";
+  }
+
   if (pending.source === "real-ai") {
     return "OpenAI analysis";
   }
@@ -307,6 +315,14 @@ function getAnalysisLabel(pending: PendingAnalysis) {
 }
 
 function getAnalysisBadge(pending: PendingAnalysis) {
+  if (pending.analysisReason === "Analysed with PDF text") {
+    return "Analysed with PDF text";
+  }
+
+  if (pending.analysisReason === "Analysed with PDF vision") {
+    return "Analysed with PDF vision";
+  }
+
   if (pending.source === "real-ai") {
     return "Real AI result";
   }
@@ -317,6 +333,10 @@ function getAnalysisBadge(pending: PendingAnalysis) {
 
   if (pending.analysisReason === "AI unavailable") {
     return "AI unavailable";
+  }
+
+  if (pending.analysisReason === "PDF vision conversion failed") {
+    return "PDF vision conversion failed";
   }
 
   return "Low confidence result";

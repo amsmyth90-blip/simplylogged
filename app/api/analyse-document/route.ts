@@ -8,9 +8,14 @@ import {
 } from "@/lib/mock-ai";
 
 const maxFileSize = 12 * 1024 * 1024;
+const maxPdfVisionPages = 3;
+const pdfVisionImageMaxDimension = 1400;
+const pdfVisionImageQuality = 72;
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 const roomIds = ["bedroom", "safe-room", "garage", "office", "family-room", "garden", "driveway", "vault"];
 type AnalysisSource = "real-ai" | "mock-fallback" | "low-confidence";
+
+export const runtime = "nodejs";
 
 const analysisSchema = {
   type: "object",
@@ -119,41 +124,67 @@ async function analysePdf(file: File, apiKey: string) {
     text = await extractPdfText(file);
   } catch (error) {
     console.warn("PDF text extraction failed", { fileName: file.name, error });
-    return analysisResponse(
-      lowConfidencePdfResult(
-        file.name,
-        "PDF text could not be extracted. This PDF appears to be scanned. Please upload a photo/screenshot or enable OCR.",
-      ),
-      "low-confidence",
-      "PDF text could not be extracted",
-    );
   }
 
-  if (!hasUsefulText(text)) {
+  if (hasUsefulText(text)) {
+    try {
+      const analysis = await analyseTextWithOpenAI(text, file.name, apiKey);
+      return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-text"), "real-ai", "Analysed with PDF text");
+    } catch (error) {
+      console.warn("OpenAI PDF text analysis failed; returning explicit low-confidence result", {
+        fileName: file.name,
+        error,
+      });
+      return analysisResponse(
+        lowConfidencePdfResult(file.name, "AI unavailable. PDF text was extracted, but OpenAI could not analyse it. Please try again."),
+        "mock-fallback",
+        "AI unavailable",
+      );
+    }
+  } else {
     console.warn("PDF text extraction returned too little text", {
       fileName: file.name,
       textLength: text.length,
     });
+  }
+
+  let pageImages: string[] = [];
+
+  try {
+    pageImages = await renderPdfPagesForVision(file);
+  } catch (error) {
+    console.warn("Scanned PDF image conversion failed", { fileName: file.name, error });
     return analysisResponse(
       lowConfidencePdfResult(
         file.name,
-        "PDF text could not be extracted. This PDF appears to be scanned. Please upload a photo/screenshot or enable OCR.",
+        "This PDF appears to be scanned, but we could not convert it for visual analysis.",
       ),
       "low-confidence",
-      "PDF text could not be extracted",
+      "PDF vision conversion failed",
+    );
+  }
+
+  if (!pageImages.length) {
+    return analysisResponse(
+      lowConfidencePdfResult(
+        file.name,
+        "This PDF appears to be scanned, but we could not convert it for visual analysis.",
+      ),
+      "low-confidence",
+      "PDF vision conversion failed",
     );
   }
 
   try {
-    const analysis = await analyseTextWithOpenAI(text, file.name, apiKey);
-    return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-text"), "real-ai");
+    const analysis = await analysePdfImagesWithOpenAI(pageImages, file.name, apiKey);
+    return analysisResponse(normalizeAnalysis(analysis, file.name, "pdf-vision"), "real-ai", "Analysed with PDF vision");
   } catch (error) {
-    console.warn("OpenAI PDF text analysis failed; returning explicit low-confidence result", {
+    console.warn("OpenAI PDF vision analysis failed; returning explicit low-confidence result", {
       fileName: file.name,
       error,
     });
     return analysisResponse(
-      lowConfidencePdfResult(file.name, "AI unavailable. PDF text was extracted, but OpenAI could not analyse it. Please try again."),
+      lowConfidencePdfResult(file.name, "AI unavailable. PDF pages were converted, but OpenAI could not analyse them. Please try again."),
       "mock-fallback",
       "AI unavailable",
     );
@@ -195,6 +226,57 @@ async function analyseTextWithOpenAI(text: string, fileName: string, apiKey: str
       text: `${buildPrompt("pdf-text", fileName)}\n\nExtracted PDF text:\n${text}`,
     },
   ]);
+}
+
+async function analysePdfImagesWithOpenAI(pageImages: string[], fileName: string, apiKey: string): Promise<DocumentAnalysis> {
+  return requestOpenAIAnalysis(apiKey, [
+    {
+      type: "input_text",
+      text: `${buildPrompt("pdf-vision", fileName)}\n\nThe attached images are rendered pages from a scanned/image-only PDF. Analyse up to ${maxPdfVisionPages} pages.`,
+    },
+    ...pageImages.map((imageUrl) => ({
+      type: "input_image" as const,
+      image_url: imageUrl,
+    })),
+  ]);
+}
+
+async function renderPdfPagesForVision(file: File) {
+  const { createCanvas } = await import("@napi-rs/canvas");
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const loadingTask = pdfjs.getDocument({
+    data: bytes,
+    useSystemFonts: true,
+  });
+  const pdf = await loadingTask.promise;
+  const pages = Math.min(pdf.numPages, maxPdfVisionPages);
+  const images: string[] = [];
+
+  for (let pageNumber = 1; pageNumber <= pages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: 1 });
+    const scale = Math.min(
+      pdfVisionImageMaxDimension / viewport.width,
+      pdfVisionImageMaxDimension / viewport.height,
+      2,
+    );
+    const scaledViewport = page.getViewport({ scale });
+    const canvas = createCanvas(Math.ceil(scaledViewport.width), Math.ceil(scaledViewport.height));
+    const context = canvas.getContext("2d");
+
+    await page.render({
+      canvas: canvas as unknown as HTMLCanvasElement,
+      canvasContext: context as unknown as CanvasRenderingContext2D,
+      viewport: scaledViewport,
+    }).promise;
+
+    const jpeg = canvas.toBuffer("image/jpeg", pdfVisionImageQuality);
+    images.push(`data:image/jpeg;base64,${jpeg.toString("base64")}`);
+  }
+
+  await pdf.destroy();
+  return images;
 }
 
 async function requestOpenAIAnalysis(
@@ -240,10 +322,10 @@ async function requestOpenAIAnalysis(
   return JSON.parse(text) as DocumentAnalysis;
 }
 
-function buildPrompt(mode: "image" | "pdf-text", fileName: string) {
+function buildPrompt(mode: "image" | "pdf-text" | "pdf-vision", fileName: string) {
   return [
     "You are analysing a life admin document for Simply Logged, a family vault app.",
-    mode === "image"
+    mode === "image" || mode === "pdf-vision"
       ? "Read the visible text in the uploaded image. Do not classify from filename alone."
       : "Classify using the extracted PDF text. Use the filename only as a weak hint if the text is unclear.",
     `Filename: ${fileName}`,
@@ -269,9 +351,9 @@ function buildPrompt(mode: "image" | "pdf-text", fileName: string) {
     "- Home Maintenance: boiler service, gas safety, repairs, maintenance contracts.",
     "Room mapping:",
     "- bedroom: ID / Certificate, Medical, School, personal records.",
-    "- safe-room: Legal, life insurance, power of attorney, funeral wishes.",
+    "- safe-room: Legal, life insurance, power of attorney, funeral wishes, highly sensitive bank/legacy documents.",
     "- garage: Vehicle, car insurance, MOT, vehicle tax, service history.",
-    "- office: Bank Statement, Mortgage / Rent, Tax, finance, pension, bank documents.",
+    "- office: Bank Statement, Mortgage / Rent, Tax, finance, pension, routine bank documents.",
     "- family-room: Insurance for home, Utility Bill, Warranty, Appliance Manual, Home Maintenance.",
     "- garden: Pet records, garden/outdoor equipment.",
     "- driveway: travel insurance, flights, visas, holiday bookings.",
@@ -324,7 +406,7 @@ function extractOutputText(data: unknown): string {
   return "";
 }
 
-function normalizeAnalysis(analysis: DocumentAnalysis, fileName: string, mode: "image" | "pdf-text"): DocumentAnalysis {
+function normalizeAnalysis(analysis: DocumentAnalysis, fileName: string, mode: "image" | "pdf-text" | "pdf-vision"): DocumentAnalysis {
   const fallback = analyseDocument(fileName);
   const category = documentCategories.includes(analysis.category as (typeof documentCategories)[number])
     ? analysis.category
@@ -363,7 +445,7 @@ function normalizeReminders(reminders: SuggestedReminder[], reminderDate: string
     }));
 }
 
-function applyConfidenceRules(analysis: DocumentAnalysis, mode: "image" | "pdf-text") {
+function applyConfidenceRules(analysis: DocumentAnalysis, mode: "image" | "pdf-text" | "pdf-vision") {
   let confidence = clampConfidence(analysis.confidence);
   const hasTitle = hasDetectedValue(analysis.title);
   const hasType = hasDetectedValue(analysis.documentType);
@@ -382,7 +464,7 @@ function applyConfidenceRules(analysis: DocumentAnalysis, mode: "image" | "pdf-t
     confidence = Math.min(confidence, 0.74);
   }
 
-  if (mode === "pdf-text" && confidence > 0.9 && (!hasProvider || !hasDateOrNumber)) {
+  if ((mode === "pdf-text" || mode === "pdf-vision") && confidence > 0.9 && (!hasProvider || !hasDateOrNumber)) {
     confidence = 0.72;
   }
 
