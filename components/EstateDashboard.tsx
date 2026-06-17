@@ -91,35 +91,37 @@ export function EstateDashboard({ panel }: EstateDashboardProps) {
   );
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-black">
-      <Image
-        src="/images/estate-map-light.png"
-        alt="Simply Logged home"
-        fill
-        unoptimized
-        priority
-        sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover object-center md:h-[112%] md:w-[112%] md:-translate-x-[6%] md:-translate-y-[6%] md:scale-[0.92] md:object-bottom lg:object-[center_bottom]"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/18" />
-      <AppHeader />
-      <section className="absolute inset-0 z-10">
-        {dynamicHotspots.map((hotspot) => (
-          <EstateHotspot key={hotspot.id} {...hotspot} />
-        ))}
-      </section>
-      {panel === "mailbox" ? (
-        <aside className="glass absolute bottom-[calc(6.15rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-md rounded-[1.75rem] p-4 text-zinc-950">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">
-            Mailbox
-          </p>
-          <h2 className="mt-1 text-lg font-bold">{badgeState.newDocuments} items need a glance</h2>
-          <p className="mt-1 text-sm text-zinc-700">
-            New uploads are waiting in the mailbox before they are filed into estate rooms.
-          </p>
-        </aside>
-      ) : null}
-      <BottomNav />
+    <main className="min-h-svh overflow-hidden bg-black md:flex md:items-center md:justify-center">
+      <div className="relative min-h-svh w-full overflow-hidden bg-black md:h-svh md:min-h-0 md:max-w-[430px] md:shadow-2xl md:shadow-black/70 lg:max-w-[460px]">
+        <Image
+          src="/images/estate-map-light.png"
+          alt="Simply Logged home"
+          fill
+          unoptimized
+          priority
+          sizes="100vw"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/18" />
+        <AppHeader />
+        <section className="absolute inset-0 z-10">
+          {dynamicHotspots.map((hotspot) => (
+            <EstateHotspot key={hotspot.id} {...hotspot} />
+          ))}
+        </section>
+        {panel === "mailbox" ? (
+          <aside className="glass absolute bottom-[calc(6.15rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 mx-auto max-w-md rounded-[1.75rem] p-4 text-zinc-950">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">
+              Mailbox
+            </p>
+            <h2 className="mt-1 text-lg font-bold">{badgeState.newDocuments} items need a glance</h2>
+            <p className="mt-1 text-sm text-zinc-700">
+              New uploads are waiting in the mailbox before they are filed into estate rooms.
+            </p>
+          </aside>
+        ) : null}
+        <BottomNav />
+      </div>
     </main>
   );
 }
