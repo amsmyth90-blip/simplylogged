@@ -69,6 +69,7 @@ function AddReviewContent() {
 
   const { analysis } = pending;
   const roomName = selectedRoom?.name ?? analysis.suggestedRoomName;
+  const confidenceLevel = getConfidenceLevel(analysis.confidence);
 
   async function save(addReminders: boolean) {
     if (!pending) {
@@ -185,9 +186,15 @@ function AddReviewContent() {
             <Detail label="Category" value={analysis.category} />
             <Detail label="Provider" value={analysis.provider} />
             <Detail label="Policy number" value={analysis.policyNumber} />
-            <Detail label="Confidence" value={`${Math.round(analysis.confidence * 100)}%`} />
+            <Detail label="Confidence" value={`${confidenceLevel} - ${Math.round(analysis.confidence * 100)}%`} />
           </dl>
         </section>
+
+        {analysis.confidence < 0.5 ? (
+          <section className="mt-4 rounded-[1.5rem] bg-amber-100 p-4 text-sm font-bold leading-6 text-amber-900 shadow-sm shadow-amber-200">
+            We could not confidently identify this document. Please review before saving.
+          </section>
+        ) : null}
 
         <section className="mt-4 rounded-[1.5rem] bg-white/88 p-4 shadow-lg shadow-slate-300/30 ring-1 ring-white">
           <label className="text-sm font-bold" htmlFor="room-select">
@@ -280,6 +287,12 @@ function Detail({ label, value }: { label: string; value: string }) {
       <dd className="min-w-0 truncate font-semibold text-zinc-900">{value}</dd>
     </div>
   );
+}
+
+function getConfidenceLevel(confidence: number) {
+  if (confidence >= 0.8) return "High";
+  if (confidence >= 0.5) return "Medium";
+  return "Low";
 }
 
 function createId(prefix: string) {

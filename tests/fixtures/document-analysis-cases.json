@@ -1,0 +1,44 @@
+[
+  {
+    "name": "home insurance policy",
+    "fileName": "home-insurance-policy-2026.pdf",
+    "expectedCategory": "Insurance",
+    "expectedRoomId": "family-room",
+    "expectedDocumentType": "Insurance policy"
+  },
+  {
+    "name": "boiler warranty",
+    "fileName": "boiler-warranty-serial-number.pdf",
+    "expectedCategory": "Warranty",
+    "expectedRoomId": "family-room",
+    "expectedDocumentType": "Warranty document"
+  },
+  {
+    "name": "car insurance",
+    "fileName": "car-insurance-renewal.pdf",
+    "expectedCategory": "Insurance",
+    "expectedRoomId": "garage",
+    "expectedDocumentType": "Insurance policy"
+  },
+  {
+    "name": "utility bill",
+    "fileName": "electricity-utility-bill-account.pdf",
+    "expectedCategory": "Utility Bill",
+    "expectedRoomId": "family-room",
+    "expectedDocumentType": "Utility bill"
+  },
+  {
+    "name": "appliance manual",
+    "fileName": "dishwasher-appliance-manual.pdf",
+    "expectedCategory": "Appliance Manual",
+    "expectedRoomId": "family-room",
+    "expectedDocumentType": "Appliance manual"
+  },
+  {
+    "name": "pet vaccination record",
+    "fileName": "pet-vaccination-record.pdf",
+    "expectedCategory": "Pet",
+    "expectedRoomId": "garden",
+    "expectedDocumentType": "Pet record"
+  }
+]
