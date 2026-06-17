@@ -99,8 +99,7 @@ export function EstateDashboard({ panel }: EstateDashboardProps) {
         unoptimized
         priority
         sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ objectPosition: "center center" }}
+        className="absolute inset-0 h-full w-full object-cover object-center md:h-[112%] md:w-[112%] md:-translate-x-[6%] md:-translate-y-[6%] md:scale-[0.92] md:object-bottom lg:object-[center_bottom]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/18" />
       <AppHeader />
