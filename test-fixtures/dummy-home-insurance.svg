@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600">
+  <rect width="1200" height="1600" fill="#ffffff"/>
+  <rect x="70" y="70" width="1060" height="1460" rx="24" fill="#ffffff" stroke="#1f2937" stroke-width="4"/>
+  <text x="120" y="170" font-family="Arial" font-size="42" font-weight="700" fill="#111827">Northstar Home Insurance</text>
+  <text x="120" y="235" font-family="Arial" font-size="30" fill="#374151">Policy renewal notice</text>
+  <line x1="120" y1="280" x2="1080" y2="280" stroke="#d1d5db" stroke-width="3"/>
+  <text x="120" y="380" font-family="Arial" font-size="30" fill="#111827">Policy holder: Amy Smyth</text>
+  <text x="120" y="440" font-family="Arial" font-size="30" fill="#111827">Policy number: TEST-LD-2026</text>
+  <text x="120" y="500" font-family="Arial" font-size="30" fill="#111827">Property: 10 Example Road, Belfast</text>
+  <text x="120" y="620" font-family="Arial" font-size="34" font-weight="700" fill="#991b1b">Renewal date: 15 August 2026</text>
+  <text x="120" y="710" font-family="Arial" font-size="30" fill="#111827">Annual premium: GBP 486.00</text>
+  <text x="120" y="800" font-family="Arial" font-size="28" fill="#374151">Action required: Review your cover and renew before the due date.</text>
+  <text x="120" y="860" font-family="Arial" font-size="28" fill="#374151">Please create a reminder 14 days before renewal.</text>
+  <rect x="120" y="960" width="960" height="260" rx="18" fill="#f3f4f6"/>
+  <text x="160" y="1035" font-family="Arial" font-size="28" font-weight="700" fill="#111827">Cover summary</text>
+  <text x="160" y="1100" font-family="Arial" font-size="25" fill="#374151">Buildings cover: GBP 500,000</text>
+  <text x="160" y="1150" font-family="Arial" font-size="25" fill="#374151">Contents cover: GBP 75,000</text>
+  <text x="160" y="1200" font-family="Arial" font-size="25" fill="#374151">Home emergency included</text>
+  <text x="120" y="1390" font-family="Arial" font-size="24" fill="#6b7280">This is a LifeDock test document. No payment is due.</text>
+</svg>

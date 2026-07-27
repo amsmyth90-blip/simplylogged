@@ -1,0 +1,19 @@
+.next
+node_modules
+out
+*.log
+.DS_Store
+
+.vercel
+.env*
+!.env.example
+
+# Local marketing/QA assets - too large for git, not used by the app
+output/
+public/promo-video/
+tools/lifedock-photo-ad/
+.qa-*/
+tmp-lifedock-dummy-bill.png
+
+# Generated iOS project lives on the CI runner, not in the repo
+ios/

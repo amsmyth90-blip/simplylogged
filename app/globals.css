@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-cream bg-aurora text-ink antialiased;
+  background-image:
+    radial-gradient(circle at top left, rgba(255, 248, 235, 0.92), rgba(255, 248, 235, 0) 38%),
+    radial-gradient(circle at top right, rgba(232, 240, 234, 0.65), rgba(232, 240, 234, 0) 28%),
+    linear-gradient(180deg, #fffdf8 0%, #f8f2e8 100%);
+}
+
+* {
+  @apply border-white/40;
+}
+
+.glass-card {
+  @apply rounded-[30px] border border-white/60 bg-white/60 shadow-[0_28px_60px_-34px_rgba(54,44,24,0.28)] backdrop-blur-xl;
+}
+
+.glass-pill {
+  @apply rounded-full border border-white/70 bg-white/60 backdrop-blur-md;
+}
+
+.estate-hero {
+  @apply relative overflow-hidden rounded-[36px] border border-white/70 shadow-[0_34px_80px_-40px_rgba(54,44,24,0.35)];
+}
+
+.estate-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(22, 18, 13, 0.18) 0%, rgba(24, 20, 14, 0.06) 42%, rgba(24, 20, 14, 0.52) 100%);
+  pointer-events: none;
+}
+
+.immersive-page {
+  @apply space-y-5 pb-2;
+}
+
+.immersive-page > :nth-child(2) {
+  position: relative;
+  z-index: 20;
+}
+
+@media (max-width: 639px) {
+  .immersive-hero {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    margin-top: -1.25rem;
+    min-height: 440px;
+    border-width: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .immersive-page > :nth-child(2) {
+    margin-top: -6.5rem !important;
+    border-top-left-radius: 3.5rem;
+    border-top-right-radius: 3.5rem;
+  }
+}
+
+.estate-sheet {
+  @apply rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,251,246,0.94),rgba(255,249,241,0.82))] shadow-[0_22px_50px_-34px_rgba(54,44,24,0.28)] backdrop-blur-xl;
+}
+
+.estate-chip {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-white/75 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-ink/60 backdrop-blur-md;
+}
+
+@keyframes lifedock-scan {
+  0%, 100% { top: 7%; opacity: 0.45; }
+  50% { top: 91%; opacity: 1; }
+}
+
+.lifedock-scan-line {
+  animation: lifedock-scan 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes lifedock-route {
+  to { stroke-dashoffset: -36; }
+}
+
+.lifedock-route-line {
+  animation: lifedock-route 1.6s linear infinite;
+}
