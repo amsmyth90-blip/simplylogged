@@ -55,8 +55,8 @@ function EstateHotspotMarker({
   className?: string;
 }) {
   const labelPositionClass = labelPosition === "right"
-    ? "left-[calc(100%+7px)] top-1/2 -translate-y-1/2"
-    : "left-1/2 top-[calc(100%-28px)] -translate-x-1/2";
+    ? "left-[calc(50%+6px)] top-1/2 -translate-y-1/2"
+    : "left-1/2 top-[calc(50%-2px)] -translate-x-1/2 -translate-y-1/2";
 
   return (
     <span
@@ -64,10 +64,6 @@ function EstateHotspotMarker({
       style={{ top, left }}
       aria-hidden="true"
     >
-      <span className="absolute inset-0 flex items-center justify-center rounded-full border border-white/90 bg-white/78 shadow-[0_5px_16px_rgba(15,23,42,0.28)] backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/92 group-focus-visible:scale-110">
-        <span className="absolute inset-[-4px] animate-pulse rounded-full border border-white/55" />
-        <span className="h-2 w-2 rounded-full bg-[#6f8b62] shadow-[0_0_0_3px_rgba(255,255,255,0.7)]" />
-      </span>
       <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-2.5 py-1 text-[12px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] sm:px-3 sm:py-1.5 sm:text-[13px] ${labelPositionClass}`}>
         {label}
       </span>
