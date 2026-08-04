@@ -145,10 +145,10 @@ export function EstateDashboard() {
                 ) : (
                   <EstateHotspotMarker
                     label={area.name}
-                    top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "5%" : "50%"}
-                    left={area.id === "garden" ? "90%" : "50%"}
+                    top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "20%" : area.id === "driveway" ? "40%" : "50%"}
+                    left={area.id === "garden" ? "75%" : area.id === "driveway" ? "62%" : "50%"}
                     labelPosition={area.id === "garden" ? "right" : "below"}
-                    className={area.id === "garden" ? "!top-[65%] sm:!top-[5%]" : ""}
+                    className={area.id === "garden" ? "!top-[42%] sm:!top-[20%]" : ""}
                   />
                 )}
               </Link>
