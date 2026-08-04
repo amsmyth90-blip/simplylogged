@@ -148,7 +148,7 @@ export function KitchenRoom() {
           <RoomHotspotMarker label="Pantry" className="left-[55%] top-[38%]" />
         </Link>
         <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[87%] top-[21%] h-[39%] w-[13%]`}>
-          <RoomHotspotMarker label="Noticeboard" className="left-[58%] top-[51%]" />
+          <RoomHotspotMarker label="Noticeboard" className="left-[58%] top-[51%]" labelPosition="left" />
         </Link>
         <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[28%] top-[48%] h-[14%] w-[42%]`}>
           <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[50%] top-[52%]" />

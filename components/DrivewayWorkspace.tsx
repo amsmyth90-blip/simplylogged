@@ -118,7 +118,7 @@ export function DrivewayWorkspace() {
           ))}
         </nav>
 
-        <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27231e]/65 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
+        <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/80 bg-[#e5ecde]/90 px-3 py-1.5 text-[12px] font-medium text-[#284334] shadow-lg backdrop-blur-lg">
           Tap an object to open it
         </div>
       </section>

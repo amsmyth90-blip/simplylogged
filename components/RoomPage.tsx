@@ -407,7 +407,7 @@ export function RoomPage({ room }: RoomPageProps) {
                   aria-label={`${object.label}: ${object.detail}`}
                 >
                   <UiIcon name={object.icon} className="h-[18px] w-[18px]" />
-                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full bg-[rgba(15,23,42,0.84)] px-3 py-1.5 text-[13px] font-semibold text-white opacity-100 shadow-lg backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus:opacity-100">
+                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold text-[#284334] opacity-100 shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus:opacity-100">
                     {object.label}
                   </span>
                 </Link>

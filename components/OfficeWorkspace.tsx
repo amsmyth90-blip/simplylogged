@@ -49,7 +49,7 @@ function OfficeHotspot({
         ) : null}
       </span>
       <span
-        className={`absolute whitespace-nowrap rounded-full border border-white/75 bg-[rgba(15,23,42,0.84)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/95 ${
+        className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] ${
           labelSide === "left"
             ? "right-[calc(100%+5px)] top-1/2 -translate-y-1/2"
             : labelSide === "below"
@@ -1111,7 +1111,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
             labelSide="right"
           />
 
-          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/60 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
+          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/80 bg-[#e5ecde]/90 px-3 py-1.5 text-[12px] font-medium text-[#284334] shadow-lg backdrop-blur-lg">
             Tap an object to open it
           </div>
         </section>

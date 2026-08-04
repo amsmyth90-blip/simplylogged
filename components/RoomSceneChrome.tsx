@@ -29,7 +29,7 @@ export function RoomHotspotMarker({
         <span className="absolute inset-[-5px] animate-pulse rounded-full border border-white/55 motion-reduce:animate-none" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#6f8b62] shadow-[0_0_0_3px_rgba(255,255,255,0.72)]" />
       </span>
-      <span className={`absolute whitespace-nowrap rounded-full border border-white/75 bg-[rgba(15,23,42,0.82)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/95 ${labelPositionClass}`}>
+      <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] ${labelPositionClass}`}>
         {label}
       </span>
     </span>

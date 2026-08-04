@@ -186,7 +186,7 @@ function RoomHotspot({
         ) : null}
       </span>
       <span
-        className={`whitespace-nowrap rounded-full border border-white/90 bg-[#f8f4ec]/95 px-3.5 py-1.5 text-[14px] font-semibold leading-none tracking-[0.01em] text-[#273126] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
+        className={`whitespace-nowrap rounded-full border border-white/90 bg-[#e5ecde]/95 px-3.5 py-1.5 text-[14px] font-semibold leading-none tracking-[0.01em] text-[#284334] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
           labelSide === "left"
             ? "absolute right-8"
             : labelSide === "below"
@@ -543,7 +543,7 @@ export function FamilyWorkspace() {
             labelSide="right"
           />
 
-          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/60 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
+          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/80 bg-[#e5ecde]/90 px-3 py-1.5 text-[12px] font-medium text-[#284334] shadow-lg backdrop-blur-lg">
             Tap an object to open it
           </div>
         </section>
