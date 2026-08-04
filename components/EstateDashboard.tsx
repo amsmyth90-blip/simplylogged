@@ -56,7 +56,7 @@ function EstateHotspotMarker({
 }) {
   const labelPositionClass = labelPosition === "right"
     ? "left-[calc(100%+7px)] top-1/2 -translate-y-1/2"
-    : "left-1/2 top-[calc(100%+6px)] -translate-x-1/2";
+    : "left-1/2 top-[calc(100%-4px)] -translate-x-1/2";
 
   return (
     <span
