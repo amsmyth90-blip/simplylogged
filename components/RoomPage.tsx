@@ -22,15 +22,15 @@ const heroAccent: Record<AreaStatus, string> = {
 };
 
 const roomHeroImages: Record<string, string> = {
-  attic: "/images/pages/attic-hero.png",
-  bedroom: "/images/pages/bedroom-hero.png",
-  office: "/images/pages/office-hero.png",
-  "family-room": "/images/pages/family-room-hero.png",
-  "safe-room": "/images/pages/safe-room-hero.png",
-  garage: "/images/pages/garage-hero.png",
-  mailbox: "/images/pages/mailbox-hero.png",
-  garden: "/images/pages/garden-hero.png",
-  driveway: "/images/pages/driveway-hero.png"
+  attic: "/images/pages/attic-hero.webp",
+  bedroom: "/images/pages/bedroom-hero.webp",
+  office: "/images/pages/office-hero.webp",
+  "family-room": "/images/pages/family-room-hero.webp",
+  "safe-room": "/images/pages/safe-room-hero.webp",
+  garage: "/images/pages/garage-hero.webp",
+  mailbox: "/images/pages/mailbox-hero.webp",
+  garden: "/images/pages/garden-hero.webp",
+  driveway: "/images/pages/driveway-hero.webp"
 };
 
 const swipeRoomOrder = ["attic", "bedroom", "office", "family-room", "safe-room", "garage", "garden", "driveway"] as const;
@@ -407,7 +407,7 @@ export function RoomPage({ room }: RoomPageProps) {
                   aria-label={`${object.label}: ${object.detail}`}
                 >
                   <UiIcon name={object.icon} className="h-[18px] w-[18px]" />
-                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full bg-slate-900/78 px-2.5 py-1 text-[10px] font-semibold text-white opacity-0 shadow-lg backdrop-blur-md transition group-hover:opacity-100 group-focus:opacity-100">
+                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full bg-[rgba(15,23,42,0.84)] px-3 py-1.5 text-[13px] font-semibold text-white opacity-100 shadow-lg backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus:opacity-100">
                     {object.label}
                   </span>
                 </Link>

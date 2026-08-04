@@ -6,6 +6,15 @@ import { useEffect, useState } from "react";
 
 import { estateAreas } from "@/lib/mock-data";
 
+const roomSceneImages = [
+  "/images/kitchen-command-centre.webp",
+  "/images/office-interactive-v1.webp",
+  "/images/family-fireside-clean.webp",
+  "/images/pages/bedroom-health-room-clean.webp",
+  "/images/pages/garage-folio-hero-v5.webp",
+  "/images/designs/driveway/08-car-boot-departure.webp",
+] as const;
+
 const hitboxSize: Record<string, { width: string; height: string }> = {
   attic: { width: "30%", height: "11%" },
   bedroom: { width: "29%", height: "11%" },
@@ -39,11 +48,11 @@ function EstateHotspotMarker({ label, top = "50%" }: { label: string; top?: stri
       style={{ top }}
       aria-hidden="true"
     >
-      <span className="relative flex h-6 w-6 items-center justify-center rounded-full border border-white/90 bg-white/72 shadow-[0_5px_16px_rgba(15,23,42,0.28)] backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/92 group-focus-visible:scale-110">
+      <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/90 bg-white/78 shadow-[0_5px_16px_rgba(15,23,42,0.28)] backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/92 group-focus-visible:scale-110">
         <span className="absolute inset-[-4px] animate-pulse rounded-full border border-white/55" />
         <span className="h-2 w-2 rounded-full bg-[#6f8b62] shadow-[0_0_0_3px_rgba(255,255,255,0.7)]" />
       </span>
-      <span className="whitespace-nowrap rounded-full border border-white/65 bg-slate-950/62 px-1.5 py-0.5 text-[8px] font-semibold tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/82">
+      <span className="whitespace-nowrap rounded-full border border-white/75 bg-[rgba(15,23,42,0.82)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/95">
         {label}
       </span>
     </span>
@@ -55,6 +64,16 @@ export function EstateDashboard() {
 
   useEffect(() => {
     setShowRoomGuides(new URLSearchParams(window.location.search).get("showRooms") === "1");
+
+    const preloadTimer = window.setTimeout(() => {
+      roomSceneImages.forEach((src) => {
+        const image = new window.Image();
+        image.decoding = "async";
+        image.src = src;
+      });
+    }, 150);
+
+    return () => window.clearTimeout(preloadTimer);
   }, []);
 
   return (
@@ -62,10 +81,11 @@ export function EstateDashboard() {
       <div className="relative h-[100svh] w-full overflow-hidden">
         <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
           <Image
-            src="/images/estate-dashboard-country.png"
+            src="/images/estate-dashboard-country.webp"
             alt="DiaryDock digital estate with a cutaway attic, office, family dog and travel luggage"
             fill
             priority
+            unoptimized
             className="object-fill"
             sizes="100vw"
           />
@@ -107,7 +127,7 @@ export function EstateDashboard() {
                 title={area.name}
               >
                 {showRoomGuides ? (
-                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold shadow-sm">
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1.5 text-[13px] font-bold shadow-sm">
                     {area.name}
                   </span>
                 ) : (

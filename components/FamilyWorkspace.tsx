@@ -186,7 +186,7 @@ function RoomHotspot({
         ) : null}
       </span>
       <span
-        className={`whitespace-nowrap rounded-full border border-white/85 bg-[#f8f4ec]/80 px-3 py-1.5 text-[11px] font-semibold tracking-[0.01em] text-[#273126] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
+        className={`whitespace-nowrap rounded-full border border-white/90 bg-[#f8f4ec]/95 px-3.5 py-1.5 text-[14px] font-semibold leading-none tracking-[0.01em] text-[#273126] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
           labelSide === "left"
             ? "absolute right-8"
             : labelSide === "below"
@@ -476,10 +476,11 @@ export function FamilyWorkspace() {
     <>
       <main className="fixed inset-0 overflow-hidden bg-[#bda888]">
         <Image
-          src="/images/family-fireside-clean.png"
+          src="/images/family-fireside-clean.webp"
           alt=""
           fill
           priority
+          unoptimized
           aria-hidden="true"
           className="scale-110 object-cover opacity-45 blur-2xl"
           sizes="100vw"
@@ -491,10 +492,11 @@ export function FamilyWorkspace() {
           className="relative mx-auto h-full w-full max-w-[34rem] overflow-hidden bg-[#d5c3a7] shadow-[0_0_70px_rgba(38,28,19,0.35)]"
         >
           <Image
-            src="/images/family-fireside-clean.png"
+            src="/images/family-fireside-clean.webp"
             alt="A warm fireside family room with a family portrait, invitation envelope and household shelves"
             fill
             priority
+            unoptimized
             className="object-cover object-center"
             sizes="(max-width: 544px) 100vw, 544px"
           />
@@ -513,7 +515,7 @@ export function FamilyWorkspace() {
             <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#6c795f]">
               {household?.householdName ?? "DiaryDock"}
             </p>
-            <h1 className="text-sm font-semibold tracking-tight text-[#1f281e]">Family Room</h1>
+            <h1 className="text-base font-semibold tracking-tight text-[#1f281e]">Family Room</h1>
           </div>
 
           <RoomHotspot
@@ -541,7 +543,7 @@ export function FamilyWorkspace() {
             labelSide="right"
           />
 
-          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/45 px-3 py-1.5 text-[10px] font-medium text-white/90 shadow-lg backdrop-blur-lg">
+          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/60 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
             Tap an object to open it
           </div>
         </section>

@@ -125,7 +125,7 @@ export function SettingsWorkspace() {
           eyebrow="Settings"
           title="Your Settings, Your Peace of Mind"
           subtitle="Personalize your experience and stay protected."
-          heroImage="/images/pages/settings-hero.png"
+          heroImage="/images/pages/settings-hero.webp"
           heroPosition="center 50%"
           badge="Estate control"
           action={

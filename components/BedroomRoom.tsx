@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -42,10 +43,14 @@ export function BedroomRoom() {
       }}
     >
       <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2">
-        <img
-          src="/images/pages/bedroom-health-room-clean.png"
+        <Image
+          src="/images/pages/bedroom-health-room-clean.webp"
           alt="Interactive DiaryDock Bedroom"
-          className="absolute inset-0 h-full w-full object-fill"
+          fill
+          priority
+          unoptimized
+          sizes="(max-width: 544px) 100vw, 544px"
+          className="object-fill"
         />
         <span
           aria-hidden="true"

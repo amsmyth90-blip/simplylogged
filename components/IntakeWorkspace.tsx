@@ -196,7 +196,7 @@ export function IntakeWorkspace() {
         subtitle="A calm place for bills, appointments, letters, shared files and scans before they are filed into the right room."
         backHref="/dashboard"
         backLabel="Estate map"
-        heroImage="/images/pages/mailbox-hero.png"
+        heroImage="/images/pages/mailbox-hero.webp"
         heroPosition="center 48%"
         heroTone="linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(71,59,38,0.15) 40%, rgba(37,31,23,0.56) 100%)"
         badge="Incoming"

@@ -278,7 +278,7 @@ function VaultWorkspaceInner() {
           eyebrow="All files"
           title="Secure Vault"
           subtitle="Every document, securely stored in one place."
-          heroImage="/images/pages/vault-hero.png"
+          heroImage="/images/pages/vault-hero.webp"
           heroPosition="center 44%"
           badge="Secure archive"
           action={

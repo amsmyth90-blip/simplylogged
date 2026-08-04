@@ -49,7 +49,7 @@ function OfficeHotspot({
         ) : null}
       </span>
       <span
-        className={`absolute whitespace-nowrap rounded-full border border-white/65 bg-slate-950/72 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/88 ${
+        className={`absolute whitespace-nowrap rounded-full border border-white/75 bg-[rgba(15,23,42,0.84)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/95 ${
           labelSide === "left"
             ? "right-[calc(100%+5px)] top-1/2 -translate-y-1/2"
             : labelSide === "below"
@@ -688,9 +688,10 @@ function OfficeDocumentDashboard({
   return (
     <div className="fixed inset-0 z-40 overflow-y-auto bg-[#4f3f31] pb-[7.25rem]">
       <Image
-        src="/images/office-interactive-v1.png"
+        src="/images/office-interactive-v1.webp"
         alt=""
         fill
+        unoptimized
         aria-hidden="true"
         className="fixed object-cover object-center"
         sizes="100vw"
@@ -1015,10 +1016,11 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
     <>
       <main className="fixed inset-0 overflow-hidden bg-[#7c634c]">
         <Image
-          src="/images/office-interactive-v1.png"
+          src="/images/office-interactive-v1.webp"
           alt=""
           fill
           priority
+          unoptimized
           aria-hidden="true"
           className="scale-110 object-cover opacity-45 blur-2xl"
           sizes="100vw"
@@ -1030,10 +1032,11 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
           className="relative mx-auto h-full w-full max-w-[34rem] overflow-hidden bg-[#c9ae8d] shadow-[0_0_70px_rgba(38,28,19,0.4)]"
         >
           <Image
-            src="/images/office-interactive-v1.png"
+            src="/images/office-interactive-v1.webp"
             alt="A warm home office with a desk, incoming post tray, laptop, scanner, filing drawers and a secure safe"
             fill
             priority
+            unoptimized
             className="object-cover object-center"
             sizes="(max-width: 544px) 100vw, 544px"
           />
@@ -1052,7 +1055,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
             <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#6c795f]">
               Household administration
             </p>
-            <h1 className="text-sm font-semibold tracking-tight text-[#1f281e]">
+            <h1 className="text-base font-semibold tracking-tight text-[#1f281e]">
               Office
             </h1>
           </div>
@@ -1108,7 +1111,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
             labelSide="right"
           />
 
-          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/48 px-3 py-1.5 text-[10px] font-medium text-white/90 shadow-lg backdrop-blur-lg">
+          <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27271f]/60 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
             Tap an object to open it
           </div>
         </section>

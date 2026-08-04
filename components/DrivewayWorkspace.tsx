@@ -70,10 +70,11 @@ export function DrivewayWorkspace() {
       }}
     >
       <Image
-        src="/images/designs/driveway/08-car-boot-departure.png"
+        src="/images/designs/driveway/08-car-boot-departure.webp"
         alt=""
         fill
         priority
+        unoptimized
         aria-hidden="true"
         className="scale-110 object-cover opacity-40 blur-2xl"
         sizes="100vw"
@@ -85,10 +86,11 @@ export function DrivewayWorkspace() {
         className="relative mx-auto h-full w-[min(100vw,56.3svh,34rem)] overflow-hidden bg-[#8f775d] shadow-[0_0_70px_rgba(36,29,21,0.5)]"
       >
         <Image
-          src="/images/designs/driveway/08-car-boot-departure.png"
+          src="/images/designs/driveway/08-car-boot-departure.webp"
           alt="A warm country driveway prepared for a journey, with an open car boot, travel cases, visitor keys, parking permit and a parcel bench"
           fill
           priority
+          unoptimized
           className="object-cover object-center"
           sizes="(max-width: 544px) 100vw, 544px"
         />
@@ -116,7 +118,7 @@ export function DrivewayWorkspace() {
           ))}
         </nav>
 
-        <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27231e]/55 px-3 py-1.5 text-[10px] font-medium text-white/90 shadow-lg backdrop-blur-lg">
+        <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/55 bg-[#27231e]/65 px-3 py-1.5 text-[12px] font-medium text-white/95 shadow-lg backdrop-blur-lg">
           Tap an object to open it
         </div>
       </section>

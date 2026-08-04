@@ -141,7 +141,7 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
         subtitle={`Join ${preview?.householdName ?? "this household"} using the access shown below.`}
         backHref="/family"
         backLabel="Family"
-        heroImage="/images/pages/family-hero.png"
+        heroImage="/images/pages/family-hero.webp"
         heroPosition="center 52%"
         badge="Pending"
       />

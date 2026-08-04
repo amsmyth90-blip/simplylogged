@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -94,7 +95,15 @@ export function KitchenRoom() {
       }}
     >
       <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
-        <img src="/images/kitchen-command-centre.png" alt="Interactive DiaryDock Kitchen" className="absolute inset-0 h-full w-full object-fill" />
+        <Image
+          src="/images/kitchen-command-centre.webp"
+          alt="Interactive DiaryDock Kitchen"
+          fill
+          priority
+          unoptimized
+          sizes="(max-width: 544px) 100vw, 544px"
+          className="object-fill"
+        />
 
         <span
           aria-hidden="true"

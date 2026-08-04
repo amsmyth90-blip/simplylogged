@@ -203,7 +203,7 @@ function RemindersWorkspaceInner() {
           eyebrow="Reminders"
           title="What Matters, When It Matters"
           subtitle="Gentle reminders to keep your life in order."
-          heroImage="/images/pages/reminders-hero.png"
+          heroImage="/images/pages/reminders-hero.webp"
           heroPosition="center 36%"
           badge={selectedAssignee ? `${selectedAssignee}'s reminders` : "Household rhythm"}
           action={

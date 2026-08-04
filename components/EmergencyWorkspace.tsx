@@ -148,7 +148,7 @@ export function EmergencyWorkspace(_: EmergencyWorkspaceProps) {
           eyebrow="Emergency"
           title="In an Emergency, We're Here"
           subtitle="Fast access to what matters most, when it matters most."
-          heroImage="/images/pages/emergency-hero.png"
+          heroImage="/images/pages/emergency-hero.webp"
           heroPosition="center 44%"
           heroTone="linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(95,24,20,0.12) 42%, rgba(47,28,24,0.5) 100%)"
           badge="Reassurance ready"

@@ -98,10 +98,11 @@ export function GarageWorkspace() {
         }}
       >
         <Image
-          src="/images/pages/garage-folio-hero-v5.png"
+          src="/images/pages/garage-folio-hero-v5.webp"
           alt=""
           fill
           priority
+          unoptimized
           aria-hidden="true"
           className="scale-110 object-cover opacity-45 blur-2xl"
           sizes="100vw"
@@ -113,10 +114,11 @@ export function GarageWorkspace() {
           className="relative mx-auto h-full w-[min(100vw,56.5svh,34rem)] overflow-hidden bg-[#514536] shadow-[0_0_70px_rgba(28,23,17,0.5)]"
         >
           <Image
-            src="/images/pages/garage-folio-hero-v5.png"
+            src="/images/pages/garage-folio-hero-v5.webp"
             alt="A warm home garage with a car, bicycle, workbench and organised storage"
             fill
             priority
+            unoptimized
             className="object-cover object-center"
             sizes="(max-width: 544px) 100vw, 544px"
           />
