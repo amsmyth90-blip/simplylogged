@@ -34,7 +34,7 @@ export function BottomNav() {
   const isActive = (item: NavItem) => {
     if (item.central) return pathname.startsWith("/capture");
     if (item.id === "home") {
-      return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room") || pathname.startsWith("/wills") || pathname.startsWith("/office") || pathname.startsWith("/garage") || pathname.startsWith("/driveway") || pathname.startsWith("/bedroom");
+      return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room") || pathname.startsWith("/wills") || pathname.startsWith("/office") || pathname.startsWith("/garage") || pathname.startsWith("/driveway") || pathname.startsWith("/bedroom") || pathname.startsWith("/garden");
     }
     if (item.id === "vault") {
       return pathname.startsWith("/vault") || pathname.startsWith("/document");

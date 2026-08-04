@@ -32,6 +32,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
   if (roomId === "bedroom") return <BedroomRoom />;
   if (roomId === "garage") return <GarageWorkspace />;
   if (roomId === "driveway") return <DrivewayWorkspace />;
+  if (roomId === "garden") redirect("/garden");
   if (roomId === "office") {
     if (drawer === "wishes") redirect("/wills");
     if (drawer === "finance") redirect("/office/bills");

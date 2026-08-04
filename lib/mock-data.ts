@@ -35,7 +35,7 @@ export const estateAreas: EstateArea[] = [
   { id: "kitchen", name: "Kitchen", domain: "Household Planning", icon: "home", href: "/room/kitchen", left: "55%", top: "55%", status: "secure" },
   { id: "garage", name: "Garage", domain: "Vehicles & Transport", icon: "car", href: "/room/garage", left: "82%", top: "55%", status: "attention" },
   { id: "mailbox", name: "Mailbox", domain: "Incoming & To File", icon: "mail", href: "/intake", left: "20%", top: "76%", status: "attention", badge: 4 },
-  { id: "garden", name: "Garden", domain: "Pets & Outdoor", icon: "leaf", href: "/room/garden", left: "21%", top: "67%", status: "ready" },
+  { id: "garden", name: "Garden", domain: "Pets & Outdoor", icon: "leaf", href: "/garden", left: "21%", top: "67%", status: "ready" },
   { id: "driveway", name: "Driveway", domain: "Travel & Access", icon: "map-pin", href: "/room/driveway", left: "82%", top: "65%", status: "attention" },
   { id: "front-gate", name: "Front Gate", domain: "Access & Security", icon: "lock", href: "/settings", left: "50%", top: "83%", status: "secure" }
 ];
