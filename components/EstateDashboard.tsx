@@ -46,11 +46,13 @@ function EstateHotspotMarker({
   top = "50%",
   left = "50%",
   labelPosition = "below",
+  className = "",
 }: {
   label: string;
   top?: string;
   left?: string;
   labelPosition?: "below" | "right";
+  className?: string;
 }) {
   const labelPositionClass = labelPosition === "right"
     ? "left-[calc(100%+7px)] top-1/2 -translate-y-1/2"
@@ -58,7 +60,7 @@ function EstateHotspotMarker({
 
   return (
     <span
-      className="pointer-events-none absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2"
+      className={`pointer-events-none absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 ${className}`}
       style={{ top, left }}
       aria-hidden="true"
     >
@@ -66,7 +68,7 @@ function EstateHotspotMarker({
         <span className="absolute inset-[-4px] animate-pulse rounded-full border border-white/55" />
         <span className="h-2 w-2 rounded-full bg-[#6f8b62] shadow-[0_0_0_3px_rgba(255,255,255,0.7)]" />
       </span>
-      <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] ${labelPositionClass}`}>
+      <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-2.5 py-1 text-[12px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] sm:px-3 sm:py-1.5 sm:text-[13px] ${labelPositionClass}`}>
         {label}
       </span>
     </span>
@@ -150,6 +152,7 @@ export function EstateDashboard() {
                     top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "5%" : "50%"}
                     left={area.id === "garden" ? "90%" : "50%"}
                     labelPosition={area.id === "garden" ? "right" : "below"}
+                    className={area.id === "garden" ? "!top-[65%] sm:!top-[5%]" : ""}
                   />
                 )}
               </Link>
