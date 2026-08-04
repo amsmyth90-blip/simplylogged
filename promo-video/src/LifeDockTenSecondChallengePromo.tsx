@@ -7,8 +7,8 @@ const blue = '#2f64c5';
 
 const BrandBug: React.FC = () => (
   <div style={{position: 'absolute', top: 78, left: 66, display: 'flex', alignItems: 'center', gap: 16}}>
-    <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
-    <div style={{color: 'white', fontSize: 30, fontWeight: 900, letterSpacing: 2.5, textShadow: '0 3px 16px rgba(0,0,0,.35)'}}>LIFEDOCK</div>
+    <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
+    <div style={{color: 'white', fontSize: 30, fontWeight: 900, letterSpacing: 2.5, textShadow: '0 3px 16px rgba(0,0,0,.35)'}}>DIARYDOCK</div>
   </div>
 );
 
@@ -82,7 +82,7 @@ const SearchScene: React.FC = () => {
   const resultOpacity = interpolate(frame, [86, 102], [0, 1], {extrapolateRight: 'clamp'});
   return (
     <AbsoluteFill style={{background: 'linear-gradient(155deg,#eef6ff,#f8f2ff)', padding: '105px 70px 90px'}}>
-      <div style={{display: 'flex', alignItems: 'center', gap: 18}}><Img src={staticFile('brand/lifedock-mark.png')} style={{width: 86, height: 86, objectFit: 'contain'}} /><div style={{fontSize: 42, color: navy, fontWeight: 900, letterSpacing: 3}}>LIFEDOCK</div></div>
+      <div style={{display: 'flex', alignItems: 'center', gap: 18}}><Img src={staticFile('brand/diarydock-mark.png')} style={{width: 86, height: 86, objectFit: 'contain'}} /><div style={{fontSize: 42, color: navy, fontWeight: 900, letterSpacing: 3}}>DIARYDOCK</div></div>
       <div style={{marginTop: 164, color: navy, fontSize: 84, lineHeight: 1.03, fontWeight: 900}}>Find it<br />in seconds.</div>
       <div style={{marginTop: 78, height: 116, borderRadius: 31, background: 'white', boxShadow: '0 22px 62px rgba(33,73,130,.16)', display: 'flex', alignItems: 'center', padding: '0 34px', gap: 24}}><div style={{fontSize: 48, color: blue}}>⌕</div><div style={{fontSize: 40, color: navy, fontWeight: 740}}>{query}</div><div style={{width: 4, height: 46, background: blue, opacity: frame % 20 < 10 ? 1 : 0}} /></div>
       <div style={{marginTop: 34, borderRadius: 34, background: 'white', padding: '34px 32px', display: 'flex', alignItems: 'center', gap: 26, opacity: resultOpacity, translate: '0 ' + interpolate(frame, [86, 106], [30, 0], {extrapolateRight: 'clamp'}) + 'px', boxShadow: '0 18px 54px rgba(33,73,130,.13)'}}>
@@ -110,8 +110,8 @@ const EndCard: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#f3f6fc', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 76, opacity}}>
       <div style={{translate: '0 ' + rise + 'px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
-        <div style={{fontSize: 108, fontWeight: 900, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
+        <div style={{fontSize: 108, fontWeight: 900, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>DIARYDOCK</div>
         <div style={{color: navy, fontSize: 68, lineHeight: 1.08, fontWeight: 880, marginTop: 62}}>Your life, organised.</div>
         <div style={{color: '#3c5680', fontSize: 35, lineHeight: 1.32, marginTop: 30}}>One secure digital home<br />for everyday life.</div>
       </div>
@@ -122,7 +122,7 @@ const EndCard: React.FC = () => {
 export const LifeDockTenSecondChallengePromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
     <Audio src={staticFile('promo-video/lifedock-challenge-countdown.wav')} volume={0.19} />
-    <Sequence from={8} durationInFrames={712}><Audio src={staticFile('promo-video/lifedock-ten-second-challenge-emily-ni.mp3')} volume={1} /></Sequence>
+    <Sequence from={8} durationInFrames={712}><Audio src={staticFile('promo-video/diarydock-ten-second-challenge-emily-ni.mp3')} volume={1} /></Sequence>
     <Sequence durationInFrames={120}><CountdownHook /></Sequence>
     <Sequence from={120} durationInFrames={150}><InfoChallenge /></Sequence>
     <Sequence from={270} durationInFrames={150}><SnapScene /></Sequence>

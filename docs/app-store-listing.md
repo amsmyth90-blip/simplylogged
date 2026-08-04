@@ -1,30 +1,31 @@
-# LifeDock — App Store Connect listing draft
+# DiaryDock — App Store Connect listing draft
 
 Copy/paste starting point for the App Store Connect listing. Review and adjust before submitting — nothing here has been legally reviewed.
 
 ## App information
 
-- **Name** (30 char max): `LifeDock`
+- **Name** (30 char max): `DiaryDock`
+- **Official tagline**: `Your digital home, for everyday life.`
 - **Subtitle** (30 char max): `Your family's digital home`
-- **Bundle ID**: `com.lifedock.app`
+- **Bundle ID**: `com.diarydock.app`
 - **Primary category**: Productivity
 - **Secondary category**: Lifestyle
-- **Support URL**: `https://www.thelifedock.com/settings` (or a dedicated support page if you make one)
-- **Marketing URL**: `https://www.thelifedock.com`
-- **Support email**: `support@thelifedock.com` (create this inbox before submitting — referenced in the in-app Privacy/Terms pages)
+- **Support URL**: `https://diarydock.com/settings` (or a dedicated support page if you make one)
+- **Marketing URL**: `https://diarydock.com`
+- **Support email**: `hello@diarydock.com` (create this inbox before submitting — referenced in the in-app Privacy/Terms pages)
 
 ## Promotional text (170 char max, editable without review)
 
-> Snap a photo, LifeDock files it. Bills, certificates, warranties and family documents — organised, reminded, and ready when you need them.
+> Snap a photo, DiaryDock files it. Bills, certificates, warranties and family documents — organised, reminded, and ready when you need them.
 
 ## Description
 
 ```
-LifeDock keeps everything important in your family's life organised under one roof.
+DiaryDock keeps everything important in your family's life organised under one roof.
 
-Snap a photo of a bill, certificate, or letter and LifeDock reads it, files it in the right room, and sets a reminder if it's due again. No more digging through drawers or email searches when you need a document in a hurry.
+Snap a photo of a bill, certificate, or letter and DiaryDock reads it, files it in the right room, and sets a reminder if it's due again. No more digging through drawers or email searches when you need a document in a hurry.
 
-WHAT YOU CAN DO WITH LIFEDOCK
+WHAT YOU CAN DO WITH DIARYDOCK
 - Capture documents with your camera and let AI suggest the title, category, and filing room
 - Browse your household by room — Kitchen, Vault, and more — instead of one long file list
 - Get reminders before renewals, expiries, and due dates
@@ -34,7 +35,7 @@ WHAT YOU CAN DO WITH LIFEDOCK
 PRIVATE BY DEFAULT
 Every document is private until you choose to share it. You control who sees what, and Emergency Access Mode only ever shows the specific items you've approved.
 
-LifeDock is built for the paperwork of real family life — insurance, warranties, school forms, medical letters, and more — so it's findable in seconds, not lost in a pile.
+DiaryDock is built for the paperwork of real family life — insurance, warranties, school forms, medical letters, and more — so it's findable in seconds, not lost in a pile.
 ```
 
 - **Keywords** (100 char max, comma-separated, no spaces needed): `documents,family organizer,household,estate,paperwork,scanner,reminders,vault,emergency`

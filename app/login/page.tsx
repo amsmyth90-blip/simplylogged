@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <section className="flex min-h-[100svh] items-center justify-center py-8">
       <div className="w-full max-w-md overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)] backdrop-blur-xl">
         <div className="border-b border-slate-200/70 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.95),_rgba(241,245,249,0.88)_55%,_rgba(226,232,240,0.9))] px-6 pb-7 pt-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">LifeDock</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">DiaryDock</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Sign in to your estate</h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">
             Secure access to your family dashboard, vault, reminders, and emergency records.

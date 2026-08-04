@@ -84,7 +84,7 @@ const EndCard: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#f7f8fb', opacity, overflow: 'hidden'}}>
       <Img
-        src={staticFile('brand/lifedock-video-end-card.png')}
+        src={staticFile('brand/diarydock-video-end-card.png')}
         style={{width: '100%', height: '100%', objectFit: 'cover', scale}}
       />
     </AbsoluteFill>
@@ -93,7 +93,7 @@ const EndCard: React.FC = () => {
 
 export const LifeDockPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', backgroundColor: ink}}>
-    <Audio src={staticFile('promo-video/amy-final-voice-isolated.mp3')} volume={1} />
+    <Audio src={staticFile('promo-video/diarydock-amy-final-voice.mp3')} volume={1} />
     <Sequence durationInFrames={210}>
       <PhotoScene video="promo-video/scene-morning.mp4" eyebrow="Life is full of details" headline="Keep today running smoothly.">
         <AppCard icon="✓" title="Boiler service" detail="Today at 10:30 · Kitchen" accent="#c4784b" />

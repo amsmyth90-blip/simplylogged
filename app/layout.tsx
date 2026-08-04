@@ -6,14 +6,14 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "LifeDock",
-    template: "%s - LifeDock"
+    default: "DiaryDock",
+    template: "%s - DiaryDock"
   },
-  description: "Everything important in your family's life, organised under one roof.",
+  description: "Your digital home, for everyday life.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "LifeDock"
+    title: "DiaryDock"
   },
   icons: {
     icon: "/icons/icon-512.png",

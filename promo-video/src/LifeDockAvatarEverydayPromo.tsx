@@ -64,7 +64,7 @@ const EndCard: React.FC = () => {
         }}
       >
         <Img
-          src={staticFile('brand/lifedock-mark.png')}
+          src={staticFile('brand/diarydock-mark.png')}
           style={{width: 250, height: 250, objectFit: 'contain'}}
         />
         <div
@@ -78,7 +78,7 @@ const EndCard: React.FC = () => {
             color: 'transparent',
           }}
         >
-          LIFEDOCK
+          DIARYDOCK
         </div>
         <div
           style={{

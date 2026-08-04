@@ -231,7 +231,7 @@ export function SearchWorkspace() {
         <p className="text-sm font-semibold text-ink">
           {query.trim() ? `${resultCount} result${resultCount === 1 ? "" : "s"}` : "Everything searchable"}
         </p>
-        <p className="text-xs text-ink/45">Private to your LifeDock</p>
+        <p className="text-xs text-ink/45">Private to your DiaryDock</p>
       </div>
 
       {filteredSections.length ? (

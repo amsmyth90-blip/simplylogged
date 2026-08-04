@@ -59,7 +59,7 @@ export function PageHeader({
               {badge ? <span className="hidden estate-chip border-white/30 bg-white/14 text-white/80 sm:inline-flex">{badge}</span> : null}
             </div>
             <span className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 font-serif text-[23px] tracking-[-0.035em] text-white drop-shadow-sm">
-              LifeDock
+              DiaryDock
             </span>
             {action ? <div className="shrink-0">{action}</div> : null}
           </div>

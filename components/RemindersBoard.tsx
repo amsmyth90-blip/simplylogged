@@ -163,6 +163,11 @@ export function RemindersBoard({ reminders, onOpenReminder, onToggleDone, onSnoo
                           {item.repeat}
                         </span>
                       ) : null}
+                      {item.assignedTo ? (
+                        <span className="rounded-full bg-[#edf4e9] px-2 py-0.5 text-[11px] font-semibold text-[#5d7653]">
+                          For {item.assignedTo}
+                        </span>
+                      ) : null}
                       {item.roomId && item.roomName ? (
                         <Link
                           href={`/room/${item.roomId}`}

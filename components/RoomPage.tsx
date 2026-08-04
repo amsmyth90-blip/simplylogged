@@ -47,6 +47,17 @@ const roomHeroPositions: Record<string, string> = {
   driveway: "center 46%"
 };
 
+const roomDocumentCategories: Record<string, string> = {
+  office: "Legal & Estate",
+  bedroom: "Health & Medical",
+  attic: "Memories",
+  garage: "Vehicles & Transport",
+  garden: "Pets & Outdoor",
+  driveway: "Travel & Access",
+  "safe-room": "Legal & Estate",
+  "family-room": "Memories"
+};
+
 type RoomPageProps = {
   room: RoomDetail;
 };
@@ -73,7 +84,7 @@ const starterSuggestions: Record<string, string[]> = {
   attic: ["Scan old family letters", "Add photo album notes", "Store keepsake details"],
   bedroom: ["Add GP details", "Scan prescription list", "Store health insurance"],
   office: ["Scan passport or ID", "Add house deeds", "Store will or POA"],
-  "family-room": ["Add school form", "Scan pet care guide", "Store holiday plan"],
+  "family-room": ["Invite a household member", "Review shared access", "Check the Family Inbox"],
   "safe-room": ["Add emergency instructions", "Mark insurance claim pack", "Store key holder notes"],
   garage: ["Scan MOT certificate", "Add car insurance", "Store service history"],
   mailbox: ["Scan new post", "Route incoming bill", "Create follow-up reminder"],
@@ -96,7 +107,7 @@ const interactiveRoomObjects: Record<string, RoomObject[]> = {
     { label: "Keepsake chest", detail: "View legacy records", href: "/vault", icon: "lock", left: "72%", top: "55%" }
   ],
   bedroom: [
-    { label: "Health folder", detail: "Open health records", href: "/vault", icon: "folder", left: "28%", top: "49%" },
+    { label: "Health & Medical", detail: "Open health records", href: "/room/bedroom#room-documents", icon: "folder", left: "28%", top: "49%" },
     { label: "Appointments", detail: "View upcoming care", href: "/reminders", icon: "calendar", left: "70%", top: "38%" }
   ],
   office: [
@@ -104,23 +115,23 @@ const interactiveRoomObjects: Record<string, RoomObject[]> = {
     { label: "Family access", detail: "Manage trusted people", href: "/family", icon: "users", left: "72%", top: "42%" }
   ],
   "family-room": [
-    { label: "Wall calendar", detail: "Open the family calendar", href: "/reminders", icon: "calendar", left: "32%", top: "40%" },
-    { label: "Weekly planner", detail: "See meals and family plans", href: "/family", icon: "home", left: "72%", top: "52%" }
+    { label: "Household members", detail: "Manage people and access", href: "/family", icon: "users", left: "32%", top: "40%" },
+    { label: "Family Inbox", detail: "Review shared action items", href: "/family", icon: "mail", left: "72%", top: "52%" }
   ],
   "safe-room": [
     { label: "Emergency plan", detail: "Open emergency access", href: "/emergency", icon: "shield", left: "34%", top: "45%" },
     { label: "Secure vault", detail: "View protected documents", href: "/vault", icon: "lock", left: "70%", top: "54%" }
   ],
   garage: [
-    { label: "Vehicle records", detail: "Open MOT and insurance", href: "/vault", icon: "car", left: "32%", top: "52%" },
+    { label: "Vehicle documents", detail: "Open MOT and insurance", href: "/room/garage#room-documents", icon: "car", left: "32%", top: "52%" },
     { label: "Service calendar", detail: "View vehicle reminders", href: "/reminders", icon: "calendar", left: "72%", top: "39%" }
   ],
   garden: [
-    { label: "Pet records", detail: "Open pet information", href: "/vault", icon: "leaf", left: "31%", top: "52%" },
+    { label: "Pet records", detail: "Open pet information", href: "/room/garden#room-documents", icon: "leaf", left: "31%", top: "52%" },
     { label: "Garden jobs", detail: "View outdoor reminders", href: "/reminders", icon: "calendar", left: "72%", top: "43%" }
   ],
   driveway: [
-    { label: "Travel documents", detail: "Open travel records", href: "/vault", icon: "map-pin", left: "32%", top: "48%" },
+    { label: "Travel documents", detail: "Open travel records", href: "/room/driveway#room-documents", icon: "map-pin", left: "32%", top: "48%" },
     { label: "Trip planner", detail: "View upcoming travel", href: "/reminders", icon: "calendar", left: "72%", top: "42%" }
   ]
 };
@@ -135,6 +146,41 @@ export function RoomPage({ room }: RoomPageProps) {
     () => state.reminders.filter((item) => item.roomId === room.id).slice(0, 3),
     [room.id, state.reminders]
   );
+  const roomVaultDocuments = useMemo(
+    () =>
+      state.vaultDocuments.filter(
+        (document) => document.roomId === room.id || document.roomName === room.name
+      ),
+    [room.id, room.name, state.vaultDocuments]
+  );
+  const documentEntries = useMemo(() => {
+    const vaultByTitle = new Map(
+      roomVaultDocuments.map((document) => [document.title.trim().toLowerCase(), document])
+    );
+    const listedTitles = new Set(documents.map((document) => document.title.trim().toLowerCase()));
+    const linkedRoomDocuments = documents.map((document) => {
+      const vaultDocument = vaultByTitle.get(document.title.trim().toLowerCase());
+
+      return {
+        ...document,
+        href: vaultDocument ? `/document/${vaultDocument.id}?from=${room.id}` : "/vault",
+        reviewStatus: vaultDocument?.reviewStatus
+      };
+    });
+    const vaultOnlyDocuments = roomVaultDocuments
+      .filter((document) => !listedTitles.has(document.title.trim().toLowerCase()))
+      .map((document) => ({
+        id: document.id,
+        title: document.title,
+        kind: document.kind,
+        size: document.size,
+        updated: document.updated,
+        href: `/document/${document.id}?from=${room.id}`,
+        reviewStatus: document.reviewStatus
+      }));
+
+    return [...linkedRoomDocuments, ...vaultOnlyDocuments];
+  }, [documents, room.id, roomVaultDocuments]);
   const mailItems = room.id === "mailbox" ? state.mailboxItems : [];
   const [modal, setModal] = useState<RoomModal>(null);
   const [taskDraft, setTaskDraft] = useState({ label: "", due: "" });
@@ -152,7 +198,7 @@ export function RoomPage({ room }: RoomPageProps) {
     setActivityDraft({ text: "", by: "Amy" });
   };
 
-  const addActivityEntry = (text: string, by = "LifeDock") => {
+  const addActivityEntry = (text: string, by = "DiaryDock") => {
     updateState((current) => ({
       ...current,
       roomActivity: {
@@ -231,21 +277,14 @@ export function RoomPage({ room }: RoomPageProps) {
         {
           id: `vault-${nextRoomDocument.id}`,
           title: nextRoomDocument.title,
-          category:
-            room.id === "office"
-              ? "Legal & Estate"
-              : room.id === "bedroom"
-                ? "Health & Medical"
-                : room.id === "attic"
-                  ? "Memories"
-                  : room.id === "safe-room"
-                    ? "Legal & Estate"
-                    : room.id === "family-room"
-                      ? "Memories"
-                      : "Home & Property",
+          category: roomDocumentCategories[room.id] ?? "Home & Property",
           kind: nextRoomDocument.kind,
           size: nextRoomDocument.size,
-          updated: "Just now"
+          updated: "Just now",
+          roomId: room.id,
+          roomName: room.name,
+          reviewStatus: "needs-review",
+          reviewReasons: ["Please check the document title, category and room before relying on these details."]
         },
         ...current.vaultDocuments
       ]
@@ -480,9 +519,24 @@ export function RoomPage({ room }: RoomPageProps) {
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section id="room-documents" className="scroll-mt-24 space-y-3">
           <div className="flex items-end justify-between gap-3">
-            <SectionHeader title="Documents" hint="Linked from the Vault" actionLabel="Open Vault" actionHref="/vault" />
+            <SectionHeader
+              title={
+                room.id === "bedroom"
+                  ? "Health & Medical"
+                  : room.id === "garage"
+                    ? "Vehicle documents"
+                    : room.id === "garden"
+                      ? "Pet records"
+                      : room.id === "driveway"
+                        ? "Travel documents"
+                        : "Documents"
+              }
+              hint="Stored securely in All Files and linked to this room"
+              actionLabel="Open All Files"
+              actionHref="/vault"
+            />
             <button
               type="button"
               onClick={() => setModal("document")}
@@ -492,13 +546,14 @@ export function RoomPage({ room }: RoomPageProps) {
             </button>
           </div>
           <div className="estate-sheet divide-y divide-white/60 overflow-hidden">
-            {documents.map((doc) => (
+            {documentEntries.map((doc) => (
               <DocumentCard
                 key={doc.id}
                 title={doc.title}
                 kind={doc.kind}
                 meta={`${doc.size} - Updated ${doc.updated.toLowerCase()}`}
-                href="/vault"
+                href={doc.href}
+                badge={doc.reviewStatus === "needs-review" ? "Please check" : undefined}
               />
             ))}
           </div>
@@ -621,7 +676,7 @@ export function RoomPage({ room }: RoomPageProps) {
               ? `Add a document to ${room.name}`
               : `Log an update in ${room.name}`
         }
-        subtitle="Shared with the rest of LifeDock through the app data layer."
+        subtitle="Shared with the rest of DiaryDock through the app data layer."
         onClose={closeModal}
         footer={
           <div className="flex items-center justify-end gap-3">

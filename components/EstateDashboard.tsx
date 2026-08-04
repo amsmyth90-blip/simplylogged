@@ -63,7 +63,7 @@ export function EstateDashboard() {
         <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
           <Image
             src="/images/estate-dashboard-country.png"
-            alt="LifeDock digital estate with a cutaway attic, office, family dog and travel luggage"
+            alt="DiaryDock digital estate with a cutaway attic, office, family dog and travel luggage"
             fill
             priority
             className="object-fill"

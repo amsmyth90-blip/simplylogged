@@ -273,6 +273,7 @@ alter table public.family_invites add column if not exists access text not null 
 alter table public.family_invites add column if not exists sent_ago text not null default 'Just now';
 alter table public.family_invites add column if not exists initials text not null default '';
 alter table public.family_invites add column if not exists status text not null default 'pending';
+alter table public.family_invites add column if not exists email text;
 alter table public.family_invites add column if not exists created_at timestamptz not null default timezone('utc', now());
 alter table public.family_invites add column if not exists updated_at timestamptz not null default timezone('utc', now());
 

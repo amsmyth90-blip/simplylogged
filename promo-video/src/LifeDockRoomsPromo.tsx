@@ -19,8 +19,8 @@ const rooms: Room[] = [
 const BrandHeader: React.FC = () => (
   <div style={{position: 'absolute', top: 64, left: 60, right: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 20}}>
     <div style={{display: 'flex', alignItems: 'center', gap: 15}}>
-      <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
-      <div style={{fontSize: 29, color: navy, fontWeight: 900, letterSpacing: 2.8}}>LIFEDOCK</div>
+      <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
+      <div style={{fontSize: 29, color: navy, fontWeight: 900, letterSpacing: 2.8}}>DIARYDOCK</div>
     </div>
     <div style={{fontSize: 25, color: muted, fontWeight: 700}}>YOUR DIGITAL HOME</div>
   </div>
@@ -126,8 +126,8 @@ const EndCard: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#f3f6fc', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 76, opacity}}>
       <div style={{translate: '0 ' + rise + 'px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
-        <div style={{fontSize: 108, fontWeight: 900, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
+        <div style={{fontSize: 108, fontWeight: 900, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>DIARYDOCK</div>
         <div style={{color: navy, fontSize: 68, lineHeight: 1.08, fontWeight: 880, marginTop: 62}}>Your life, organised.</div>
         <div style={{color: '#3c5680', fontSize: 35, lineHeight: 1.32, marginTop: 30}}>One secure digital home<br />for everyday life.</div>
       </div>
@@ -138,7 +138,7 @@ const EndCard: React.FC = () => {
 export const LifeDockRoomsPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: '#f3f6fc'}}>
     <Audio src={staticFile('promo-video/lifedock-rooms-home-tour.wav')} volume={0.2} />
-    <Sequence from={8} durationInFrames={742}><Audio src={staticFile('promo-video/lifedock-rooms-laura-ni.mp3')} volume={1} /></Sequence>
+    <Sequence from={8} durationInFrames={742}><Audio src={staticFile('promo-video/diarydock-rooms-laura-ni.mp3')} volume={1} /></Sequence>
     <Sequence durationInFrames={90}><IntroScene /></Sequence>
     <Sequence from={90} durationInFrames={120}><RoomTourScene activeIndex={0} /></Sequence>
     <Sequence from={210} durationInFrames={105}><RoomTourScene activeIndex={1} /></Sequence>

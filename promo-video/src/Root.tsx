@@ -12,6 +12,7 @@ import {LifeDockFamilyDadOrganisedPromo} from './LifeDockFamilyDadOrganisedPromo
 import {LifeDockAvatarEverydayPromo} from './LifeDockAvatarEverydayPromo';
 import {LifeDockTenSecondChallengePromo} from './LifeDockTenSecondChallengePromo';
 import {LifeDockRoomsPromo} from './LifeDockRoomsPromo';
+import {DiaryDockHomeEmergencyPromo, DiaryDockPassportPromo} from './DiaryDockAdditionalPromos';
 
 export const RemotionRoot: React.FC = () => (
   <>
@@ -42,7 +43,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition
       id="LifeDockFamilyFinal"
       component={LifeDockFamilyFinal}
-      durationInFrames={480}
+      durationInFrames={277}
       fps={30}
       width={1080}
       height={1920}
@@ -110,6 +111,22 @@ export const RemotionRoot: React.FC = () => (
       fps={30}
       width={1080}
       height={1920}
+    />
+    <Composition
+      id="DiaryDockPassportPromo"
+      component={DiaryDockPassportPromo}
+      durationInFrames={900}
+      fps={30}
+      width={720}
+      height={1280}
+    />
+    <Composition
+      id="DiaryDockHomeEmergencyPromo"
+      component={DiaryDockHomeEmergencyPromo}
+      durationInFrames={840}
+      fps={30}
+      width={720}
+      height={1280}
     />
   </>
 );

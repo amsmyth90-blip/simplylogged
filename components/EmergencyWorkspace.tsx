@@ -375,7 +375,7 @@ export function EmergencyWorkspace(_: EmergencyWorkspaceProps) {
               ? "Add household plan"
               : "Add home note"
         }
-        subtitle="Shared across the app through the LifeDock data layer."
+        subtitle="Shared across the app through the DiaryDock data layer."
         onClose={closeModal}
         footer={
           <div className="flex items-center justify-end gap-3">

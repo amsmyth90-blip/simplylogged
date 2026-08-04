@@ -7,11 +7,9 @@ import { useEffect, useState } from "react";
 import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { type DocumentExtractionResult, type SuggestedRoom } from "@/lib/document-extraction";
+import { sanitizeDocumentFileName, uploadPrivateDocument } from "@/lib/document-storage";
 import { roomDetails, type Reminder, type RoomActivity, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-
-const DOCUMENT_BUCKET = "lifedock-documents";
 
 const MAX_ANALYSIS_UPLOAD_SIZE = 3.5 * 1024 * 1024;
 const MAX_ANALYSIS_IMAGE_EDGE = 1800;
@@ -64,7 +62,7 @@ function loadImageFromFile(file: File) {
 
 async function preparePageImage(file: File, maxBytes: number) {
   if (!file.type.startsWith("image/")) {
-    throw new Error("LifeDock can currently scan photographed image pages only.");
+    throw new Error("DiaryDock can currently scan photographed image pages only.");
   }
 
   const image = await loadImageFromFile(file);
@@ -94,7 +92,7 @@ async function preparePageImage(file: File, maxBytes: number) {
     throw new Error("One page is too detailed to upload. Please crop it closer to the document and try again.");
   }
 
-  const baseName = sanitizeFileName(file.name.replace(/\.[^.]+$/, "")) || "document-page";
+  const baseName = sanitizeDocumentFileName(file.name.replace(/\.[^.]+$/, "")) || "document-page";
   return new File([blob], `${baseName}.jpg`, { type: "image/jpeg", lastModified: Date.now() });
 }
 
@@ -122,7 +120,7 @@ async function createCombinedPdf(files: File[]) {
   }
 
   const bytes = await pdf.save();
-  return new File([bytes], `lifedock-${files.length}-page-scan.pdf`, {
+  return new File([bytes], `diarydock-${files.length}-page-scan.pdf`, {
     type: "application/pdf",
     lastModified: Date.now()
   });
@@ -141,7 +139,7 @@ async function readCaptureApiPayload(response: Response) {
   const text = (await response.text()).trim();
   return {
     error: text.toLowerCase().includes("request entity") || text.toLowerCase().includes("request body")
-      ? "That photo was too large for document reading. LifeDock now compresses large images automatically, so please try the scan again."
+      ? "That photo was too large for document reading. DiaryDock now compresses large images automatically, so please try the scan again."
       : text || "The document could not be analyzed. Please try again."
   };
 }
@@ -168,16 +166,6 @@ const categoryToDocumentKind: Record<VaultDocument["category"], VaultDocument["k
   Memories: "Image"
 };
 
-function sanitizeFileName(name: string) {
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9.]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 96);
-}
-
 function buildReviewReasons(extraction: DocumentExtractionResult) {
   const reasons: string[] = [];
 
@@ -198,38 +186,6 @@ function buildReviewReasons(extraction: DocumentExtractionResult) {
   }
 
   return reasons;
-}
-
-async function uploadDocumentFile(file: File, documentId: string) {
-  const client = getSupabaseBrowserClient();
-  if (!client) {
-    return null;
-  }
-
-  const {
-    data: { user },
-    error: userError
-  } = await client.auth.getUser();
-
-  if (userError || !user) {
-    throw new Error("Please sign in again before saving this document.");
-  }
-
-  const safeName = sanitizeFileName(file.name || "document-photo");
-  const storagePath = `${user.id}/${documentId}/${safeName || "document-photo"}`;
-  const { error } = await client.storage.from(DOCUMENT_BUCKET).upload(storagePath, file, {
-    contentType: file.type || "application/octet-stream",
-    upsert: false
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return {
-    bucket: DOCUMENT_BUCKET,
-    path: storagePath
-  };
 }
 
 export function DocumentCaptureWorkspace() {
@@ -306,7 +262,7 @@ export function DocumentCaptureWorkspace() {
     const fileMeta = `${originalFiles.length} page${originalFiles.length === 1 ? "" : "s"} - ${totalKb} KB`;
 
     try {
-      const storedFile = repositoryMode === "supabase" ? await uploadDocumentFile(storedUpload, documentId) : null;
+      const storedFile = repositoryMode === "supabase" ? await uploadPrivateDocument(storedUpload, documentId) : null;
       const reviewReasons = buildReviewReasons(extraction);
       const nextDocument: VaultDocument = {
         id: documentId,
@@ -340,9 +296,9 @@ export function DocumentCaptureWorkspace() {
       };
       const nextActivity: RoomActivity = {
         id: activityId,
-        text: `LifeDock read ${originalFiles.length} page${originalFiles.length === 1 ? "" : "s"}, filed ${extraction.title}, and stored the original`,
+        text: `DiaryDock read ${originalFiles.length} page${originalFiles.length === 1 ? "" : "s"}, filed ${extraction.title}, and stored the original`,
         when: "Just now",
-        by: "LifeDock"
+        by: "DiaryDock"
       };
       const reminderNote = [
         extraction.issuer,
@@ -636,7 +592,7 @@ export function DocumentCaptureWorkspace() {
             <div className="relative mt-5 overflow-hidden rounded-[30px] border border-white/85 bg-white/35 shadow-[0_28px_65px_-38px_rgba(30,61,72,0.55)] backdrop-blur-sm">
               <img
                 src="/images/estate-dashboard-country.png"
-                alt="LifeDock estate"
+                alt="DiaryDock estate"
                 className="h-[280px] w-full object-cover transition-[object-position] duration-700"
                 style={{ objectPosition: `center ${filingTarget.imagePosition}%` }}
               />
@@ -709,7 +665,7 @@ export function DocumentCaptureWorkspace() {
 
               <Link href={savedDocumentId ? `/document/${savedDocumentId}` : "/vault"} className="mt-4 flex w-full items-center justify-center gap-2 rounded-[19px] bg-[#86a774] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_30px_-20px_rgba(67,102,63,0.7)]">
                 <UiIcon name="file" className="h-4 w-4" />
-                View in LifeDock
+                View in DiaryDock
               </Link>
 
               <button type="button" onClick={() => { setSelectedFiles([]); resetResults(); }} className="mt-3 w-full text-center text-sm font-semibold text-[#5f8155]">
