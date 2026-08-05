@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { createHouseholdInvite } from "@/lib/household-sharing";
 import type { HouseholdMember, Invite } from "@/lib/lifedock-data";
@@ -167,40 +168,27 @@ const householdStyles: Array<{
 
 function RoomHotspot({
   label,
-  icon,
   position,
   onClick,
   href,
   labelSide = "right",
-  badge
 }: HotspotProps) {
   const content = (
-    <>
-      <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/90 bg-white/75 text-[#52664a] shadow-[0_10px_24px_rgba(51,46,36,0.24)] backdrop-blur-xl">
-        <span className="absolute inset-[-7px] animate-ping rounded-full border border-white/55 opacity-35" />
-        <UiIcon name={icon} className="relative h-[17px] w-[17px]" />
-        {badge ? (
-          <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#aa5548] px-1 text-[9px] font-bold text-white">
-            {badge}
-          </span>
-        ) : null}
-      </span>
-      <span
-        className={`whitespace-nowrap rounded-full border border-white/90 bg-[#e5ecde]/95 px-3.5 py-1.5 text-[14px] font-semibold leading-none tracking-[0.01em] text-[#284334] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
+    <span
+      className={`${roomImageLabelClass} ${
           labelSide === "left"
             ? "absolute right-8"
             : labelSide === "below"
               ? "absolute top-9"
               : "absolute left-8"
         }`}
-      >
-        {label}
-      </span>
-    </>
+    >
+      {label}
+    </span>
   );
 
   const className =
-    "absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center transition duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white";
+    "group absolute z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white";
   const style = position;
 
   return href ? (

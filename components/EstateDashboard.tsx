@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { estateAreas } from "@/lib/mock-data";
 
 const roomSceneImages = [
@@ -64,7 +65,7 @@ function EstateHotspotMarker({
       style={{ top, left }}
       aria-hidden="true"
     >
-      <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-2.5 py-1 text-[12px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] sm:px-3 sm:py-1.5 sm:text-[13px] ${labelPositionClass}`}>
+      <span className={`absolute ${roomImageLabelClass} ${labelPositionClass}`}>
         {label}
       </span>
     </span>
@@ -146,7 +147,7 @@ export function EstateDashboard() {
                   <EstateHotspotMarker
                     label={area.name}
                     top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "20%" : area.id === "driveway" ? "48%" : "50%"}
-                    left={area.id === "garden" ? "65%" : area.id === "driveway" ? "62%" : "50%"}
+                    left={area.id === "garden" ? "65%" : area.id === "driveway" ? "55%" : "50%"}
                     labelPosition={area.id === "garden" ? "right" : "below"}
                     className={area.id === "garden" ? "!top-[42%] sm:!top-[20%]" : ""}
                   />
