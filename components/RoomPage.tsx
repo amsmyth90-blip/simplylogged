@@ -9,7 +9,6 @@ import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
-import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatusChip } from "@/components/StatusChip";
 import { TaskChecklist } from "@/components/TaskChecklist";
@@ -104,7 +103,7 @@ type RoomObject = {
 
 const interactiveRoomObjects: Record<string, RoomObject[]> = {
   attic: [
-    { label: "Photo albums", detail: "Open family memories", href: "/vault", icon: "archive", left: "78%", top: "30%" },
+    { label: "Photo albums", detail: "Open family memories", href: "/vault", icon: "archive", left: "30%", top: "44%" },
     { label: "Keepsake chest", detail: "View legacy records", href: "/vault", icon: "lock", left: "72%", top: "55%" }
   ],
   bedroom: [
@@ -120,8 +119,8 @@ const interactiveRoomObjects: Record<string, RoomObject[]> = {
     { label: "Family Inbox", detail: "Review shared action items", href: "/family", icon: "mail", left: "72%", top: "52%" }
   ],
   "safe-room": [
-    { label: "Emergency plan", detail: "Open emergency access", href: "/emergency", icon: "shield", left: "28%", top: "27%" },
-    { label: "Secure vault", detail: "View protected documents", href: "/vault", icon: "lock", left: "70%", top: "34%" }
+    { label: "Emergency plan", detail: "Open emergency access", href: "/emergency", icon: "shield", left: "34%", top: "45%" },
+    { label: "Secure vault", detail: "View protected documents", href: "/vault", icon: "lock", left: "70%", top: "54%" }
   ],
   garage: [
     { label: "Vehicle documents", detail: "Open MOT and insurance", href: "/room/garage#room-documents", icon: "car", left: "32%", top: "52%" },
@@ -403,11 +402,12 @@ export function RoomPage({ room }: RoomPageProps) {
                 <Link
                   key={object.label}
                   href={object.href}
-                  className="group pointer-events-auto absolute flex h-11 w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="group pointer-events-auto absolute flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/62 text-slate-800 shadow-[0_15px_30px_-14px_rgba(15,23,42,0.6)] ring-2 ring-white/30 backdrop-blur-md transition hover:scale-110 hover:bg-white/90 focus:scale-110 focus:outline-none"
                   style={{ left: object.left, top: object.top, transform: "translate(-50%, -50%)" }}
                   aria-label={`${object.label}: ${object.detail}`}
                 >
-                  <span className={`absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 ${roomImageLabelClass}`}>
+                  <UiIcon name={object.icon} className="h-[18px] w-[18px]" />
+                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold text-[#284334] opacity-100 shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus:opacity-100">
                     {object.label}
                   </span>
                 </Link>
