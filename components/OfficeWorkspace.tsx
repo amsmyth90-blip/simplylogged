@@ -9,6 +9,7 @@ import { ModalShell } from "@/components/ModalShell";
 import {
   roomImageLabelClass,
   roomMarkerCircleClass,
+  roomMarkerDotClass,
   roomMarkerHaloClass,
 } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
@@ -34,7 +35,6 @@ type OfficeHotspotProps = {
 
 function OfficeHotspot({
   label,
-  icon,
   position,
   onClick,
   href,
@@ -46,7 +46,7 @@ function OfficeHotspot({
     <>
       <span className={roomMarkerCircleClass}>
         <span className={roomMarkerHaloClass} />
-        <UiIcon name={icon} className="relative h-[17px] w-[17px]" />
+        <span className={roomMarkerDotClass} />
         {badge ? (
           <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#a65448] px-1 text-[9px] font-bold text-white">
             {badge}
