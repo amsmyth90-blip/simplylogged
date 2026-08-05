@@ -1067,7 +1067,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
                 : "Admin inbox"
             }
             icon="mail"
-            position={{ left: "19%", top: "50.5%" }}
+            position={{ left: "18%", top: "49%" }}
             onClick={() => setPanel("inbox")}
             badge={officeInbox.length || undefined}
             labelSide="right"
@@ -1077,10 +1077,10 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
               adminCount ? `Today's admin · ${adminCount}` : "Today's admin"
             }
             icon="briefcase"
-            position={{ left: "50%", top: "53%" }}
+            position={{ left: "50%", top: "57%" }}
             onClick={() => setPanel("admin")}
             badge={adminCount || undefined}
-            labelSide="below"
+            labelSide="right"
           />
           <OfficeHotspot
             label={`Personal ID · ${drawerFiles.identity.length}`}
@@ -1099,14 +1099,14 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
           <OfficeHotspot
             label={`Home & insurance · ${drawerFiles.home.length}`}
             icon="home"
-            position={{ left: "88%", top: "63%" }}
+            position={{ left: "87%", top: "61%" }}
             onClick={() => openDocumentDrawer("home")}
             labelSide="left"
           />
           <OfficeHotspot
             label={`Bills & contracts · ${drawerFiles.finance.length}`}
             icon="chart"
-            position={{ left: "24%", top: "67%" }}
+            position={{ left: "23%", top: "72%" }}
             onClick={() => openDocumentDrawer("finance")}
             labelSide="right"
           />

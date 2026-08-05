@@ -145,10 +145,10 @@ export function KitchenRoom() {
           <RoomHotspotMarker label="Meal planner" className="left-[70%] top-[49%]" labelPosition="right" />
         </Link>
         <Link href="/kitchen/pantry" aria-label="Open pantry and shopping list" title="Pantry and shopping" className={`${roomHotspotClass} group left-[76%] top-[18%] h-[43%] w-[10%]`}>
-          <RoomHotspotMarker label="Pantry" className="left-[55%] top-[38%]" />
+          <RoomHotspotMarker label="Pantry" className="left-[55%] top-[30%]" />
         </Link>
-        <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[87%] top-[21%] h-[39%] w-[13%]`}>
-          <RoomHotspotMarker label="Noticeboard" className="left-[58%] top-[51%]" labelPosition="left" />
+        <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[82%] top-[21%] h-[39%] w-[18%]`}>
+          <RoomHotspotMarker label="Noticeboard" className="left-[28%] top-[55%]" labelPosition="left" />
         </Link>
         <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[28%] top-[48%] h-[14%] w-[42%]`}>
           <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[50%] top-[52%]" />
