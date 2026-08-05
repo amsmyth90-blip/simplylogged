@@ -56,12 +56,12 @@ function EstateHotspotMarker({
   className?: string;
 }) {
   const labelPositionClass = labelPosition === "right"
-    ? "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
-    : "left-1/2 top-[calc(100%+6px)] -translate-x-1/2";
+    ? "left-[calc(50%+6px)] top-1/2 -translate-y-1/2"
+    : "left-1/2 top-[calc(50%-2px)] -translate-x-1/2 -translate-y-1/2";
 
   return (
     <span
-      className={`pointer-events-none absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 ${className}`}
+      className={`pointer-events-none absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 ${className}`}
       style={{ top, left }}
       aria-hidden="true"
     >
