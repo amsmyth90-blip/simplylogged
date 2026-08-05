@@ -4,6 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  roomImageLabelClass,
+  roomMarkerCircleClass,
+  roomMarkerDotClass,
+  roomMarkerHaloClass,
+} from "@/components/RoomSceneChrome";
 import { estateAreas } from "@/lib/mock-data";
 
 const roomSceneImages = [
@@ -55,16 +61,20 @@ function EstateHotspotMarker({
   className?: string;
 }) {
   const labelPositionClass = labelPosition === "right"
-    ? "left-[calc(50%+6px)] top-1/2 -translate-y-1/2"
-    : "left-1/2 top-[calc(50%-2px)] -translate-x-1/2 -translate-y-1/2";
+    ? "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
+    : "left-1/2 top-[calc(100%+6px)] -translate-x-1/2";
 
   return (
     <span
-      className={`pointer-events-none absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 ${className}`}
+      className={`pointer-events-none absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 ${className}`}
       style={{ top, left }}
       aria-hidden="true"
     >
-      <span className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-2.5 py-1 text-[12px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] sm:px-3 sm:py-1.5 sm:text-[13px] ${labelPositionClass}`}>
+      <span className={roomMarkerCircleClass}>
+        <span className={roomMarkerHaloClass} />
+        <span className={roomMarkerDotClass} />
+      </span>
+      <span className={`absolute ${roomImageLabelClass} ${labelPositionClass}`}>
         {label}
       </span>
     </span>
@@ -146,7 +156,7 @@ export function EstateDashboard() {
                   <EstateHotspotMarker
                     label={area.name}
                     top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "20%" : area.id === "driveway" ? "48%" : "50%"}
-                    left={area.id === "garden" ? "65%" : area.id === "driveway" ? "62%" : "50%"}
+                    left={area.id === "garden" ? "65%" : area.id === "driveway" ? "50%" : "50%"}
                     labelPosition={area.id === "garden" ? "right" : "below"}
                     className={area.id === "garden" ? "!top-[42%] sm:!top-[20%]" : ""}
                   />

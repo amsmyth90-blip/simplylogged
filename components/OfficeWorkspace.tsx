@@ -6,6 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
+import {
+  roomImageLabelClass,
+  roomMarkerCircleClass,
+  roomMarkerHaloClass,
+} from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { WillsWishesRecord } from "@/lib/lifedock-data";
 import type { VaultDocument } from "@/lib/mock-data";
@@ -39,8 +44,8 @@ function OfficeHotspot({
   const visibleLabel = href === "/office/bills" ? "Household bills" : label;
   const content = (
     <>
-      <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/80 bg-white/72 text-slate-800 shadow-[0_15px_30px_-14px_rgba(15,23,42,0.6)] ring-2 ring-white/30 backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/90 group-focus-visible:scale-110">
-        <span className="absolute inset-[-5px] animate-pulse rounded-full border border-white/55" />
+      <span className={roomMarkerCircleClass}>
+        <span className={roomMarkerHaloClass} />
         <UiIcon name={icon} className="relative h-[17px] w-[17px]" />
         {badge ? (
           <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#a65448] px-1 text-[9px] font-bold text-white">
@@ -49,12 +54,12 @@ function OfficeHotspot({
         ) : null}
       </span>
       <span
-        className={`absolute whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold leading-none tracking-wide text-[#284334] shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition duration-300 group-hover:bg-[#f4f7ef] ${
+        className={`absolute ${roomImageLabelClass} ${
           labelSide === "left"
-            ? "right-[calc(100%+5px)] top-1/2 -translate-y-1/2"
+            ? "right-[calc(100%+6px)] top-1/2 -translate-y-1/2"
             : labelSide === "below"
-              ? "left-1/2 top-[calc(100%+5px)] -translate-x-1/2"
-              : "left-[calc(100%+5px)] top-1/2 -translate-y-1/2"
+              ? "left-1/2 top-[calc(100%+6px)] -translate-x-1/2"
+              : "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
         }`}
       >
         {visibleLabel}

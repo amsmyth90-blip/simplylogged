@@ -108,7 +108,7 @@ export function BedroomRoom() {
         >
           <RoomHotspotMarker
             label="Emergency Info"
-            className="left-[49%] top-[38%]"
+            className="left-[58%] top-[50%]"
             labelPosition="left"
           />
         </Link>

@@ -6,6 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
+import {
+  roomImageLabelClass,
+  roomMarkerCircleClass,
+  roomMarkerHaloClass,
+} from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { createHouseholdInvite } from "@/lib/household-sharing";
 import type { HouseholdMember, Invite } from "@/lib/lifedock-data";
@@ -176,8 +181,8 @@ function RoomHotspot({
 }: HotspotProps) {
   const content = (
     <>
-      <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/90 bg-white/75 text-[#52664a] shadow-[0_10px_24px_rgba(51,46,36,0.24)] backdrop-blur-xl">
-        <span className="absolute inset-[-7px] animate-ping rounded-full border border-white/55 opacity-35" />
+      <span className={roomMarkerCircleClass}>
+        <span className={roomMarkerHaloClass} />
         <UiIcon name={icon} className="relative h-[17px] w-[17px]" />
         {badge ? (
           <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#aa5548] px-1 text-[9px] font-bold text-white">
@@ -186,12 +191,12 @@ function RoomHotspot({
         ) : null}
       </span>
       <span
-        className={`whitespace-nowrap rounded-full border border-white/90 bg-[#e5ecde]/95 px-3.5 py-1.5 text-[14px] font-semibold leading-none tracking-[0.01em] text-[#284334] shadow-[0_10px_24px_rgba(51,46,36,0.2)] backdrop-blur-xl ${
+        className={`absolute ${roomImageLabelClass} ${
           labelSide === "left"
-            ? "absolute right-8"
+            ? "right-[calc(100%+6px)] top-1/2 -translate-y-1/2"
             : labelSide === "below"
-              ? "absolute top-9"
-              : "absolute left-8"
+              ? "left-1/2 top-[calc(100%+6px)] -translate-x-1/2"
+              : "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
         }`}
       >
         {label}
@@ -523,7 +528,7 @@ export function FamilyWorkspace() {
             icon="users"
             position={familyPosition}
             onClick={() => members[0] && setSelectedMember(members[0])}
-            labelSide="right"
+            labelSide="below"
           />
 
           <RoomHotspot
@@ -540,7 +545,7 @@ export function FamilyWorkspace() {
             position={{ left: "65%", top: "36.8%" }}
             onClick={() => setInboxOpen(true)}
             badge={familyInboxItems.length || undefined}
-            labelSide="right"
+            labelSide="left"
           />
 
           <div className="absolute bottom-[5.8rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/80 bg-[#e5ecde]/90 px-3 py-1.5 text-[12px] font-medium text-[#284334] shadow-lg backdrop-blur-lg">

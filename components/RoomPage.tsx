@@ -9,6 +9,11 @@ import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
+import {
+  roomImageLabelClass,
+  roomMarkerCircleClass,
+  roomMarkerHaloClass,
+} from "@/components/RoomSceneChrome";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatusChip } from "@/components/StatusChip";
 import { TaskChecklist } from "@/components/TaskChecklist";
@@ -402,12 +407,13 @@ export function RoomPage({ room }: RoomPageProps) {
                 <Link
                   key={object.label}
                   href={object.href}
-                  className="group pointer-events-auto absolute flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/62 text-slate-800 shadow-[0_15px_30px_-14px_rgba(15,23,42,0.6)] ring-2 ring-white/30 backdrop-blur-md transition hover:scale-110 hover:bg-white/90 focus:scale-110 focus:outline-none"
+                  className={`group pointer-events-auto absolute ${roomMarkerCircleClass} focus:outline-none`}
                   style={{ left: object.left, top: object.top, transform: "translate(-50%, -50%)" }}
                   aria-label={`${object.label}: ${object.detail}`}
                 >
+                  <span className={roomMarkerHaloClass} />
                   <UiIcon name={object.icon} className="h-[18px] w-[18px]" />
-                  <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/90 bg-[rgba(229,236,222,0.94)] px-3 py-1.5 text-[13px] font-semibold text-[#284334] opacity-100 shadow-[0_7px_18px_rgba(32,53,42,0.3)] backdrop-blur-md transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus:opacity-100">
+                  <span className={`absolute left-1/2 top-[calc(100%+6px)] -translate-x-1/2 ${roomImageLabelClass}`}>
                     {object.label}
                   </span>
                 </Link>
