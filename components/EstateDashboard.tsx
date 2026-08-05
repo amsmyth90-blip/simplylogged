@@ -4,12 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import {
-  roomImageLabelClass,
-  roomMarkerCircleClass,
-  roomMarkerDotClass,
-  roomMarkerHaloClass,
-} from "@/components/RoomSceneChrome";
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { estateAreas } from "@/lib/mock-data";
 
 const roomSceneImages = [
@@ -70,10 +65,6 @@ function EstateHotspotMarker({
       style={{ top, left }}
       aria-hidden="true"
     >
-      <span className={roomMarkerCircleClass}>
-        <span className={roomMarkerHaloClass} />
-        <span className={roomMarkerDotClass} />
-      </span>
       <span className={`absolute ${roomImageLabelClass} ${labelPositionClass}`}>
         {label}
       </span>
