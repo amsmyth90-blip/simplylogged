@@ -5,6 +5,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { BedroomRoom } from "@/components/BedroomRoom";
 import { DrivewayWorkspace } from "@/components/DrivewayWorkspace";
 import { GarageWorkspace } from "@/components/GarageWorkspace";
+import { GardenRoom } from "@/components/GardenRoom";
 import { KitchenRoom } from "@/components/KitchenRoom";
 import { OfficeWorkspace } from "@/components/OfficeWorkspace";
 import { RoomPage } from "@/components/RoomPage";
@@ -32,7 +33,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
   if (roomId === "bedroom") return <BedroomRoom />;
   if (roomId === "garage") return <GarageWorkspace />;
   if (roomId === "driveway") return <DrivewayWorkspace />;
-  if (roomId === "garden") redirect("/garden");
+  if (roomId === "garden") return <GardenRoom />;
   if (roomId === "office") {
     if (drawer === "wishes") redirect("/wills");
     if (drawer === "finance") redirect("/office/bills");

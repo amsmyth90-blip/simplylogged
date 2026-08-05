@@ -1,18 +1,11 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { BottomNav } from "@/components/BottomNav";
-import { GardenWorkspace } from "@/components/garden/GardenWorkspace";
 import { requireUser } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Garden" };
 
 export default async function GardenPage() {
   await requireUser();
-
-  return (
-    <>
-      <GardenWorkspace />
-      <BottomNav />
-    </>
-  );
+  redirect("/room/garden");
 }
