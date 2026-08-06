@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { BottomNav } from "@/components/BottomNav";
+import { AtticRoom } from "@/components/AtticRoom";
 import { BedroomRoom } from "@/components/BedroomRoom";
 import { DrivewayWorkspace } from "@/components/DrivewayWorkspace";
 import { GarageWorkspace } from "@/components/GarageWorkspace";
@@ -29,6 +30,7 @@ export default async function RoomDetailPage({ params, searchParams }: RoomDetai
   await requireUser();
   const [{ roomId }, { drawer }] = await Promise.all([params, searchParams]);
   if (roomId === "family-room") redirect("/family");
+  if (roomId === "attic") return <AtticRoom />;
   if (roomId === "kitchen") return <KitchenRoom />;
   if (roomId === "bedroom") return <BedroomRoom />;
   if (roomId === "garage") return <GarageWorkspace />;
