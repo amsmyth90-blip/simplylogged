@@ -3,7 +3,7 @@ import Link from "next/link";
 import { UiIcon } from "@/components/UiIcon";
 
 export const roomHotspotClass =
-  "absolute z-20 rounded-2xl bg-transparent transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/90";
+  "absolute z-20 bg-transparent focus-visible:outline-none";
 
 export const roomMarkerCircleClass =
   "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/90 bg-white/72 text-[#52664a] shadow-[0_10px_24px_rgba(51,46,36,0.24)] ring-2 ring-white/30 backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/90 group-focus-visible:scale-110";
