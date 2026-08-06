@@ -171,8 +171,7 @@ export function FamilyStoryBuilderWorkspace() {
             </p>
             <h1 className="mt-2 font-serif text-3xl">Your family story is tucked away</h1>
             <p className="mt-3 text-sm leading-6 text-[#667068]">
-              The story has been saved, and any photos you added are linked behind the scenes so it
-              stays part of the memory, not lost in All Files.
+              The story and linked photos have been saved together in Family History.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Link
@@ -427,10 +426,6 @@ export function FamilyStoryBuilderWorkspace() {
           </section>
         ) : null}
 
-        <p className="mt-4 rounded-[18px] border border-[#20352a]/[0.07] bg-[#eef2e9] px-4 py-3 text-[12px] leading-5 text-[#667068]">
-          Family stories belong in the Attic. Identity documents, wills, health records and vehicle
-          documents should stay in their own rooms.
-        </p>
       </div>
     </main>
   );

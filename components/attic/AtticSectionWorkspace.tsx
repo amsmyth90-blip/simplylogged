@@ -74,17 +74,6 @@ function ActionLink({
   );
 }
 
-function NumberedItem({ index, text }: { index: number; text: string }) {
-  return (
-    <li className="flex gap-3 rounded-[18px] bg-[#f7f5ef] p-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e8eee3] text-xs font-bold text-[#52705a]">
-        {index}
-      </span>
-      <span className="pt-1 text-sm leading-5 text-[#33483b]">{text}</span>
-    </li>
-  );
-}
-
 export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
   const { state } = useLifeDockData();
   const primaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
@@ -139,8 +128,7 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
                   {section.intention}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#667068]">
-                  {section.description} This page is for memories and family story only, keeping
-                  legal, health, vehicle and travel records in their proper rooms.
+                  {section.description}
                 </p>
               </div>
             </div>
@@ -205,108 +193,10 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
             </AtticCard>
           ) : null}
 
-          <AtticCard>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
-                  Organise this by
-                </p>
-                <h2 className="mt-1 font-serif text-2xl">Simple sections</h2>
-              </div>
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-[#e8eee3] text-[#52705a]"
-                aria-hidden="true"
-              >
-                <UiIcon name="folder" className="h-5 w-5" />
-              </span>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {section.organiseBy.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full bg-[#e8eee3] px-3 py-2 text-[11px] font-semibold text-[#52705a]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          </AtticCard>
-
-          <AtticCard>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
-              When adding something, ask
-            </p>
-            <ol className="mt-4 space-y-2">
-              {section.prompts.map((prompt, index) => (
-                <NumberedItem key={prompt} index={index + 1} text={prompt} />
-              ))}
-            </ol>
-          </AtticCard>
-
-          <AtticCard className="bg-[#eef2e9]/90">
-            <div className="flex items-start gap-3">
-              <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-white text-[#52705a]"
-                aria-hidden="true"
-              >
-                <UiIcon name="check" className="h-5 w-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
-                  Belongs here
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {section.scope.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-[#20352a]/[0.07] bg-white px-3 py-2 text-[11px] font-semibold text-[#52705a]"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </AtticCard>
-
-          <AtticCard>
-            <div className="flex items-start gap-3">
-              <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-[#f4e9e5] text-[#8a5149]"
-                aria-hidden="true"
-              >
-                <UiIcon name="alert" className="h-5 w-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8a5149]">
-                  Keep this in other rooms
-                </p>
-                <ul className="mt-3 space-y-2">
-                  {section.notHere.map((item) => (
-                    <li key={item} className="flex gap-2 text-xs leading-5 text-[#667068]">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8a5149]/50" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </AtticCard>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <ActionLink
-              href="/vault"
-              icon="lock"
-              label="View stored files"
-              description="Open All Files for anything already uploaded."
-            />
-            <ActionLink
-              href="/room/attic"
-              icon="archive"
-              label="Back to Attic"
-              description="Return to the photo-room labels."
-            />
-          </div>
+          <p className="rounded-[18px] border border-[#20352a]/[0.07] bg-[#eef2e9]/80 px-4 py-3 text-[12px] leading-5 text-[#667068]">
+            Attic is for memories and family story. Formal legal, health, vehicle and travel
+            records stay in their own rooms.
+          </p>
         </div>
       </div>
     </main>
