@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { PageHeader } from "@/components/PageHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { AtticSection } from "@/lib/attic-sections";
 
@@ -39,14 +38,15 @@ function ActionLink({
       href={href}
       className={`group flex min-h-[76px] items-center gap-3 rounded-[20px] border p-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] ${
         primary
-          ? "border-[#315443]/15 bg-[#315443] text-white hover:bg-[#3b604d]"
-          : "border-[#20352a]/[0.07] bg-[#f7f5ef] text-[#20352a] hover:bg-[#eef2e9]"
+          ? "border-[#315443]/15 bg-[#315443] text-white hover:bg-[#3b604d] active:bg-[#294736]"
+          : "border-[#20352a]/[0.07] bg-[#f7f5ef] text-[#20352a] hover:bg-[#eef2e9] active:bg-[#e8eee3]"
       }`}
     >
       <span
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] ${
           primary ? "bg-white/14 text-[#e8eee3]" : "bg-white text-[#52705a]"
         }`}
+        aria-hidden="true"
       >
         <UiIcon name={icon} className="h-5 w-5" />
       </span>
@@ -65,6 +65,7 @@ function ActionLink({
         className={`h-4 w-4 shrink-0 transition group-hover:translate-x-0.5 ${
           primary ? "text-white/70" : "text-[#8a938b]"
         }`}
+        aria-hidden="true"
       />
     </Link>
   );
@@ -83,39 +84,48 @@ function NumberedItem({ index, text }: { index: number; text: string }) {
 
 export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
   return (
-    <main className="min-h-screen bg-[#f5f2ea] pb-32 text-[#20352a]">
-      <div className="mx-auto max-w-[760px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-        <PageHeader
-          eyebrow="Attic · Memories"
-          title={section.title}
-          subtitle={section.description}
-          backHref="/room/attic"
-          backLabel="Attic"
-          heroImage="/images/pages/attic-memory-room-v1.webp"
-          heroPosition="center 42%"
-          heroTone="linear-gradient(180deg, rgba(34,30,23,0.18) 0%, rgba(34,30,23,0.18) 35%, rgba(34,30,23,0.72) 100%)"
-          badge="Memory room"
-          meta={
-            <span className="estate-chip border-white/30 bg-white/14 text-white/80">
-              No legal, health, car or travel records here
-            </span>
-          }
-        />
+    <main className="min-h-screen overflow-x-hidden bg-[#f5f2ea] pb-32 text-[#20352a]">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <span className="absolute -right-16 top-12 h-64 w-64 rounded-full bg-[#dfe7d8]/55 blur-3xl" />
+        <span className="absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-[#ead9c0]/45 blur-3xl" />
+      </div>
 
-        <div className="-mt-20 space-y-4">
-          <AtticCard className="relative z-30">
+      <div className="relative mx-auto w-full max-w-[680px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
+        <header className="flex items-center gap-3">
+          <Link
+            href="/room/attic"
+            aria-label="Back to Attic"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#20352a]/10 bg-white/80 shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"
+          >
+            <UiIcon name="arrow-left" className="h-5 w-5" aria-hidden="true" />
+          </Link>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6f8e72]">
+              Attic
+            </p>
+            <h1 className="font-serif text-3xl leading-tight tracking-tight">{section.title}</h1>
+          </div>
+        </header>
+
+        <div className="mt-8 space-y-4">
+          <AtticCard>
             <div className="flex items-start gap-3">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-[#e8eee3] text-[#52705a]">
+              <span
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-[#e8eee3] text-[#52705a]"
+                aria-hidden="true"
+              >
                 <UiIcon name={section.icon} className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
-                  What this page is for
+                  Memory room
                 </p>
-                <h2 className="mt-1 font-serif text-2xl text-[#20352a]">{section.intention}</h2>
-                <p className="mt-2 text-xs leading-5 text-[#667068]">
-                  This starts as an organising page. It gives the Attic structure now, while keeping
-                  private records empty until you choose to add them.
+                <h2 className="mt-1 font-serif text-2xl text-[#20352a]">
+                  {section.intention}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[#667068]">
+                  {section.description} This page is for memories and family story only, keeping
+                  legal, health, vehicle and travel records in their proper rooms.
                 </p>
               </div>
             </div>
@@ -145,7 +155,10 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
                 </p>
                 <h2 className="mt-1 font-serif text-2xl">Simple sections</h2>
               </div>
-              <span className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-[#e8eee3] text-[#52705a]">
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-[#e8eee3] text-[#52705a]"
+                aria-hidden="true"
+              >
                 <UiIcon name="folder" className="h-5 w-5" />
               </span>
             </div>
@@ -174,7 +187,10 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
 
           <AtticCard className="bg-[#eef2e9]/90">
             <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-white text-[#52705a]">
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-white text-[#52705a]"
+                aria-hidden="true"
+              >
                 <UiIcon name="check" className="h-5 w-5" />
               </span>
               <div className="min-w-0">
@@ -197,7 +213,10 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
 
           <AtticCard>
             <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-[#f4e9e5] text-[#8a5149]">
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] bg-[#f4e9e5] text-[#8a5149]"
+                aria-hidden="true"
+              >
                 <UiIcon name="alert" className="h-5 w-5" />
               </span>
               <div className="min-w-0">
