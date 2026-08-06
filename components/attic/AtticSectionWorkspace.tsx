@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { AtticSection } from "@/lib/attic-sections";
 
@@ -83,6 +86,18 @@ function NumberedItem({ index, text }: { index: number; text: string }) {
 }
 
 export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
+  const { state } = useLifeDockData();
+  const primaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
+  const secondaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
+  const primaryDescription =
+    section.id === "family-history"
+      ? "Add images, write the story and save it as one memory."
+      : "Scan or upload a photo, note, letter or item image.";
+  const secondaryDescription =
+    section.id === "family-history"
+      ? "Capture names, places, dates and the details people forget."
+      : "Add context so the memory makes sense later.";
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5f2ea] pb-32 text-[#20352a]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
@@ -133,19 +148,62 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <ActionLink
-              href="/capture?room=attic"
+              href={primaryHref}
               icon="camera"
               label={section.primaryAction}
-              description="Scan or upload a photo, note, letter or item image."
+              description={primaryDescription}
               primary
             />
             <ActionLink
-              href="/capture?room=attic"
+              href={secondaryHref}
               icon={section.icon}
               label={section.secondaryAction}
-              description="Add context so the memory makes sense later."
+              description={secondaryDescription}
             />
           </div>
+
+          {section.id === "family-history" && state.familyStories.length ? (
+            <AtticCard>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
+                    Your stories
+                  </p>
+                  <h2 className="mt-1 font-serif text-2xl">Recently added</h2>
+                </div>
+                <span
+                  className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-[#e8eee3] text-[#52705a]"
+                  aria-hidden="true"
+                >
+                  <UiIcon name="heart" className="h-5 w-5" />
+                </span>
+              </div>
+              <div className="mt-4 space-y-2">
+                {state.familyStories.slice(0, 3).map((story) => (
+                  <article key={story.id} className="rounded-[18px] bg-[#f7f5ef] p-3">
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#52705a]">
+                        <UiIcon name="file" className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-semibold text-[#20352a]">{story.title}</h3>
+                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#667068]">
+                          {story.storyText}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-semibold text-[#52705a]">
+                          {story.people ? <span>{story.people}</span> : null}
+                          {story.dateLabel ? <span>{story.dateLabel}</span> : null}
+                          <span>
+                            {story.images.length} photo{story.images.length === 1 ? "" : "s"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </AtticCard>
+          ) : null}
 
           <AtticCard>
             <div className="flex items-start justify-between gap-3">

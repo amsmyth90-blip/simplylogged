@@ -92,6 +92,10 @@ import {
   hydrateHealthRecord,
   type HealthRecord,
 } from "@/lib/health-records";
+import {
+  hydrateFamilyStories,
+  type FamilyStoryRecord,
+} from "@/lib/family-story-records";
 
 export type Invite = {
   id: string;
@@ -283,6 +287,7 @@ export type LifeDockAppState = {
   trips: TripsRecord;
   travelChecklist: TravelChecklistRecord;
   health: HealthRecord;
+  familyStories: FamilyStoryRecord[];
 };
 
 export type RepositoryMode = "session" | "supabase";
@@ -620,6 +625,7 @@ function hydrateLifeDockState(state: LifeDockAppState): LifeDockAppState {
     trips: hydrateTripsRecord(state.trips),
     travelChecklist: hydrateTravelChecklistRecord(state.travelChecklist),
     health: hydrateHealthRecord(state.health),
+    familyStories: hydrateFamilyStories(state.familyStories),
     kitchenItems: state.kitchenItems ?? [
       { id: "milk", name: "Milk", checked: false, section: "Shopping" },
       { id: "pasta", name: "Pasta", checked: true, section: "Pantry" },
@@ -754,6 +760,7 @@ export function createInitialLifeDockState(): LifeDockAppState {
     trips: createInitialTripsRecord(),
     travelChecklist: createInitialTravelChecklistRecord(),
     health: createInitialHealthRecord(),
+    familyStories: [],
     kitchenItems: [
       { id: "milk", name: "Milk", checked: false, section: "Shopping" },
       { id: "pasta", name: "Pasta", checked: true, section: "Pantry" },
