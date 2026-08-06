@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { BottomNav } from "@/components/BottomNav";
-import { AtticSectionPlaceholder } from "@/components/attic/AtticSectionPlaceholder";
+import { AtticSectionWorkspace } from "@/components/attic/AtticSectionWorkspace";
 import { requireUser } from "@/lib/auth";
 import { atticSections, getAtticSection, isAtticSection } from "@/lib/attic-sections";
 
@@ -24,7 +24,7 @@ export default async function AtticSectionPage({ params }: AtticSectionPageProps
 
   return (
     <>
-      <AtticSectionPlaceholder section={getAtticSection(section)} />
+      <AtticSectionWorkspace section={getAtticSection(section)} />
       <BottomNav />
     </>
   );
