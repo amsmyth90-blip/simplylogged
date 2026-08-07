@@ -31,8 +31,8 @@ export const estateAreas: EstateArea[] = [
   { id: "attic", name: "Attic", domain: "Memories & Legacy", icon: "archive", href: "/room/attic", left: "50%", top: "32%", status: "secure" },
   { id: "bedroom", name: "Bedroom", domain: "Personal & Health", icon: "bed", href: "/room/bedroom", left: "25%", top: "43%", status: "ready" },
   { id: "office", name: "Office", domain: "Legal & Documents", icon: "briefcase", href: "/room/office", left: "54%", top: "43%", status: "secure" },
-  { id: "family-room", name: "Family Room", domain: "Family & Relationships", icon: "users", href: "/room/family-room", left: "25%", top: "55%", status: "ready" },
-  { id: "kitchen", name: "Kitchen", domain: "Family Planning", icon: "home", href: "/room/kitchen", left: "55%", top: "55%", status: "secure" },
+  { id: "family-room", name: "Family Room", domain: "Family & Relationships", icon: "users", href: "/family", left: "25%", top: "55%", status: "ready" },
+  { id: "kitchen", name: "Kitchen", domain: "Household Planning", icon: "home", href: "/room/kitchen", left: "55%", top: "55%", status: "secure" },
   { id: "garage", name: "Garage", domain: "Vehicles & Transport", icon: "car", href: "/room/garage", left: "82%", top: "55%", status: "attention" },
   { id: "mailbox", name: "Mailbox", domain: "Incoming & To File", icon: "mail", href: "/intake", left: "20%", top: "76%", status: "attention", badge: 4 },
   { id: "garden", name: "Garden", domain: "Pets & Outdoor", icon: "leaf", href: "/room/garden", left: "21%", top: "67%", status: "ready" },
@@ -160,13 +160,13 @@ export const roomDetails: Record<string, RoomDetail> = {
   office: {
     id: "office",
     name: "Office",
-    domain: "Legal & Documents",
+    domain: "Household Administration",
     icon: "briefcase",
     status: "secure",
-    headline: "The paperwork that matters, protected.",
+    headline: "Paperwork handled, then securely filed.",
     description:
-      "Wills, deeds, and powers of attorney — stored with restricted access and a clear record of who can see what.",
-    belongsHere: ["Wills", "House deeds", "Passports", "Contracts", "Power of attorney", "Official IDs"],
+      "Incoming post becomes action here. Finished documents stay securely in the Vault and remain linked to the Office.",
+    belongsHere: ["Bills to action", "Household forms", "Legal matters", "Renewals", "Identity admin", "Vault shortcuts"],
     stats: { records: 26, documents: 15, updated: "This week" },
     tasks: [
       { id: "off-1", label: "Verify account recovery codes", due: "This week", done: false },
@@ -183,9 +183,9 @@ export const roomDetails: Record<string, RoomDetail> = {
       { id: "off-a2", text: "Will reviewed and re-sealed in the Vault", when: "This week", by: "Amy" }
     ],
     quickActions: [
-      { label: "Open Vault", icon: "lock", href: "/vault" },
-      { label: "Manage access", icon: "users", href: "/family" },
-      { label: "Add document", icon: "plus", href: "/vault" }
+      { label: "Review incoming post", icon: "mail", href: "/intake" },
+      { label: "Office reminders", icon: "calendar", href: "/reminders" },
+      { label: "Open Vault", icon: "lock", href: "/vault" }
     ]
   },
   "family-room": {
@@ -194,10 +194,10 @@ export const roomDetails: Record<string, RoomDetail> = {
     domain: "Family & Relationships",
     icon: "users",
     status: "ready",
-    headline: "Shared plans, in one warm place.",
+    headline: "Your household, together.",
     description:
-      "Celebrations, school life, and who-does-what — the everyday rhythm of the household, visible to everyone in it.",
-    belongsHere: ["School forms", "Birthday plans", "Holiday notes", "Pet care guides", "Shared schedules", "Family lists"],
+      "Household members, invitations, access, weekly routines and shared items needing attention live here.",
+    belongsHere: ["Household members", "Invitations", "Access permissions", "Weekly routines", "Family inbox", "Shared responsibilities"],
     stats: { records: 22, documents: 7, updated: "Today" },
     tasks: [
       { id: "fam-1", label: "Add the summer holiday plan", due: "This week", done: false },
@@ -273,7 +273,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     activity: [
       { id: "gar-a1", text: "Service invoice filed from mailbox", when: "5 days ago", by: "Michael" },
-      { id: "gar-a2", text: "MOT reminder scheduled", when: "Last week", by: "LifeDock" }
+      { id: "gar-a2", text: "MOT reminder scheduled", when: "Last week", by: "DiaryDock" }
     ],
     quickActions: [
       { label: "Set reminder", icon: "calendar", href: "/reminders" },
@@ -337,7 +337,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     activity: [
       { id: "gdn-a1", text: "Vaccination card updated after vet visit", when: "Last week", by: "Amy" },
-      { id: "gdn-a2", text: "Sprinkler reminder set for August", when: "2 weeks ago", by: "LifeDock" }
+      { id: "gdn-a2", text: "Sprinkler reminder set for August", when: "2 weeks ago", by: "DiaryDock" }
     ],
     quickActions: [
       { label: "Set reminder", icon: "calendar", href: "/reminders" },
@@ -382,9 +382,9 @@ export const roomDetails: Record<string, RoomDetail> = {
     domain: "Meals & Household",
     icon: "home",
     status: "ready",
-    headline: "Family meals and kitchen life, organised together.",
-    description: "Shared plans, pantry lists, recipes, appliance records, warranties and household food documents live here.",
-    belongsHere: ["Meal plans", "Shopping lists", "Recipes", "Appliance manuals", "Kitchen warranties", "Grocery receipts"],
+    headline: "Household planning starts on the Kitchen wall.",
+    description: "The family calendar, noticeboard, meal plans, pantry lists, recipes and kitchen records all have one clear home here.",
+    belongsHere: ["Family calendar", "Noticeboard", "Meal plans", "Shopping lists", "Recipes", "Kitchen documents"],
     stats: { records: 16, documents: 5, updated: "Today" },
     tasks: [
       { id: "kit-1", label: "Plan next week's dinners", due: "Friday", done: false },
@@ -401,7 +401,7 @@ export const roomDetails: Record<string, RoomDetail> = {
       { id: "kit-a2", text: "Added dishwasher warranty", when: "Yesterday", by: "Michael" }
     ],
     quickActions: [
-      { label: "Family calendar", icon: "calendar", href: "/family/calendar" },
+      { label: "Wall calendar", icon: "calendar", href: "/kitchen/calendar" },
       { label: "Meal planner", icon: "plus", href: "/kitchen/meal-planner" },
       { label: "Add document", icon: "share", href: "/capture?room=kitchen" }
     ]
@@ -423,6 +423,9 @@ export type VaultCategory = {
 export const vaultCategories: VaultCategory[] = [
   { id: "identity", name: "Identity", icon: "users", count: 8, note: "Passports, IDs, certificates" },
   { id: "home", name: "Home & Property", icon: "home", count: 14, note: "Deeds, insurance, warranties" },
+  { id: "vehicles", name: "Vehicles & Transport", icon: "car", count: 0, note: "Insurance, MOT and service records" },
+  { id: "pets", name: "Pets & Outdoor", icon: "leaf", count: 0, note: "Pet care and outdoor records" },
+  { id: "travel", name: "Travel & Access", icon: "map-pin", count: 0, note: "Trips, arrivals and travel documents" },
   { id: "finance", name: "Finance", icon: "chart", count: 11, note: "Accounts, statements, pensions" },
   { id: "legal", name: "Legal & Estate", icon: "briefcase", count: 7, note: "Wills, POA, executor notes" },
   { id: "health", name: "Health & Medical", icon: "heart", count: 9, note: "Records, prescriptions, cover" },
@@ -465,7 +468,9 @@ export const vaultDocuments: VaultDocument[] = [
     size: "8.2 MB",
     updated: "2 days ago",
     sharedWith: ["Michael"],
-    starred: true
+    starred: true,
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v2",
@@ -476,7 +481,9 @@ export const vaultDocuments: VaultDocument[] = [
     updated: "This week",
     sharedWith: ["Michael", "David"],
     starred: true,
-    emergencyVisible: true
+    emergencyVisible: true,
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v3",
@@ -484,7 +491,9 @@ export const vaultDocuments: VaultDocument[] = [
     category: "Home & Property",
     kind: "Scan",
     size: "4.3 MB",
-    updated: "February"
+    updated: "February",
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v4",
@@ -494,7 +503,9 @@ export const vaultDocuments: VaultDocument[] = [
     size: "1.4 MB",
     updated: "1 week ago",
     sharedWith: ["Michael"],
-    emergencyVisible: true
+    emergencyVisible: true,
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v5",
@@ -503,7 +514,9 @@ export const vaultDocuments: VaultDocument[] = [
     kind: "Scan",
     size: "520 KB",
     updated: "Last month",
-    emergencyVisible: true
+    emergencyVisible: true,
+    roomId: "bedroom",
+    roomName: "Bedroom"
   },
   {
     id: "v6",
@@ -511,7 +524,9 @@ export const vaultDocuments: VaultDocument[] = [
     category: "Finance",
     kind: "PDF",
     size: "290 KB",
-    updated: "Yesterday"
+    updated: "Yesterday",
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v7",
@@ -520,7 +535,9 @@ export const vaultDocuments: VaultDocument[] = [
     kind: "Scan",
     size: "610 KB",
     updated: "January",
-    starred: true
+    starred: true,
+    roomId: "office",
+    roomName: "Office"
   },
   {
     id: "v8",
@@ -530,6 +547,207 @@ export const vaultDocuments: VaultDocument[] = [
     size: "290 KB",
     updated: "Today",
     sharedWith: ["Everyone"],
+    emergencyVisible: true,
+    roomId: "safe-room",
+    roomName: "Safe Room"
+  },
+  {
+    id: "v9",
+    title: "NHS Numbers & GP Details",
+    category: "Health & Medical",
+    kind: "Note",
+    size: "8 KB",
+    updated: "Yesterday",
+    roomId: "bedroom",
+    roomName: "Bedroom",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v10",
+    title: "Prescription List",
+    category: "Health & Medical",
+    kind: "PDF",
+    size: "120 KB",
+    updated: "Last week",
+    roomId: "bedroom",
+    roomName: "Bedroom",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v11",
+    title: "Health Insurance Policy",
+    category: "Health & Medical",
+    kind: "PDF",
+    size: "2.1 MB",
+    updated: "March",
+    roomId: "bedroom",
+    roomName: "Bedroom",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v12",
+    title: "Tesla Model Y â€” V5C",
+    category: "Vehicles & Transport",
+    kind: "Scan",
+    size: "1.1 MB",
+    updated: "5 days ago",
+    roomId: "garage",
+    roomName: "Garage",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v13",
+    title: "MOT History",
+    category: "Vehicles & Transport",
+    kind: "PDF",
+    size: "240 KB",
+    updated: "March",
+    roomId: "garage",
+    roomName: "Garage",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v14",
+    title: "Breakdown Cover",
+    category: "Vehicles & Transport",
+    kind: "PDF",
+    size: "380 KB",
+    updated: "January",
+    roomId: "garage",
+    roomName: "Garage",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v15",
+    title: "Biscuit's Vaccination Card",
+    category: "Pets & Outdoor",
+    kind: "Scan",
+    size: "300 KB",
+    updated: "Last week",
+    roomId: "garden",
+    roomName: "Garden",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v16",
+    title: "Gardener â€” Contact & Rates",
+    category: "Pets & Outdoor",
+    kind: "Note",
+    size: "4 KB",
+    updated: "June",
+    roomId: "garden",
+    roomName: "Garden",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v17",
+    title: "Planting Plan â€” Spring 2026",
+    category: "Pets & Outdoor",
+    kind: "Image",
+    size: "1.6 MB",
+    updated: "April",
+    roomId: "garden",
+    roomName: "Garden",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v18",
+    title: "Travel Checklist",
+    category: "Travel & Access",
+    kind: "Note",
+    size: "7 KB",
+    updated: "2 weeks ago",
+    roomId: "driveway",
+    roomName: "Driveway",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v19",
+    title: "Guest Arrival Guide",
+    category: "Travel & Access",
+    kind: "Note",
+    size: "5 KB",
+    updated: "May",
+    roomId: "driveway",
+    roomName: "Driveway",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v20",
+    title: "Passport Renewal Dates",
+    category: "Travel & Access",
+    kind: "Note",
+    size: "3 KB",
+    updated: "May",
+    roomId: "driveway",
+    roomName: "Driveway",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v21",
+    title: "Council Tax Bill 2026â€“27",
+    category: "Finance",
+    kind: "PDF",
+    size: "420 KB",
+    updated: "Today",
+    roomId: "office",
+    roomName: "Office",
+    issuer: "Local Council",
+    dueDate: "2026-08-15",
+    extractionSummary: "Annual household council tax bill and payment schedule.",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v22",
+    title: "Electricity Bill â€” July 2026",
+    category: "Finance",
+    kind: "PDF",
+    size: "310 KB",
+    updated: "Yesterday",
+    roomId: "office",
+    roomName: "Office",
+    issuer: "Electricity supplier",
+    dueDate: "2026-08-08",
+    extractionSummary: "Monthly household electricity bill.",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v23",
+    title: "Bank Statement â€” June 2026",
+    category: "Finance",
+    kind: "PDF",
+    size: "290 KB",
+    updated: "Last week",
+    roomId: "office",
+    roomName: "Office",
+    issuer: "Household bank account",
+    extractionSummary: "Monthly household bank statement.",
+    reviewStatus: "reviewed"
+  },
+  {
+    id: "v24",
+    title: "Funeral Wishes",
+    category: "Legal & Estate",
+    kind: "Note",
+    size: "12 KB",
+    updated: "This week",
+    roomId: "office",
+    roomName: "Office",
+    extractionSummary: "Personal funeral preferences and wishes for trusted family members.",
+    reviewStatus: "reviewed",
+    emergencyVisible: true
+  },
+  {
+    id: "v25",
+    title: "Lasting Power of Attorney",
+    category: "Legal & Estate",
+    kind: "PDF",
+    size: "740 KB",
+    updated: "February",
+    roomId: "office",
+    roomName: "Office",
+    extractionSummary: "Authority and attorney details for future decision-making.",
+    reviewStatus: "reviewed",
     emergencyVisible: true
   }
 ];
@@ -561,6 +779,9 @@ export type Reminder = {
   repeat?: string;
   documentId?: string;
   documentTitle?: string;
+  assignedTo?: string;
+  dueDate?: string;
+  sourceNoticeId?: string;
 };
 
 export const remindersList: Reminder[] = [

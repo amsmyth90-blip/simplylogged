@@ -29,14 +29,14 @@ const sourceCards: { title: string; detail: string; icon: IconName; badge: strin
     badge: "Live"
   },
   {
-    title: "Share to LifeDock",
+    title: "Share to DiaryDock",
     detail: "Native app share-sheet target for email attachments and PDFs.",
     icon: "share",
     badge: "Next"
   },
   {
     title: "Email forwarding",
-    detail: "Forward bills or appointments into a private LifeDock inbox.",
+    detail: "Forward bills or appointments into a private DiaryDock inbox.",
     icon: "mail",
     badge: "Planned"
   }
@@ -164,7 +164,7 @@ export function IntakeWorkspace() {
                         ? `Created a follow-up reminder for ${item.title}`
                         : `Sent ${item.title} into ${room.name}`,
                   when: "Just now",
-                  by: "LifeDock"
+                  by: "DiaryDock"
                 },
                 ...(current.roomActivity[room.id] ?? [])
               ]
@@ -196,7 +196,7 @@ export function IntakeWorkspace() {
         subtitle="A calm place for bills, appointments, letters, shared files and scans before they are filed into the right room."
         backHref="/dashboard"
         backLabel="Estate map"
-        heroImage="/images/pages/mailbox-hero.png"
+        heroImage="/images/pages/mailbox-hero.webp"
         heroPosition="center 48%"
         heroTone="linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(71,59,38,0.15) 40%, rgba(37,31,23,0.56) 100%)"
         badge="Incoming"
@@ -265,7 +265,7 @@ export function IntakeWorkspace() {
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <SectionHeader title="To be filed" hint="Confirm where LifeDock should put each item" />
+          <SectionHeader title="To be filed" hint="Confirm where DiaryDock should put each item" />
           <div className="flex rounded-full border border-white/70 bg-white/60 p-1 shadow-soft backdrop-blur-md">
             {(["new", "all"] as const).map((item) => (
               <button

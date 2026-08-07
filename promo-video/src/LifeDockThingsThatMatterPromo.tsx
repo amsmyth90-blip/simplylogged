@@ -23,8 +23,8 @@ const SceneShot: React.FC<{src: string; startFrom?: number; playbackRate?: numbe
     <AbsoluteFill style={{background: 'linear-gradient(180deg,rgba(4,20,45,.14),transparent 46%,rgba(4,20,45,.38))'}} />
     {showBadge && (
       <div style={{position: 'absolute', top: 74, left: 58, display: 'flex', alignItems: 'center', gap: 16}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
-        <div style={{color: 'white', fontSize: 30, fontWeight: 850, letterSpacing: 2.6, textShadow: '0 3px 14px rgba(0,0,0,.35)'}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
+        <div style={{color: 'white', fontSize: 30, fontWeight: 850, letterSpacing: 2.6, textShadow: '0 3px 14px rgba(0,0,0,.35)'}}>DIARYDOCK</div>
       </div>
     )}
   </AbsoluteFill>
@@ -82,8 +82,8 @@ const EndCard: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#f3f6fc', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 72, opacity}}>
       <div style={{translate: `0 ${rise}px`, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
-        <div style={{fontSize: 108, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
+        <div style={{fontSize: 108, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>DIARYDOCK</div>
         <div style={{color: navy, fontSize: 70, lineHeight: 1.08, fontWeight: 850, marginTop: 60}}>Your life.<br />Organised.</div>
       </div>
     </AbsoluteFill>
@@ -95,7 +95,7 @@ export const LifeDockThingsThatMatterPromo: React.FC = () => (
     {/* Reusing the existing warm bed as a placeholder; swap in a dedicated sparse-piano cue once composed */}
     <Audio src={staticFile('promo-video/lifedock-family-warm.wav')} volume={0.16} />
     {/* Neil's narration - drop the ElevenLabs "Neil - Calming and Melodic" render in at this path */}
-    <Audio src={staticFile('promo-video/things-that-matter-voice-neil.mp3')} volume={1} />
+    <Audio src={staticFile('promo-video/diarydock-things-that-matter-neil.mp3')} volume={1} />
 
     {/* 0:00-0:03 - cold open, rain on the window, no VO */}
     <Sequence durationInFrames={90}>
@@ -141,7 +141,7 @@ export const LifeDockThingsThatMatterPromo: React.FC = () => (
     {/* 0:21-0:25 - the exhale */}
     <Sequence from={630} durationInFrames={120}>
       <SceneShot src="promo-video/things-exhale.mp4" />
-      <StoryCaption from={630} to={750}>Meet Guardian. The quiet intelligence behind LifeDock.</StoryCaption>
+      <StoryCaption from={630} to={750}>Meet Guardian. The quiet intelligence behind DiaryDock.</StoryCaption>
     </Sequence>
 
     {/* 0:25-0:29 - golden hour, family, belonging */}

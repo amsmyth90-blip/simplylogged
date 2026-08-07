@@ -10,7 +10,7 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const SOURCE_ICON = path.join(ROOT, "public/brand/lifedock-app-icon.png");
+const SOURCE_ICON = path.join(ROOT, "public/brand/diarydock-app-icon.png");
 const BACKGROUND = "#f8f4ec"; // matches tailwind.config.ts `cream`
 
 async function main() {

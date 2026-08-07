@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { LifeDockDataProvider, useLifeDockData } from "@/components/LifeDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
@@ -19,6 +19,7 @@ type ReminderDraft = {
   timeLabel: string;
   priority: Reminder["priority"];
   repeat: string;
+  assignedTo: string;
 };
 
 type RemindersWorkspaceProps = {
@@ -32,7 +33,8 @@ const defaultDraft: ReminderDraft = {
   group: "today",
   timeLabel: "",
   priority: "normal",
-  repeat: ""
+  repeat: "",
+  assignedTo: ""
 };
 
 function buildDraft(reminder?: Reminder): ReminderDraft {
@@ -47,7 +49,8 @@ function buildDraft(reminder?: Reminder): ReminderDraft {
     group: reminder.group,
     timeLabel: reminder.timeLabel,
     priority: reminder.priority,
-    repeat: reminder.repeat ?? ""
+    repeat: reminder.repeat ?? "",
+    assignedTo: reminder.assignedTo ?? ""
   };
 }
 
@@ -66,6 +69,30 @@ function RemindersWorkspaceInner() {
   const [draft, setDraft] = useState<ReminderDraft>(defaultDraft);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [selectedAssignee, setSelectedAssignee] = useState("");
+
+  const assigneeOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          [
+            ...state.householdProfiles
+              .filter((profile) => profile.showInReminders)
+              .map((profile) => profile.name.trim()),
+            ...state.householdMembers.map((member) => member.name.trim()),
+            ...state.kidSchedules.map((routine) => routine.childName.trim())
+          ].filter(Boolean)
+        )
+      ),
+    [state.householdMembers, state.householdProfiles, state.kidSchedules]
+  );
+
+  useEffect(() => {
+    const person = new URLSearchParams(window.location.search).get("person")?.trim() ?? "";
+    if (person) {
+      setSelectedAssignee(person);
+    }
+  }, []);
 
   const roomOptions = useMemo(
     () =>
@@ -75,13 +102,18 @@ function RemindersWorkspaceInner() {
     []
   );
 
-  const focusItems = reminders.filter((item) => item.priority === "high" && item.group !== "done").slice(0, 3);
-  const repeatingItems = reminders.filter((item) => item.repeat).slice(0, 3);
-  const documentFollowUps = reminders.filter((item) => item.documentId).slice(0, 4);
+  const visibleReminders = selectedAssignee
+    ? reminders.filter(
+        (item) => item.assignedTo?.toLowerCase() === selectedAssignee.toLowerCase()
+      )
+    : reminders;
+  const focusItems = visibleReminders.filter((item) => item.priority === "high" && item.group !== "done").slice(0, 3);
+  const repeatingItems = visibleReminders.filter((item) => item.repeat).slice(0, 3);
+  const documentFollowUps = visibleReminders.filter((item) => item.documentId).slice(0, 4);
   const groupedCounts = {
-    today: reminders.filter((item) => item.group === "today").length,
-    week: reminders.filter((item) => item.group === "week").length,
-    later: reminders.filter((item) => item.group === "later").length
+    today: visibleReminders.filter((item) => item.group === "today").length,
+    week: visibleReminders.filter((item) => item.group === "week").length,
+    later: visibleReminders.filter((item) => item.group === "later").length
   };
 
   const closeModal = () => {
@@ -92,7 +124,7 @@ function RemindersWorkspaceInner() {
 
   const openCreate = () => {
     setEditingId(null);
-    setDraft(defaultDraft);
+    setDraft({ ...defaultDraft, assignedTo: selectedAssignee });
     setOpen(true);
   };
 
@@ -122,7 +154,8 @@ function RemindersWorkspaceInner() {
       group: draft.group,
       timeLabel,
       priority: draft.priority,
-      repeat: draft.repeat.trim() || undefined
+      repeat: draft.repeat.trim() || undefined,
+      assignedTo: draft.assignedTo.trim() || undefined
     };
 
     updateState((current) => ({
@@ -170,11 +203,20 @@ function RemindersWorkspaceInner() {
           eyebrow="Reminders"
           title="What Matters, When It Matters"
           subtitle="Gentle reminders to keep your life in order."
-          heroImage="/images/pages/reminders-hero.png"
+          heroImage="/images/pages/reminders-hero.webp"
           heroPosition="center 36%"
-          badge="Household rhythm"
+          badge={selectedAssignee ? `${selectedAssignee}'s reminders` : "Household rhythm"}
           action={
             <div className="flex items-center gap-2">
+              {selectedAssignee ? (
+                <button
+                  type="button"
+                  onClick={() => setSelectedAssignee("")}
+                  className="rounded-full border border-white/30 bg-white/14 px-3 py-2 text-[11px] font-semibold text-white/90 backdrop-blur-md"
+                >
+                  Show everyone
+                </button>
+              ) : null}
               <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
                 {repositoryMode === "supabase" ? "Supabase live" : "Session demo"}
               </span>
@@ -215,7 +257,7 @@ function RemindersWorkspaceInner() {
           </div>
 
           <div className="estate-sheet p-5">
-            <SectionHeader title="Steady rhythms" hint="Repeating jobs that keep LifeDock current" />
+            <SectionHeader title="Steady rhythms" hint="Repeating jobs that keep DiaryDock current" />
             <div className="mt-4 space-y-3">
               {repeatingItems.map((reminder) => (
                 <button
@@ -267,14 +309,14 @@ function RemindersWorkspaceInner() {
                 ))
               ) : (
                 <p className="rounded-[24px] border border-dashed border-white/80 bg-white/45 px-4 py-5 text-sm leading-6 text-ink/55">
-                  Scan a document with a renewal or appointment date and LifeDock will suggest a linked reminder here.
+                  Scan a document with a renewal or appointment date and DiaryDock will suggest a linked reminder here.
                 </p>
               )}
             </div>
           </div>
 
           <div className="estate-sheet p-5">
-            <SectionHeader title="Email into LifeDock" hint="Planned intake path for bills and appointments" />
+            <SectionHeader title="Email into DiaryDock" hint="Planned intake path for bills and appointments" />
             <div className="mt-4 rounded-[26px] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(237,244,239,0.76))] p-4">
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-mist text-sky-700">
@@ -283,7 +325,7 @@ function RemindersWorkspaceInner() {
                 <div>
                   <p className="text-sm font-semibold text-ink">Yes, email sharing is possible.</p>
                   <p className="mt-1 text-xs leading-5 text-ink/55">
-                    The production version can support forwarding bills or appointments to a private LifeDock email address,
+                    The production version can support forwarding bills or appointments to a private DiaryDock email address,
                     then using the same AI confirm-and-file flow as scanning.
                   </p>
                 </div>
@@ -313,13 +355,13 @@ function RemindersWorkspaceInner() {
           ))}
         </section>
 
-        <RemindersBoard reminders={reminders} onOpenReminder={openEdit} onToggleDone={toggleDone} onSnooze={snooze} />
+        <RemindersBoard reminders={visibleReminders} onOpenReminder={openEdit} onToggleDone={toggleDone} onSnooze={snooze} />
       </div>
 
       <ModalShell
         open={open}
         title={editingId ? "Edit reminder" : "New reminder"}
-        subtitle="Shared across the app through the LifeDock data layer."
+        subtitle="Shared across the app through the DiaryDock data layer."
         onClose={closeModal}
         footer={
           <div className="flex items-center justify-end gap-3">
@@ -363,7 +405,7 @@ function RemindersWorkspaceInner() {
             />
           </label>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <label className="block space-y-2">
               <span className="text-sm font-semibold text-ink">Room</span>
               <select
@@ -389,6 +431,27 @@ function RemindersWorkspaceInner() {
                 placeholder="This Friday"
                 className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
               />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-ink">For</span>
+              <select
+                value={draft.assignedTo}
+                onChange={(event) =>
+                  setDraft((current) => ({ ...current, assignedTo: event.target.value }))
+                }
+                className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
+              >
+                <option value="">Everyone</option>
+                {draft.assignedTo && !assigneeOptions.includes(draft.assignedTo) ? (
+                  <option value={draft.assignedTo}>{draft.assignedTo}</option>
+                ) : null}
+                {assigneeOptions.map((assignee) => (
+                  <option key={assignee} value={assignee}>
+                    {assignee}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 

@@ -13,17 +13,17 @@ const CharacterShot: React.FC<{src: string}> = ({src}) => (
 
 const PromiseCard: React.FC = () => (
   <AbsoluteFill style={{background: 'linear-gradient(150deg,#edf6ff,#f5f0ff)', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 76}}>
-    <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 210, height: 210, objectFit: 'contain'}} />
-    <div style={{color: navy, fontSize: 72, lineHeight: 1.06, fontWeight: 850, marginTop: 42}}>Family life moves fast.<br />LifeDock keeps up.</div>
+    <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 210, height: 210, objectFit: 'contain'}} />
+    <div style={{color: navy, fontSize: 72, lineHeight: 1.06, fontWeight: 850, marginTop: 42}}>Family life moves fast.<br />DiaryDock keeps up.</div>
     <div style={{color: '#48617f', fontSize: 36, lineHeight: 1.4, marginTop: 38}}>Appointments, addresses and important details,<br />together in one secure place.</div>
   </AbsoluteFill>
 );
 
 const EndCard: React.FC = () => (
   <AbsoluteFill style={{background: '#f3f6fc', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 72}}>
-    <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 260, height: 260, objectFit: 'contain'}} />
-    <div style={{fontSize: 112, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>LIFEDOCK</div>
-    <div style={{color: navy, fontSize: 52, lineHeight: 1.18, fontWeight: 800, marginTop: 70}}>Your digital home for everyday life.</div>
+    <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 260, height: 260, objectFit: 'contain'}} />
+    <div style={{fontSize: 112, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>DIARYDOCK</div>
+    <div style={{color: navy, fontSize: 52, lineHeight: 1.18, fontWeight: 800, marginTop: 70}}>Your digital home, for everyday life.</div>
     <div style={{color: '#3c5680', fontSize: 34, marginTop: 28}}>Organised. Protected. In one place.</div>
     <div style={{background: '#2f64c5', color: 'white', borderRadius: 999, padding: '22px 46px', fontSize: 34, fontWeight: 750, marginTop: 76}}>For today and whatever comes next.</div>
   </AbsoluteFill>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { UiIcon, type IconName } from "@/components/UiIcon";
+import { useLifeDockData } from "@/components/LifeDockDataProvider";
 
 type NavItem = {
   id: string;
@@ -16,19 +17,24 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { id: "home", href: "/dashboard", label: "Home", icon: "home" },
-  { id: "vault", href: "/vault", label: "Vault", icon: "folder" },
+  { id: "vault", href: "/vault", label: "All Files", icon: "folder" },
   { id: "add", href: "/capture", label: "Scan", icon: "plus", central: true },
   { id: "reminders", href: "/reminders", label: "Reminders", icon: "calendar", badge: 2 },
-  { id: "family", href: "/family", label: "Family", icon: "users" }
+  { id: "family", href: "/family", label: "Family Room", icon: "users" }
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { household } = useLifeDockData();
+  const visibleNavItems =
+    household?.role === "viewer"
+      ? navItems.filter((item) => item.id === "home" || item.id === "family")
+      : navItems;
 
   const isActive = (item: NavItem) => {
     if (item.central) return pathname.startsWith("/capture");
     if (item.id === "home") {
-      return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room");
+      return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room") || pathname.startsWith("/wills") || pathname.startsWith("/office") || pathname.startsWith("/garage") || pathname.startsWith("/driveway") || pathname.startsWith("/bedroom") || pathname.startsWith("/garden");
     }
     if (item.id === "vault") {
       return pathname.startsWith("/vault") || pathname.startsWith("/document");
@@ -38,8 +44,11 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-2 left-1/2 z-50 w-[calc(100%-1rem)] max-w-[54rem] -translate-x-1/2 rounded-[25px] border border-white/90 bg-white/[0.92] p-1.5 shadow-[0_22px_48px_-24px_rgba(15,23,42,0.48)] backdrop-blur-2xl">
-      <ul className="grid grid-cols-5 gap-1">
-        {navItems.map((item) => {
+      <ul
+        className="grid gap-1"
+        style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
+      >
+        {visibleNavItems.map((item) => {
           const active = isActive(item);
 
           return (

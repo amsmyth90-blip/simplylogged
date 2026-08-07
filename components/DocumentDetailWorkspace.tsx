@@ -17,6 +17,8 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type DocumentDetailWorkspaceProps = {
   documentId: string;
+  backHref?: string;
+  backLabel?: string;
 };
 
 type DocumentCorrectionDraft = {
@@ -31,14 +33,6 @@ type DocumentCorrectionDraft = {
   sharedWith: string[];
   emergencyVisible: boolean;
 };
-
-function formatConfidence(confidence?: number) {
-  if (typeof confidence !== "number") {
-    return "Not scored";
-  }
-
-  return `${Math.round(confidence * 100)}%`;
-}
 
 function buildDraft(document: VaultDocument): DocumentCorrectionDraft {
   return {
@@ -55,7 +49,11 @@ function buildDraft(document: VaultDocument): DocumentCorrectionDraft {
   };
 }
 
-export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceProps) {
+export function DocumentDetailWorkspace({
+  documentId,
+  backHref = "/vault",
+  backLabel = "All Files"
+}: DocumentDetailWorkspaceProps) {
   const { state, hydrated, updateState } = useLifeDockData();
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState<string | null>(null);
@@ -111,7 +109,7 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
       }
 
       if (error || !data?.signedUrl) {
-        setFileMessage(error?.message ?? "LifeDock could not load the stored file preview.");
+        setFileMessage(error?.message ?? "DiaryDock could not load the stored file preview.");
         return;
       }
 
@@ -146,7 +144,7 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
     setIsOpening(false);
 
     if (error || !data?.signedUrl) {
-      setFileMessage(error?.message ?? "LifeDock could not open the stored file.");
+      setFileMessage(error?.message ?? "DiaryDock could not open the stored file.");
       return;
     }
 
@@ -308,7 +306,7 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
   if (!hydrated) {
     return (
       <div className="space-y-4">
-        <PageHeader eyebrow="Vault document" title="Loading document" backHref="/vault" backLabel="Vault" />
+        <PageHeader eyebrow="Vault document" title="Loading document" backHref={backHref} backLabel={backLabel} />
         <div className="estate-sheet p-5 text-sm text-ink/55">Loading your secure document details...</div>
       </div>
     );
@@ -317,14 +315,14 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
   if (!document) {
     return (
       <div className="space-y-4">
-        <PageHeader eyebrow="Vault document" title="Document not found" backHref="/vault" backLabel="Vault" />
+        <PageHeader eyebrow="Vault document" title="Document not found" backHref={backHref} backLabel={backLabel} />
         <EmptyState
           icon="file"
           title="This document is not in the Vault"
           message="It may have been removed, or the app is still syncing your account."
           action={
-            <Link href="/vault" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
-              Back to Vault
+            <Link href={backHref} className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
+              Back to {backLabel}
             </Link>
           }
         />
@@ -341,8 +339,8 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
         eyebrow={document.category}
         title={document.title}
         subtitle={document.extractionSummary ?? "Secure document details, filing, and AI capture notes."}
-        backHref="/vault"
-        backLabel="Vault"
+        backHref={backHref}
+        backLabel={backLabel}
         action={
           <div className="flex items-center gap-2">
             <button
@@ -380,7 +378,7 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
       <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <section className="estate-sheet overflow-hidden p-4">
-            <SectionHeader title="Original file" hint={document.originalFileName ?? "Stored LifeDock document"} />
+            <SectionHeader title="Original file" hint={document.originalFileName ?? "Stored DiaryDock document"} />
             <div className="mt-4 overflow-hidden rounded-[28px] border border-white/70 bg-white/58">
               {signedUrl && isImage ? (
                 <img src={signedUrl} alt={document.title} className="max-h-[560px] w-full object-contain" />
@@ -411,7 +409,7 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
 
           {document.extractedText ? (
             <section className="estate-sheet p-5">
-              <SectionHeader title="OCR text" hint="Text LifeDock read from the document" />
+              <SectionHeader title="OCR text" hint="Text DiaryDock read from the document" />
               <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-ink/68">{document.extractedText}</p>
             </section>
           ) : null}
@@ -455,7 +453,26 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
           )}
 
           <section className="estate-sheet p-5">
-            <SectionHeader title="Filing details" hint="Where LifeDock placed this document" />
+            <SectionHeader title="Filing details" hint="Where DiaryDock placed this document" />
+            <div className={`mt-4 flex items-start gap-3 rounded-2xl border px-4 py-3 ${
+              document.reviewStatus === "needs-review"
+                ? "border-amber-200/80 bg-amber-50/80 text-amber-900"
+                : "border-[#cbd8c5] bg-[#edf3e9]/80 text-[#465b40]"
+            }`}>
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/75">
+                <UiIcon name={document.reviewStatus === "needs-review" ? "alert" : "check"} className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">
+                  {document.reviewStatus === "needs-review" ? "Please check these details" : "Details checked"}
+                </p>
+                <p className="mt-1 text-xs leading-5 opacity-75">
+                  {document.reviewStatus === "needs-review"
+                    ? "Compare the information below with the original document. Use Edit to correct anything before marking it as reviewed."
+                    : "These details have been reviewed. You can still use Edit if anything needs to be updated."}
+                </p>
+              </div>
+            </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-2xl bg-white/76 px-3.5 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Room</p>
@@ -474,8 +491,10 @@ export function DocumentDetailWorkspace({ documentId }: DocumentDetailWorkspaceP
                 <p className="mt-1 font-semibold text-ink">{document.dueDate || "None visible"}</p>
               </div>
               <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Confidence</p>
-                <p className="mt-1 font-semibold text-ink">{formatConfidence(document.confidence)}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Detail check</p>
+                <p className="mt-1 font-semibold text-ink">
+                  {document.reviewStatus === "needs-review" ? "Please review" : "Checked"}
+                </p>
               </div>
               <div className="rounded-2xl bg-white/76 px-3.5 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Updated</p>

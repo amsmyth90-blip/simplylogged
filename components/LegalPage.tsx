@@ -46,8 +46,8 @@ export function LegalPage({ eyebrow, title, subtitle, effectiveDate, sections }:
         <SectionHeader title="Questions" hint="Privacy, data, and account support" />
         <p className="mt-3 text-sm leading-7 text-ink/62">
           For privacy questions, data export, account deletion, or terms questions, contact{" "}
-          <a href="mailto:support@thelifedock.com" className="font-semibold text-ink underline">
-            support@thelifedock.com
+          <a href="mailto:hello@diarydock.com" className="font-semibold text-ink underline">
+            hello@diarydock.com
           </a>
           .
         </p>

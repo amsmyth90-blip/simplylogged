@@ -227,7 +227,7 @@ function VaultWorkspaceInner() {
     setOpeningFileId(null);
 
     if (error || !data?.signedUrl) {
-      setFileMessage(error?.message ?? "LifeDock could not open the stored file yet.");
+      setFileMessage(error?.message ?? "DiaryDock could not open the stored file yet.");
       return;
     }
 
@@ -275,10 +275,10 @@ function VaultWorkspaceInner() {
     <>
       <div className="immersive-page">
         <PageHeader
-          eyebrow="Vault"
-          title="The Vault"
-          subtitle="Secure. Private. Always yours."
-          heroImage="/images/pages/vault-hero.png"
+          eyebrow="All files"
+          title="Secure Vault"
+          subtitle="Every document, securely stored in one place."
+          heroImage="/images/pages/vault-hero.webp"
           heroPosition="center 44%"
           badge="Secure archive"
           action={
@@ -364,7 +364,7 @@ function VaultWorkspaceInner() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-ink">All documents</p>
-                <p className="hidden">Everything currently stored in LifeDock</p>
+                <p className="hidden">Everything currently stored in DiaryDock</p>
               </div>
             </button>
 
@@ -610,7 +610,7 @@ function VaultWorkspaceInner() {
                           <div className="min-w-0">
                             <p className="text-xs font-semibold text-moss">Original file stored</p>
                             <p className="mt-0.5 truncate text-xs text-ink/50">
-                              {selectedDocument.originalFileName ?? "Private LifeDock file"}
+                              {selectedDocument.originalFileName ?? "Private DiaryDock file"}
                             </p>
                           </div>
                           <button
@@ -700,7 +700,7 @@ function VaultWorkspaceInner() {
       <ModalShell
         open={open}
         title={editingId ? "Edit document" : "Add document"}
-        subtitle="Shared with rooms and mailbox routing through the LifeDock data layer."
+        subtitle="Shared with rooms and mailbox routing through the DiaryDock data layer."
         onClose={closeModal}
         footer={
           <div className="flex items-center justify-end gap-3">

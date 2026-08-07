@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 BRAND = ROOT / "public" / "brand"
-SOURCE = BRAND / "lifedock-logo-master.png"
+SOURCE = BRAND / "diarydock-logo-master.png"
 
 
 def remove_white(image: Image.Image) -> Image.Image:
@@ -42,17 +42,17 @@ def contain(image: Image.Image, size: tuple[int, int]) -> Image.Image:
 
 master = Image.open(SOURCE).convert("RGBA")
 transparent = remove_white(master)
-transparent.save(BRAND / "lifedock-logo-transparent.png")
+transparent.save(BRAND / "diarydock-logo-transparent.png")
 
 # Compact lock-up: symbol and wordmark without the small tagline.
 compact_source = transparent.crop((70, 110, master.width - 70, 925))
 compact = alpha_crop(compact_source, 10)
-compact.save(BRAND / "lifedock-logo-compact.png")
+compact.save(BRAND / "diarydock-logo-compact.png")
 
 # Mark-only extraction for small screens and app icons.
 mark_source = transparent.crop((300, 120, 920, 770))
 mark = alpha_crop(mark_source, 8)
-mark.save(BRAND / "lifedock-mark.png")
+mark.save(BRAND / "diarydock-mark.png")
 
 # Rounded app icon with the selected mark and its original colour treatment.
 icon_size = 1024
@@ -78,12 +78,12 @@ icon.alpha_composite(
     mark_white,
     ((icon_size - mark_white.width) // 2, (icon_size - mark_white.height) // 2 - 10),
 )
-icon.save(BRAND / "lifedock-app-icon.png")
+icon.save(BRAND / "diarydock-app-icon.png")
 
 # Single-colour white asset for dark video frames and dark website headers.
 white = Image.new("RGBA", compact.size, (255, 255, 255, 0))
 white.putalpha(compact.getchannel("A"))
-white.save(BRAND / "lifedock-logo-white.png")
+white.save(BRAND / "diarydock-logo-white.png")
 
 # Portrait video end card.
 end_card = Image.new("RGB", (1080, 1920), "#F7F8FB")
@@ -103,7 +103,7 @@ end_card.paste(logo, ((1080 - logo.width) // 2, 360), logo)
 font_regular = ImageFont.truetype(r"C:\Windows\Fonts\arial.ttf", 39)
 font_bold = ImageFont.truetype(r"C:\Windows\Fonts\arialbd.ttf", 48)
 font_cta = ImageFont.truetype(r"C:\Windows\Fonts\arialbd.ttf", 34)
-headline = "Your digital home for everyday life."
+headline = "Your digital home, for everyday life."
 tagline = "ORGANISED. PROTECTED. IN ONE PLACE."
 
 draw.text(
@@ -121,7 +121,7 @@ draw.text(
     anchor="mm",
 )
 draw.rounded_rectangle((155, 1490, 925, 1590), radius=50, fill="#285BB4")
-cta = "For today—and whatever comes next"
+cta = "For today, and whatever comes next"
 draw.text(
     (540, 1540),
     cta,
@@ -129,6 +129,6 @@ draw.text(
     fill="white",
     anchor="mm",
 )
-end_card.save(BRAND / "lifedock-video-end-card.png")
+end_card.save(BRAND / "diarydock-video-end-card.png")
 
-print("Created LifeDock brand pack in", BRAND)
+print("Created DiaryDock brand pack in", BRAND)

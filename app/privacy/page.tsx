@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <LegalPage
       eyebrow="Privacy"
       title="Privacy Policy"
-      subtitle="How LifeDock collects, uses, and protects your family's information."
+      subtitle="How DiaryDock collects, uses, and protects your family's information."
       effectiveDate="27 July 2026"
       sections={[
         {
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
         {
           title: "Security",
           body: [
-            "LifeDock uses account authentication, database-level row security so accounts can only see their own records, and private file storage by default.",
+            "DiaryDock uses account authentication, database-level row security so accounts can only see their own records, and private file storage by default.",
             "Documents are private unless you choose to share them with an invited family member or mark them visible in Emergency Access Mode. Emergency Access Mode only ever shows the specific records you have approved for that purpose."
           ]
         },
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
         {
           title: "Children's privacy",
           body: [
-            "LifeDock is intended for adult household organisers and is not directed at children. We do not knowingly collect personal information from children under 13."
+            "DiaryDock is intended for adult household organisers and is not directed at children. We do not knowingly collect personal information from children under 13."
           ]
         },
         {

@@ -28,7 +28,9 @@ export type IconName =
   | "clock"
   | "gear"
   | "alert"
-  | "share";
+  | "share"
+  | "camera"
+  | "microphone";
 
 type UiIconProps = {
   name: IconName;
@@ -239,6 +241,21 @@ export function UiIcon({ name, className = "h-5 w-5" }: UiIconProps) {
         <svg {...shared}>
           <path d="M7 3.5h7L19 8.5v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" />
           <path d="M13.5 3.5V9H19" />
+        </svg>
+      );
+    case "camera":
+      return (
+        <svg {...shared}>
+          <path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8H3v-8a2 2 0 0 1 2-2Z" />
+          <circle cx="12" cy="13" r="3.5" />
+        </svg>
+      );
+    case "microphone":
+      return (
+        <svg {...shared}>
+          <rect x="8" y="3.5" width="8" height="12" rx="4" />
+          <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0" />
+          <path d="M12 18v3M8.5 21h7" />
         </svg>
       );
     case "clock":

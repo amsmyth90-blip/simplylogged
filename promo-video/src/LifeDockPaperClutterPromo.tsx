@@ -28,8 +28,8 @@ const FilmShot: React.FC<{src: string; startFrom?: number; landscapeInPortrait?:
     />
     <AbsoluteFill style={{background: 'linear-gradient(180deg,rgba(4,20,45,.10),transparent 56%,rgba(4,20,45,.30))'}} />
     <div style={{position: 'absolute', top: 74, left: 58, display: 'flex', alignItems: 'center', gap: 16}}>
-      <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
-      <div style={{color: 'white', fontSize: 30, fontWeight: 850, letterSpacing: 2.6, textShadow: '0 3px 14px rgba(0,0,0,.35)'}}>LIFEDOCK</div>
+      <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 62, height: 62, objectFit: 'contain'}} />
+      <div style={{color: 'white', fontSize: 30, fontWeight: 850, letterSpacing: 2.6, textShadow: '0 3px 14px rgba(0,0,0,.35)'}}>DIARYDOCK</div>
     </div>
   </AbsoluteFill>
 );
@@ -52,8 +52,8 @@ const AppointmentCreated: React.FC = () => {
   return (
     <AbsoluteFill style={{background: 'linear-gradient(150deg,#eaf6ff 0%,#f7f2ff 58%,#eef8f4 100%)', padding: '112px 70px', fontFamily: 'Arial, Helvetica, sans-serif'}}>
       <div style={{display: 'flex', alignItems: 'center', gap: 18}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 88, height: 88, objectFit: 'contain'}} />
-        <div style={{fontSize: 42, color: navy, fontWeight: 850, letterSpacing: 3}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 88, height: 88, objectFit: 'contain'}} />
+        <div style={{fontSize: 42, color: navy, fontWeight: 850, letterSpacing: 3}}>DIARYDOCK</div>
       </div>
 
       <div style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -87,8 +87,8 @@ const EndCard: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#f3f6fc', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 72, opacity}}>
       <div style={{translate: `0 ${rise}px`, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Img src={staticFile('brand/lifedock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
-        <div style={{fontSize: 110, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>LIFEDOCK</div>
+        <Img src={staticFile('brand/diarydock-mark.png')} style={{width: 250, height: 250, objectFit: 'contain'}} />
+        <div style={{fontSize: 110, fontWeight: 850, letterSpacing: 8, marginTop: 28, background: 'linear-gradient(90deg,#06336d,#477dd1,#8a62e8)', WebkitBackgroundClip: 'text', color: 'transparent'}}>DIARYDOCK</div>
         <div style={{color: navy, fontSize: 62, lineHeight: 1.08, fontWeight: 850, marginTop: 66}}>No paper clutter.<br />No missed dates.</div>
         <div style={{color: '#3c5680', fontSize: 36, lineHeight: 1.32, marginTop: 34}}>Your digital home<br />for everyday life.</div>
         <div style={{background: '#2f64c5', color: 'white', borderRadius: 999, padding: '22px 46px', fontSize: 33, fontWeight: 780, marginTop: 68}}>Snap it. Store it. Done.</div>
@@ -100,7 +100,7 @@ const EndCard: React.FC = () => {
 export const LifeDockPaperClutterPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
     <Audio src={staticFile('promo-video/lifedock-paper-bright.wav')} volume={0.18} />
-    <Audio src={staticFile('promo-video/paper-clutter-voice-ni.mp3')} volume={1} />
+    <Audio src={staticFile('promo-video/diarydock-paper-clutter-sheena-ni.mp3')} volume={1} />
 
     <Sequence durationInFrames={30}>
       <FilmShot src="promo-video/paper-addressed-arrival.mp4" startFrom={15} />

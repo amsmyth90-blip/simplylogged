@@ -20,7 +20,7 @@ export function EmergencyAccessWorkspace() {
         subtitle="A limited view for trusted people in a crisis."
         backHref="/emergency"
         backLabel="Emergency"
-        heroImage="/images/pages/emergency-hero.png"
+        heroImage="/images/pages/emergency-hero.webp"
         heroPosition="center 44%"
         heroTone="linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(95,24,20,0.16) 44%, rgba(47,28,24,0.58) 100%)"
         badge="Limited view"

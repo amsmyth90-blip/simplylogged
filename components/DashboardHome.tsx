@@ -97,7 +97,7 @@ export function DashboardHome() {
                 <Link
                   href="/search"
                   className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-white/45 text-slate-700 shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)] backdrop-blur-xl transition hover:bg-white/80"
-                  aria-label="Search LifeDock"
+                  aria-label="Search DiaryDock"
                 >
                   <UiIcon name="search" className="h-3.5 w-3.5" />
                 </Link>

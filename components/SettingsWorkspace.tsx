@@ -61,7 +61,7 @@ export function SettingsWorkspace() {
   const exportData = () => {
     const payload = {
       exportedAt: new Date().toISOString(),
-      app: "LifeDock",
+      app: "DiaryDock",
       profile: state.settingsProfile,
       documents: state.vaultDocuments,
       reminders: state.reminders,
@@ -76,10 +76,10 @@ export function SettingsWorkspace() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `lifedock-export-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = `diarydock-export-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
-    setRequestMessage("Your LifeDock export has been prepared as a JSON file.");
+    setRequestMessage("Your DiaryDock export has been prepared as a JSON file.");
   };
 
   const requestDeletion = () => {
@@ -125,7 +125,7 @@ export function SettingsWorkspace() {
           eyebrow="Settings"
           title="Your Settings, Your Peace of Mind"
           subtitle="Personalize your experience and stay protected."
-          heroImage="/images/pages/settings-hero.png"
+          heroImage="/images/pages/settings-hero.webp"
           heroPosition="center 50%"
           badge="Estate control"
           action={
@@ -218,7 +218,7 @@ export function SettingsWorkspace() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">Privacy Policy</span>
-                <span className="mt-0.5 block text-xs text-ink/50">How LifeDock handles family and document data</span>
+                <span className="mt-0.5 block text-xs text-ink/50">How DiaryDock handles family and document data</span>
               </span>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </Link>
@@ -244,7 +244,7 @@ export function SettingsWorkspace() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">Export my data</span>
-                <span className="mt-0.5 block text-xs text-ink/50">Download a JSON copy of this LifeDock estate</span>
+                <span className="mt-0.5 block text-xs text-ink/50">Download a JSON copy of this DiaryDock estate</span>
               </span>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </button>
@@ -267,7 +267,7 @@ export function SettingsWorkspace() {
         </section>
 
         <section className="estate-sheet p-5">
-          <SectionHeader title="LifeDock status" hint="At-a-glance confidence checks" />
+          <SectionHeader title="DiaryDock status" hint="At-a-glance confidence checks" />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="rounded-3xl bg-white/65 p-4">
               <p className="text-sm font-semibold text-ink">Backups</p>
@@ -304,7 +304,7 @@ export function SettingsWorkspace() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-ink">App version</p>
               </div>
-              <span className="text-xs font-medium text-ink/45">LifeDock 0.1.0</span>
+              <span className="text-xs font-medium text-ink/45">DiaryDock 0.1.0</span>
             </div>
           </div>
         </section>
@@ -322,9 +322,9 @@ export function SettingsWorkspace() {
         }
         subtitle={
           modal === "profile"
-            ? "Stored through the LifeDock data layer."
+            ? "Stored through the DiaryDock data layer."
             : modal === "export"
-              ? "Prepare a local JSON copy of this LifeDock estate."
+              ? "Prepare a local JSON copy of this DiaryDock estate."
               : "This records a deletion request for MVP testing."
         }
         onClose={closeModal}

@@ -5,7 +5,7 @@ import { VaultWorkspace } from "@/components/VaultWorkspace";
 import { requireUser } from "@/lib/auth";
 import { vaultDocuments } from "@/lib/mock-data";
 
-export const metadata: Metadata = { title: "Vault" };
+export const metadata: Metadata = { title: "All Files" };
 
 export default async function VaultPage() {
   await requireUser();

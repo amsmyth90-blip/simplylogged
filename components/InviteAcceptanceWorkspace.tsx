@@ -1,35 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { EmptyState } from "@/components/EmptyState";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
-import type { HouseholdMember, Invite } from "@/lib/lifedock-data";
 import {
-  deleteStructuredFamilyInvite,
-  upsertStructuredHouseholdMember
-} from "@/lib/structured-data";
+  acceptHouseholdInvite,
+  getHouseholdInvite,
+  type HouseholdInvitePreview
+} from "@/lib/household-sharing";
+import type { Invite } from "@/lib/lifedock-data";
 
 type InviteAcceptanceWorkspaceProps = {
   inviteId: string;
 };
-
-function accessToneForInvite(access: string): HouseholdMember["accessTone"] {
-  if (access.includes("Partner")) {
-    return "full";
-  }
-
-  if (access.includes("Family viewer")) {
-    return "shared";
-  }
-
-  return "limited";
-}
 
 function managedAreasForInvite(access: string) {
   if (access.includes("Partner")) {
@@ -47,115 +35,82 @@ function managedAreasForInvite(access: string) {
   return ["Attic"];
 }
 
-function roleForInvite(invite: Invite) {
-  if (invite.access.includes("Partner")) {
-    return "Partner";
-  }
-
-  if (invite.access.includes("Emergency")) {
-    return "Emergency Contact";
-  }
-
-  if (invite.access.includes("Family viewer")) {
-    return "Family Viewer";
-  }
-
-  return invite.relation || "Family Member";
-}
-
-function memberFromInvite(invite: Invite): HouseholdMember {
-  return {
-    id: `member-${invite.id}`,
-    name: invite.name,
-    role: roleForInvite(invite),
-    access: invite.access.includes("Partner")
-      ? "Full access"
-      : invite.access.includes("Family viewer")
-        ? "Shared access"
-        : "Limited access",
-    accessTone: accessToneForInvite(invite.access),
-    note: `${invite.relation} joined through a LifeDock invite.`,
-    initials: invite.initials,
-    manages: managedAreasForInvite(invite.access),
-    lastActive: "Now"
-  };
-}
-
 export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspaceProps) {
-  const { state, hydrated, updateState } = useLifeDockData();
-  const [accepted, setAccepted] = useState(false);
+  const [preview, setPreview] = useState<HouseholdInvitePreview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
+  const [error, setError] = useState("");
 
-  const invite = state.familyInvites.find((item) => item.id === inviteId) ?? null;
-  const acceptedMember = useMemo(
-    () => state.householdMembers.find((member) => member.id === `member-${inviteId}`) ?? null,
-    [inviteId, state.householdMembers]
-  );
+  useEffect(() => {
+    let cancelled = false;
 
-  const acceptInvite = () => {
-    if (!invite) {
-      return;
+    const loadInvite = async () => {
+      try {
+        const nextPreview = await getHouseholdInvite(inviteId);
+        if (!cancelled) {
+          setPreview(nextPreview);
+          setError(
+            nextPreview
+              ? ""
+              : "This invite is unavailable. Sign in with the email address it was created for."
+          );
+        }
+      } catch (loadError) {
+        if (!cancelled) {
+          setError(loadError instanceof Error ? loadError.message : "The invite could not be loaded.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadInvite();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [inviteId]);
+
+  const invite: Invite | null = preview
+    ? {
+        id: preview.token,
+        name: preview.name,
+        relation: preview.relation,
+        access: preview.access,
+        sentAgo: "Recently",
+        initials:
+          preview.name
+            .split(" ")
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase())
+            .join("") || "LD",
+        status: "pending"
+      }
+    : null;
+
+  const acceptInvite = async () => {
+    if (!invite) return;
+
+    setAccepting(true);
+    setError("");
+
+    try {
+      await acceptHouseholdInvite(invite.id);
+      window.location.assign("/dashboard?joined=1");
+    } catch (acceptError) {
+      setError(acceptError instanceof Error ? acceptError.message : "The invite could not be accepted.");
+      setAccepting(false);
     }
-
-    const nextMember = memberFromInvite(invite);
-
-    updateState((current) => ({
-      ...current,
-      householdMembers: [
-        nextMember,
-        ...current.householdMembers.filter(
-          (member) => member.id !== nextMember.id && member.name.toLowerCase() !== nextMember.name.toLowerCase()
-        )
-      ],
-      familyInvites: current.familyInvites.filter((item) => item.id !== invite.id)
-    }));
-
-    void upsertStructuredHouseholdMember(nextMember);
-    void deleteStructuredFamilyInvite(invite.id);
-    setAccepted(true);
   };
 
-  if (!hydrated) {
+  if (loading) {
     return (
       <div className="space-y-4">
         <PageHeader eyebrow="Family invite" title="Loading invite" backHref="/family" backLabel="Family" />
         <div className="estate-sheet p-5 text-sm text-ink/55">Checking the invite details...</div>
-      </div>
-    );
-  }
-
-  if (accepted || acceptedMember) {
-    return (
-      <div className="space-y-4">
-        <PageHeader
-          eyebrow="Family invite"
-          title="Welcome to LifeDock"
-          subtitle="This person is now part of the household circle."
-          backHref="/family"
-          backLabel="Family"
-          heroImage="/images/pages/family-hero.png"
-          heroPosition="center 52%"
-          badge="Invite accepted"
-        />
-        <section className="estate-sheet p-5">
-          <div className="flex items-center gap-4">
-            <Avatar initials={acceptedMember?.initials ?? "OK"} size="lg" toneIndex={2} />
-            <div>
-              <p className="text-lg font-semibold tracking-tight text-ink">
-                {acceptedMember?.name ?? "Family member"} added
-              </p>
-              <p className="mt-1 text-sm leading-6 text-ink/55">
-                Access is saved in the household member records and can be managed from Family.
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/family"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white shadow-soft"
-          >
-            Open Family
-            <UiIcon name="chevron-right" className="h-4 w-4" />
-          </Link>
-        </section>
       </div>
     );
   }
@@ -167,7 +122,7 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
         <EmptyState
           icon="users"
           title="This invite is no longer active"
-          message="It may already have been accepted or cancelled."
+          message={error || "It may already have been accepted, cancelled or created for a different email."}
           action={
             <Link href="/family" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
               Back to Family
@@ -183,10 +138,10 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
       <PageHeader
         eyebrow="Family invite"
         title={`${invite.name} has been invited`}
-        subtitle="Review the access level before adding them to this LifeDock household."
+        subtitle={`Join ${preview?.householdName ?? "this household"} using the access shown below.`}
         backHref="/family"
         backLabel="Family"
-        heroImage="/images/pages/family-hero.png"
+        heroImage="/images/pages/family-hero.webp"
         heroPosition="center 52%"
         badge="Pending"
       />
@@ -219,12 +174,16 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
 
         <button
           type="button"
-          onClick={acceptInvite}
+          onClick={() => void acceptInvite()}
+          disabled={accepting}
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-ink/90"
         >
-          Accept invite
+          {accepting ? "Joining household..." : "Accept invite"}
           <UiIcon name="chevron-right" className="h-4 w-4" />
         </button>
+        {error ? (
+          <p className="mt-3 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>
+        ) : null}
       </section>
     </div>
   );

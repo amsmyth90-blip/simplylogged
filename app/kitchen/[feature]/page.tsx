@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { KitchenFeatureWorkspace } from "@/components/KitchenFeatureWorkspace";
 import { requireUser } from "@/lib/auth";
 
-const features = ["meal-planner", "pantry", "recipes", "notes", "documents"] as const;
+const features = ["calendar", "meal-planner", "pantry", "recipes", "notes", "documents"] as const;
 type Feature = (typeof features)[number];
 
 export function generateStaticParams() { return features.map(feature => ({ feature })); }

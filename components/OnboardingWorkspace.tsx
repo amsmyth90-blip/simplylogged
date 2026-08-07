@@ -22,7 +22,7 @@ export function OnboardingWorkspace() {
       {
         id: "household",
         title: "Name your household",
-        detail: onboarding.householdName || "Add a name so LifeDock feels personal.",
+        detail: onboarding.householdName || "Add a name so DiaryDock feels personal.",
         complete: Boolean(onboarding.householdName.trim()),
         href: "#household"
       },
@@ -113,7 +113,7 @@ export function OnboardingWorkspace() {
     <div className="immersive-page">
       <PageHeader
         eyebrow="First setup"
-        title="Set up your LifeDock"
+        title="Set up your DiaryDock"
         subtitle="Start with the people, rooms, and documents that matter most. You can keep refining it later."
         heroImage="/images/estate-map-light.png"
         heroPosition="center 20%"
@@ -139,7 +139,7 @@ export function OnboardingWorkspace() {
               {onboarding.completed ? "Setup complete" : "Your setup checklist"}
             </p>
             <p className="mt-1 text-sm leading-6 text-ink/58">
-              {progress.completed} of {progress.total} steps are ready. LifeDock gets calmer and more useful with every item you add.
+              {progress.completed} of {progress.total} steps are ready. DiaryDock gets calmer and more useful with every item you add.
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-5">
               {setupSteps.map((step) => (
@@ -167,7 +167,7 @@ export function OnboardingWorkspace() {
       </section>
 
       <section id="household" className="estate-sheet p-5">
-        <SectionHeader title="Household basics" hint="Make LifeDock feel like yours" />
+        <SectionHeader title="Household basics" hint="Make DiaryDock feel like yours" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block space-y-2">
             <span className="text-sm font-semibold text-ink">Household name</span>
@@ -283,7 +283,7 @@ export function OnboardingWorkspace() {
       <section className="estate-sheet p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-ink">Ready to use LifeDock?</p>
+            <p className="text-sm font-semibold text-ink">Ready to use DiaryDock?</p>
             <p className="mt-1 text-xs leading-5 text-ink/55">
               Finish setup when the essentials are in place. You can still add and correct everything later.
             </p>

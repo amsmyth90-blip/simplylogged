@@ -4,7 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { estateAreas } from "@/lib/mock-data";
+
+const roomSceneImages = [
+  "/images/kitchen-command-centre.webp",
+  "/images/office-interactive-v1.webp",
+  "/images/family-fireside-clean.webp",
+  "/images/pages/bedroom-health-room-clean.webp",
+  "/images/pages/garage-folio-hero-v5.webp",
+  "/images/designs/driveway/08-car-boot-departure.webp",
+] as const;
 
 const hitboxSize: Record<string, { width: string; height: string }> = {
   attic: { width: "30%", height: "11%" },
@@ -32,18 +42,30 @@ const guideColours: Record<string, string> = {
   "front-gate": "border-fuchsia-400 bg-fuchsia-300/20 text-fuchsia-950"
 };
 
-function EstateHotspotMarker({ label, top = "50%" }: { label: string; top?: string }) {
+function EstateHotspotMarker({
+  label,
+  top = "50%",
+  left = "50%",
+  labelPosition = "below",
+  className = "",
+}: {
+  label: string;
+  top?: string;
+  left?: string;
+  labelPosition?: "below" | "right";
+  className?: string;
+}) {
+  const labelPositionClass = labelPosition === "right"
+    ? "left-[calc(50%+6px)] top-1/2 -translate-y-1/2"
+    : "left-1/2 top-[calc(50%-2px)] -translate-x-1/2 -translate-y-1/2";
+
   return (
     <span
-      className="pointer-events-none absolute left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5"
-      style={{ top }}
+      className={`pointer-events-none absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 ${className}`}
+      style={{ top, left }}
       aria-hidden="true"
     >
-      <span className="relative flex h-6 w-6 items-center justify-center rounded-full border border-white/90 bg-white/72 shadow-[0_5px_16px_rgba(15,23,42,0.28)] backdrop-blur-xl transition duration-300 group-hover:scale-110 group-hover:bg-white/92 group-focus-visible:scale-110">
-        <span className="absolute inset-[-4px] animate-pulse rounded-full border border-white/55" />
-        <span className="h-2 w-2 rounded-full bg-[#6f8b62] shadow-[0_0_0_3px_rgba(255,255,255,0.7)]" />
-      </span>
-      <span className="whitespace-nowrap rounded-full border border-white/65 bg-slate-950/62 px-1.5 py-0.5 text-[8px] font-semibold tracking-wide text-white shadow-md backdrop-blur-md transition duration-300 group-hover:bg-slate-950/82">
+      <span className={`absolute ${roomImageLabelClass} ${labelPositionClass}`}>
         {label}
       </span>
     </span>
@@ -55,6 +77,16 @@ export function EstateDashboard() {
 
   useEffect(() => {
     setShowRoomGuides(new URLSearchParams(window.location.search).get("showRooms") === "1");
+
+    const preloadTimer = window.setTimeout(() => {
+      roomSceneImages.forEach((src) => {
+        const image = new window.Image();
+        image.decoding = "async";
+        image.src = src;
+      });
+    }, 150);
+
+    return () => window.clearTimeout(preloadTimer);
   }, []);
 
   return (
@@ -62,10 +94,11 @@ export function EstateDashboard() {
       <div className="relative h-[100svh] w-full overflow-hidden">
         <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
           <Image
-            src="/images/estate-dashboard-country.png"
-            alt="LifeDock digital estate with a cutaway attic, office, family dog and travel luggage"
+            src="/images/estate-dashboard-country.webp"
+            alt="DiaryDock digital estate with a cutaway attic, office, family dog and travel luggage"
             fill
             priority
+            unoptimized
             className="object-fill"
             sizes="100vw"
           />
@@ -107,11 +140,17 @@ export function EstateDashboard() {
                 title={area.name}
               >
                 {showRoomGuides ? (
-                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold shadow-sm">
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1.5 text-[13px] font-bold shadow-sm">
                     {area.name}
                   </span>
                 ) : (
-                  <EstateHotspotMarker label={area.name} top={area.id === "front-gate" ? "28%" : "50%"} />
+                  <EstateHotspotMarker
+                    label={area.name}
+                    top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "20%" : area.id === "driveway" ? "48%" : "50%"}
+                    left={area.id === "garden" ? "65%" : area.id === "driveway" ? "50%" : "50%"}
+                    labelPosition={area.id === "garden" ? "right" : "below"}
+                    className={area.id === "garden" ? "!top-[42%] sm:!top-[20%]" : ""}
+                  />
                 )}
               </Link>
             );

@@ -176,6 +176,24 @@ export async function upsertStructuredReminder(reminder: Reminder) {
   }
 }
 
+export async function deleteStructuredReminder(reminderId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) {
+    return;
+  }
+
+  const userId = await getAuthenticatedUserId();
+  const { error } = await client
+    .from("reminders")
+    .delete()
+    .eq("id", reminderId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function upsertStructuredHouseholdMember(member: HouseholdMember) {
   const client = getSupabaseBrowserClient();
   if (!client) {
@@ -216,10 +234,11 @@ export async function upsertStructuredFamilyInvite(invite: Invite) {
 
   const userId = await getAuthenticatedUserId();
   const { error } = await client.from("family_invites").upsert(
-    {
-      id: invite.id,
-      user_id: userId,
-      name: invite.name,
+      {
+        id: invite.id,
+        user_id: userId,
+        email: invite.email ?? null,
+        name: invite.name,
       relation: invite.relation,
       access: invite.access,
       sent_ago: invite.sentAgo,
@@ -345,6 +364,7 @@ export async function loadStructuredDocumentsAndReminders() {
     ? []
     : (invitesResult.data ?? []).map((row) => ({
         id: row.id,
+        email: row.email ?? undefined,
         name: row.name,
         relation: row.relation,
         access: row.access,

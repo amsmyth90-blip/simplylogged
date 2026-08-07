@@ -1,11 +1,11 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.lifedock.app",
-  appName: "LifeDock",
+  appId: "com.diarydock.app",
+  appName: "DiaryDock",
   webDir: "public",
   server: {
-    url: "https://www.thelifedock.com",
+    url: "https://diarydock.com",
     cleartext: false
   },
   ios: {

@@ -1,5 +1,5 @@
 {
-  "name": "lifedock",
+  "name": "diarydock",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "promo:render": "remotion render promo-video/index.ts LifeDockPromo output/lifedock-promo.mp4",
+    "promo:render": "remotion render promo-video/index.ts LifeDockPromo output/diarydock-promo.mp4",
     "icons:generate": "node tools/generate-app-icons.mjs",
     "assets:generate": "capacitor-assets generate --iconBackgroundColor '#f8f4ec' --splashBackgroundColor '#f8f4ec'"
   },
