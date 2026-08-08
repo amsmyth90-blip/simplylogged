@@ -762,6 +762,13 @@ function Inventory({ highValueOnly = false }: { highValueOnly?: boolean }) {
 function CoverCheck() {
   const { state, updateState } = useLifeDockData();
   const policy = useHomePolicy();
+  const stored = policy ? state.insurance.homeCoverChecks.find(
+    (check) => check.policyId === policy.id,
+  ) : undefined;
+  const [draft, setDraft] = useState({
+    estimatedRebuildCost: stored?.estimatedRebuildCost || 0,
+    recentHomeChanges: stored?.recentHomeChanges || "",
+  });
   if (!policy)
     return (
       <BillsShell>
@@ -786,13 +793,6 @@ function CoverCheck() {
   const buildingsLimit = parseCoverValue(
     policy.coverItems.find((item) => /building/i.test(item.label))?.value || "",
   );
-  const stored = state.insurance.homeCoverChecks.find(
-    (check) => check.policyId === policy.id,
-  );
-  const [draft, setDraft] = useState({
-    estimatedRebuildCost: stored?.estimatedRebuildCost || 0,
-    recentHomeChanges: stored?.recentHomeChanges || "",
-  });
   const save = () => {
     const check = {
       policyId: policy.id,

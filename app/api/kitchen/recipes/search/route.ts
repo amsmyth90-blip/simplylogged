@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import type { KitchenRecipe } from "@/lib/kitchen-recipes";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 type MealDbMeal = Record<string, string | null>;
@@ -35,6 +36,21 @@ export async function GET(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "You must be signed in to search recipes." }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(`api:kitchen:recipe-search:${user.id}`, {
+    limit: 60,
+    windowMs: 10 * 60 * 1000
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many recipe searches. Please wait a moment and try again." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) }
+      }
+    );
   }
 
   const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";

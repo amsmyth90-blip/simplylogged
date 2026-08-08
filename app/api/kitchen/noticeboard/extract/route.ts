@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
@@ -56,6 +57,21 @@ export async function POST(request: Request) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: "You must be signed in to add a notice." }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(`api:kitchen:noticeboard:${user.id}`, {
+    limit: 18,
+    windowMs: 10 * 60 * 1000
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many smart notice captures. Please wait a moment and try again." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) }
+      }
+    );
   }
 
   const formData = await request.formData();

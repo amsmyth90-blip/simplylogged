@@ -16,6 +16,7 @@ import {
 } from "@/lib/bill-document-analysis";
 import { insuranceDocumentAnalysisSchema, type InsuranceDocumentAnalysis } from "@/lib/insurance-document-analysis";
 import { receiptDocumentAnalysisSchema, type ReceiptDocumentAnalysis } from "@/lib/receipt-document-analysis";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_PAGE_COUNT = 12;
@@ -52,6 +53,21 @@ export async function POST(request: Request) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "You must be signed in to use document capture." }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(`api:capture:extract:${user.id}`, {
+    limit: 20,
+    windowMs: 10 * 60 * 1000
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many document scans. Please wait a moment and try again." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) }
+      }
+    );
   }
 
   const formData = await request.formData();

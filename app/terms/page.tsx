@@ -10,7 +10,7 @@ export default function TermsPage() {
       eyebrow="Terms"
       title="Terms of Use"
       subtitle="The terms that apply when you use DiaryDock."
-      effectiveDate="27 July 2026"
+      effectiveDate="8 August 2026"
       sections={[
         {
           title: "Acceptance of terms",
@@ -28,7 +28,7 @@ export default function TermsPage() {
         {
           title: "Document uploads and AI extraction",
           body: [
-            "When you upload a document or photo for AI reading, DiaryDock attempts to extract useful text and filing details. Results may occasionally be incomplete or incorrect.",
+            "When you upload or record content for AI reading, DiaryDock may send that content to its AI provider so it can extract useful text, summaries, reminders, and filing details. Results may occasionally be incomplete or incorrect.",
             "You are responsible for reviewing AI-suggested text, categories, dates, and reminders before relying on them, and for keeping original copies of important documents.",
             "DiaryDock organises information but does not provide legal, financial, medical, insurance, or emergency-services advice, and should not be relied on as the sole record of critical documents."
           ]

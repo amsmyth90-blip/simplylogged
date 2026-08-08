@@ -10,13 +10,13 @@ export default function PrivacyPage() {
       eyebrow="Privacy"
       title="Privacy Policy"
       subtitle="How DiaryDock collects, uses, and protects your family's information."
-      effectiveDate="27 July 2026"
+      effectiveDate="8 August 2026"
       sections={[
         {
           title: "Information we collect",
           body: [
             "Account information: your email address and authentication details, managed via our database provider, Supabase.",
-            "Content you add: document titles, categories, room placement, reminders, notes, and the files or photos you upload (for example bills, certificates, and insurance paperwork).",
+            "Content you add: document titles, categories, room placement, reminders, notes, and the files or photos you upload. This may include sensitive household information such as wills, medical records, insurance paperwork, bills, identity documents, pet records, and family memories.",
             "Family and sharing settings: names or invite details for family members you add, the access level you grant them, and which documents you mark visible in Emergency Access Mode.",
             "Usage data such as device type and app version, collected automatically to keep the service running reliably and to diagnose problems."
           ]
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           title: "How we use your information",
           body: [
             "To store and organise your documents, show reminders, and route items to the correct room in your digital home.",
-            "When you use AI document reading, the photo or file you upload is sent to our AI provider, OpenAI, solely to extract text and suggest filing details (title, category, dates). Under OpenAI's API terms, content submitted through the API is not used to train their models. The extracted result is only saved to your account after you confirm it.",
+            "When you choose to use AI document, photo, recipe, noticeboard, bill, receipt, will, insurance, or kitchen reading, the file, photo, audio, or extracted text you provide is sent to our AI provider, OpenAI, solely to read it and suggest useful details. Under OpenAI's API terms, content submitted through the API is not used to train their models. AI results can be incomplete or wrong, so DiaryDock asks you to review important details before relying on them.",
             "To operate family sharing and Emergency Access Mode exactly as you configure them, and to respond to support requests.",
             "We do not sell your personal data, and we do not use your documents or photos for advertising."
           ]
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           title: "Who we share data with",
           body: [
             "Supabase, for authentication, database, and file storage.",
-            "OpenAI, for AI-based text extraction from uploaded documents and photos, as described above.",
+            "OpenAI, for AI-based extraction and summarisation from files, photos, audio, and text that you explicitly submit for smart reading, as described above.",
             "Family members you explicitly invite, limited to the documents and access level you assign them.",
             "We do not share your data with any other third party except where required by law."
           ]

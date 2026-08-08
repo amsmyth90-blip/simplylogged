@@ -6,10 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "promo:render": "remotion render promo-video/index.ts LifeDockPromo output/diarydock-promo.mp4",
-    "icons:generate": "node tools/generate-app-icons.mjs",
-    "assets:generate": "capacitor-assets generate --iconBackgroundColor '#f8f4ec' --splashBackgroundColor '#f8f4ec'"
+    "icons:generate": "node tools/generate-app-icons.mjs"
   },
   "dependencies": {
     "@capacitor/core": "^8.4.2",
@@ -17,24 +16,26 @@
     "@remotion/media": "^4.0.494",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.7",
-    "next": "^15.5.9",
+    "next": "^16.3.0",
     "openai": "^6.48.0",
     "pdf-lib": "^1.17.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.2",
     "@remotion/cli": "^4.0.327",
     "@types/node": "22.15.30",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.5",
     "autoprefixer": "10.4.21",
-    "postcss": "8.5.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.0",
+    "postcss": "^8.5.26",
     "remotion": "^4.0.327",
     "sharp": "^0.35.3",
     "tailwindcss": "3.4.17",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.66.0"
   }
 }
