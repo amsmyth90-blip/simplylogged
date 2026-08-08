@@ -109,7 +109,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     tasks: [
       { id: "attic-1", label: "Digitise the 2000s photo albums", due: "This month", done: false },
       { id: "attic-2", label: "Label Grandad's medal box", done: false },
-      { id: "attic-3", label: "Back up wedding video to the Vault", done: true }
+      { id: "attic-3", label: "Back up wedding video to All Files", done: true }
     ],
     documents: [
       { id: "attic-d1", title: "Photo Archive 1998–2004", kind: "Scan", size: "1.2 GB", updated: "3 days ago" },
@@ -122,7 +122,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     quickActions: [
       { label: "Add memory", icon: "plus", href: "/room/attic" },
-      { label: "Open Vault", icon: "lock", href: "/vault" },
+      { label: "Open All Files", icon: "lock", href: "/files" },
       { label: "Share album", icon: "share", href: "/family" }
     ]
   },
@@ -165,8 +165,8 @@ export const roomDetails: Record<string, RoomDetail> = {
     status: "secure",
     headline: "Paperwork handled, then securely filed.",
     description:
-      "Incoming post becomes action here. Finished documents stay securely in the Vault and remain linked to the Office.",
-    belongsHere: ["Bills to action", "Household forms", "Legal matters", "Renewals", "Identity admin", "Vault shortcuts"],
+      "Incoming post becomes action here. Finished documents stay securely in All Files and remain linked to the Office.",
+    belongsHere: ["Bills to action", "Household forms", "Legal matters", "Renewals", "Identity admin", "Secure file shortcuts"],
     stats: { records: 26, documents: 15, updated: "This week" },
     tasks: [
       { id: "off-1", label: "Verify account recovery codes", due: "This week", done: false },
@@ -180,12 +180,12 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     activity: [
       { id: "off-a1", text: "Two-factor authentication verified", when: "2 days ago", by: "Michael" },
-      { id: "off-a2", text: "Will reviewed and re-sealed in the Vault", when: "This week", by: "Amy" }
+      { id: "off-a2", text: "Will reviewed and re-filed securely", when: "This week", by: "Amy" }
     ],
     quickActions: [
       { label: "Review incoming post", icon: "mail", href: "/intake" },
       { label: "Office reminders", icon: "calendar", href: "/reminders" },
-      { label: "Open Vault", icon: "lock", href: "/vault" }
+      { label: "Open All Files", icon: "lock", href: "/files" }
     ]
   },
   "family-room": {
@@ -246,7 +246,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     quickActions: [
       { label: "Emergency panel", icon: "phone", href: "/emergency" },
-      { label: "Open Vault", icon: "lock", href: "/vault" },
+      { label: "Open All Files", icon: "lock", href: "/files" },
       { label: "Manage access", icon: "users", href: "/family" }
     ]
   },
@@ -277,7 +277,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     quickActions: [
       { label: "Set reminder", icon: "calendar", href: "/reminders" },
-      { label: "Add document", icon: "plus", href: "/vault" },
+      { label: "Add document", icon: "plus", href: "/files" },
       { label: "Breakdown line", icon: "phone", href: "/emergency" }
     ]
   },
@@ -310,7 +310,7 @@ export const roomDetails: Record<string, RoomDetail> = {
     ],
     quickActions: [
       { label: "Scan a letter", icon: "plus", href: "/room/mailbox" },
-      { label: "Open Vault", icon: "lock", href: "/vault" },
+      { label: "Open All Files", icon: "lock", href: "/files" },
       { label: "Set reminder", icon: "calendar", href: "/reminders" }
     ]
   },
@@ -914,7 +914,7 @@ export const familyMembers: FamilyMember[] = [
     role: "Primary Organizer",
     access: "Full access",
     accessTone: "full",
-    note: "Owns the estate overview, sharing, and the Vault.",
+    note: "Owns the estate overview, sharing, and All Files.",
     initials: "A",
     manages: ["Everything"],
     lastActive: "Now"
@@ -1049,7 +1049,7 @@ export const emergencyPlans: EmergencyPlan[] = [
     summary: "Who to call and what responders need to know",
     steps: [
       "Call 999 and ask for an ambulance.",
-      "Medical cards for each family member are in the Vault under Health & Medical.",
+      "Medical cards for each family member are in All Files under Health & Medical.",
       "Lily has a penicillin allergy — this is flagged on her medical card.",
       "First-aid kit: hall cupboard, top shelf. Nearest defibrillator: village hall, St Mary's Lane (400m)."
     ]

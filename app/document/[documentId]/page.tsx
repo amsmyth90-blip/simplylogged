@@ -34,7 +34,7 @@ export default async function DocumentPage({ params, searchParams }: DocumentPag
     <>
       <DocumentDetailWorkspace
         documentId={documentId}
-        backHref={returnTarget?.href ?? "/vault"}
+        backHref={returnTarget?.href ?? "/files"}
         backLabel={returnTarget?.label ?? "All Files"}
       />
       <BottomNav />

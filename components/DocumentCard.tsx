@@ -25,7 +25,7 @@ export function DocumentCard({
   title,
   kind,
   meta,
-  href = "/vault",
+  href = "/files",
   badge,
   starred = false,
   compact = false

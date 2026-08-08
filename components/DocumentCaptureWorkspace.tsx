@@ -425,7 +425,7 @@ export function DocumentCaptureWorkspace() {
     preparing: ["OPTIMISING PAGES", "Making every page crystal clear"],
     reading: ["READING PAGES", `Reading ${selectedFiles.length} page${selectedFiles.length === 1 ? "" : "s"} together`],
     organising: ["SMART FILING", "Finding its room, category and dates"],
-    saving: ["SECURE VAULT", "Combining and saving your document"]
+    saving: ["SECURE FILES", "Combining and saving your document"]
   } as const;
   const activeProcessingStage =
     processingStage === "preparing" ||
@@ -462,8 +462,8 @@ export function DocumentCaptureWorkspace() {
       <div className="relative mx-auto flex min-h-[calc(100svh-7rem)] w-full max-w-md flex-col px-5 pt-5">
         <header className="flex items-center justify-between">
           <Link
-            href="/vault"
-            aria-label="Back to Vault"
+            href="/files"
+            aria-label="Back to All Files"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-white/85 bg-white/72 text-slate-700 shadow-[0_14px_28px_-20px_rgba(30,64,73,0.45)] backdrop-blur-xl"
           >
             <UiIcon name="arrow-left" className="h-4 w-4" />
@@ -663,7 +663,7 @@ export function DocumentCaptureWorkspace() {
                 </div>
               </div>
 
-              <Link href={savedDocumentId ? `/document/${savedDocumentId}` : "/vault"} className="mt-4 flex w-full items-center justify-center gap-2 rounded-[19px] bg-[#86a774] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_30px_-20px_rgba(67,102,63,0.7)]">
+              <Link href={savedDocumentId ? `/document/${savedDocumentId}` : "/files"} className="mt-4 flex w-full items-center justify-center gap-2 rounded-[19px] bg-[#86a774] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_30px_-20px_rgba(67,102,63,0.7)]">
                 <UiIcon name="file" className="h-4 w-4" />
                 View in DiaryDock
               </Link>

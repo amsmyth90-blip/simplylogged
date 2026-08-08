@@ -158,7 +158,7 @@ export function SearchWorkspace() {
     ];
 
     return [
-      { id: "documents", title: "Documents", hint: "Vault files, OCR text, issuers, rooms", results: documentResults },
+      { id: "documents", title: "Documents", hint: "All Files, OCR text, issuers, rooms", results: documentResults },
       { id: "rooms", title: "Rooms", hint: "Estate rooms and what belongs there", results: roomResults },
       { id: "reminders", title: "Reminders", hint: "Tasks, renewals, dates, repeats", results: reminderResults },
       { id: "mailbox", title: "Mailbox", hint: "Incoming and routed paperwork", results: mailboxResults },

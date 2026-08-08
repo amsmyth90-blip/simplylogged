@@ -487,7 +487,7 @@ export const initialSettingGroups: SettingGroup[] = [
         kind: "link",
         label: "Export estate archive",
         hint: "Everything as a sealed file",
-        href: "/vault",
+        href: "/files",
       },
     ],
   },

@@ -159,7 +159,7 @@ export function IntakeWorkspace() {
                   id: `${room.id}-intake-activity-${timestamp}`,
                   text:
                     target === "vault"
-                      ? `Saved ${item.title} to the Vault from Intake`
+                      ? `Saved ${item.title} to All Files from Intake`
                       : target === "reminder"
                         ? `Created a follow-up reminder for ${item.title}`
                         : `Sent ${item.title} into ${room.name}`,
@@ -178,7 +178,7 @@ export function IntakeWorkspace() {
 
     const nextMessage =
       target === "vault"
-        ? `${item.title} was saved to Vault.`
+        ? `${item.title} was saved to All Files.`
         : target === "reminder"
           ? `${item.title} now has a reminder.`
           : target === "room"
@@ -323,7 +323,7 @@ export function IntakeWorkspace() {
                     onClick={() => routeItem(item, "vault")}
                     className="rounded-2xl bg-ink px-3 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-ink/25"
                   >
-                    Save to Vault
+                    Save to All Files
                   </button>
                   <button
                     type="button"

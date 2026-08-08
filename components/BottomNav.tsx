@@ -17,7 +17,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { id: "home", href: "/dashboard", label: "Home", icon: "home" },
-  { id: "vault", href: "/vault", label: "All Files", icon: "folder" },
+  { id: "files", href: "/files", label: "All Files", icon: "folder" },
   { id: "add", href: "/capture", label: "Scan", icon: "plus", central: true },
   { id: "reminders", href: "/reminders", label: "Reminders", icon: "calendar", badge: 2 },
   { id: "family", href: "/family", label: "Family Room", icon: "users" }
@@ -36,8 +36,8 @@ export function BottomNav() {
     if (item.id === "home") {
       return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room") || pathname.startsWith("/wills") || pathname.startsWith("/office") || pathname.startsWith("/garage") || pathname.startsWith("/driveway") || pathname.startsWith("/bedroom") || pathname.startsWith("/garden");
     }
-    if (item.id === "vault") {
-      return pathname.startsWith("/vault") || pathname.startsWith("/document");
+    if (item.id === "files") {
+      return pathname.startsWith("/files") || pathname.startsWith("/vault") || pathname.startsWith("/document");
     }
     return pathname.startsWith(item.href);
   };

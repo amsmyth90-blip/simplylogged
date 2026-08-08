@@ -108,15 +108,15 @@ type RoomObject = {
 
 const interactiveRoomObjects: Record<string, RoomObject[]> = {
   attic: [
-    { label: "Photo albums", detail: "Open family memories", href: "/vault", icon: "archive", left: "30%", top: "44%" },
-    { label: "Keepsake chest", detail: "View legacy records", href: "/vault", icon: "lock", left: "72%", top: "55%" }
+    { label: "Photo albums", detail: "Open family memories", href: "/files", icon: "archive", left: "30%", top: "44%" },
+    { label: "Keepsake chest", detail: "View legacy records", href: "/files", icon: "lock", left: "72%", top: "55%" }
   ],
   bedroom: [
     { label: "Health & Medical", detail: "Open health records", href: "/room/bedroom#room-documents", icon: "folder", left: "28%", top: "49%" },
     { label: "Appointments", detail: "View upcoming care", href: "/reminders", icon: "calendar", left: "70%", top: "38%" }
   ],
   office: [
-    { label: "Document drawer", detail: "Open important files", href: "/vault", icon: "folder", left: "28%", top: "52%" },
+    { label: "Document drawer", detail: "Open important files", href: "/files", icon: "folder", left: "28%", top: "52%" },
     { label: "Family access", detail: "Manage trusted people", href: "/family", icon: "users", left: "72%", top: "42%" }
   ],
   "family-room": [
@@ -125,7 +125,7 @@ const interactiveRoomObjects: Record<string, RoomObject[]> = {
   ],
   "safe-room": [
     { label: "Emergency plan", detail: "Open emergency access", href: "/emergency", icon: "shield", left: "34%", top: "45%" },
-    { label: "Secure vault", detail: "View protected documents", href: "/vault", icon: "lock", left: "70%", top: "54%" }
+    { label: "Secure files", detail: "View protected documents", href: "/files", icon: "lock", left: "70%", top: "54%" }
   ],
   garage: [
     { label: "Vehicle documents", detail: "Open MOT and insurance", href: "/room/garage#room-documents", icon: "car", left: "32%", top: "52%" },
@@ -168,7 +168,7 @@ export function RoomPage({ room }: RoomPageProps) {
 
       return {
         ...document,
-        href: vaultDocument ? `/document/${vaultDocument.id}?from=${room.id}` : "/vault",
+        href: vaultDocument ? `/document/${vaultDocument.id}?from=${room.id}` : "/files",
         reviewStatus: vaultDocument?.reviewStatus
       };
     });
@@ -357,7 +357,7 @@ export function RoomPage({ room }: RoomPageProps) {
 
     const routeText =
       target === "vault"
-        ? `${item.title} was sent to the Vault`
+        ? `${item.title} was sent to All Files`
         : target === "reminder"
           ? `${item.title} was turned into a reminder`
           : `${item.title} was routed to ${item.suggestedRoom ?? "its room"}`;
@@ -541,7 +541,7 @@ export function RoomPage({ room }: RoomPageProps) {
               }
               hint="Stored securely in All Files and linked to this room"
               actionLabel="Open All Files"
-              actionHref="/vault"
+              actionHref="/files"
             />
             <button
               type="button"
@@ -589,7 +589,7 @@ export function RoomPage({ room }: RoomPageProps) {
                       onClick={() => routeMailboxItem(item.id, "vault")}
                       className="rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-ink/65 transition hover:bg-white"
                     >
-                      File to Vault
+                      File to All Files
                     </button>
                     <button
                       type="button"

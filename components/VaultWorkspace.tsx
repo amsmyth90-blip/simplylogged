@@ -276,7 +276,7 @@ function VaultWorkspaceInner() {
       <div className="immersive-page">
         <PageHeader
           eyebrow="All files"
-          title="Secure Vault"
+          title="All Files"
           subtitle="Every document, securely stored in one place."
           heroImage="/images/pages/vault-hero.webp"
           heroPosition="center 44%"

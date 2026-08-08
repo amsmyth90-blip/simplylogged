@@ -34,7 +34,7 @@ export function EmergencyAccessWorkspace() {
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-ink">Emergency mode is intentionally limited</h2>
             <p className="mt-1 text-sm leading-6 text-ink/60">
-              This screen shows only emergency-approved information. Private Vault documents stay hidden unless you mark them visible.
+              This screen shows only emergency-approved information. Private documents stay hidden unless you mark them visible.
             </p>
           </div>
         </div>

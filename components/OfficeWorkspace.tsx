@@ -904,7 +904,7 @@ function OfficeDocumentDashboard({
               </div>
 
               <Link
-                href="/vault"
+                href="/files"
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#24372f] px-4 py-3 text-sm font-semibold text-white"
               >
                 <UiIcon name="folder" className="h-4 w-4" />
@@ -1138,7 +1138,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
           <p className="rounded-2xl border border-[#d8c9ad] bg-[#f4ead7]/75 px-4 py-3 text-xs leading-5 text-ink/60">
             New post starts in the Mailbox. Use the main Scan button below to
             add paperwork; the Office helps you act on it before the final
-            document is stored in the Vault.
+            document is stored securely in All Files.
           </p>
           <Link
             href="/office/correspondence"

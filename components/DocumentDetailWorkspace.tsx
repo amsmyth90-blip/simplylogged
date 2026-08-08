@@ -51,7 +51,7 @@ function buildDraft(document: VaultDocument): DocumentCorrectionDraft {
 
 export function DocumentDetailWorkspace({
   documentId,
-  backHref = "/vault",
+  backHref = "/files",
   backLabel = "All Files"
 }: DocumentDetailWorkspaceProps) {
   const { state, hydrated, updateState } = useLifeDockData();
@@ -306,7 +306,7 @@ export function DocumentDetailWorkspace({
   if (!hydrated) {
     return (
       <div className="space-y-4">
-        <PageHeader eyebrow="Vault document" title="Loading document" backHref={backHref} backLabel={backLabel} />
+        <PageHeader eyebrow="Secure document" title="Loading document" backHref={backHref} backLabel={backLabel} />
         <div className="estate-sheet p-5 text-sm text-ink/55">Loading your secure document details...</div>
       </div>
     );
@@ -315,10 +315,10 @@ export function DocumentDetailWorkspace({
   if (!document) {
     return (
       <div className="space-y-4">
-        <PageHeader eyebrow="Vault document" title="Document not found" backHref={backHref} backLabel={backLabel} />
+        <PageHeader eyebrow="Secure document" title="Document not found" backHref={backHref} backLabel={backLabel} />
         <EmptyState
           icon="file"
-          title="This document is not in the Vault"
+          title="This document is not in All Files"
           message="It may have been removed, or the app is still syncing your account."
           action={
             <Link href={backHref} className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white">
@@ -476,7 +476,7 @@ export function DocumentDetailWorkspace({
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-2xl bg-white/76 px-3.5 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Room</p>
-                <p className="mt-1 font-semibold text-ink">{document.roomName ?? "Vault only"}</p>
+                <p className="mt-1 font-semibold text-ink">{document.roomName ?? "All Files only"}</p>
               </div>
               <div className="rounded-2xl bg-white/76 px-3.5 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Category</p>
@@ -629,7 +629,7 @@ export function DocumentDetailWorkspace({
                   onChange={(event) => setDraft((current) => (current ? { ...current, roomId: event.target.value } : current))}
                   className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
                 >
-                  <option value="">Vault only</option>
+                  <option value="">All Files only</option>
                   {roomOptions.map((room) => (
                     <option key={room.id} value={room.id}>
                       {room.name}

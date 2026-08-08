@@ -278,7 +278,7 @@ export function SettingsWorkspace() {
             <div className="rounded-3xl bg-white/65 p-4">
               <p className="text-sm font-semibold text-ink">Devices</p>
               <p className="mt-1 text-xs leading-5 text-ink/55">
-                {vaultSecurity.devices} trusted devices can open the estate and the Vault.
+                {vaultSecurity.devices} trusted devices can open the estate and All Files.
               </p>
             </div>
             <div className="rounded-3xl bg-white/65 p-4">
@@ -296,7 +296,7 @@ export function SettingsWorkspace() {
             <div className="flex items-center gap-3.5 px-4 py-3.5">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-ink">Help centre</p>
-                <p className="mt-0.5 text-xs text-ink/50">Guides for rooms, the Vault, and sharing</p>
+                <p className="mt-0.5 text-xs text-ink/50">Guides for rooms, All Files, and sharing</p>
               </div>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </div>
