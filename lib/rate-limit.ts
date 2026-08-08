@@ -21,8 +21,22 @@ declare global {
 const store = globalThis.__diaryDockRateLimitStore ?? new Map<string, RateLimitEntry>();
 globalThis.__diaryDockRateLimitStore = store;
 
+function compactExpiredEntries(now: number) {
+  if (store.size < 1000) {
+    return;
+  }
+
+  for (const [key, entry] of store.entries()) {
+    if (entry.resetAt <= now) {
+      store.delete(key);
+    }
+  }
+}
+
 export function checkRateLimit(key: string, options: RateLimitOptions): RateLimitResult {
   const now = Date.now();
+  compactExpiredEntries(now);
+
   const existing = store.get(key);
 
   if (!existing || existing.resetAt <= now) {
@@ -50,4 +64,9 @@ export function checkRateLimit(key: string, options: RateLimitOptions): RateLimi
     remaining: Math.max(0, options.limit - existing.count),
     retryAfterSeconds: 0
   };
+}
+
+export function getForwardedClientIp(headers: Headers) {
+  const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwardedFor || headers.get("x-real-ip") || "unknown";
 }
