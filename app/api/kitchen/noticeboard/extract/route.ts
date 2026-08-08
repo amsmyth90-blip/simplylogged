@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "You must be signed in to add a notice." }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit(`api:kitchen:noticeboard:${user.id}`, {
+  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("api:kitchen:noticeboard", user.id), {
     limit: 18,
     windowMs: 10 * 60 * 1000
   });

@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 type RateLimitOptions = {
   limit: number;
   windowMs: number;
@@ -14,12 +17,22 @@ type RateLimitResult = {
   remaining: number;
 };
 
+type RateLimitRpcRow = {
+  allowed: boolean;
+  remaining: number;
+  retry_after_seconds: number;
+};
+
 declare global {
   var __diaryDockRateLimitStore: Map<string, RateLimitEntry> | undefined;
 }
 
 const store = globalThis.__diaryDockRateLimitStore ?? new Map<string, RateLimitEntry>();
 globalThis.__diaryDockRateLimitStore = store;
+
+export function createRateLimitKey(...parts: string[]) {
+  return createHash("sha256").update(parts.join("\u001f")).digest("hex");
+}
 
 function compactExpiredEntries(now: number) {
   if (store.size < 1000) {
@@ -69,4 +82,64 @@ export function checkRateLimit(key: string, options: RateLimitOptions): RateLimi
 export function getForwardedClientIp(headers: Headers) {
   const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   return forwardedFor || headers.get("x-real-ip") || "unknown";
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseRateLimitRow(value: unknown): RateLimitRpcRow | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!isRecord(row)) {
+    return null;
+  }
+
+  const allowed = row.allowed;
+  const remaining = row.remaining;
+  const retryAfterSeconds = row.retry_after_seconds;
+
+  if (
+    typeof allowed !== "boolean" ||
+    typeof remaining !== "number" ||
+    typeof retryAfterSeconds !== "number"
+  ) {
+    return null;
+  }
+
+  return {
+    allowed,
+    remaining,
+    retry_after_seconds: retryAfterSeconds
+  };
+}
+
+export async function checkSharedRateLimit(
+  supabase: SupabaseClient,
+  key: string,
+  options: RateLimitOptions
+): Promise<RateLimitResult> {
+  try {
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      bucket_key: key,
+      max_requests: options.limit,
+      window_seconds: Math.ceil(options.windowMs / 1000)
+    });
+
+    if (error) {
+      return checkRateLimit(key, options);
+    }
+
+    const row = parseRateLimitRow(data);
+    if (!row) {
+      return checkRateLimit(key, options);
+    }
+
+    return {
+      allowed: row.allowed,
+      remaining: Math.max(0, row.remaining),
+      retryAfterSeconds: Math.max(0, row.retry_after_seconds)
+    };
+  } catch {
+    return checkRateLimit(key, options);
+  }
 }

@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 import type { KitchenRecipe } from "@/lib/kitchen-recipes";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 const recipeSchema = {
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "You must be signed in to scan recipes." }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit(`api:kitchen:recipe-scan:${user.id}`, {
+  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("api:kitchen:recipe-scan", user.id), {
     limit: 12,
     windowMs: 10 * 60 * 1000
   });

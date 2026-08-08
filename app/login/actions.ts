@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { checkRateLimit, getForwardedClientIp } from "@/lib/rate-limit";
+import { checkSharedRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
@@ -16,7 +16,8 @@ export async function signInAction(formData: FormData) {
 
   const requestHeaders = await headers();
   const clientIp = getForwardedClientIp(requestHeaders);
-  const rateLimit = checkRateLimit(`auth:signin:${clientIp}:${email.toLowerCase()}`, {
+  const supabase = await getSupabaseServerClient();
+  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("auth:signin", clientIp, email.toLowerCase()), {
     limit: 8,
     windowMs: 10 * 60 * 1000
   });
@@ -25,7 +26,6 @@ export async function signInAction(formData: FormData) {
     redirect("/login?error=Too%20many%20sign-in%20attempts.%20Please%20wait%20a%20moment%20and%20try%20again.");
   }
 
-  const supabase = await getSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
