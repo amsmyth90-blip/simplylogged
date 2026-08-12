@@ -17,3 +17,6 @@ tmp-lifedock-dummy-bill.png
 
 # Generated iOS project lives on the CI runner, not in the repo
 ios/
+
+# Supabase local link/cache metadata
+supabase/.temp/

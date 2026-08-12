@@ -381,7 +381,7 @@ security definer
 set search_path = public, extensions
 as $$
 declare
-  current_time timestamptz := timezone('utc', now());
+  v_now timestamptz := now();
   effective_max integer;
   effective_window_seconds integer;
   hashed_key text;
@@ -406,34 +406,34 @@ begin
   values (
     hashed_key,
     1,
-    current_time + make_interval(secs => effective_window_seconds),
-    current_time,
+    v_now + make_interval(secs => effective_window_seconds),
+    v_now,
     current_time
   )
   on conflict (key_hash)
   do update set
     request_count = case
-      when public.rate_limit_buckets.reset_at <= current_time then 1
+      when public.rate_limit_buckets.reset_at <= v_now then 1
       else public.rate_limit_buckets.request_count + 1
     end,
     reset_at = case
-      when public.rate_limit_buckets.reset_at <= current_time
-        then current_time + make_interval(secs => effective_window_seconds)
+      when public.rate_limit_buckets.reset_at <= v_now
+        then v_now + make_interval(secs => effective_window_seconds)
       else public.rate_limit_buckets.reset_at
     end,
-    updated_at = current_time
+    updated_at = v_now
   returning request_count, public.rate_limit_buckets.reset_at
   into current_count, current_reset_at;
 
   delete from public.rate_limit_buckets
-  where public.rate_limit_buckets.reset_at < current_time - interval '1 hour'
-    and public.rate_limit_buckets.updated_at < current_time - interval '1 hour';
+  where public.rate_limit_buckets.reset_at < v_now - interval '1 hour'
+    and public.rate_limit_buckets.updated_at < v_now - interval '1 hour';
 
   allowed := current_count <= effective_max;
   remaining := greatest(0, effective_max - current_count);
   retry_after_seconds := case
     when allowed then 0
-    else greatest(1, ceil(extract(epoch from current_reset_at - current_time))::integer)
+    else greatest(1, ceil(extract(epoch from current_reset_at - v_now))::integer)
   end;
   reset_at := current_reset_at;
 
@@ -444,3 +444,4 @@ $$;
 revoke all on function public.check_rate_limit(text, integer, integer) from public;
 grant execute on function public.check_rate_limit(text, integer, integer) to anon;
 grant execute on function public.check_rate_limit(text, integer, integer) to authenticated;
+
