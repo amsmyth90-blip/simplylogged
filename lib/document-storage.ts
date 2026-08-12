@@ -2,7 +2,7 @@
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export const DOCUMENT_BUCKET = "lifedock-documents";
+export const DOCUMENT_BUCKET = "diarydock-documents";
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 export const ACCEPTED_DOCUMENT_TYPES = [
   "application/pdf",

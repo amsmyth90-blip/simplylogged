@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import {
   roomImageLabelClass,
@@ -13,7 +13,7 @@ import {
 } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { createHouseholdInvite } from "@/lib/household-sharing";
-import type { HouseholdMember, Invite } from "@/lib/lifedock-data";
+import type { HouseholdMember, Invite } from "@/lib/diarydock-data";
 import { upsertStructuredReminder } from "@/lib/structured-data";
 
 type InviteDraft = {
@@ -220,7 +220,7 @@ function RoomHotspot({
 }
 
 export function FamilyWorkspace() {
-  const { state, household, hydrated, canManageHousehold, repositoryMode, updateState } = useLifeDockData();
+  const { state, household, hydrated, canManageHousehold, repositoryMode, updateState } = useDiaryDockData();
   const members = state.householdMembers;
   const invites = state.familyInvites;
   const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
@@ -248,7 +248,7 @@ export function FamilyWorkspace() {
   }, []);
 
   useEffect(() => {
-    const storedStyle = window.localStorage.getItem("lifedock-household-style");
+    const storedStyle = window.localStorage.getItem("diarydock-household-style");
     if (householdStyles.some((style) => style.id === storedStyle)) {
       setHouseholdStyle(storedStyle as HouseholdStyle);
       setHouseholdStyleSet(true);
@@ -261,7 +261,7 @@ export function FamilyWorkspace() {
   const selectHouseholdStyle = (style: HouseholdStyle) => {
     setHouseholdStyle(style);
     setHouseholdStyleSet(true);
-    window.localStorage.setItem("lifedock-household-style", style);
+    window.localStorage.setItem("diarydock-household-style", style);
   };
 
   const activeHouseholdStyle =

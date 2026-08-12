@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   getKitchenRecipeSteps,
@@ -32,7 +32,7 @@ function mealImageStyle(image: string) {
 }
 
 export function KitchenRecipes() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const recipes = state.kitchenRecipes;
   const scanInputRef = useRef<HTMLInputElement>(null);
   const deepLinkHandledRef = useRef(false);

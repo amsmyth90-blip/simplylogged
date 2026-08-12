@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillPageHeader } from "@/components/wills/WillUi";
 import { LettersLegalNotice, LetterSubpageNav } from "@/components/wills/letters/LettersUi";
 import { hydrateLettersRecord, recipientLabel } from "@/lib/letter-records";
 
 export function LetterPreviewWorkspace({ letterId }: { letterId: string }) {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const letter = hydrateLettersRecord(state.willsWishes.lettersOfWishes).letters.find((item) => item.id === letterId) ?? null;
   if (!hydrated) return <div className="mx-auto w-full max-w-[680px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068]">Preparing the envelope preview…</div>;
   if (!letter) return <div className="mx-auto w-full max-w-[680px]"><WillPageHeader title="Letter not found" subtitle="This letter is not available in your private records." backHref="/wills/letters-of-wishes" /></div>;

@@ -90,10 +90,10 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockThingsThatMatterPromo: React.FC = () => (
+export const DiaryDockThingsThatMatterPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
     {/* Reusing the existing warm bed as a placeholder; swap in a dedicated sparse-piano cue once composed */}
-    <Audio src={staticFile('promo-video/lifedock-family-warm.wav')} volume={0.16} />
+    <Audio src={staticFile('promo-video/diarydock-family-warm.wav')} volume={0.16} />
     {/* Neil's narration - drop the ElevenLabs "Neil - Calming and Melodic" render in at this path */}
     <Audio src={staticFile('promo-video/diarydock-things-that-matter-neil.mp3')} volume={1} />
 

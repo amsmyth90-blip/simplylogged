@@ -135,9 +135,9 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockRoomsPromo: React.FC = () => (
+export const DiaryDockRoomsPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: '#f3f6fc'}}>
-    <Audio src={staticFile('promo-video/lifedock-rooms-home-tour.wav')} volume={0.2} />
+    <Audio src={staticFile('promo-video/diarydock-rooms-home-tour.wav')} volume={0.2} />
     <Sequence from={8} durationInFrames={742}><Audio src={staticFile('promo-video/diarydock-rooms-laura-ni.mp3')} volume={1} /></Sequence>
     <Sequence durationInFrames={90}><IntroScene /></Sequence>
     <Sequence from={90} durationInFrames={120}><RoomTourScene activeIndex={0} /></Sequence>

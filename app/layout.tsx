@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
-import { LifeDockDataProvider } from "@/components/LifeDockDataProvider";
+import { DiaryDockDataProvider } from "@/components/DiaryDockDataProvider";
 
 import "./globals.css";
 
@@ -33,13 +33,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <LifeDockDataProvider>
+        <DiaryDockDataProvider>
           <div className="min-h-screen pb-28">
             <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:px-8">
               {children}
             </main>
           </div>
-        </LifeDockDataProvider>
+        </DiaryDockDataProvider>
       </body>
     </html>
   );

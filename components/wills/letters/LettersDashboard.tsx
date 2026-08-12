@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillPageHeader, WillSectionHeading, formatWillDate } from "@/components/wills/WillUi";
 import { LettersLegalNotice, LetterSafetyNotice } from "@/components/wills/letters/LettersUi";
 import { hydrateLettersRecord, purposeLabel, recipientLabel } from "@/lib/letter-records";
 
 export function LettersDashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const record = hydrateLettersRecord(state.willsWishes.lettersOfWishes);
   const letters = [...record.letters].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   const readyCount = letters.filter((letter) => letter.status === "ready").length;

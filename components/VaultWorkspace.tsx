@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/EmptyState";
-import { LifeDockDataProvider, useLifeDockData } from "@/components/LifeDockDataProvider";
+import { DiaryDockDataProvider, useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
@@ -70,7 +70,7 @@ function recencyRank(document: VaultDocument) {
 }
 
 function VaultWorkspaceInner() {
-  const { state, repositoryMode, updateState } = useLifeDockData();
+  const { state, repositoryMode, updateState } = useDiaryDockData();
   const documents = state.vaultDocuments;
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");

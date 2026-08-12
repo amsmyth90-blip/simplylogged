@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { gardenSections } from "@/lib/garden-sections";
@@ -37,7 +37,7 @@ function EmptyPreview({ icon, title, detail, href, action }: { icon: IconName; t
 }
 
 export function GardenWorkspace() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const [addOpen, setAddOpen] = useState(false);
 
   const gardenReminders = useMemo(

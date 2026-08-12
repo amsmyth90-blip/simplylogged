@@ -11,9 +11,9 @@ out
 # Local marketing/QA assets - too large for git, not used by the app
 output/
 public/promo-video/
-tools/lifedock-photo-ad/
+tools/diarydock-photo-ad/
 .qa-*/
-tmp-lifedock-dummy-bill.png
+tmp-diarydock-dummy-bill.png
 
 # Generated iOS project lives on the CI runner, not in the repo
 ios/

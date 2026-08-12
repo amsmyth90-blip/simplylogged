@@ -253,7 +253,7 @@ export type OnboardingState = {
   familyInviteAdded: boolean;
 };
 
-export type LifeDockAppState = {
+export type DiaryDockAppState = {
   reminders: Reminder[];
   vaultDocuments: VaultDocument[];
   householdMembers: HouseholdMember[];
@@ -572,7 +572,7 @@ export function getOnboardingProgress(onboarding: OnboardingState) {
   };
 }
 
-function hydrateLifeDockState(state: LifeDockAppState): LifeDockAppState {
+function hydrateDiaryDockState(state: DiaryDockAppState): DiaryDockAppState {
   const storedRecipes = state.kitchenRecipes?.length
     ? state.kitchenRecipes
     : starterKitchenRecipes;
@@ -660,7 +660,7 @@ function mergeStructuredReminders(primary: Reminder[], fallback: Reminder[]) {
 }
 
 function mergeStructuredRoomDocuments(
-  state: LifeDockAppState,
+  state: DiaryDockAppState,
   documents: VaultDocument[],
 ) {
   const roomDocuments = { ...state.roomDocuments };
@@ -690,9 +690,9 @@ function mergeStructuredRoomDocuments(
   return roomDocuments;
 }
 
-async function mergeStructuredData(state: LifeDockAppState) {
+async function mergeStructuredData(state: DiaryDockAppState) {
   const structured = await loadStructuredDocumentsAndReminders();
-  const nextState = hydrateLifeDockState({
+  const nextState = hydrateDiaryDockState({
     ...state,
     vaultDocuments: mergeById(structured.documents, state.vaultDocuments),
     reminders: mergeStructuredReminders(structured.reminders, state.reminders),
@@ -706,8 +706,8 @@ async function mergeStructuredData(state: LifeDockAppState) {
   return nextState;
 }
 
-export function createInitialLifeDockState(): LifeDockAppState {
-  return hydrateLifeDockState({
+export function createInitialDiaryDockState(): DiaryDockAppState {
+  return hydrateDiaryDockState({
     reminders: remindersList,
     vaultDocuments,
     householdMembers: familyMembers,
@@ -769,12 +769,12 @@ export function createInitialLifeDockState(): LifeDockAppState {
   });
 }
 
-const SESSION_KEY = "lifedock-app-state";
+const SESSION_KEY = "diarydock-app-state";
 
-export type LifeDockRepository = {
+export type DiaryDockRepository = {
   mode: RepositoryMode;
-  load: () => Promise<LifeDockAppState>;
-  save: (state: LifeDockAppState) => Promise<void>;
+  load: () => Promise<DiaryDockAppState>;
+  save: (state: DiaryDockAppState) => Promise<void>;
 };
 
 const householdStateKeys = [
@@ -786,28 +786,28 @@ const householdStateKeys = [
   "familyCalendarEvents",
   "kidSchedules",
   "householdProfiles",
-] as const satisfies ReadonlyArray<keyof LifeDockAppState>;
+] as const satisfies ReadonlyArray<keyof DiaryDockAppState>;
 
 type HouseholdState = Pick<
-  LifeDockAppState,
+  DiaryDockAppState,
   (typeof householdStateKeys)[number]
 >;
 
-function pickHouseholdState(state: LifeDockAppState): HouseholdState {
+function pickHouseholdState(state: DiaryDockAppState): HouseholdState {
   return Object.fromEntries(
     householdStateKeys.map((key) => [key, state[key]]),
   ) as HouseholdState;
 }
 
 function applyHouseholdState(
-  state: LifeDockAppState,
+  state: DiaryDockAppState,
   householdState: Partial<HouseholdState> | null | undefined,
 ) {
   if (!householdState) {
     return state;
   }
 
-  return hydrateLifeDockState({
+  return hydrateDiaryDockState({
     ...state,
     ...Object.fromEntries(
       householdStateKeys
@@ -845,12 +845,12 @@ function inviteAge(createdAt: string) {
 }
 
 function applyHouseholdDirectory(
-  state: LifeDockAppState,
+  state: DiaryDockAppState,
   directory: Awaited<ReturnType<typeof loadHouseholdDirectory>>,
 ) {
   if (!directory) return state;
 
-  return hydrateLifeDockState({
+  return hydrateDiaryDockState({
     ...state,
     householdMembers: directory.members.map((member) => ({
       id: member.userId,
@@ -901,21 +901,21 @@ function applyHouseholdDirectory(
   });
 }
 
-function createSessionRepository(): LifeDockRepository {
+function createSessionRepository(): DiaryDockRepository {
   return {
     mode: "session",
     async load() {
       if (typeof window === "undefined") {
-        return createInitialLifeDockState();
+        return createInitialDiaryDockState();
       }
 
       try {
         const raw = window.sessionStorage.getItem(SESSION_KEY);
         return raw
-          ? hydrateLifeDockState(JSON.parse(raw) as LifeDockAppState)
-          : createInitialLifeDockState();
+          ? hydrateDiaryDockState(JSON.parse(raw) as DiaryDockAppState)
+          : createInitialDiaryDockState();
       } catch {
-        return createInitialLifeDockState();
+        return createInitialDiaryDockState();
       }
     },
     async save(state) {
@@ -932,7 +932,7 @@ function createSessionRepository(): LifeDockRepository {
   };
 }
 
-function createSupabaseRepository(): LifeDockRepository {
+function createSupabaseRepository(): DiaryDockRepository {
   const getCurrentUserId = async () => {
     const client = getSupabaseBrowserClient();
     if (!client) {
@@ -952,12 +952,12 @@ function createSupabaseRepository(): LifeDockRepository {
     async load() {
       const client = getSupabaseBrowserClient();
       if (!client) {
-        return createInitialLifeDockState();
+        return createInitialDiaryDockState();
       }
 
       const userId = await getCurrentUserId();
       if (!userId) {
-        return createInitialLifeDockState();
+        return createInitialDiaryDockState();
       }
 
       const { data: privateData, error: privateError } = await client
@@ -968,8 +968,8 @@ function createSupabaseRepository(): LifeDockRepository {
 
       let privateState =
         !privateError && privateData?.payload
-          ? hydrateLifeDockState(privateData.payload as LifeDockAppState)
-          : createInitialLifeDockState();
+          ? hydrateDiaryDockState(privateData.payload as DiaryDockAppState)
+          : createInitialDiaryDockState();
 
       if (!privateData?.payload) {
         await client.from("app_state").upsert(
@@ -1043,7 +1043,7 @@ function createSupabaseRepository(): LifeDockRepository {
   };
 }
 
-export function createLifeDockRepository(): LifeDockRepository {
+export function createDiaryDockRepository(): DiaryDockRepository {
   return isSupabaseConfigured()
     ? createSupabaseRepository()
     : createSessionRepository();

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { AtticSection } from "@/lib/attic-sections";
 
@@ -75,7 +75,7 @@ function ActionLink({
 }
 
 export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const primaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
   const secondaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
   const primaryDescription =

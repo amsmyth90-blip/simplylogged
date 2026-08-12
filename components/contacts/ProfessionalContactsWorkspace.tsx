@@ -12,7 +12,7 @@ import {
   BillsShell,
   fieldClass,
 } from "@/components/bills/BillsUi";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import type { Reminder } from "@/lib/mock-data";
 import {
@@ -134,7 +134,7 @@ function ContactRow({ contact }: { contact: ProfessionalContact }) {
 }
 
 function Dashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const contacts = state.professionalContacts.contacts;
   const favourites = contacts.filter((contact) => contact.isFavourite);
   const upcoming = contacts
@@ -279,7 +279,7 @@ function Dashboard() {
 }
 
 function Directory() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All categories");
   const [favouritesOnly, setFavouritesOnly] = useState(false);
@@ -523,7 +523,7 @@ function ContactForm({
 
 function NewContact() {
   const router = useRouter();
-  const { updateState } = useLifeDockData();
+  const { updateState } = useDiaryDockData();
   const [draft, setDraft] = useState(() => emptyContact());
   const [error, setError] = useState("");
   const update = <K extends keyof ProfessionalContact>(
@@ -587,7 +587,7 @@ function NewContact() {
 
 function ContactDetail({ contactId }: { contactId: string }) {
   const router = useRouter();
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const original = state.professionalContacts.contacts.find(
     (contact) => contact.id === contactId,
   );
@@ -897,7 +897,7 @@ function ContactDetail({ contactId }: { contactId: string }) {
 }
 
 function Meetings({ contactId }: { contactId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const contact = state.professionalContacts.contacts.find(
     (item) => item.id === contactId,
   );
@@ -1175,7 +1175,7 @@ function categoryFromCsv(value: string): ProfessionalContactCategory {
 }
 
 function ImportContacts() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const [preview, setPreview] = useState<CsvPreview[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");

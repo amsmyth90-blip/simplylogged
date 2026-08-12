@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ChangeEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   BillsAction,
@@ -58,7 +58,7 @@ function documentKind(file: File): VaultDocument["kind"] {
 }
 
 function useHomePolicy() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   return (
     state.insurance.policies.find(
       (policy) =>
@@ -99,7 +99,7 @@ function NoHomePolicy() {
 }
 
 function Dashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const policy = useHomePolicy();
   if (!hydrated)
     return (
@@ -419,7 +419,7 @@ function Cover() {
 }
 
 function Inventory({ highValueOnly = false }: { highValueOnly?: boolean }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = useHomePolicy();
   const [showForm, setShowForm] = useState(false);
   const [room, setRoom] = useState<string>("All");
@@ -760,7 +760,7 @@ function Inventory({ highValueOnly = false }: { highValueOnly?: boolean }) {
 }
 
 function CoverCheck() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = useHomePolicy();
   const stored = policy ? state.insurance.homeCoverChecks.find(
     (check) => check.policyId === policy.id,
@@ -910,7 +910,7 @@ function CoverCheck() {
 
 function Claim() {
   const router = useRouter();
-  const { updateState } = useLifeDockData();
+  const { updateState } = useDiaryDockData();
   const policy = useHomePolicy();
   const claimTypes = [
     "Escape of water",

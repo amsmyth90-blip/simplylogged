@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { type DocumentExtractionResult, type SuggestedRoom } from "@/lib/document-extraction";
 import { sanitizeDocumentFileName, uploadPrivateDocument } from "@/lib/document-storage";
@@ -189,7 +189,7 @@ function buildReviewReasons(extraction: DocumentExtractionResult) {
 }
 
 export function DocumentCaptureWorkspace() {
-  const { repositoryMode, updateState } = useLifeDockData();
+  const { repositoryMode, updateState } = useDiaryDockData();
   const searchParams = useSearchParams();
   const preferredRoomId = searchParams.get("room");
   const preferredRoom = preferredRoomId ? roomDetails[preferredRoomId] : null;
@@ -238,7 +238,7 @@ export function DocumentCaptureWorkspace() {
     setSelectedFiles((current) => current.filter((_, pageIndex) => pageIndex !== index));
   };
 
-  async function saveToLifeDock(
+  async function saveToDiaryDock(
     originalFiles: File[],
     preparedFiles: File[],
     extraction: DocumentExtractionResult,
@@ -410,7 +410,7 @@ export function DocumentCaptureWorkspace() {
       setProcessingStage("organising");
       // Keep the confirmed route visible long enough to understand where the document is going.
       await new Promise((resolve) => window.setTimeout(resolve, 1800));
-      await saveToLifeDock(files, preparedFiles, extraction, {
+      await saveToDiaryDock(files, preparedFiles, extraction, {
         createReminder: shouldCreateReminder,
         reminderTimeLabel: nextReminderTime,
         reminderPriority: extraction.dueDate ? "high" : "normal"

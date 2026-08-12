@@ -86,6 +86,6 @@ header.writeUInt16LE(16, 34);
 header.write('data', 36);
 header.writeUInt32LE(pcm.length, 40);
 
-const output = path.resolve('public/promo-video/lifedock-clean-music.wav');
+const output = path.resolve('public/promo-video/diarydock-clean-music.wav');
 fs.writeFileSync(output, Buffer.concat([header, pcm]));
 console.log(output);

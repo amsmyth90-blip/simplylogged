@@ -23,9 +23,9 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockFamilyFinal: React.FC = () => (
+export const DiaryDockFamilyFinal: React.FC = () => (
   <AbsoluteFill style={{background: navy}}>
-    <Audio src={staticFile('promo-video/lifedock-family-warm.wav')} volume={0.15} />
+    <Audio src={staticFile('promo-video/diarydock-family-warm.wav')} volume={0.15} />
 
     <Sequence durationInFrames={speakerFrames}>
       <Video

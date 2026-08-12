@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ChangeEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   BillsAction,
@@ -137,7 +137,7 @@ function PolicyRow({ policy }: { policy: InsurancePolicy }) {
 }
 
 function Dashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   if (!hydrated)
     return (
       <BillsShell>
@@ -336,7 +336,7 @@ function Dashboard() {
 }
 
 function Policies() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const [query, setQuery] = useState("");
   const [type, setType] = useState("All");
   const [status, setStatus] = useState("All");
@@ -420,7 +420,7 @@ function Policies() {
 
 function NewPolicy() {
   const router = useRouter();
-  const { updateState } = useLifeDockData();
+  const { updateState } = useDiaryDockData();
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const blank = (partial: Partial<InsurancePolicy> = {}) => {
@@ -620,7 +620,7 @@ function NewPolicy() {
 }
 
 function PolicyDetail({ policyId }: { policyId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = state.insurance.policies.find((p) => p.id === policyId);
   const [draft, setDraft] = useState<InsurancePolicy | undefined>(policy);
   const [message, setMessage] = useState("");
@@ -1015,7 +1015,7 @@ function PolicyDetail({ policyId }: { policyId: string }) {
 }
 
 function Review() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const inbox = state.insurance.policies.filter(
     (p) => p.reviewStatus === "needs-review",
   );
@@ -1097,7 +1097,7 @@ function Review() {
 }
 
 function Compare() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const comparable = state.insurance.policies.filter(
     (p) => p.reviewStatus === "reviewed" && p.history.length > 1,
   );
@@ -1168,7 +1168,7 @@ function Compare() {
 }
 
 function Claims() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const [showForm, setShowForm] = useState(false);
   const [evidenceWorking, setEvidenceWorking] = useState("");
   const policies = state.insurance.policies.filter(

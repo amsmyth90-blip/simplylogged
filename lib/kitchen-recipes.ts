@@ -17,7 +17,7 @@ export type KitchenRecipe = {
   instructions: string;
   steps?: KitchenRecipeStep[];
   favourite?: boolean;
-  source: "lifedock" | "scanned" | "themealdb";
+  source: "diarydock" | "scanned" | "themealdb";
   sourceUrl?: string;
 };
 
@@ -261,7 +261,7 @@ export const starterKitchenRecipes: KitchenRecipe[] = [
     ingredients: ["4 salmon fillets", "1 lemon", "2 tbsp chopped fresh herbs", "2 garlic cloves", "2 tbsp olive oil", "250 g asparagus", "Sea salt", "Black pepper"],
     instructions: "Prepare and season the salmon, then roast it with asparagus at 200°C (180°C fan) until it flakes easily. Rest briefly and finish with lemon and herbs.",
     steps: starterRecipeSteps.salmon,
-    source: "lifedock"
+    source: "diarydock"
   },
   {
     id: "roast",
@@ -273,7 +273,7 @@ export const starterKitchenRecipes: KitchenRecipe[] = [
     ingredients: ["1.6 kg whole chicken", "1 kg potatoes", "500 g carrots", "300 g green beans", "8 Yorkshire puddings", "500 ml gravy", "2 tbsp fresh herbs", "Sea salt"],
     instructions: "Season and roast the chicken with potatoes and carrots, checking that the thickest part reaches 75°C. Rest before carving and serve with beans, Yorkshire puddings and gravy.",
     steps: starterRecipeSteps.roast,
-    source: "lifedock"
+    source: "diarydock"
   },
   {
     id: "pasta",
@@ -285,7 +285,7 @@ export const starterKitchenRecipes: KitchenRecipe[] = [
     ingredients: ["320 g pasta", "250 g cherry tomatoes", "1 courgette", "100 g spinach", "60 g parmesan", "1 handful fresh basil", "2 tbsp olive oil", "Black pepper"],
     instructions: "Cook the pasta until al dente while sautéing the vegetables. Toss everything with spinach and pasta water, then finish with parmesan and basil.",
     steps: starterRecipeSteps.pasta,
-    source: "lifedock"
+    source: "diarydock"
   },
   {
     id: "curry",
@@ -297,6 +297,6 @@ export const starterKitchenRecipes: KitchenRecipe[] = [
     ingredients: ["1 x 400 g tin chickpeas", "500 g sweet potato", "100 g spinach", "1 x 400 ml tin coconut milk", "2 tbsp curry spices", "250 g rice", "1 handful coriander", "1 lime"],
     instructions: "Toast the spices, simmer the sweet potato in coconut milk, then add chickpeas and spinach. Serve with rice, coriander and lime.",
     steps: starterRecipeSteps.curry,
-    source: "lifedock"
+    source: "diarydock"
   }
 ];

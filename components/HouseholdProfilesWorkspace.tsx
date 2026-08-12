@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon } from "@/components/UiIcon";
-import type { HouseholdProfile } from "@/lib/lifedock-data";
+import type { HouseholdProfile } from "@/lib/diarydock-data";
 
 type ProfileDraft = Omit<HouseholdProfile, "id" | "linkedUserId">;
 
@@ -56,7 +56,7 @@ function initialsFor(name: string) {
 }
 
 export function HouseholdProfilesWorkspace() {
-  const { state, household, hydrated, canManageHousehold, updateState } = useLifeDockData();
+  const { state, household, hydrated, canManageHousehold, updateState } = useDiaryDockData();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ProfileDraft>(emptyDraft);

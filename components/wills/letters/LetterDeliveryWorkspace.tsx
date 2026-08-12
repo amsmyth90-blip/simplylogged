@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { WillCard, WillPageHeader, WillSectionHeading, formatWillDate } from "@/components/wills/WillUi";
 import { LettersLegalNotice, LetterSafetyNotice, LetterSubpageNav } from "@/components/wills/letters/LettersUi";
 import { hydrateLettersRecord, type LetterDeliveryPreferences, type LetterDeliveryType } from "@/lib/letter-records";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import type { Reminder } from "@/lib/mock-data";
 import { upsertStructuredReminder } from "@/lib/structured-data";
 
@@ -19,7 +19,7 @@ const deliveryOptions: Array<{ value: LetterDeliveryType; title: string; descrip
   { value: "after-death", title: "When I pass away", description: "Requires a future verified post-death process", icon: "shield" }
 ];
 
-function replaceDelivery(state: LifeDockAppState, letterId: string, delivery: LetterDeliveryPreferences) {
+function replaceDelivery(state: DiaryDockAppState, letterId: string, delivery: LetterDeliveryPreferences) {
   const record = hydrateLettersRecord(state.willsWishes.lettersOfWishes);
   const now = new Date().toISOString();
   return {
@@ -34,7 +34,7 @@ function replaceDelivery(state: LifeDockAppState, letterId: string, delivery: Le
   };
 }
 export function LetterDeliveryWorkspace({ letterId }: { letterId: string }) {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const record = hydrateLettersRecord(state.willsWishes.lettersOfWishes);
   const letter = record.letters.find((item) => item.id === letterId) ?? null;
   const [delivery, setDelivery] = useState<LetterDeliveryPreferences>(letter?.delivery ?? {

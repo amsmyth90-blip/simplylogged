@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
 import { quickDials } from "@/lib/mock-data";
 
 export function EmergencyAccessWorkspace() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const emergencyDocuments = state.vaultDocuments.filter((document) => document.emergencyVisible);
 
   return (

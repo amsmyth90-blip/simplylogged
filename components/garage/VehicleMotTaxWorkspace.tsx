@@ -5,7 +5,7 @@ import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { BillsCard, fieldClass } from "@/components/bills/BillsUi";
 import { GarageVehicleSectionNav } from "@/components/garage/GarageVehicleSectionNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import {
@@ -55,7 +55,7 @@ function numberOrNull(value: string) {
 }
 
 export function VehicleMotTaxWorkspace({ vehicleId, view = "overview" }: { vehicleId: string; view?: MotTaxView }) {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const vehicle = state.vehicles.vehicles.find((item) => item.id === vehicleId);
   const [dialog, setDialog] = useState<"mot" | "tax" | null>(null);
   const [message, setMessage] = useState("");

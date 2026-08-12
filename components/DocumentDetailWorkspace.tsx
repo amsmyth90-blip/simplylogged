@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { documentCategoryOptions } from "@/lib/document-extraction";
 import { roomDetails, type Reminder, type VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
@@ -54,7 +54,7 @@ export function DocumentDetailWorkspace({
   backHref = "/files",
   backLabel = "All Files"
 }: DocumentDetailWorkspaceProps) {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState<string | null>(null);
   const [isOpening, setIsOpening] = useState(false);

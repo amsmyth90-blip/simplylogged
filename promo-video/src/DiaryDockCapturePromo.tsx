@@ -62,7 +62,7 @@ const EndScene: React.FC = () => {
   return <AbsoluteFill style={{background: '#f7f8fb', opacity}}><Img src={staticFile('brand/diarydock-video-end-card.png')} style={{width: '100%', height: '100%', objectFit: 'cover'}} /></AbsoluteFill>;
 };
 
-export const LifeDockCapturePromo: React.FC = () => <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
+export const DiaryDockCapturePromo: React.FC = () => <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
   <Sequence durationInFrames={300}><CaptureScene /></Sequence>
   <Sequence from={300} durationInFrames={300}><CalendarScene /></Sequence>
   <Sequence from={600} durationInFrames={180}><EndScene /></Sequence>

@@ -12,7 +12,7 @@ import {
   BillsShell,
   fieldClass,
 } from "@/components/bills/BillsUi";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { BillDocumentAnalysis } from "@/lib/bill-document-analysis";
 import {
@@ -266,7 +266,7 @@ function ContractRow({ contract }: { contract: ContractRecord }) {
 }
 
 function Dashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const reviewed = state.contracts.contracts.filter(
     (contract) => contract.reviewStatus === "reviewed",
   );
@@ -460,7 +460,7 @@ function Dashboard() {
 }
 
 function AllContracts() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("All");
   const [category, setCategory] = useState("All");
@@ -545,7 +545,7 @@ function AllContracts() {
 }
 
 function Checks() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const issues = deriveIssues(state.contracts.contracts);
   const inbox = state.contracts.contracts.filter(
     (contract) => contract.reviewStatus === "needs-review",
@@ -628,7 +628,7 @@ function Checks() {
 
 function NewContract() {
   const router = useRouter();
-  const { updateState } = useLifeDockData();
+  const { updateState } = useDiaryDockData();
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const makeDraft = (partial: Partial<ContractRecord> = {}) => {
@@ -836,7 +836,7 @@ function NewContract() {
 }
 
 function ContractDetail({ contractId }: { contractId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const original = state.contracts.contracts.find(
     (contract) => contract.id === contractId,
   );
@@ -1314,7 +1314,7 @@ function ContractDetail({ contractId }: { contractId: string }) {
 }
 
 function CancellationGuide({ contractId }: { contractId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const contract = state.contracts.contracts.find(
     (item) => item.id === contractId,
   );
@@ -1500,7 +1500,7 @@ function CancellationGuide({ contractId }: { contractId: string }) {
 }
 
 function Forecast() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const active = state.contracts.contracts.filter(
     (contract) =>
       contract.reviewStatus === "reviewed" && contract.status === "active",

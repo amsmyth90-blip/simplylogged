@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const SESSION_STATE_EVENT = "lifedock:session-state";
+const SESSION_STATE_EVENT = "diarydock:session-state";
 
 function isBrowser() {
   return typeof window !== "undefined";

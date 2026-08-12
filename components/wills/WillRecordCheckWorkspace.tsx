@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillLegalNotice, WillPageHeader, WillSectionHeading } from "@/components/wills/WillUi";
 import { getCurrentWillVersion, hydrateWillRecord } from "@/lib/will-records";
 
 export function WillRecordCheckWorkspace() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const record = hydrateWillRecord(state.willsWishes.myWill);
   const current = getCurrentWillVersion(record);
   const document = current ? state.vaultDocuments.find((item) => item.id === current.documentId) : null;

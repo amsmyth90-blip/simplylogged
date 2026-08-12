@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { Reminder } from "@/lib/mock-data";
@@ -311,7 +311,7 @@ function CreateTripWizard({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const { state, updateState, repositoryMode } = useLifeDockData();
+  const { state, updateState, repositoryMode } = useDiaryDockData();
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<TripDraft>(blankTrip);
   const [error, setError] = useState("");
@@ -925,7 +925,7 @@ export function TripsWorkspace({
 }: {
   createOnLoad?: boolean;
 }) {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const [createOpen, setCreateOpen] = useState(createOnLoad);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<TripFilter>("all");

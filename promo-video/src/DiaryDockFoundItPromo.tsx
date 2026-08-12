@@ -97,9 +97,9 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockFoundItPromo: React.FC = () => (
+export const DiaryDockFoundItPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
-    <Audio src={staticFile('promo-video/lifedock-found-it-upbeat.wav')} volume={0.18} />
+    <Audio src={staticFile('promo-video/diarydock-found-it-upbeat.wav')} volume={0.18} />
     <Sequence from={12} durationInFrames={680}>
       <Audio src={staticFile('promo-video/diarydock-found-it-gerry-ni.mp3')} volume={1} />
     </Sequence>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import {
   roomImageLabelClass,
@@ -13,7 +13,7 @@ import {
   roomMarkerHaloClass,
 } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import type { WillsWishesRecord } from "@/lib/lifedock-data";
+import type { WillsWishesRecord } from "@/lib/diarydock-data";
 import type { VaultDocument } from "@/lib/mock-data";
 
 type OfficePanel = "inbox" | "admin" | "documents" | null;
@@ -919,7 +919,7 @@ function OfficeDocumentDashboard({
 }
 
 export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const [panel, setPanel] = useState<OfficePanel>(
     initialDrawer ? "documents" : null,
   );

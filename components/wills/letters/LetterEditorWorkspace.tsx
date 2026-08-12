@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillPageHeader, WillSectionHeading } from "@/components/wills/WillUi";
 import { LettersLegalNotice, LetterSafetyNotice, LetterSubpageNav } from "@/components/wills/letters/LettersUi";
@@ -19,11 +19,11 @@ import {
   type LetterRecipientType,
   type LettersOfWishesRecord
 } from "@/lib/letter-records";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import type { VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument } from "@/lib/structured-data";
 
-function replaceLetters(state: LifeDockAppState, record: LettersOfWishesRecord) {
+function replaceLetters(state: DiaryDockAppState, record: LettersOfWishesRecord) {
   return { ...state, willsWishes: { ...state.willsWishes, lettersOfWishes: record } };
 }
 function readableFileSize(bytes: number) {
@@ -34,7 +34,7 @@ const inputClass = "mt-2 min-h-12 w-full rounded-[15px] border border-[#20352a]/
 
 export function LetterEditorWorkspace({ letterId }: { letterId?: string }) {
   const router = useRouter();
-  const { state, hydrated, repositoryMode, updateState } = useLifeDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const record = hydrateLettersRecord(state.willsWishes.lettersOfWishes);
   const storedLetter = useMemo(() => letterId ? record.letters.find((letter) => letter.id === letterId) ?? null : null, [letterId, record.letters]);
   const [draft, setDraft] = useState<LetterOfWishes>(createLetterDraft);

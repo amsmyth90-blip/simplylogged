@@ -12,7 +12,7 @@ const tone = (frequency, t, harmonics = [1]) =>
 
 const tracks = [
   {
-    file: 'lifedock-found-it-upbeat.wav',
+    file: 'diarydock-found-it-upbeat.wav',
     bpm: 98,
     chords: [[130.81, 164.81, 196], [146.83, 185, 220], [110, 146.83, 196], [98, 130.81, 174.61]],
     melody: [392, 493.88, 523.25, 493.88, 440, 392, 329.63, 392],
@@ -28,7 +28,7 @@ const tracks = [
     },
   },
   {
-    file: 'lifedock-family-warm.wav',
+    file: 'diarydock-family-warm.wav',
     bpm: 86,
     chords: [[130.81, 164.81, 196], [110, 146.83, 174.61], [87.31, 130.81, 164.81], [98, 146.83, 196]],
     melody: [329.63, 392, 440, 392, 293.66, 329.63, 392, 493.88],
@@ -48,7 +48,7 @@ const tracks = [
     },
   },
   {
-    file: 'lifedock-dentist-light.wav',
+    file: 'diarydock-dentist-light.wav',
     bpm: 104,
     chords: [[146.83, 185, 220], [123.47, 164.81, 196], [110, 146.83, 185], [130.81, 164.81, 220]],
     melody: [440, 554.37, 493.88, 659.25, 440, 493.88, 369.99, 493.88],
@@ -66,7 +66,7 @@ const tracks = [
     },
   },
   {
-    file: 'lifedock-paper-bright.wav',
+    file: 'diarydock-paper-bright.wav',
     bpm: 112,
     chords: [[164.81, 207.65, 246.94], [130.81, 174.61, 220], [146.83, 185, 220], [146.83, 196, 246.94]],
     melody: [659.25, 493.88, 587.33, 739.99, 659.25, 587.33, 493.88, 587.33],

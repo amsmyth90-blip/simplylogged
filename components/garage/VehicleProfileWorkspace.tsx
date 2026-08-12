@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { BillsCard, fieldClass } from "@/components/bills/BillsUi";
@@ -240,7 +240,7 @@ function ActionButton({ icon, label, onClick }: { icon: IconName; label: string;
 
 export function VehicleProfileWorkspace({ vehicleId, initialTab = "overview", initialCostsView = "overview" }: { vehicleId: string; initialTab?: VehicleTab; initialCostsView?: VehicleCostView }) {
   const router = useRouter();
-  const { state, hydrated, repositoryMode, updateState } = useLifeDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const tab = initialTab;
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [moreOpen, setMoreOpen] = useState(false);

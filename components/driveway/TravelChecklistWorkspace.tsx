@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import {
@@ -192,7 +192,7 @@ export function TravelChecklistWorkspace({
   initialTripId?: string;
   backHref?: string;
 } = {}) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const availableTrips = useMemo(
     () =>
       state.trips.trips

@@ -6,14 +6,14 @@ import { useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
-import { getOnboardingProgress } from "@/lib/lifedock-data";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { getOnboardingProgress } from "@/lib/diarydock-data";
 import { roomDetails } from "@/lib/mock-data";
 
 const priorityRooms = ["office", "safe-room", "bedroom", "family-room", "garage", "garden", "driveway", "attic"];
 
 export function OnboardingWorkspace() {
-  const { state, repositoryMode, updateState } = useLifeDockData();
+  const { state, repositoryMode, updateState } = useDiaryDockData();
   const onboarding = state.onboarding;
   const progress = getOnboardingProgress(onboarding);
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { healthProfileProgress } from "@/lib/health-records";
@@ -102,7 +102,7 @@ function EmptyPreview({ icon, title, detail }: { icon: IconName; title: string; 
 }
 
 export function BedroomHealthWorkspace() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [addOpen, setAddOpen] = useState(false);

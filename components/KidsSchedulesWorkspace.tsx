@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import type { KidScheduleRoutine } from "@/lib/lifedock-data";
+import type { KidScheduleRoutine } from "@/lib/diarydock-data";
 
 type PlannerMode = "week" | "editor";
 type HouseholdStyle = "children" | "adults" | "shared" | "solo";
@@ -102,7 +102,7 @@ function groupRoutinesBySlot(routines: KidScheduleRoutine[]) {
 }
 
 export function KidsSchedulesWorkspace({ previewEditable = false }: { previewEditable?: boolean }) {
-  const { state, canEditShared, updateState } = useLifeDockData();
+  const { state, canEditShared, updateState } = useDiaryDockData();
   const editable = canEditShared || previewEditable;
   const routines = state.kidSchedules;
   const [mode, setMode] = useState<PlannerMode>("week");
@@ -128,7 +128,7 @@ export function KidsSchedulesWorkspace({ previewEditable = false }: { previewEdi
   }, []);
 
   useEffect(() => {
-    const storedStyle = window.localStorage.getItem("lifedock-household-style");
+    const storedStyle = window.localStorage.getItem("diarydock-household-style");
     if (["children", "adults", "shared", "solo"].includes(storedStyle ?? "")) {
       setHouseholdStyle(storedStyle as HouseholdStyle);
     }

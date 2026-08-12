@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 
 type NavItem = {
   id: string;
@@ -25,7 +25,7 @@ const navItems: NavItem[] = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { household } = useLifeDockData();
+  const { household } = useDiaryDockData();
   const visibleNavItems =
     household?.role === "viewer"
       ? navItems.filter((item) => item.id === "home" || item.id === "family")

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { LifeDockDataProvider, useLifeDockData } from "@/components/LifeDockDataProvider";
+import { DiaryDockDataProvider, useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { RemindersBoard } from "@/components/RemindersBoard";
@@ -64,7 +64,7 @@ function snoozeReminder(reminder: Reminder): Reminder {
 }
 
 function RemindersWorkspaceInner() {
-  const { state, repositoryMode, updateState } = useLifeDockData();
+  const { state, repositoryMode, updateState } = useDiaryDockData();
   const reminders = state.reminders;
   const [draft, setDraft] = useState<ReminderDraft>(defaultDraft);
   const [editingId, setEditingId] = useState<string | null>(null);

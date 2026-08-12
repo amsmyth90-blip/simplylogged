@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { quickDials, roomDetails, type AreaIcon } from "@/lib/mock-data";
 
 type SearchResult = {
@@ -40,7 +40,7 @@ function matchesQuery(result: SearchResult, query: string) {
 }
 
 export function SearchWorkspace() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const [query, setQuery] = useState("");
 
   const sections = useMemo<SearchSection[]>(() => {

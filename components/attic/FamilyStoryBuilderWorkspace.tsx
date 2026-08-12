@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { sanitizeDocumentFileName, uploadPrivateDocument } from "@/lib/document-storage";
 import type { VaultDocument } from "@/lib/mock-data";
@@ -25,7 +25,7 @@ function storyTags(value: string) {
 }
 
 export function FamilyStoryBuilderWorkspace() {
-  const { repositoryMode, updateState } = useLifeDockData();
+  const { repositoryMode, updateState } = useDiaryDockData();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);

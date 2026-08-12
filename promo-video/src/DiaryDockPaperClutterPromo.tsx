@@ -97,9 +97,9 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockPaperClutterPromo: React.FC = () => (
+export const DiaryDockPaperClutterPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
-    <Audio src={staticFile('promo-video/lifedock-paper-bright.wav')} volume={0.18} />
+    <Audio src={staticFile('promo-video/diarydock-paper-bright.wav')} volume={0.18} />
     <Audio src={staticFile('promo-video/diarydock-paper-clutter-sheena-ni.mp3')} volume={1} />
 
     <Sequence durationInFrames={30}>

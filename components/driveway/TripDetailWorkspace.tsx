@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
@@ -826,7 +826,7 @@ export function TripDetailWorkspace({
   section?: TripSection;
 }) {
   const router = useRouter();
-  const { state, updateState, hydrated, repositoryMode } = useLifeDockData();
+  const { state, updateState, hydrated, repositoryMode } = useDiaryDockData();
   const trip = state.trips.trips.find((item) => item.id === tripId);
   const [addMode, setAddMode] = useState<AddMode>(null);
   const [message, setMessage] = useState("");

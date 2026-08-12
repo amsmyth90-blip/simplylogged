@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { WillCard, WillLegalNotice, WillPageHeader, formatWillDate } from "@/components/wills/WillUi";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import { getCurrentWillVersion, hydrateWillRecord, type WillRecord, type WillSummaryReview } from "@/lib/will-records";
 
-function updateWill(state: LifeDockAppState, updater: (record: WillRecord) => WillRecord) {
+function updateWill(state: DiaryDockAppState, updater: (record: WillRecord) => WillRecord) {
   return { ...state, willsWishes: { ...state.willsWishes, myWill: updater(hydrateWillRecord(state.willsWishes.myWill)) } };
 }
 
 export function WillSummaryWorkspace() {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const record = hydrateWillRecord(state.willsWishes.myWill);
   const currentVersion = getCurrentWillVersion(record);
   const document = currentVersion ? state.vaultDocuments.find((item) => item.id === currentVersion.documentId) ?? null : null;

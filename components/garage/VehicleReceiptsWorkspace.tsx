@@ -6,7 +6,7 @@ import { useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } f
 
 import { BillsCard, fieldClass } from "@/components/bills/BillsUi";
 import { GarageVehicleSectionNav } from "@/components/garage/GarageVehicleSectionNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { openPrivateDocument, uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
@@ -35,7 +35,7 @@ function audit(action: string) { return { id: crypto.randomUUID(), action, creat
 
 export function VehicleReceiptsWorkspace({ vehicleId, mode = "overview", receiptId }: { vehicleId: string; mode?: ReceiptsMode; receiptId?: string }) {
   const router = useRouter();
-  const { state, hydrated, repositoryMode, updateState } = useLifeDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const vehicle = state.vehicles.vehicles.find((item) => item.id === vehicleId);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | "All">("All");

@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillPageHeader, formatWillDate } from "@/components/wills/WillUi";
 import { LettersLegalNotice, LetterSubpageNav } from "@/components/wills/letters/LettersUi";
 import { hydrateLettersRecord } from "@/lib/letter-records";
 
 export function LetterVersionsWorkspace({ letterId }: { letterId: string }) {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const record = hydrateLettersRecord(state.willsWishes.lettersOfWishes);
   const letter = record.letters.find((item) => item.id === letterId) ?? null;
   const [message, setMessage] = useState("");

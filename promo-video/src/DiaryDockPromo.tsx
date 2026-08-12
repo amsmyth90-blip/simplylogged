@@ -91,7 +91,7 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockPromo: React.FC = () => (
+export const DiaryDockPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', backgroundColor: ink}}>
     <Audio src={staticFile('promo-video/diarydock-amy-final-voice.mp3')} volume={1} />
     <Sequence durationInFrames={210}>

@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { DocumentCard } from "@/components/DocumentCard";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
@@ -143,7 +143,7 @@ const interactiveRoomObjects: Record<string, RoomObject[]> = {
 export function RoomPage({ room }: RoomPageProps) {
   const router = useRouter();
   const swipeStartX = useRef<number | null>(null);
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const tasks = state.roomTasks[room.id] ?? room.tasks;
   const documents = state.roomDocuments[room.id] ?? room.documents;
   const activity = state.roomActivity[room.id] ?? room.activity;

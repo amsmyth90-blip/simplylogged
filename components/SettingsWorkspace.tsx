@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -19,14 +19,14 @@ type ProfileDraft = {
 
 type DataModalMode = "profile" | "export" | "delete" | null;
 
-function toggleRow(rows: typeof import("@/lib/lifedock-data").initialSettingGroups[number]["rows"], label: string) {
+function toggleRow(rows: typeof import("@/lib/diarydock-data").initialSettingGroups[number]["rows"], label: string) {
   return rows.map((row) =>
     row.kind === "toggle" && row.label === label ? { ...row, value: !row.value } : row
   );
 }
 
 export function SettingsWorkspace() {
-  const { state, repositoryMode, updateState } = useLifeDockData();
+  const { state, repositoryMode, updateState } = useDiaryDockData();
   const profileState = state.settingsProfile;
   const groups = state.settingsGroups;
   const [modal, setModal] = useState<DataModalMode>(null);

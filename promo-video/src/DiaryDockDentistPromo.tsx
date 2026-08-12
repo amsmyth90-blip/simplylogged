@@ -29,9 +29,9 @@ const EndCard: React.FC = () => (
   </AbsoluteFill>
 );
 
-export const LifeDockDentistPromo: React.FC = () => (
+export const DiaryDockDentistPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
-    <Audio src={staticFile('promo-video/lifedock-dentist-light.wav')} volume={0.17} />
+    <Audio src={staticFile('promo-video/diarydock-dentist-light.wav')} volume={0.17} />
     <Sequence durationInFrames={72}><CharacterShot src="promo-video/dentist-mum-1.mp4" /></Sequence>
     <Sequence from={72} durationInFrames={95}><CharacterShot src="promo-video/dentist-dad-1-v3.mp4" /></Sequence>
     <Sequence from={167} durationInFrames={90}><CharacterShot src="promo-video/dentist-mum-2.mp4" /></Sequence>

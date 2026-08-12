@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { RoomHotspotMarker, RoomSceneHeader, roomHotspotClass } from "@/components/RoomSceneChrome";
 import { getPlannedMeal, getWeekDates } from "@/lib/meal-planner";
 
@@ -54,7 +54,7 @@ function MiniCalendar() {
 export function KitchenRoom() {
   const router = useRouter();
   const touchStartX = useRef<number | null>(null);
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const weekDates = getWeekDates();
   const todayIndex = (new Date().getDay() + 6) % 7;
   const tonightMeal = getPlannedMeal(state.mealPlan, weekDates[todayIndex], todayIndex);

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import type { KitchenListItem } from "@/lib/lifedock-data";
+import type { KitchenListItem } from "@/lib/diarydock-data";
 import type { PantryAnalysisResult } from "@/lib/pantry-analysis";
 
 type PantryStage = "capture" | "checking" | "confirm" | "meals" | "shopping";
@@ -54,7 +54,7 @@ function PantryHeader({ onBack }: { onBack?: () => void }) {
 }
 
 export function KitchenPantryPlanner() {
-  const { repositoryMode, state, updateState } = useLifeDockData();
+  const { repositoryMode, state, updateState } = useDiaryDockData();
   const [stage, setStage] = useState<PantryStage>("capture");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);

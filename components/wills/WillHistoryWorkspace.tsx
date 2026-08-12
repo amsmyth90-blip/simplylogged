@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillLegalNotice, WillPageHeader, formatWillDate } from "@/components/wills/WillUi";
 import { openPrivateDocument } from "@/lib/document-storage";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import { hydrateWillRecord, setCurrentWillVersion, type WillRecord } from "@/lib/will-records";
 
-function updateWill(state: LifeDockAppState, updater: (record: WillRecord) => WillRecord) {
+function updateWill(state: DiaryDockAppState, updater: (record: WillRecord) => WillRecord) {
   return { ...state, willsWishes: { ...state.willsWishes, myWill: updater(hydrateWillRecord(state.willsWishes.myWill)) } };
 }
 
 export function WillHistoryWorkspace() {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const record = hydrateWillRecord(state.willsWishes.myWill);
   const [message, setMessage] = useState("");
   const versions = [...record.versions].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());

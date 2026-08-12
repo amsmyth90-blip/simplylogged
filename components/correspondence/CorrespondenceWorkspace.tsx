@@ -12,7 +12,7 @@ import {
   BillsShell,
   fieldClass,
 } from "@/components/bills/BillsUi";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   correspondenceFolders,
@@ -164,7 +164,7 @@ function CorrespondenceRow({ item }: { item: CorrespondenceRecord }) {
 }
 
 function Dashboard() {
-  const { state, hydrated } = useLifeDockData();
+  const { state, hydrated } = useDiaryDockData();
   const items = state.correspondence.correspondence;
   const confirmed = items.filter((item) => item.reviewStatus === "reviewed");
   const unread = confirmed.filter((item) => item.status === "unread");
@@ -292,7 +292,7 @@ function Dashboard() {
 }
 
 function Folders() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [folder, setFolder] = useState("All folders");
@@ -411,7 +411,7 @@ function Folders() {
 
 function NewCorrespondence() {
   const router = useRouter();
-  const { updateState } = useLifeDockData();
+  const { updateState } = useDiaryDockData();
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const makeDraft = (partial: Partial<CorrespondenceRecord> = {}) => {
@@ -606,7 +606,7 @@ function NewCorrespondence() {
 }
 
 function LetterDetail({ correspondenceId }: { correspondenceId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const original = state.correspondence.correspondence.find(
     (item) => item.id === correspondenceId,
   );
@@ -1112,7 +1112,7 @@ function LetterDetail({ correspondenceId }: { correspondenceId: string }) {
 }
 
 function Summary({ correspondenceId }: { correspondenceId: string }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const item = state.correspondence.correspondence.find(
     (entry) => entry.id === correspondenceId,
   );

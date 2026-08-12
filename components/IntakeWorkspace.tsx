@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import type { MailItem } from "@/lib/lifedock-data";
+import type { MailItem } from "@/lib/diarydock-data";
 import { roomDetails, type Reminder, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
 
@@ -64,7 +64,7 @@ function kindForMail(item: MailItem): VaultDocument["kind"] {
 }
 
 export function IntakeWorkspace() {
-  const { state, updateState, repositoryMode } = useLifeDockData();
+  const { state, updateState, repositoryMode } = useDiaryDockData();
   const [filter, setFilter] = useState<MailItem["routeStatus"] | "all">("new");
   const [message, setMessage] = useState("Ready to sort incoming items.");
 

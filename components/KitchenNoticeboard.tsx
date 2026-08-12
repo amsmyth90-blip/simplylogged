@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import type { KitchenNotice, NoticeCategory } from "@/lib/lifedock-data";
+import type { KitchenNotice, NoticeCategory } from "@/lib/diarydock-data";
 import type { Reminder, ReminderGroup } from "@/lib/mock-data";
 import { deleteStructuredReminder, upsertStructuredReminder } from "@/lib/structured-data";
 
@@ -171,7 +171,7 @@ function getNoticePlacement(index: number, total: number): CSSProperties {
 }
 
 export function KitchenNoticeboard() {
-  const { state, updateState, hydrated } = useLifeDockData();
+  const { state, updateState, hydrated } = useDiaryDockData();
   const [filter, setFilter] = useState<(typeof categories)[number]>("All");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState(emptyDraft);

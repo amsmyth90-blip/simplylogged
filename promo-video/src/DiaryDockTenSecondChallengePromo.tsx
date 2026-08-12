@@ -119,9 +119,9 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockTenSecondChallengePromo: React.FC = () => (
+export const DiaryDockTenSecondChallengePromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
-    <Audio src={staticFile('promo-video/lifedock-challenge-countdown.wav')} volume={0.19} />
+    <Audio src={staticFile('promo-video/diarydock-challenge-countdown.wav')} volume={0.19} />
     <Sequence from={8} durationInFrames={712}><Audio src={staticFile('promo-video/diarydock-ten-second-challenge-emily-ni.mp3')} volume={1} /></Sequence>
     <Sequence durationInFrames={120}><CountdownHook /></Sequence>
     <Sequence from={120} durationInFrames={150}><InfoChallenge /></Sequence>

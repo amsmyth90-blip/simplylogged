@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import { EstateDashboard } from "@/components/EstateDashboard";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import { getOnboardingProgress } from "@/lib/lifedock-data";
+import { getOnboardingProgress } from "@/lib/diarydock-data";
 import { readinessScore } from "@/lib/mock-data";
 
 export function DashboardHome() {
@@ -36,7 +36,7 @@ export function DashboardHome() {
     };
   }, []);
 
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const reviewCount = state.vaultDocuments.filter((document) => document.reviewStatus === "needs-review").length;
   const activeReminderCount = state.reminders.filter((reminder) => reminder.group === "today" || reminder.group === "week").length;
   const onboardingProgress = getOnboardingProgress(state.onboarding);

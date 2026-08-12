@@ -37,6 +37,6 @@
   ],
   "exclude": [
     "node_modules",
-    "tools/lifedock-photo-ad"
+    "tools/diarydock-photo-ad"
   ]
 }

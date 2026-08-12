@@ -28,7 +28,7 @@ const EndCard: React.FC = () => (
   </AbsoluteFill>
 );
 
-export const LifeDockFamilyDadOrganisedPromo: React.FC = () => (
+export const DiaryDockFamilyDadOrganisedPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
     <Sequence durationInFrames={450}>
       <CharacterShot src="promo-video/family-dad-organised-final.mp4" />

@@ -24,7 +24,7 @@ const AvatarScene: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#101318', overflow: 'hidden'}}>
       <Video
-        src={staticFile('promo-video/lifedock-avatar-everyday-raw.mp4')}
+        src={staticFile('promo-video/diarydock-avatar-everyday-raw.mp4')}
         objectFit="cover"
         style={{width: '100%', height: '100%'}}
       />
@@ -108,7 +108,7 @@ const EndCard: React.FC = () => {
   );
 };
 
-export const LifeDockAvatarEverydayPromo: React.FC = () => (
+export const DiaryDockAvatarEverydayPromo: React.FC = () => (
   <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
     <Sequence durationInFrames={avatarFrames}>
       <AvatarScene />

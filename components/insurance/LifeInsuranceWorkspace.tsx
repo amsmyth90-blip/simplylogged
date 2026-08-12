@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   BillsAction,
@@ -36,7 +36,7 @@ function LifeInsuranceNotice() {
 }
 
 function useLifePolicy() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   return (
     state.insurance.policies.find(
       (policy) =>
@@ -100,7 +100,7 @@ function NoLifePolicy() {
 }
 
 function Dashboard() {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const policy = useLifePolicy();
   const [message, setMessage] = useState("");
 
@@ -313,7 +313,7 @@ function Dashboard() {
 }
 
 function CoverSummary() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = useLifePolicy();
   const stored = policy
     ? state.insurance.lifePolicyDetails.find(
@@ -552,7 +552,7 @@ function CoverSummary() {
 }
 
 function Beneficiaries() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = useLifePolicy();
   const storedDetails = policy
     ? state.insurance.lifePolicyDetails.find(
@@ -880,7 +880,7 @@ function Beneficiaries() {
 }
 
 function ClaimPack() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const policy = useLifePolicy();
   const stored = policy
     ? state.insurance.lifePolicyDetails.find(

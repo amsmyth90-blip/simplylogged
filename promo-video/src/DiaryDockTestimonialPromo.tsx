@@ -44,7 +44,7 @@ const PromiseScene: React.FC = () => {
   </AbsoluteFill>;
 };
 
-export const LifeDockTestimonialPromo: React.FC = () => <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
+export const DiaryDockTestimonialPromo: React.FC = () => <AbsoluteFill style={{fontFamily: 'Arial, Helvetica, sans-serif', background: navy}}>
   <Audio src={staticFile('promo-video/diarydock-testimonial-sheena-ni.mp3')} />
   <Sequence durationInFrames={300}><FamilyScene /></Sequence>
   <Sequence from={300} durationInFrames={90}><PromiseScene /></Sequence>

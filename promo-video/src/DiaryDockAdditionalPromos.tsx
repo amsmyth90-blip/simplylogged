@@ -11,7 +11,7 @@ const BrandBug: React.FC = () => (
 
 const Footage: React.FC<{trimBefore: number}> = ({trimBefore}) => (
   <AbsoluteFill style={{overflow: 'hidden', background: '#082d61'}}>
-    <Video src={staticFile('promo-video/lifedock-passport-footage-master.mp4')} muted trimBefore={trimBefore} objectFit="cover" style={{width: '100%', height: '100%'}} />
+    <Video src={staticFile('promo-video/diarydock-passport-footage-master.mp4')} muted trimBefore={trimBefore} objectFit="cover" style={{width: '100%', height: '100%'}} />
     <AbsoluteFill style={{background: 'linear-gradient(180deg,rgba(4,22,50,.08),transparent 65%,rgba(4,22,50,.24))'}} />
     <BrandBug />
   </AbsoluteFill>
@@ -37,11 +37,11 @@ export const DiaryDockPassportPromo: React.FC = () => (
 
 export const DiaryDockHomeEmergencyPromo: React.FC = () => (
   <AbsoluteFill style={{background: '#082d61'}}>
-    <Audio src={staticFile('promo-video/lifedock-paper-bright.wav')} volume={0.15} />
+    <Audio src={staticFile('promo-video/diarydock-paper-bright.wav')} volume={0.15} />
     <Sequence from={8} durationInFrames={820}><Audio src={staticFile('promo-video/diarydock-home-emergency-sheena-ni.mp3')} volume={1} /></Sequence>
     <Sequence durationInFrames={720}>
       <AbsoluteFill style={{overflow: 'hidden'}}>
-        <Video src={staticFile('promo-video/lifedock-home-emergency-real-stock-master.mp4')} muted objectFit="cover" style={{width: '100%', height: '100%'}} />
+        <Video src={staticFile('promo-video/diarydock-home-emergency-real-stock-master.mp4')} muted objectFit="cover" style={{width: '100%', height: '100%'}} />
         <AbsoluteFill style={{background: 'linear-gradient(180deg,rgba(4,22,50,.08),transparent 65%,rgba(4,22,50,.22))'}} />
         <BrandBug />
       </AbsoluteFill>

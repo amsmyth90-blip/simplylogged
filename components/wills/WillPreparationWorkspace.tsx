@@ -2,18 +2,18 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillLegalNotice, WillPageHeader, WillSectionHeading } from "@/components/wills/WillUi";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import { createInitialWillRecord, getPreparationProgress, hydrateWillRecord, willPreparationSections, type WillPreparationStatus, type WillRecord } from "@/lib/will-records";
 
-function replaceWill(state: LifeDockAppState, record: WillRecord) {
+function replaceWill(state: DiaryDockAppState, record: WillRecord) {
   return { ...state, willsWishes: { ...state.willsWishes, myWill: record } };
 }
 
 export function WillPreparationWorkspace() {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const stored = hydrateWillRecord(state.willsWishes.myWill);
   const [draft, setDraft] = useState<WillRecord>(createInitialWillRecord);
   const [message, setMessage] = useState("");

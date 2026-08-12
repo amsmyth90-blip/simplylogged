@@ -13,7 +13,7 @@ import {
   getHouseholdInvite,
   type HouseholdInvitePreview
 } from "@/lib/household-sharing";
-import type { Invite } from "@/lib/lifedock-data";
+import type { Invite } from "@/lib/diarydock-data";
 
 type InviteAcceptanceWorkspaceProps = {
   inviteId: string;

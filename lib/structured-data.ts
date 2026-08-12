@@ -1,7 +1,7 @@
 "use client";
 
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
-import type { HouseholdMember, Invite } from "@/lib/lifedock-data";
+import type { HouseholdMember, Invite } from "@/lib/diarydock-data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 function arrayOrEmpty<T>(value: T[] | undefined) {

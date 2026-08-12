@@ -5,7 +5,7 @@ import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { BillsCard, fieldClass } from "@/components/bills/BillsUi";
 import { GarageVehicleSectionNav } from "@/components/garage/GarageVehicleSectionNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import {
@@ -105,7 +105,7 @@ function humanStatus(value: string) {
 }
 
 export function VehicleInsuranceWorkspace({ vehicleId, view = "overview" }: { vehicleId: string; view?: InsuranceView }) {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const vehicle = state.vehicles.vehicles.find((item) => item.id === vehicleId);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [message, setMessage] = useState("");

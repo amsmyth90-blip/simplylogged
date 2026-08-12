@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -37,7 +37,7 @@ const defaultNote = {
 };
 
 export function EmergencyWorkspace(_: EmergencyWorkspaceProps) {
-  const { state, repositoryMode, updateState } = useLifeDockData();
+  const { state, repositoryMode, updateState } = useDiaryDockData();
   const contacts = state.emergencyContacts;
   const plans = state.emergencyPlans;
   const notes = state.homeInfo;

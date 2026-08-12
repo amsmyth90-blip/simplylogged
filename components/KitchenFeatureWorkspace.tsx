@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { KitchenNoticeboard } from "@/components/KitchenNoticeboard";
 import { KitchenPantryPlanner } from "@/components/KitchenPantryPlanner";
 import { KitchenRecipes } from "@/components/KitchenRecipes";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { normaliseRecipeIngredient, scaleRecipeIngredient } from "@/lib/kitchen-recipes";
 import { defaultMeals, getMealKey, getPlannedMeal, getWeekDates, type MealPlanItem } from "@/lib/meal-planner";
@@ -78,7 +78,7 @@ function FeatureShell({ title, subtitle, children }: { title: string; subtitle: 
 }
 
 function FamilyCalendar() {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const now = new Date();
   const [cursor, setCursor] = useState(() => new Date(now.getFullYear(), now.getMonth(), 1));
   const [selected, setSelected] = useState(now.getDate());
@@ -240,7 +240,7 @@ function FamilyCalendar() {
 }
 
 function MealPlanner() {
-  const { repositoryMode, state, updateState } = useLifeDockData();
+  const { repositoryMode, state, updateState } = useDiaryDockData();
   const todayDayIndex = (new Date().getDay() + 6) % 7;
   const [weekOffset, setWeekOffset] = useState(0);
   const [selectedDay, setSelectedDay] = useState(todayDayIndex);
@@ -256,7 +256,7 @@ function MealPlanner() {
   const dragStartRef = useRef({ x: 0, y: 0 });
   const didDragRef = useRef(false);
   const suppressClickRef = useRef(false);
-  const [diners, setDiners] = useStoredState<string[]>("lifedock-meal-diners-v2", []);
+  const [diners, setDiners] = useStoredState<string[]>("diarydock-meal-diners-v2", []);
   const savedMealProfiles = state.householdProfiles.filter((profile) => profile.showInMeals);
   const householdMealProfiles = [
     ...savedMealProfiles,
@@ -754,12 +754,12 @@ function MealPlanner() {
 
 function Recipes() {
   const recipes = [{ id:"roast",name:"Sunday roast chicken",time:"1 hr 30",note:"Family favourite" },{ id:"pasta",name:"Tomato garden pasta",time:"25 min",note:"Quick weekday meal" },{ id:"salmon",name:"Lemon herb salmon",time:"35 min",note:"Fresh and simple" }];
-  const [favourites,setFavourites] = useStoredState<string[]>("lifedock-favourite-recipes", ["roast"]);
+  const [favourites,setFavourites] = useStoredState<string[]>("diarydock-favourite-recipes", ["roast"]);
   return <FeatureShell title="Family recipes" subtitle="The recipes everyone asks for, kept together in the Kitchen."><div className="space-y-3">{recipes.map(recipe => <article key={recipe.id} className="rounded-[24px] border border-white/90 bg-white/76 p-4"><div className="flex items-start justify-between"><div><h2 className="font-semibold">{recipe.name}</h2><p className="mt-1 text-xs text-slate-500">{recipe.time} · {recipe.note}</p></div><button aria-label="Toggle favourite" onClick={() => setFavourites(current => current.includes(recipe.id) ? current.filter(id => id !== recipe.id) : [...current, recipe.id])} className={"flex h-9 w-9 items-center justify-center rounded-full " + (favourites.includes(recipe.id) ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400")}><UiIcon name="star" className="h-4 w-4" /></button></div></article>)}</div></FeatureShell>;
 }
 
 function KitchenDocuments() {
-  const { state } = useLifeDockData();
+  const { state } = useDiaryDockData();
   const saved = state.vaultDocuments.filter(document => document.roomId === "kitchen" || document.roomName === "Kitchen");
   const examples = saved.length ? saved : [{ id:"sample-warranty",title:"Dishwasher Warranty",category:"Home & Property",updated:"Today" },{ id:"sample-manual",title:"Oven User Manual",category:"Home & Property",updated:"Last month" },{ id:"sample-inventory",title:"Kitchen Appliance Inventory",category:"Home & Property",updated:"May" }];
   return <FeatureShell title="Kitchen documents" subtitle="Manuals, warranties, appliance receipts and kitchen records."><Link href="/capture?room=kitchen" className="flex items-center justify-center gap-2 rounded-[22px] bg-[#263b35] py-3.5 text-sm font-semibold text-white"><UiIcon name="plus" className="h-4 w-4" />Add Kitchen document</Link><div className="mt-4 space-y-2.5">{examples.map(document => <article key={document.id} className="flex items-center gap-3 rounded-[22px] border border-white/90 bg-white/78 p-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e7f0e2] text-[#5b7751]"><UiIcon name="file" className="h-5 w-5" /></span><div className="min-w-0"><h2 className="truncate text-sm font-semibold">{document.title}</h2><p className="mt-0.5 text-[11px] text-slate-500">{document.category} · {document.updated}</p></div></article>)}</div></FeatureShell>;

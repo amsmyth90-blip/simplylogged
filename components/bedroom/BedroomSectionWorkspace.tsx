@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { healthProfileProgress, type BedroomSectionId, type HealthTimelineEvent } from "@/lib/health-records";
@@ -70,7 +70,7 @@ function contactName(contact: { firstName: string; lastName: string; company: st
 }
 
 function HealthProfileSection({ emergencyOnly, onMessage }: { emergencyOnly: boolean; onMessage: (message: string) => void }) {
-  const { state, updateState } = useLifeDockData();
+  const { state, updateState } = useDiaryDockData();
   const health = state.health;
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState(health.profile);
@@ -184,7 +184,7 @@ function MiniEmpty({ icon, text, href, label }: { icon: IconName; text: string; 
 }
 
 export function BedroomSectionWorkspace({ section, initiallyAdding = false }: { section: BedroomSectionId; initiallyAdding?: boolean }) {
-  const { state, hydrated, repositoryMode, updateState } = useLifeDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const [adding, setAdding] = useState(initiallyAdding);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [message, setMessage] = useState("");

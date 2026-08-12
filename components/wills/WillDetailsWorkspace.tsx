@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillLegalNotice, WillPageHeader, WillSectionHeading, formatWillDate } from "@/components/wills/WillUi";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import { createInitialWillRecord, getCurrentWillVersion, hydrateWillRecord, type WillRecord, type WillVersionStatus } from "@/lib/will-records";
 
-function replaceWill(state: LifeDockAppState, record: WillRecord): LifeDockAppState {
+function replaceWill(state: DiaryDockAppState, record: WillRecord): DiaryDockAppState {
   return { ...state, willsWishes: { ...state.willsWishes, myWill: record } };
 }
 
@@ -17,7 +17,7 @@ const fieldClass = "mt-2 min-h-12 w-full rounded-[15px] border border-[#20352a]/
 const areaClass = "mt-2 w-full rounded-[15px] border border-[#20352a]/10 bg-white px-3 py-3 text-sm leading-6 text-[#20352a] outline-none transition focus:border-[#6f8e72] focus:ring-2 focus:ring-[#6f8e72]/15";
 
 export function WillDetailsWorkspace() {
-  const { state, hydrated, updateState } = useLifeDockData();
+  const { state, hydrated, updateState } = useDiaryDockData();
   const storedRecord = hydrateWillRecord(state.willsWishes.myWill);
   const [draft, setDraft] = useState<WillRecord>(createInitialWillRecord);
   const [savedMessage, setSavedMessage] = useState("");

@@ -10,31 +10,31 @@ import {
 } from "react";
 
 import {
-  createInitialLifeDockState,
-  createLifeDockRepository,
-  type LifeDockAppState,
+  createInitialDiaryDockState,
+  createDiaryDockRepository,
+  type DiaryDockAppState,
   type RepositoryMode
-} from "@/lib/lifedock-data";
+} from "@/lib/diarydock-data";
 import {
   loadHouseholdDirectory,
   type HouseholdDirectory
 } from "@/lib/household-sharing";
 
-type LifeDockDataContextValue = {
+type DiaryDockDataContextValue = {
   repositoryMode: RepositoryMode;
-  state: LifeDockAppState;
+  state: DiaryDockAppState;
   hydrated: boolean;
   household: HouseholdDirectory | null;
   canManageHousehold: boolean;
   canEditShared: boolean;
-  updateState: (updater: (current: LifeDockAppState) => LifeDockAppState) => void;
+  updateState: (updater: (current: DiaryDockAppState) => DiaryDockAppState) => void;
 };
 
-const LifeDockDataContext = createContext<LifeDockDataContextValue | null>(null);
+const DiaryDockDataContext = createContext<DiaryDockDataContextValue | null>(null);
 
-export function LifeDockDataProvider({ children }: { children: ReactNode }) {
-  const repository = useMemo(() => createLifeDockRepository(), []);
-  const [state, setState] = useState<LifeDockAppState>(createInitialLifeDockState);
+export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
+  const repository = useMemo(() => createDiaryDockRepository(), []);
+  const [state, setState] = useState<DiaryDockAppState>(createInitialDiaryDockState);
   const [household, setHousehold] = useState<HouseholdDirectory | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
@@ -67,7 +67,7 @@ export function LifeDockDataProvider({ children }: { children: ReactNode }) {
     };
   }, [repository]);
 
-  const updateState = (updater: (current: LifeDockAppState) => LifeDockAppState) => {
+  const updateState = (updater: (current: DiaryDockAppState) => DiaryDockAppState) => {
     setState((current) => {
       const next = updater(current);
       void repository.save(next).catch(() => undefined);
@@ -76,7 +76,7 @@ export function LifeDockDataProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LifeDockDataContext.Provider
+    <DiaryDockDataContext.Provider
       value={{
         repositoryMode: repository.mode,
         state,
@@ -91,15 +91,15 @@ export function LifeDockDataProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </LifeDockDataContext.Provider>
+    </DiaryDockDataContext.Provider>
   );
 }
 
-export function useLifeDockData() {
-  const context = useContext(LifeDockDataContext);
+export function useDiaryDockData() {
+  const context = useContext(DiaryDockDataContext);
 
   if (!context) {
-    throw new Error("useLifeDockData must be used within LifeDockDataProvider");
+    throw new Error("useDiaryDockData must be used within DiaryDockDataProvider");
   }
 
   return context;

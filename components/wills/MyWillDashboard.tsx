@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 
-import { useLifeDockData } from "@/components/LifeDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import {
   WillActionLink,
@@ -14,7 +14,7 @@ import {
   formatWillDate
 } from "@/components/wills/WillUi";
 import { openPrivateDocument, uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
-import type { LifeDockAppState } from "@/lib/lifedock-data";
+import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
 import type { WillDocumentAnalysis } from "@/lib/will-document-analysis";
@@ -30,7 +30,7 @@ import {
 
 type UploadStage = "idle" | "uploading" | "processing" | "complete" | "error";
 
-function updateWillState(state: LifeDockAppState, updater: (record: WillRecord) => WillRecord): LifeDockAppState {
+function updateWillState(state: DiaryDockAppState, updater: (record: WillRecord) => WillRecord): DiaryDockAppState {
   return {
     ...state,
     willsWishes: {
@@ -66,7 +66,7 @@ const lifeEvents = [
 ];
 
 export function MyWillDashboard() {
-  const { state, hydrated, repositoryMode, updateState } = useLifeDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const record = hydrateWillRecord(state.willsWishes.myWill);
   const currentVersion = getCurrentWillVersion(record);
