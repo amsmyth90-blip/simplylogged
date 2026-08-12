@@ -123,7 +123,7 @@ export async function POST(request: Request) {
       text: {
         format: {
           type: "json_schema",
-          name: "lifedock_notice_extraction",
+          name: "diarydock_notice_extraction",
           schema: noticeSchema,
           strict: true
         }

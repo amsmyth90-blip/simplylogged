@@ -5,7 +5,7 @@ A 30-second, 1080×1920 vertical social promo built with Remotion, including Amy
 Render from the repository root:
 
 ```powershell
-npx remotion render promo-video/index.ts LifeDockPromo output/diarydock-promo.mp4
+npx remotion render promo-video/index.ts DiaryDockPromo output/diarydock-promo.mp4
 ```
 
 The generated people are fictional. The video is designed to work silently with on-screen copy, making it suitable for autoplay social feeds.

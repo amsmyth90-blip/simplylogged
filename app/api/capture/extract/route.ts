@@ -176,7 +176,7 @@ export async function POST(request: Request) {
       text: {
         format: {
           type: "json_schema",
-          name: analysisMode === "will" ? "diarydock_will_document_analysis" : analysisMode === "bill" ? "diarydock_bill_document_analysis" : analysisMode === "insurance" ? "diarydock_insurance_document_analysis" : analysisMode === "receipt" ? "diarydock_vehicle_receipt_analysis" : "lifedock_document_extraction",
+          name: analysisMode === "will" ? "diarydock_will_document_analysis" : analysisMode === "bill" ? "diarydock_bill_document_analysis" : analysisMode === "insurance" ? "diarydock_insurance_document_analysis" : analysisMode === "receipt" ? "diarydock_vehicle_receipt_analysis" : "diarydock_document_extraction",
           schema: analysisMode === "will" ? willDocumentAnalysisSchema : analysisMode === "bill" ? billDocumentAnalysisSchema : analysisMode === "insurance" ? insuranceDocumentAnalysisSchema : analysisMode === "receipt" ? receiptDocumentAnalysisSchema : documentExtractionSchema,
           strict: true
         }

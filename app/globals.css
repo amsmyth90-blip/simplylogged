@@ -92,18 +92,18 @@ body.kids-schedules-immersive > div {
   @apply inline-flex items-center gap-1.5 rounded-full border border-white/75 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-ink/60 backdrop-blur-md;
 }
 
-@keyframes lifedock-scan {
+@keyframes diarydock-scan {
   0%, 100% { top: 7%; opacity: 0.45; }
   50% { top: 91%; opacity: 1; }
 }
 
-.lifedock-scan-line {
-  animation: lifedock-scan 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+.diarydock-scan-line {
+  animation: diarydock-scan 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
-@keyframes lifedock-route {
+@keyframes diarydock-route {
   to { stroke-dashoffset: -36; }
 }
 
-.lifedock-route-line {
-  animation: lifedock-route 1.6s linear infinite;
+.diarydock-route-line {
+  animation: diarydock-route 1.6s linear infinite;
 }

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "promo:render": "remotion render promo-video/index.ts LifeDockPromo output/diarydock-promo.mp4",
+    "promo:render": "remotion render promo-video/index.ts DiaryDockPromo output/diarydock-promo.mp4",
     "icons:generate": "node tools/generate-app-icons.mjs"
   },
   "dependencies": {

@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       text: {
         format: {
           type: "json_schema",
-          name: "lifedock_pantry_analysis",
+          name: "diarydock_pantry_analysis",
           schema: pantryAnalysisSchema,
           strict: true
         }

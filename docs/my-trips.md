@@ -2,7 +2,7 @@
 
 ## Architecture
 
-My Trips is part of the existing Driveway/Travel Room and uses the authenticated DiaryDock app shell. Trip data is stored inside the existing per-user `app_state` payload through `LifeDockDataProvider`. In Supabase mode that row is protected by the existing owner-only Row Level Security policy. Session mode uses the existing session repository.
+My Trips is part of the existing Driveway/Travel Room and uses the authenticated DiaryDock app shell. Trip data is stored inside the existing per-user `app_state` payload through the shared DiaryDock data provider. In Supabase mode that row is protected by the existing owner-only Row Level Security policy. Session mode uses the existing session repository.
 
 The feature deliberately reuses canonical DiaryDock records:
 

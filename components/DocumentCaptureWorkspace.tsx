@@ -604,7 +604,7 @@ export function DocumentCaptureWorkspace() {
                 {filingRoom}
               </div>
               <svg aria-hidden="true" viewBox="0 0 340 260" className="pointer-events-none absolute inset-0 h-full w-full">
-                <path d={filingRoutePath} fill="none" stroke="rgba(151,203,126,0.95)" strokeWidth="4" strokeLinecap="round" strokeDasharray="3 8" className="lifedock-route-line drop-shadow-[0_0_5px_rgba(128,190,106,0.9)]" />
+                <path d={filingRoutePath} fill="none" stroke="rgba(151,203,126,0.95)" strokeWidth="4" strokeLinecap="round" strokeDasharray="3 8" className="diarydock-route-line drop-shadow-[0_0_5px_rgba(128,190,106,0.9)]" />
                 <circle cx={filingTargetX} cy="140" r="7" fill="rgba(223,242,215,0.88)" stroke="rgba(104,145,88,0.95)" strokeWidth="3" className="drop-shadow-[0_0_7px_rgba(128,190,106,0.95)]" />
               </svg>
             </div>

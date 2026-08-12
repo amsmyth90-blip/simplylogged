@@ -17,7 +17,7 @@ import {DiaryDockHomeEmergencyPromo, DiaryDockPassportPromo} from './DiaryDockAd
 export const RemotionRoot: React.FC = () => (
   <>
     <Composition
-      id="LifeDockPromo"
+      id="DiaryDockPromo"
       component={LifeDockPromo}
       durationInFrames={900}
       fps={30}
@@ -25,7 +25,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockCapturePromo"
+      id="DiaryDockCapturePromo"
       component={LifeDockCapturePromo}
       durationInFrames={780}
       fps={30}
@@ -33,7 +33,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockTestimonialPromo"
+      id="DiaryDockTestimonialPromo"
       component={LifeDockTestimonialPromo}
       durationInFrames={540}
       fps={30}
@@ -41,7 +41,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockFamilyFinal"
+      id="DiaryDockFamilyFinal"
       component={LifeDockFamilyFinal}
       durationInFrames={277}
       fps={30}
@@ -49,7 +49,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockDentistPromo"
+      id="DiaryDockDentistPromo"
       component={LifeDockDentistPromo}
       durationInFrames={918}
       fps={30}
@@ -57,7 +57,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockPaperClutterPromo"
+      id="DiaryDockPaperClutterPromo"
       component={LifeDockPaperClutterPromo}
       durationInFrames={810}
       fps={30}
@@ -65,7 +65,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockThingsThatMatterPromo"
+      id="DiaryDockThingsThatMatterPromo"
       component={LifeDockThingsThatMatterPromo}
       durationInFrames={1080}
       fps={30}
@@ -73,7 +73,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockFamilyDadOrganisedPromo"
+      id="DiaryDockFamilyDadOrganisedPromo"
       component={LifeDockFamilyDadOrganisedPromo}
       durationInFrames={720}
       fps={30}
@@ -81,7 +81,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockFoundItPromo"
+      id="DiaryDockFoundItPromo"
       component={LifeDockFoundItPromo}
       durationInFrames={750}
       fps={30}
@@ -89,7 +89,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockAvatarEverydayPromo"
+      id="DiaryDockAvatarEverydayPromo"
       component={LifeDockAvatarEverydayPromo}
       durationInFrames={722}
       fps={30}
@@ -97,7 +97,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockTenSecondChallengePromo"
+      id="DiaryDockTenSecondChallengePromo"
       component={LifeDockTenSecondChallengePromo}
       durationInFrames={840}
       fps={30}
@@ -105,7 +105,7 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
     />
     <Composition
-      id="LifeDockRoomsPromo"
+      id="DiaryDockRoomsPromo"
       component={LifeDockRoomsPromo}
       durationInFrames={900}
       fps={30}

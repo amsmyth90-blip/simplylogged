@@ -26,8 +26,8 @@ grant select, insert, update on table public.app_state to authenticated;
 
 alter table public.app_state enable row level security;
 
-drop policy if exists "LifeDock app state access" on public.app_state;
-create policy "LifeDock app state access"
+drop policy if exists "DiaryDock app state access" on public.app_state;
+create policy "DiaryDock app state access"
 on public.app_state
 for all
 to authenticated
@@ -204,16 +204,16 @@ grant select, insert, update, delete on table public.reminders to authenticated;
 alter table public.documents enable row level security;
 alter table public.reminders enable row level security;
 
-drop policy if exists "LifeDock document row access" on public.documents;
-create policy "LifeDock document row access"
+drop policy if exists "DiaryDock document row access" on public.documents;
+create policy "DiaryDock document row access"
 on public.documents
 for all
 to authenticated
 using (user_id = (select auth.uid()))
 with check (user_id = (select auth.uid()));
 
-drop policy if exists "LifeDock reminder row access" on public.reminders;
-create policy "LifeDock reminder row access"
+drop policy if exists "DiaryDock reminder row access" on public.reminders;
+create policy "DiaryDock reminder row access"
 on public.reminders
 for all
 to authenticated
@@ -318,24 +318,24 @@ alter table public.household_members enable row level security;
 alter table public.family_invites enable row level security;
 alter table public.document_permissions enable row level security;
 
-drop policy if exists "LifeDock household member row access" on public.household_members;
-create policy "LifeDock household member row access"
+drop policy if exists "DiaryDock household member row access" on public.household_members;
+create policy "DiaryDock household member row access"
 on public.household_members
 for all
 to authenticated
 using (user_id = (select auth.uid()))
 with check (user_id = (select auth.uid()));
 
-drop policy if exists "LifeDock family invite row access" on public.family_invites;
-create policy "LifeDock family invite row access"
+drop policy if exists "DiaryDock family invite row access" on public.family_invites;
+create policy "DiaryDock family invite row access"
 on public.family_invites
 for all
 to authenticated
 using (user_id = (select auth.uid()))
 with check (user_id = (select auth.uid()));
 
-drop policy if exists "LifeDock document permission row access" on public.document_permissions;
-create policy "LifeDock document permission row access"
+drop policy if exists "DiaryDock document permission row access" on public.document_permissions;
+create policy "DiaryDock document permission row access"
 on public.document_permissions
 for all
 to authenticated

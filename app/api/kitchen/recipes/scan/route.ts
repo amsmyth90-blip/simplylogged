@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     text: {
       format: {
         type: "json_schema",
-        name: "lifedock_recipe_scan",
+        name: "diarydock_recipe_scan",
         schema: recipeSchema,
         strict: true
       }
