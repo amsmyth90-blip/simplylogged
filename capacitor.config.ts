@@ -9,7 +9,20 @@ const config: CapacitorConfig = {
     cleartext: false
   },
   ios: {
-    contentInset: "always"
+    contentInset: "always",
+    limitsNavigationsToAppBoundDomains: false
+  },
+  plugins: {
+    Camera: {
+      ios: {
+        NSCameraUsageDescription:
+          "DiaryDock uses the camera so you can scan documents and keep household records organised.",
+        NSPhotoLibraryUsageDescription:
+          "DiaryDock lets you choose photos or documents from your library to add to your private records.",
+        NSPhotoLibraryAddUsageDescription:
+          "DiaryDock may save generated images or document previews to your photo library if you choose to export them."
+      }
+    }
   }
 };
 

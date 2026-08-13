@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "promo:render": "remotion render promo-video/index.ts DiaryDockPromo output/diarydock-promo.mp4",
-    "icons:generate": "node tools/generate-app-icons.mjs"
+    "icons:generate": "node tools/generate-app-icons.mjs",
+    "assets:generate": "npm run icons:generate && npx --yes @capacitor/assets@3.0.5 generate --ios",
+    "ios:sync": "npm run assets:generate && npx cap sync ios",
+    "release:testflight": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/create-testflight-release.ps1"
   },
   "dependencies": {
     "@capacitor/core": "^8.4.2",

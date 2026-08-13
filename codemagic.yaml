@@ -5,7 +5,7 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       groups:
-        - appstore_credentials # add in Codemagic UI: APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY
+        - appstore_credentials # Codemagic UI: add App Store Connect API key integration or variables listed in docs/testflight-setup.md
       vars:
         BUNDLE_ID: "com.diarydock.app"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
@@ -18,7 +18,9 @@ workflows:
         - tag
       tag_patterns:
         - pattern: "ios-*"
-          include_glob_notify_only: true
+          include: true
+        - pattern: "*"
+          include: false
     scripts:
       - name: Install npm dependencies
         script: |
@@ -34,6 +36,15 @@ workflows:
       - name: Sync Capacitor
         script: |
           npx cap sync ios
+      - name: Configure iOS permissions and build settings
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName DiaryDock" ios/App/App/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string DiaryDock uses the camera so you can scan documents and keep household records organised." ios/App/App/Info.plist || \
+          /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription DiaryDock uses the camera so you can scan documents and keep household records organised." ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string DiaryDock lets you choose photos or documents from your library to add to your private records." ios/App/App/Info.plist || \
+          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryUsageDescription DiaryDock lets you choose photos or documents from your library to add to your private records." ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string DiaryDock may save generated images or document previews to your photo library if you choose to export them." ios/App/App/Info.plist || \
+          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryAddUsageDescription DiaryDock may save generated images or document previews to your photo library if you choose to export them." ios/App/App/Info.plist
       - name: Set up code signing certificates and provisioning profiles
         script: |
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
@@ -48,7 +59,12 @@ workflows:
           cd ios/App && pod install
       - name: Increment build number
         script: |
-          cd ios/App && agvtool new-version -all "$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" | awk '{print $1+1}')"
+          cd ios/App
+          latest_build_number="$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" 2>/dev/null | awk '{print $1+1}')"
+          if [ -z "$latest_build_number" ]; then
+            latest_build_number="$BUILD_NUMBER"
+          fi
+          agvtool new-version -all "$latest_build_number"
       - name: Build and archive
         script: |
           xcode-project build-ipa \
