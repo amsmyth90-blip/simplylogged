@@ -9,11 +9,14 @@
     "lint": "eslint .",
     "promo:render": "remotion render promo-video/index.ts DiaryDockPromo output/diarydock-promo.mp4",
     "icons:generate": "node tools/generate-app-icons.mjs",
-    "assets:generate": "npm run icons:generate && npx --yes @capacitor/assets@3.0.5 generate --ios",
+    "assets:generate": "npm run icons:generate && npx --yes @capacitor/assets@3.0.5 generate --ios --android",
     "ios:sync": "npm run assets:generate && npx cap sync ios",
-    "release:testflight": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/create-testflight-release.ps1"
+    "android:sync": "npm run assets:generate && npx cap sync android",
+    "release:testflight": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/create-testflight-release.ps1",
+    "release:android": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/create-android-release.ps1"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
     "@capacitor/core": "^8.4.2",
     "@capacitor/ios": "^8.4.2",
     "@remotion/media": "^4.0.494",

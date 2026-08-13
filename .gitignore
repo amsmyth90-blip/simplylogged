@@ -18,5 +18,8 @@ tmp-diarydock-dummy-bill.png
 # Generated iOS project lives on the CI runner, not in the repo
 ios/
 
+# Generated Android project lives on the CI runner, not in the repo
+android/
+
 # Supabase local link/cache metadata
 supabase/.temp/
