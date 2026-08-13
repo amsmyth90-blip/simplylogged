@@ -26,9 +26,9 @@ if ($existing) {
   throw "Tag '$tag' already exists. Choose a new version or delete the old tag intentionally."
 }
 
-$status = git status --porcelain
+$status = git status --porcelain --untracked-files=no
 if ($status) {
-  throw "Working tree is not clean. Commit or stash changes before creating an Android release tag."
+  throw "Tracked files are not clean. Commit or stash tracked changes before creating an Android release tag."
 }
 
 git tag -a $tag -m "DiaryDock Android developer APK $Version"
