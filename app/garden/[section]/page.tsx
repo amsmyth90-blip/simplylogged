@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { BottomNav } from "@/components/BottomNav";
-import { GardenSectionPlaceholder } from "@/components/garden/GardenSectionPlaceholder";
+import { GardenSectionWorkspace } from "@/components/garden/GardenSectionWorkspace";
 import { requireUser } from "@/lib/auth";
 import { gardenSections, getGardenSection, isGardenSection } from "@/lib/garden-sections";
 
@@ -22,10 +21,5 @@ export default async function GardenSectionPage({ params }: GardenSectionPagePro
   const { section } = await params;
   if (!isGardenSection(section)) notFound();
 
-  return (
-    <>
-      <GardenSectionPlaceholder section={getGardenSection(section)} />
-      <BottomNav />
-    </>
-  );
+  return <GardenSectionWorkspace section={getGardenSection(section)} />;
 }
