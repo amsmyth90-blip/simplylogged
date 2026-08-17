@@ -36,3 +36,6 @@ Codemagic should then run the `DiaryDock Android - Developer APK` workflow and p
 - The Android app loads `https://diarydock.com`, so deploy the web app before making a test APK.
 - A debug APK is fine for your own testing, but if you later want family testers through Google Play, create a signed release build and use Google Play internal testing.
 - Google Play release setup needs a Play Console account, a keystore, and app listing/privacy information.
+- Google Play also needs public URLs for privacy and account deletion:
+  - `https://diarydock.com/privacy`
+  - `https://diarydock.com/account-deletion`

@@ -10,7 +10,7 @@ export default function TermsPage() {
       eyebrow="Terms"
       title="Terms of Use"
       subtitle="The terms that apply when you use DiaryDock."
-      effectiveDate="8 August 2026"
+      effectiveDate="17 August 2026"
       sections={[
         {
           title: "Acceptance of terms",
@@ -50,7 +50,7 @@ export default function TermsPage() {
         {
           title: "Termination",
           body: [
-            "You may stop using DiaryDock and request account deletion at any time via Settings or by contacting support. We may suspend or terminate accounts that violate these terms or misuse the service."
+            "You may stop using DiaryDock and request account deletion at any time via Settings, /account-deletion, or by contacting support. We may suspend or terminate accounts that violate these terms or misuse the service."
           ]
         },
         {

@@ -89,7 +89,7 @@ export function SettingsWorkspace() {
     }
 
     setRequestMessage(
-      "Deletion request recorded for MVP testing. Before public launch this should create a support ticket and start a formal retention window."
+      "Your deletion request has been recorded. We will verify account ownership and process eligible account data within 30 days."
     );
   };
 
@@ -234,6 +234,17 @@ export function SettingsWorkspace() {
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </Link>
 
+            <Link href="/cookies" className="flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-white/60">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/45 text-moss">
+                <UiIcon name="gear" className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-ink">Cookie Policy</span>
+                <span className="mt-0.5 block text-xs text-ink/50">Essential cookies and local storage</span>
+              </span>
+              <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
+            </Link>
+
             <button
               type="button"
               onClick={() => setModal("export")}
@@ -259,10 +270,21 @@ export function SettingsWorkspace() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">Request account deletion</span>
-                <span className="mt-0.5 block text-xs text-ink/50">MVP-safe deletion request flow</span>
+                <span className="mt-0.5 block text-xs text-ink/50">Ask us to delete your account and data</span>
               </span>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </button>
+
+            <Link href="/account-deletion" className="flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-white/60">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blush text-orange-700">
+                <UiIcon name="file" className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-ink">Deletion information</span>
+                <span className="mt-0.5 block text-xs text-ink/50">What is deleted and how long it takes</span>
+              </span>
+              <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
+            </Link>
           </div>
         </section>
 
@@ -293,13 +315,13 @@ export function SettingsWorkspace() {
         <section className="space-y-3">
           <SectionHeader title="Support" />
           <div className="estate-sheet divide-y divide-white/60 overflow-hidden">
-            <div className="flex items-center gap-3.5 px-4 py-3.5">
+            <Link href="/support" className="flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-white/60">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-ink">Help centre</p>
-                <p className="mt-0.5 text-xs text-ink/50">Guides for rooms, All Files, and sharing</p>
+                <p className="text-sm font-semibold text-ink">Support centre</p>
+                <p className="mt-0.5 text-xs text-ink/50">Account, privacy, and app help</p>
               </div>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
-            </div>
+            </Link>
             <div className="flex items-center gap-3.5 px-4 py-3.5">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-ink">App version</p>
@@ -325,7 +347,7 @@ export function SettingsWorkspace() {
             ? "Stored through the DiaryDock data layer."
             : modal === "export"
               ? "Prepare a local JSON copy of this DiaryDock estate."
-              : "This records a deletion request for MVP testing."
+              : "Ask DiaryDock to delete your account and eligible personal data."
         }
         onClose={closeModal}
         footer={
@@ -395,10 +417,10 @@ export function SettingsWorkspace() {
         {modal === "delete" ? (
           <div className="space-y-4">
             <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3">
-              <p className="text-sm font-semibold text-orange-800">Deletion is not instant in MVP testing</p>
+              <p className="text-sm font-semibold text-orange-800">Deletion is reviewed before processing</p>
               <p className="mt-1 text-xs leading-5 text-orange-700">
-                This records the user's intention. Before public launch, this should connect to a real deletion workflow,
-                retention period, and confirmation email.
+                We verify account ownership first, then delete eligible account data and uploaded content within 30 days.
+                Some records may remain briefly in backups or where legally required.
               </p>
             </div>
             <label className="block space-y-2">

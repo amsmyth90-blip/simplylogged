@@ -10,7 +10,10 @@ Copy/paste starting point for the App Store Connect listing. Review and adjust b
 - **Bundle ID**: `com.diarydock.app`
 - **Primary category**: Productivity
 - **Secondary category**: Lifestyle
-- **Support URL**: `https://diarydock.com/settings` (or a dedicated support page if you make one)
+- **Support URL**: `https://diarydock.com/support`
+- **Privacy Policy URL**: `https://diarydock.com/privacy`
+- **Account deletion URL**: `https://diarydock.com/account-deletion`
+- **Cookie Policy URL**: `https://diarydock.com/cookies`
 - **Marketing URL**: `https://diarydock.com`
 - **Support email**: `hello@diarydock.com` (create this inbox before submitting — referenced in the in-app Privacy/Terms pages)
 
@@ -58,6 +61,20 @@ Fill this in via App Store Connect → App Privacy. Based on the current codebas
 | Usage data / diagnostics | Depends on hosting analytics — confirm if Vercel Analytics or similar is enabled | — | No | App performance |
 
 None of the above should require "Data Used to Track You" (no ad tracking / no data broker sharing in the current app). Double-check this table against the actual final build before submitting — it's a legal declaration to Apple, not just marketing copy.
+
+## Account deletion
+
+Apple and Google both expect users to be able to request account/data deletion. DiaryDock now has:
+
+- In-app route: Settings -> Privacy, terms & data -> Request account deletion
+- Public route: `https://diarydock.com/account-deletion`
+- Support email: `hello@diarydock.com`
+
+Before public release, connect the deletion request to a real admin/support process that removes the Supabase Auth user, `app_state`, owned household records, private storage files, and eligible shared-access records.
+
+## Cookies and local storage
+
+Use `https://diarydock.com/cookies` as the public cookie policy. Current app behaviour is essential auth cookies and local/session storage only; no advertising cookies or third-party marketing pixels are implemented.
 
 ## Screenshots (required)
 
