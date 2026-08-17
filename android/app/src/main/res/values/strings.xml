@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DiaryDock</string>
+    <string name="title_activity_main">DiaryDock</string>
+    <string name="package_name">com.diarydock.app</string>
+    <string name="custom_url_scheme">com.diarydock.app</string>
+</resources>
