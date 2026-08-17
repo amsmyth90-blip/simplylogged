@@ -79,6 +79,19 @@ async function deleteWhere(client: SupabaseClient, table: string, column: string
   }
 }
 
+function isMissingOptionalTableError(message: string) {
+  return message.includes("Could not find the table") ||
+    (message.includes("relation") && message.includes("does not exist")) ||
+    message.includes("schema cache");
+}
+
+async function deleteWhereIfTableExists(client: SupabaseClient, table: string, column: string, value: string) {
+  const { error } = await client.from(table).delete().eq(column, value);
+  if (error && !isMissingOptionalTableError(error.message)) {
+    throw new Error(`${table}: ${error.message}`);
+  }
+}
+
 export async function processAccountDeletion(
   client: SupabaseClient,
   requestId: string,
@@ -109,11 +122,11 @@ export async function processAccountDeletion(
 
   const deletedStorageObjects = await removeStoragePrefix(client, DOCUMENT_BUCKET, userId);
 
-  await deleteWhere(client, "document_permissions", "owner_id", userId);
+  await deleteWhereIfTableExists(client, "document_permissions", "owner_id", userId);
   await deleteWhere(client, "documents", "user_id", userId);
   await deleteWhere(client, "reminders", "user_id", userId);
-  await deleteWhere(client, "household_members", "user_id", userId);
-  await deleteWhere(client, "family_invites", "user_id", userId);
+  await deleteWhereIfTableExists(client, "household_members", "user_id", userId);
+  await deleteWhereIfTableExists(client, "family_invites", "user_id", userId);
   await deleteWhere(client, "app_state", "id", userId);
 
   const { error: inviteError } = await client
@@ -121,7 +134,7 @@ export async function processAccountDeletion(
     .delete()
     .or(`invited_by.eq.${userId},accepted_by.eq.${userId}`);
 
-  if (inviteError) {
+  if (inviteError && !isMissingOptionalTableError(inviteError.message)) {
     throw new Error(`household_invites: ${inviteError.message}`);
   }
 
