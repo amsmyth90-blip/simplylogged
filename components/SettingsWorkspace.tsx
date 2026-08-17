@@ -339,6 +339,16 @@ export function SettingsWorkspace() {
         <section className="space-y-3">
           <SectionHeader title="Support" />
           <div className="estate-sheet divide-y divide-white/60 overflow-hidden">
+            <a href="mailto:hello@diarydock.com?subject=DiaryDock%20support" className="flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-white/60">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/55 text-moss">
+                <UiIcon name="mail" className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-ink">Email support</p>
+                <p className="mt-0.5 text-xs text-ink/50">hello@diarydock.com</p>
+              </div>
+              <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
+            </a>
             <Link href="/support" className="flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-white/60">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-ink">Support centre</p>

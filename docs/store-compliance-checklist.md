@@ -45,7 +45,7 @@ Use these URLs in App Store Connect and Google Play Console:
 
 ## Required operational follow-up before public launch
 
-- Create and monitor `hello@diarydock.com`.
+- Confirm `hello@diarydock.com` remains monitored. DNS currently routes DiaryDock email through Zoho Mail (`mx.zoho.eu`, SPF and Zoho verification present). A test message sent to `hello@diarydock.com` on 17 August 2026 arrived in Amy's monitored Outlook inbox.
 - Add `SUPABASE_SERVICE_ROLE_KEY`, `ACCOUNT_DELETION_ADMIN_TOKEN` and `ACCOUNT_DELETION_ADMIN_EMAILS` to Vercel production environment variables.
 - Apply the Supabase migration `20260817103000_account_deletion_requests.sql`.
 - Review pending deletion requests in `public.account_deletion_requests` or the protected internal page at `/admin/account-deletion`.
