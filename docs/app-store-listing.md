@@ -70,7 +70,7 @@ Apple and Google both expect users to be able to request account/data deletion. 
 - Public route: `https://diarydock.com/account-deletion`
 - Support email: `hello@diarydock.com`
 
-Before public release, make sure the production environment has `SUPABASE_SERVICE_ROLE_KEY` and `ACCOUNT_DELETION_ADMIN_TOKEN` configured. Verified deletion requests can then be processed through the server-only admin endpoint documented in `docs/store-compliance-checklist.md`.
+Before public release, make sure the production environment has `SUPABASE_SERVICE_ROLE_KEY`, `ACCOUNT_DELETION_ADMIN_TOKEN` and `ACCOUNT_DELETION_ADMIN_EMAILS` configured. Verified deletion requests can then be reviewed in `/admin/account-deletion` or processed through the server-only admin endpoint documented in `docs/store-compliance-checklist.md`.
 
 ## Cookies and local storage
 
