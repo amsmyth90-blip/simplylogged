@@ -8,7 +8,7 @@ import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
-import { UiIcon, type IconName } from "@/components/UiIcon";
+import { UiIcon } from "@/components/UiIcon";
 import { vaultSecurity } from "@/lib/mock-data";
 
 type ProfileDraft = {
@@ -31,6 +31,7 @@ export function SettingsWorkspace() {
   const groups = state.settingsGroups;
   const [modal, setModal] = useState<DataModalMode>(null);
   const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteRequestBusy, setDeleteRequestBusy] = useState(false);
   const [requestMessage, setRequestMessage] = useState<string | null>(null);
   const [profileDraft, setProfileDraft] = useState<ProfileDraft>({
     name: profileState.name,
@@ -50,6 +51,7 @@ export function SettingsWorkspace() {
   const closeModal = () => {
     setModal(null);
     setDeleteConfirm("");
+    setDeleteRequestBusy(false);
     setRequestMessage(null);
     setProfileDraft({
       name: profileState.name,
@@ -82,15 +84,37 @@ export function SettingsWorkspace() {
     setRequestMessage("Your DiaryDock export has been prepared as a JSON file.");
   };
 
-  const requestDeletion = () => {
+  const requestDeletion = async () => {
     if (deleteConfirm.trim().toUpperCase() !== "DELETE") {
       setRequestMessage("Type DELETE to confirm the account deletion request.");
       return;
     }
 
-    setRequestMessage(
-      "Your deletion request has been recorded. We will verify account ownership and process eligible account data within 30 days."
-    );
+    setDeleteRequestBusy(true);
+    setRequestMessage(null);
+
+    try {
+      const response = await fetch("/api/account/deletion/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation: deleteConfirm })
+      });
+      const payload = await response.json().catch(() => null) as { message?: string; error?: string } | null;
+
+      if (!response.ok) {
+        setRequestMessage(payload?.error ?? "Unable to record the deletion request. Please contact support.");
+        return;
+      }
+
+      setRequestMessage(
+        payload?.message ??
+          "Your account deletion request has been recorded. We will verify ownership and process eligible data within 30 days."
+      );
+    } catch {
+      setRequestMessage("Unable to contact DiaryDock support services. Please try again or email hello@diarydock.com.");
+    } finally {
+      setDeleteRequestBusy(false);
+    }
   };
 
   const saveProfile = () => {
@@ -361,10 +385,17 @@ export function SettingsWorkspace() {
             </button>
             <button
               type="button"
-              onClick={modal === "profile" ? saveProfile : modal === "export" ? exportData : requestDeletion}
-              className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-ink/90"
+              onClick={modal === "profile" ? saveProfile : modal === "export" ? exportData : () => void requestDeletion()}
+              disabled={deleteRequestBusy}
+              className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-ink/90 disabled:cursor-wait disabled:opacity-60"
             >
-              {modal === "profile" ? "Save profile" : modal === "export" ? "Download export" : "Record request"}
+              {modal === "profile"
+                ? "Save profile"
+                : modal === "export"
+                  ? "Download export"
+                  : deleteRequestBusy
+                    ? "Recording request…"
+                    : "Record request"}
             </button>
           </div>
         }

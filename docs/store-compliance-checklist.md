@@ -46,7 +46,18 @@ Use these URLs in App Store Connect and Google Play Console:
 ## Required operational follow-up before public launch
 
 - Create and monitor `hello@diarydock.com`.
-- Connect the Settings deletion request to a real backend/admin process or support ticket.
-- Create an internal deletion runbook covering Supabase Auth user, `app_state`, household ownership, shared access, storage objects, and backups.
+- Add `SUPABASE_SERVICE_ROLE_KEY` and `ACCOUNT_DELETION_ADMIN_TOKEN` to Vercel production environment variables.
+- Apply the Supabase migration `20260817103000_account_deletion_requests.sql`.
+- Review pending deletion requests in `public.account_deletion_requests`.
+- Process a verified request through the server-only endpoint:
+
+```bash
+curl -X POST https://diarydock.com/api/admin/account-deletion/process \
+  -H "Authorization: Bearer $ACCOUNT_DELETION_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"requestId":"REQUEST_UUID"}'
+```
+
+- The processor removes the user's private storage folder, structured records, legacy records, private `app_state`, household invitation links, and the Supabase Auth user. Household-owner records are cascaded by Supabase foreign keys where configured.
 - Confirm whether Vercel or any other hosting analytics are enabled. If analytics are added, update `/privacy`, `/cookies`, Apple App Privacy, and Google Play Data Safety.
 - Have the final privacy policy, terms, and deletion wording reviewed before public launch.

@@ -70,7 +70,7 @@ Apple and Google both expect users to be able to request account/data deletion. 
 - Public route: `https://diarydock.com/account-deletion`
 - Support email: `hello@diarydock.com`
 
-Before public release, connect the deletion request to a real admin/support process that removes the Supabase Auth user, `app_state`, owned household records, private storage files, and eligible shared-access records.
+Before public release, make sure the production environment has `SUPABASE_SERVICE_ROLE_KEY` and `ACCOUNT_DELETION_ADMIN_TOKEN` configured. Verified deletion requests can then be processed through the server-only admin endpoint documented in `docs/store-compliance-checklist.md`.
 
 ## Cookies and local storage
 

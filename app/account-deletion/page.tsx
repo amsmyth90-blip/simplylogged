@@ -15,7 +15,7 @@ export default function AccountDeletionPage() {
         {
           title: "How to request deletion",
           body: [
-            "If you can sign in, open DiaryDock Settings and choose Request account deletion under Privacy, terms & data.",
+            "If you can sign in, open DiaryDock Settings and choose Request account deletion under Privacy, terms & data. This records a secure deletion request against your account.",
             "If you cannot sign in, email hello@diarydock.com from the email address linked to your DiaryDock account and include the words Account deletion request in the subject line."
           ]
         },
