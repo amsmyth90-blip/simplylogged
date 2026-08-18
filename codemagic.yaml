@@ -33,8 +33,8 @@ workflows:
           npx cap sync android
       - name: Configure Android app label and permissions
         script: |
-          sed -i.bak 's/<string name="app_name">.*<\/string>/<string name="app_name">DiaryDock<\/string>/' android/app/src/main/res/values/strings.xml || true
-          sed -i.bak 's/<string name="title_activity_main">.*<\/string>/<string name="title_activity_main">DiaryDock<\/string>/' android/app/src/main/res/values/strings.xml || true
+          sed -i '' 's/<string name="app_name">.*<\/string>/<string name="app_name">DiaryDock<\/string>/' android/app/src/main/res/values/strings.xml || true
+          sed -i '' 's/<string name="title_activity_main">.*<\/string>/<string name="title_activity_main">DiaryDock<\/string>/' android/app/src/main/res/values/strings.xml || true
       - name: Build debug APK
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
