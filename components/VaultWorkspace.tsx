@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/EmptyState";
 import { DiaryDockDataProvider, useDiaryDockData } from "@/components/DiaryDockDataProvider";
@@ -69,8 +70,18 @@ function recencyRank(document: VaultDocument) {
   return 5;
 }
 
+function isEmailImport(document: VaultDocument) {
+  return (
+    document.roomId === "mailbox" ||
+    document.roomName === "Mailbox" ||
+    document.reviewReasons?.some((reason) => reason.toLowerCase().includes("email")) ||
+    document.extractionSummary?.toLowerCase().includes("forwarded into diarydock by email")
+  );
+}
+
 function VaultWorkspaceInner() {
   const { state, repositoryMode, updateState } = useDiaryDockData();
+  const searchParams = useSearchParams();
   const documents = state.vaultDocuments;
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -91,6 +102,7 @@ function VaultWorkspaceInner() {
     .filter((item) => item.roomId === "office" || item.roomId === "safe-room")
     .slice(0, 3);
   const reviewQueue = documents.filter((document) => document.reviewStatus === "needs-review");
+  const emailImportQueue = reviewQueue.filter(isEmailImport);
   const sharedQueue = documents.filter((document) => document.sharedWith?.length);
   const emergencyQueue = documents.filter((document) => document.emergencyVisible);
 
@@ -148,6 +160,14 @@ function VaultWorkspaceInner() {
   const selectedDocument =
     filteredDocuments.find((document) => document.id === selectedId) ?? filteredDocuments[0] ?? null;
   const starred = filteredDocuments.filter((document) => document.starred);
+
+  useEffect(() => {
+    const filter = searchParams.get("filter");
+
+    if (filter === "needs-review" || filter === "shared" || filter === "emergency" || filter === "starred") {
+      setSelectedFilter(filter);
+    }
+  }, [searchParams]);
 
   const categoryCounts = useMemo(() => {
     return vaultCategories.map((category) => ({
@@ -344,6 +364,42 @@ function VaultWorkspaceInner() {
           </div>
         </section>
 
+        {selectedFilter === "needs-review" ? (
+          <section className="estate-sheet border border-amber-200/65 bg-amber-50/72 p-5">
+            <div className="flex items-start gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/82 text-amber-700">
+                <UiIcon name="alert" className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <SectionHeader
+                  title="Review inbox"
+                  hint={
+                    emailImportQueue.length
+                      ? `${emailImportQueue.length} emailed document${emailImportQueue.length === 1 ? "" : "s"} waiting`
+                      : "Scans and emailed files stay here until checked"
+                  }
+                />
+                <p className="mt-2 text-sm leading-6 text-ink/62">
+                  Check each title, room, category and date against the original file. DiaryDock keeps imported email
+                  attachments private, but it never treats suggested details as confirmed until you review them.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {[
+                { label: "Open the file", detail: "Compare the saved original with the suggested details." },
+                { label: "Move it", detail: "Choose the correct room, such as Office, Garage or Bedroom." },
+                { label: "Mark reviewed", detail: "Only confirm it once the important information looks right." }
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl bg-white/72 px-3.5 py-3">
+                  <p className="text-xs font-semibold text-ink">{item.label}</p>
+                  <p className="mt-1 text-[11px] leading-4 text-ink/50">{item.detail}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <section className="space-y-3">
           <SectionHeader title="Categories" hint={`${documents.length} documents across your secure collections`} />
           <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -457,6 +513,11 @@ function VaultWorkspaceInner() {
                         {document.reviewStatus === "needs-review" ? (
                           <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                             Review
+                          </span>
+                        ) : null}
+                        {isEmailImport(document) ? (
+                          <span className="shrink-0 rounded-full bg-sage/65 px-2 py-0.5 text-[10px] font-semibold text-moss">
+                            Email import
                           </span>
                         ) : null}
                       </span>

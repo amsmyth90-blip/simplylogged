@@ -45,6 +45,13 @@ export function SettingsWorkspace() {
     email: profileState.email,
     plan: profileState.plan
   });
+  const reviewQueue = state.vaultDocuments.filter((document) => document.reviewStatus === "needs-review");
+  const emailedReviewQueue = reviewQueue.filter(
+    (document) =>
+      document.roomId === "mailbox" ||
+      document.roomName === "Mailbox" ||
+      document.reviewReasons?.some((reason) => reason.toLowerCase().includes("email"))
+  );
 
   const enabledToggles = useMemo(
     () =>
@@ -368,6 +375,67 @@ export function SettingsWorkspace() {
                   {forwardingAddress.copied ? "Copied" : "Copy"}
                 </button>
               ) : null}
+            </div>
+
+            <div className="px-4 py-4">
+              <div className="rounded-[28px] border border-moss/10 bg-[linear-gradient(135deg,rgba(245,248,241,0.95),rgba(255,253,248,0.95))] p-4">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/85 text-moss shadow-[0_12px_28px_-24px_rgba(32,53,42,0.45)]">
+                    <UiIcon name="folder" className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-ink">Email documents to DiaryDock</p>
+                    <p className="mt-1 text-xs leading-5 text-ink/55">
+                      Forward an email with a PDF or image attached. DiaryDock saves the file privately and places it in
+                      the review inbox so you can rename it, move it to the right room, and check any important dates.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {[
+                    { title: "1. Forward", detail: "Send a test PDF or photo to your DiaryDock address." },
+                    { title: "2. Review", detail: "Open All Files and check anything marked Review." },
+                    { title: "3. File", detail: "Correct the title, room, category and dates before relying on it." }
+                  ].map((step) => (
+                    <div key={step.title} className="rounded-2xl bg-white/72 px-3 py-3">
+                      <p className="text-xs font-semibold text-ink">{step.title}</p>
+                      <p className="mt-1 text-[11px] leading-4 text-ink/50">{step.detail}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {["PDF", "JPG", "PNG", "WebP", "HEIC"].map((type) => (
+                    <span key={type} className="rounded-full bg-white/78 px-3 py-1 text-[11px] font-semibold text-ink/52">
+                      {type}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <Link
+                    href="/files?filter=needs-review"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-4 text-sm font-semibold text-white shadow-soft"
+                  >
+                    Review inbox
+                    <span className="rounded-full bg-white/18 px-2 py-0.5 text-[11px]">{reviewQueue.length}</span>
+                  </Link>
+                  <Link
+                    href="/support"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl border border-moss/20 bg-white/70 px-4 text-sm font-semibold text-ink/65"
+                  >
+                    How it works
+                  </Link>
+                </div>
+
+                {emailedReviewQueue.length ? (
+                  <p className="mt-3 rounded-2xl bg-white/72 px-3 py-2 text-xs leading-5 text-ink/55">
+                    {emailedReviewQueue.length} emailed document{emailedReviewQueue.length === 1 ? "" : "s"} waiting to
+                    be checked.
+                  </p>
+                ) : null}
+              </div>
             </div>
 
             <button

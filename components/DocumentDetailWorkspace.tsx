@@ -151,21 +151,27 @@ export function DocumentDetailWorkspace({
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
-  const markReviewed = () => {
+  const markReviewed = async () => {
+    if (!document) {
+      return;
+    }
+
+    const reviewedDocument: VaultDocument = {
+      ...document,
+      reviewStatus: "reviewed",
+      reviewReasons: [],
+      reviewedAt: "Just now",
+      updated: "Just now"
+    };
+
     updateState((current) => ({
       ...current,
       vaultDocuments: current.vaultDocuments.map((item) =>
-        item.id === documentId
-          ? {
-              ...item,
-              reviewStatus: "reviewed",
-              reviewReasons: [],
-              reviewedAt: "Just now",
-              updated: "Just now"
-            }
-          : item
+        item.id === documentId ? reviewedDocument : item
       )
     }));
+
+    await upsertStructuredDocument(reviewedDocument);
   };
 
   const openCorrection = () => {
@@ -429,7 +435,7 @@ export function DocumentDetailWorkspace({
               </div>
               <button
                 type="button"
-                onClick={markReviewed}
+                onClick={() => void markReviewed()}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white shadow-soft"
               >
                 <UiIcon name="check" className="h-4 w-4" />
