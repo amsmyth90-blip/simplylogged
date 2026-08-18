@@ -6,7 +6,7 @@ workflows:
     environment:
       vars:
         PACKAGE_NAME: "com.diarydock.app"
-      node: 20
+      node: 22
       java: 17
     triggering:
       events:
@@ -43,83 +43,3 @@ workflows:
           ./gradlew assembleDebug
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
-
-  ios-testflight:
-    name: DiaryDock iOS - TestFlight
-    max_build_duration: 60
-    instance_type: mac_mini_m2
-    environment:
-      groups:
-        - appstore_credentials # Codemagic UI: add App Store Connect API key integration or variables listed in docs/testflight-setup.md
-      vars:
-        BUNDLE_ID: "com.diarydock.app"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-      node: 20
-      xcode: latest
-      cocoapods: default
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: "ios-*"
-          include: true
-        - pattern: "*"
-          include: false
-    scripts:
-      - name: Install npm dependencies
-        script: |
-          npm ci
-      - name: Add iOS platform if missing
-        script: |
-          if [ ! -d "ios" ]; then
-            npx cap add ios
-          fi
-      - name: Generate app icons and splash screens
-        script: |
-          npm run assets:generate
-      - name: Sync Capacitor
-        script: |
-          npx cap sync ios
-      - name: Configure iOS permissions and build settings
-        script: |
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName DiaryDock" ios/App/App/Info.plist || true
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string DiaryDock uses the camera so you can scan documents and keep household records organised." ios/App/App/Info.plist || \
-          /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription DiaryDock uses the camera so you can scan documents and keep household records organised." ios/App/App/Info.plist
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string DiaryDock lets you choose photos or documents from your library to add to your private records." ios/App/App/Info.plist || \
-          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryUsageDescription DiaryDock lets you choose photos or documents from your library to add to your private records." ios/App/App/Info.plist
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string DiaryDock may save generated images or document previews to your photo library if you choose to export them." ios/App/App/Info.plist || \
-          /usr/libexec/PlistBuddy -c "Set :NSPhotoLibraryAddUsageDescription DiaryDock may save generated images or document previews to your photo library if you choose to export them." ios/App/App/Info.plist
-      - name: Set up code signing certificates and provisioning profiles
-        script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain initialize
-          app-store-connect list-builds || true
-          keychain add-certificates
-          xcode-project use-profiles
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios/App && pod install
-      - name: Increment build number
-        script: |
-          cd ios/App
-          latest_build_number="$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" 2>/dev/null | awk '{print $1+1}')"
-          if [ -z "$latest_build_number" ]; then
-            latest_build_number="$BUILD_NUMBER"
-          fi
-          agvtool new-version -all "$latest_build_number"
-      - name: Build and archive
-        script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-    # TestFlight publishing is intentionally disabled until App Store Connect is linked in Codemagic.
-    # publishing:
-    #   app_store_connect:
-    #     auth: integration
-    #     submit_to_testflight: true
