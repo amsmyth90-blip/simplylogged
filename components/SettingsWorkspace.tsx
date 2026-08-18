@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
@@ -19,6 +19,12 @@ type ProfileDraft = {
 
 type DataModalMode = "profile" | "export" | "delete" | null;
 
+type ForwardingAddressState =
+  | { status: "loading" }
+  | { status: "ready"; address: string; copied: boolean }
+  | { status: "not-configured"; message: string }
+  | { status: "error"; message: string };
+
 function toggleRow(rows: typeof import("@/lib/diarydock-data").initialSettingGroups[number]["rows"], label: string) {
   return rows.map((row) =>
     row.kind === "toggle" && row.label === label ? { ...row, value: !row.value } : row
@@ -33,6 +39,7 @@ export function SettingsWorkspace() {
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleteRequestBusy, setDeleteRequestBusy] = useState(false);
   const [requestMessage, setRequestMessage] = useState<string | null>(null);
+  const [forwardingAddress, setForwardingAddress] = useState<ForwardingAddressState>({ status: "loading" });
   const [profileDraft, setProfileDraft] = useState<ProfileDraft>({
     name: profileState.name,
     email: profileState.email,
@@ -47,6 +54,53 @@ export function SettingsWorkspace() {
       ),
     [groups]
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadForwardingAddress() {
+      try {
+        const response = await fetch("/api/import/email-address", { cache: "no-store" });
+        const payload = (await response.json().catch(() => null)) as
+          | { configured?: boolean; address?: string; message?: string; error?: string }
+          | null;
+
+        if (cancelled) return;
+
+        if (!response.ok) {
+          setForwardingAddress({ status: "error", message: payload?.error ?? "Email forwarding is not available yet." });
+          return;
+        }
+
+        if (payload?.configured && payload.address) {
+          setForwardingAddress({ status: "ready", address: payload.address, copied: false });
+          return;
+        }
+
+        setForwardingAddress({
+          status: "not-configured",
+          message: payload?.message ?? "Email forwarding needs the production mail provider connected."
+        });
+      } catch {
+        if (!cancelled) {
+          setForwardingAddress({ status: "error", message: "Unable to check the forwarding address right now." });
+        }
+      }
+    }
+
+    void loadForwardingAddress();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const copyForwardingAddress = async () => {
+    if (forwardingAddress.status !== "ready") return;
+
+    await navigator.clipboard.writeText(forwardingAddress.address);
+    setForwardingAddress({ ...forwardingAddress, copied: true });
+  };
 
   const closeModal = () => {
     setModal(null);
@@ -283,6 +337,38 @@ export function SettingsWorkspace() {
               </span>
               <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/30" />
             </button>
+
+            <div className="flex items-start gap-3.5 px-4 py-3.5">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/55 text-moss">
+                <UiIcon name="mail" className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-ink">Email forwarding</p>
+                {forwardingAddress.status === "ready" ? (
+                  <>
+                    <p className="mt-0.5 break-all text-xs text-ink/55">{forwardingAddress.address}</p>
+                    <p className="mt-1 text-xs leading-5 text-ink/45">
+                      Forward emails with PDF or image attachments here and DiaryDock will save them for review.
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-0.5 text-xs leading-5 text-ink/50">
+                    {forwardingAddress.status === "loading"
+                      ? "Checking your private forwarding address…"
+                      : forwardingAddress.message}
+                  </p>
+                )}
+              </div>
+              {forwardingAddress.status === "ready" ? (
+                <button
+                  type="button"
+                  onClick={() => void copyForwardingAddress()}
+                  className="shrink-0 rounded-full border border-ink/15 bg-white/80 px-3 py-1.5 text-xs font-semibold text-ink/65 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-moss"
+                >
+                  {forwardingAddress.copied ? "Copied" : "Copy"}
+                </button>
+              ) : null}
+            </div>
 
             <button
               type="button"

@@ -1,38 +1,17 @@
 "use client";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-
-export const DOCUMENT_BUCKET = "diarydock-documents";
-export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
-export const ACCEPTED_DOCUMENT_TYPES = [
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/heic"
-] as const;
-
-export function sanitizeDocumentFileName(name: string) {
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9.]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 96);
-}
+export {
+  ACCEPTED_DOCUMENT_TYPES,
+  DOCUMENT_BUCKET,
+  MAX_DOCUMENT_BYTES,
+  sanitizeDocumentFileName,
+  validateDocumentUpload
+} from "@/lib/document-rules";
+import { DOCUMENT_BUCKET, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 
 export function validateDocumentFile(file: File) {
-  if (!ACCEPTED_DOCUMENT_TYPES.includes(file.type as (typeof ACCEPTED_DOCUMENT_TYPES)[number])) {
-    return "Choose a PDF, JPEG, PNG, WebP or HEIC file.";
-  }
-  if (file.size > MAX_DOCUMENT_BYTES) {
-    return "Please choose a file smaller than 10 MB.";
-  }
-  if (file.size === 0) {
-    return "This file is empty. Please choose another file.";
-  }
-  return null;
+  return validateDocumentUpload(file);
 }
 
 export async function uploadPrivateDocument(file: File, documentId: string) {
