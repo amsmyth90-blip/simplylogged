@@ -13,11 +13,12 @@ export async function GET() {
   }
 
   const secret = getInboundEmailSecret();
+  const providerReady = process.env.DIARYDOCK_INBOUND_EMAIL_PROVIDER_READY === "true";
 
-  if (!secret) {
+  if (!secret || !providerReady) {
     return NextResponse.json({
       configured: false,
-      message: "Email forwarding is ready in the app, but the inbound email secret still needs to be added in production."
+      message: "Email forwarding is built into the app. The final mail-provider connection still needs to be switched on before forwarding is active."
     });
   }
 
