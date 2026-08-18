@@ -1,6 +1,7 @@
 import { Buffer } from "buffer";
 import { randomUUID } from "crypto";
 import { NextResponse, type NextRequest } from "next/server";
+import { Resend } from "resend";
 
 import { DOCUMENT_BUCKET, isAcceptedDocumentType, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 import { getInboundEmailSecret, verifyInboundEmailAddress } from "@/lib/inbound-email";
@@ -24,6 +25,24 @@ type InboundAttachment = {
   mimeType: string;
   bytes: ArrayBuffer;
   size: number;
+};
+
+type AttachmentMetadata = {
+  id: string;
+  filename?: string | null;
+  content_type?: string | null;
+};
+
+type ResendReceivedEvent = {
+  type: "email.received";
+  data: {
+    email_id: string;
+    from?: string;
+    to?: string[];
+    received_for?: string[];
+    subject?: string;
+    attachments?: AttachmentMetadata[];
+  };
 };
 
 type JsonEmailPayload = {
@@ -186,9 +205,98 @@ async function parseInboundPayload(request: NextRequest) {
   };
 }
 
+function hasResendSignature(request: NextRequest) {
+  return Boolean(
+    request.headers.get("webhook-id") ||
+      request.headers.get("svix-id") ||
+      request.headers.get("resend-signature") ||
+      request.headers.get("webhook-signature")
+  );
+}
+
+function getResendHeader(request: NextRequest, primary: string, fallback: string) {
+  return request.headers.get(primary) ?? request.headers.get(fallback) ?? "";
+}
+
+function isResendReceivedEvent(value: unknown): value is ResendReceivedEvent {
+  if (!value || typeof value !== "object") return false;
+
+  const event = value as Partial<ResendReceivedEvent>;
+  return event.type === "email.received" && Boolean(event.data?.email_id);
+}
+
+async function parseResendPayload(request: NextRequest, resend: Resend, webhookSecret: string) {
+  const payload = await request.text();
+  const event = resend.webhooks.verify({
+    payload,
+    webhookSecret,
+    headers: {
+      id: getResendHeader(request, "webhook-id", "svix-id"),
+      timestamp: getResendHeader(request, "webhook-timestamp", "svix-timestamp"),
+      signature:
+        request.headers.get("webhook-signature") ??
+        request.headers.get("svix-signature") ??
+        request.headers.get("resend-signature") ??
+        ""
+    }
+  });
+
+  if (!isResendReceivedEvent(event)) {
+    return null;
+  }
+
+  const emailResult = await resend.emails.receiving.get(event.data.email_id, { html_format: "cid" });
+  if (emailResult.error || !emailResult.data) {
+    throw new Error("DiaryDock could not read the received email from Resend.");
+  }
+
+  const attachmentMetadata =
+    emailResult.data.attachments?.length ? emailResult.data.attachments : event.data.attachments ?? [];
+  const attachments: InboundAttachment[] = [];
+
+  for (const attachment of attachmentMetadata.slice(0, 12)) {
+    const id = attachment.id;
+    const attachmentResult = await resend.emails.receiving.attachments.get({
+      emailId: event.data.email_id,
+      id
+    });
+
+    if (attachmentResult.error || !attachmentResult.data?.download_url) {
+      continue;
+    }
+
+    const response = await fetch(attachmentResult.data.download_url);
+    if (!response.ok) {
+      continue;
+    }
+
+    const bytes = await response.arrayBuffer();
+    attachments.push({
+      name: attachmentResult.data.filename ?? attachment.filename ?? "forwarded-attachment",
+      mimeType: attachmentResult.data.content_type ?? attachment.content_type ?? "application/octet-stream",
+      bytes,
+      size: bytes.byteLength
+    });
+  }
+
+  const payloadForDiaryDock: JsonEmailPayload = {
+    to: emailResult.data.to,
+    recipients: emailResult.data.received_for,
+    subject: emailResult.data.subject,
+    from: emailResult.data.from
+  };
+
+  return {
+    payload: payloadForDiaryDock,
+    recipientText: collectRecipientText(payloadForDiaryDock),
+    attachments
+  };
+}
+
 export async function POST(request: NextRequest) {
-  const webhookSecret = process.env.DIARYDOCK_INBOUND_WEBHOOK_SECRET?.trim();
+  const webhookSecret = process.env.RESEND_WEBHOOK_SECRET?.trim() ?? process.env.DIARYDOCK_INBOUND_WEBHOOK_SECRET?.trim();
   const inboundSecret = getInboundEmailSecret();
+  const resendApiKey = process.env.RESEND_API_KEY?.trim();
 
   if (!webhookSecret || !inboundSecret || !isSupabaseAdminConfigured()) {
     return NextResponse.json(
@@ -197,15 +305,38 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const suppliedSecret =
-    request.headers.get("x-diarydock-webhook-secret") ??
-    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  let parsedPayload: Awaited<ReturnType<typeof parseInboundPayload>>;
 
-  if (suppliedSecret !== webhookSecret) {
-    return unauthorized();
+  if (hasResendSignature(request)) {
+    if (!resendApiKey) {
+      return NextResponse.json({ error: "Resend API access is not configured yet." }, { status: 503 });
+    }
+
+    try {
+      const resend = new Resend(resendApiKey);
+      const resendPayload = await parseResendPayload(request, resend, webhookSecret);
+
+      if (!resendPayload) {
+        return NextResponse.json({ ok: true, skipped: true });
+      }
+
+      parsedPayload = resendPayload;
+    } catch {
+      return unauthorized("DiaryDock could not verify this Resend webhook.");
+    }
+  } else {
+    const suppliedSecret =
+      request.headers.get("x-diarydock-webhook-secret") ??
+      request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+
+    if (suppliedSecret !== webhookSecret) {
+      return unauthorized();
+    }
+
+    parsedPayload = await parseInboundPayload(request);
   }
 
-  const { payload, recipientText, attachments } = await parseInboundPayload(request);
+  const { payload, recipientText, attachments } = parsedPayload;
   const userId = verifyInboundEmailAddress(recipientText, inboundSecret);
 
   if (!userId) {

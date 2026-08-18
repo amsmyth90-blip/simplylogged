@@ -7,7 +7,7 @@ function base64Url(input: Buffer) {
 }
 
 export function getInboundEmailDomain() {
-  return process.env.DIARYDOCK_INBOUND_EMAIL_DOMAIN?.trim() || "diarydock.com";
+  return process.env.DIARYDOCK_INBOUND_EMAIL_DOMAIN?.trim() || "inbound.diarydock.com";
 }
 
 export function getInboundEmailSecret() {
