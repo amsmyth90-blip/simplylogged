@@ -336,19 +336,19 @@ export function KitchenRecipes() {
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.98),transparent_38%),linear-gradient(180deg,#fbfaf7_0%,#f7f4ee_57%,#f2f0e9_100%)] text-[#172033]">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
         <header className="flex h-12 shrink-0 items-center gap-3">
-          <Link href="/room/kitchen" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/88 text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to Kitchen">
+          <Link href="/room/kitchen" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to Kitchen">
             <UiIcon name="arrow-left" className="h-4 w-4" />
           </Link>
           <div className="min-w-0 flex-1">
             <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#718c65]">Kitchen</p>
             <h1 className="font-serif text-[21px] font-semibold leading-5 tracking-tight">Family recipes</h1>
           </div>
-          <button type="button" onClick={toggleFavourite} className={`flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/88 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)] ${selected.favourite ? "text-amber-500" : "text-slate-400"}`} aria-label={selected.favourite ? "Remove from favourites" : "Add to favourites"} aria-pressed={Boolean(selected.favourite)}>
+          <button type="button" onClick={toggleFavourite} className={`flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)] ${selected.favourite ? "text-amber-500" : "text-slate-400"}`} aria-label={selected.favourite ? "Remove from favourites" : "Add to favourites"} aria-pressed={Boolean(selected.favourite)}>
             <UiIcon name="star" className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => setRecipeOptionsOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/88 text-[18px] font-bold tracking-widest text-slate-500 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Recipe options">
+          <button type="button" onClick={() => setRecipeOptionsOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-[18px] font-bold tracking-widest text-slate-500 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Recipe options">
             ···
           </button>
         </header>
@@ -404,7 +404,7 @@ export function KitchenRecipes() {
             <button type="button" onClick={() => setCooking(true)} className="flex items-center justify-center gap-2 rounded-full bg-[#6f8f62] text-[11px] font-semibold text-white shadow-[0_13px_26px_-15px_rgba(67,101,55,0.75)] transition active:scale-[0.98]">
               <UiIcon name="clock" className="h-4 w-4" />Start cooking
             </button>
-            <button type="button" onClick={() => setPlannerOpen(true)} className="flex items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white/86 text-[11px] font-semibold text-[#607b55] shadow-sm">
+            <button type="button" onClick={() => setPlannerOpen(true)} className="flex items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-[#fffdf8] text-[11px] font-semibold text-[#607b55] shadow-sm">
               <UiIcon name="calendar" className="h-4 w-4" />Add to day
             </button>
           </div>
@@ -412,20 +412,20 @@ export function KitchenRecipes() {
       </div>
 
       {directoryOpen ? (
-        <div data-testid="recipe-directory" className="absolute inset-0 z-[65] bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.98),transparent_40%),linear-gradient(180deg,#f7f6f1,#edf3e9)] px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+        <div data-testid="recipe-directory" className="absolute inset-0 z-[65] bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.98),transparent_40%),linear-gradient(180deg,#f7f6f1,#edf3e9)] px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
           <div className="mx-auto flex h-full w-full max-w-lg flex-col">
             <header className="flex h-12 shrink-0 items-center gap-3">
-              <button type="button" onClick={() => { setDirectoryOpen(false); setSearch(""); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/88 text-slate-700 shadow-sm" aria-label="Close recipe directory">
+              <button type="button" onClick={() => { setDirectoryOpen(false); setSearch(""); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Close recipe directory">
                 <UiIcon name="arrow-left" className="h-4 w-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#718c65]">Kitchen</p>
                 <h2 className="font-serif text-[21px] font-semibold leading-5 tracking-tight">Recipe directory</h2>
               </div>
-              <span className="rounded-full bg-white/80 px-2.5 py-1 text-[9px] font-bold text-[#66805c] shadow-sm">{recipes.length} dishes</span>
+              <span className="rounded-full bg-white px-2.5 py-1 text-[9px] font-bold text-[#66805c] shadow-sm">{recipes.length} dishes</span>
             </header>
 
-            <label className="mt-3 flex h-11 shrink-0 items-center gap-2.5 rounded-[18px] border border-white/90 bg-white/82 px-3.5 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)] backdrop-blur-xl">
+            <label className="mt-3 flex h-11 shrink-0 items-center gap-2.5 rounded-[18px] border border-white/90 bg-[#fffdf8] px-3.5 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)] backdrop-blur-xl">
               <UiIcon name="search" className="h-4 w-4 text-slate-400" />
               <input value={search} onChange={event => { setSearch(event.target.value); setOnlineRecipes([]); setOnlineError(""); }} onKeyDown={event => { if (event.key === "Enter") void searchOnline(); }} placeholder="Search dishes or ingredients" className="min-w-0 flex-1 bg-transparent text-xs font-medium outline-none placeholder:text-slate-400" />
               <button type="button" onClick={() => void searchOnline()} disabled={search.trim().length < 2 || onlineLoading} className="rounded-full bg-[#6f8f62] px-3 py-1.5 text-[9px] font-semibold text-white disabled:opacity-40">
@@ -437,7 +437,7 @@ export function KitchenRecipes() {
               <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-10 items-center justify-center gap-2 rounded-[16px] bg-[#263b35] text-[10px] font-semibold text-white shadow-sm">
                 <UiIcon name="camera" className="h-4 w-4" />Scan recipe
               </button>
-              <button type="button" onClick={() => { setSearch(""); setOnlineRecipes([]); setOnlineError(""); }} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white/80 text-[10px] font-semibold text-slate-700 shadow-sm">
+              <button type="button" onClick={() => { setSearch(""); setOnlineRecipes([]); setOnlineError(""); }} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white text-[10px] font-semibold text-slate-700 shadow-sm">
                 <UiIcon name="folder" className="h-4 w-4" />My recipes
               </button>
               <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
@@ -452,7 +452,7 @@ export function KitchenRecipes() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {onlineRecipes.map(recipe => (
-                      <button key={recipe.id} data-online-recipe-id={recipe.id} type="button" onClick={() => selectRecipe(recipe, true)} className="overflow-hidden rounded-[22px] border border-white bg-white/86 text-left shadow-[0_16px_35px_-25px_rgba(38,51,43,0.55)]">
+                      <button key={recipe.id} data-online-recipe-id={recipe.id} type="button" onClick={() => selectRecipe(recipe, true)} className="overflow-hidden rounded-[22px] border border-white bg-[#fffdf8] text-left shadow-[0_16px_35px_-25px_rgba(38,51,43,0.55)]">
                         <span className="block aspect-[1.25/1] bg-cover bg-center" style={mealImageStyle(recipe.image)} />
                         <span className="block px-3 pb-3 pt-2.5">
                           <span className="block line-clamp-2 font-serif text-[13px] font-semibold leading-4 text-slate-800">{recipe.name}</span>
@@ -463,17 +463,17 @@ export function KitchenRecipes() {
                   </div>
                 </div>
               ) : null}
-              {onlineError ? <p className="mb-3 rounded-2xl bg-white/70 px-3 py-2.5 text-center text-[10px] text-slate-500">{onlineError}</p> : null}
+              {onlineError ? <p className="mb-3 rounded-2xl bg-white px-3 py-2.5 text-center text-[10px] text-slate-500">{onlineError}</p> : null}
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="font-serif text-[12px] font-semibold">Saved in DiaryDock</h3>
                 <span className="text-[8px] font-bold uppercase tracking-wide text-slate-400">{visibleRecipes.length} dishes</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {visibleRecipes.map(recipe => (
-                  <button key={recipe.id} data-recipe-id={recipe.id} type="button" onClick={() => selectRecipe(recipe)} className={`overflow-hidden rounded-[22px] border bg-white/86 text-left shadow-[0_16px_35px_-25px_rgba(38,51,43,0.55)] ${selected.id === recipe.id ? "border-[#78956b] ring-2 ring-[#a8bc9f]/45" : "border-white"}`}>
+                  <button key={recipe.id} data-recipe-id={recipe.id} type="button" onClick={() => selectRecipe(recipe)} className={`overflow-hidden rounded-[22px] border bg-[#fffdf8] text-left shadow-[0_16px_35px_-25px_rgba(38,51,43,0.55)] ${selected.id === recipe.id ? "border-[#78956b] ring-2 ring-[#a8bc9f]/45" : "border-white"}`}>
                     <span className="relative block aspect-[1.25/1] bg-cover bg-center" style={mealImageStyle(recipe.image)}>
                       {selected.id === recipe.id ? <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#6f8f62] text-white shadow-sm"><UiIcon name="check" className="h-3.5 w-3.5" /></span> : null}
-                      {recipe.favourite ? <span className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-amber-500 shadow-sm"><UiIcon name="star" className="h-3.5 w-3.5" /></span> : null}
+                      {recipe.favourite ? <span className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-amber-500 shadow-sm"><UiIcon name="star" className="h-3.5 w-3.5" /></span> : null}
                     </span>
                     <span className="block px-3 pb-3 pt-2.5">
                       <span className="block font-serif text-[13px] font-semibold leading-4 text-slate-800">{recipe.name}</span>
@@ -483,7 +483,7 @@ export function KitchenRecipes() {
                 ))}
               </div>
               {!visibleRecipes.length ? (
-                <div className="flex h-48 flex-col items-center justify-center rounded-[24px] border border-white bg-white/70 text-center">
+                <div className="flex h-48 flex-col items-center justify-center rounded-[24px] border border-white bg-white text-center">
                   <UiIcon name="search" className="h-6 w-6 text-slate-300" />
                   <p className="mt-2 text-sm font-semibold text-slate-600">No matching dishes</p>
                   <p className="mt-1 text-[10px] text-slate-400">Try a recipe name or ingredient.</p>
@@ -496,7 +496,7 @@ export function KitchenRecipes() {
 
       {scanState !== "idle" ? (
         <div className="absolute inset-0 z-[80] flex items-center justify-center bg-[#1b2a25]/30 p-6 backdrop-blur-md">
-          <section className="w-full max-w-sm rounded-[30px] border border-white/90 bg-[#fffdf8]/96 p-6 text-center shadow-2xl">
+          <section className="w-full max-w-sm rounded-[30px] border border-white/90 bg-[#fffdf8] p-6 text-center shadow-2xl">
             <span className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${scanState === "saved" ? "bg-[#dfead9] text-[#5e7a53]" : "bg-[#263b35] text-white"}`}>
               {scanState === "saved" ? <UiIcon name="check" className="h-7 w-7" /> : <UiIcon name="camera" className="h-7 w-7 animate-pulse" />}
             </span>
@@ -508,7 +508,7 @@ export function KitchenRecipes() {
 
       {cooking ? (
         <div className="absolute inset-0 z-[70] flex items-end bg-[#17211d]/25 p-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur-[3px]" onClick={() => setCooking(false)} role="presentation">
-          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white/90 bg-[#fffdf8]/96 p-5 shadow-2xl backdrop-blur-2xl" role="dialog" aria-modal="true" aria-label={`Cook ${selected.name}`} onClick={event => event.stopPropagation()}>
+          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white/90 bg-[#fffdf8] p-5 shadow-2xl backdrop-blur-2xl" role="dialog" aria-modal="true" aria-label={`Cook ${selected.name}`} onClick={event => event.stopPropagation()}>
             <div className="flex items-center gap-3">
               <span className="h-14 w-14 shrink-0 rounded-2xl bg-cover bg-center" style={mealImageStyle(selected.image)} />
               <div className="min-w-0 flex-1"><p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#718c65]">{state.kitchenCookingProgress?.recipeId === selected.id ? "Continue cooking" : "Ready to cook"}</p><h2 className="mt-1 truncate font-serif text-xl font-semibold">{selected.name}</h2></div>
@@ -530,26 +530,26 @@ export function KitchenRecipes() {
         <div className="fixed inset-0 z-[90] overflow-hidden bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.98),transparent_35%),linear-gradient(180deg,#edf4e9_0%,#faf9f5_52%,#f1eee6_100%)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
           <div className="mx-auto flex h-full w-full max-w-lg flex-col">
             <header className="flex h-12 shrink-0 items-center gap-3">
-              <button type="button" onClick={() => setCookingMode(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/85 text-slate-700 shadow-sm" aria-label="Exit cooking mode">
+              <button type="button" onClick={() => setCookingMode(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Exit cooking mode">
                 <UiIcon name="arrow-left" className="h-4 w-4" />
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#718c65]">Cooking now</p>
                 <h1 className="truncate font-serif text-[19px] font-semibold leading-5">{selected.name}</h1>
               </div>
-              <button type="button" onClick={() => setShowCookingIngredients(current => !current)} className="rounded-full border border-white bg-white/80 px-3 py-2 text-[9px] font-bold text-[#607b55] shadow-sm" aria-expanded={showCookingIngredients}>
+              <button type="button" onClick={() => setShowCookingIngredients(current => !current)} className="rounded-full border border-white bg-white px-3 py-2 text-[9px] font-bold text-[#607b55] shadow-sm" aria-expanded={showCookingIngredients}>
                 Ingredients
               </button>
             </header>
 
             <div className="mt-3 flex shrink-0 gap-1">
               {cookingSteps.map((_, index) => (
-                <span key={index} className={`h-1 flex-1 rounded-full transition-colors ${index <= cookingStep ? "bg-[#708d64]" : "bg-white/80"}`} />
+                <span key={index} className={`h-1 flex-1 rounded-full transition-colors ${index <= cookingStep ? "bg-[#708d64]" : "bg-white"}`} />
               ))}
             </div>
 
             <main className="mt-4 flex min-h-0 flex-1 flex-col">
-              <div className="relative min-h-0 flex-1 overflow-hidden rounded-[30px] border border-white bg-white/82 shadow-[0_25px_60px_-35px_rgba(32,48,39,0.55)] backdrop-blur-xl">
+              <div className="relative min-h-0 flex-1 overflow-hidden rounded-[30px] border border-white bg-[#fffdf8] shadow-[0_25px_60px_-35px_rgba(32,48,39,0.55)] backdrop-blur-xl">
                 <div className="h-[34%] bg-cover bg-center" style={mealImageStyle(selected.image)} role="img" aria-label={selected.name} />
                 <div className="flex h-[66%] flex-col p-5">
                   <div className="flex items-center justify-between">
@@ -591,7 +591,7 @@ export function KitchenRecipes() {
               </div>
 
               <div className="mt-4 grid h-12 shrink-0 grid-cols-[48px_1fr] gap-2">
-                <button type="button" onClick={() => moveToCookingStep(cookingStep - 1)} disabled={cookingStep === 0} className="flex items-center justify-center rounded-[18px] border border-white bg-white/80 text-slate-600 shadow-sm disabled:opacity-35" aria-label="Previous step">
+                <button type="button" onClick={() => moveToCookingStep(cookingStep - 1)} disabled={cookingStep === 0} className="flex items-center justify-center rounded-[18px] border border-white bg-white text-slate-600 shadow-sm disabled:opacity-35" aria-label="Previous step">
                   <UiIcon name="arrow-left" className="h-4 w-4" />
                 </button>
                 {cookingStep < cookingSteps.length - 1 ? (
@@ -609,7 +609,7 @@ export function KitchenRecipes() {
 
           {showCookingIngredients ? (
             <div className="absolute inset-0 z-[100] flex items-end bg-[#17211d]/25 p-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur-[3px]" onClick={() => setShowCookingIngredients(false)} role="presentation">
-              <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8]/97 p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Recipe ingredients" onClick={event => event.stopPropagation()}>
+              <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Recipe ingredients" onClick={event => event.stopPropagation()}>
                 <div className="flex items-center justify-between">
                   <div><p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#718c65]">For this recipe</p><h2 className="mt-1 font-serif text-xl font-semibold">Ingredients</h2></div>
                   <button type="button" onClick={() => setShowCookingIngredients(false)} className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-lg text-slate-500" aria-label="Close ingredients">x</button>
@@ -636,7 +636,7 @@ export function KitchenRecipes() {
 
       {recipeOptionsOpen ? (
         <div className="absolute inset-0 z-[75] flex items-end bg-[#17211d]/25 p-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur-[3px]" onClick={() => setRecipeOptionsOpen(false)} role="presentation">
-          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8]/97 p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Recipe options" onClick={event => event.stopPropagation()}>
+          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Recipe options" onClick={event => event.stopPropagation()}>
             <div className="flex items-center gap-3">
               <span className="h-14 w-14 rounded-2xl bg-cover bg-center" style={mealImageStyle(selected.image)} />
               <div className="min-w-0 flex-1">
@@ -662,7 +662,7 @@ export function KitchenRecipes() {
 
       {plannerOpen ? (
         <div className="absolute inset-0 z-[78] flex items-end bg-[#17211d]/25 p-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur-[3px]" onClick={() => setPlannerOpen(false)} role="presentation">
-          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8]/98 p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Add recipe to a day" onClick={event => event.stopPropagation()}>
+          <section className="mx-auto w-full max-w-lg rounded-[28px] border border-white bg-[#fffdf8] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-label="Add recipe to a day" onClick={event => event.stopPropagation()}>
             <div className="flex items-center justify-between">
               <div><p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#718c65]">Weekly meal planner</p><h2 className="mt-1 font-serif text-xl font-semibold">Choose a day</h2></div>
               <button type="button" onClick={() => setPlannerOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-lg text-slate-500" aria-label="Close meal planner">x</button>
@@ -688,13 +688,13 @@ export function KitchenRecipes() {
         <div className="absolute inset-0 z-[80] bg-[linear-gradient(180deg,#f8faf5,#f2eee6)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
           <section className="mx-auto flex h-full w-full max-w-lg flex-col" role="dialog" aria-modal="true" aria-label="Edit recipe">
             <header className="flex h-12 shrink-0 items-center gap-3">
-              <button type="button" onClick={() => setEditDraft(null)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white/85 text-slate-700 shadow-sm" aria-label="Cancel editing">
+              <button type="button" onClick={() => setEditDraft(null)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Cancel editing">
                 <UiIcon name="arrow-left" className="h-4 w-4" />
               </button>
               <div className="min-w-0 flex-1"><p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#718c65]">Kitchen</p><h2 className="font-serif text-xl font-semibold">Edit recipe</h2></div>
               <button type="button" onClick={saveRecipeEdits} className="rounded-full bg-[#263b35] px-4 py-2 text-[10px] font-bold text-white">Save</button>
             </header>
-            <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[28px] border border-white bg-white/78 p-4 shadow-[0_25px_60px_-38px_rgba(32,48,39,0.55)]">
+            <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[28px] border border-white bg-[#fffdf8] p-4 shadow-[0_25px_60px_-38px_rgba(32,48,39,0.55)]">
               <label className="block"><span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Recipe name</span><input value={editDraft.name} onChange={event => setEditDraft(current => current ? { ...current, name: event.target.value } : current)} className="mt-1 h-11 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#78956b]" /></label>
               <div className="grid grid-cols-2 gap-3">
                 <label className="block"><span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Total time</span><input value={editDraft.time} onChange={event => setEditDraft(current => current ? { ...current, time: event.target.value } : current)} className="mt-1 h-11 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#78956b]" /></label>
@@ -709,7 +709,7 @@ export function KitchenRecipes() {
 
       {deleteConfirmOpen ? (
         <div className="absolute inset-0 z-[85] flex items-center justify-center bg-[#17211d]/30 p-5 backdrop-blur-sm">
-          <section className="w-full max-w-sm rounded-[28px] border border-white bg-[#fffdf8]/98 p-5 text-center shadow-2xl" role="alertdialog" aria-modal="true" aria-label="Delete recipe">
+          <section className="w-full max-w-sm rounded-[28px] border border-white bg-[#fffdf8] p-5 text-center shadow-2xl" role="alertdialog" aria-modal="true" aria-label="Delete recipe">
             <h2 className="font-serif text-xl font-semibold">Delete this recipe?</h2>
             <p className="mt-2 text-xs leading-5 text-slate-500">{selected.name} will be removed from your saved recipes.</p>
             <div className="mt-5 grid grid-cols-2 gap-2">

@@ -43,7 +43,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-2 left-1/2 z-50 w-[calc(100%-1rem)] max-w-[54rem] -translate-x-1/2 rounded-[25px] border border-white/90 bg-white/[0.92] p-1.5 shadow-[0_22px_48px_-24px_rgba(15,23,42,0.48)] backdrop-blur-2xl">
+    <nav className="fixed bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.875rem))] left-1/2 z-50 w-[calc(100%-1rem)] max-w-[54rem] -translate-x-1/2 rounded-[25px] border border-white/90 bg-white/[0.96] p-1.5 shadow-[0_22px_48px_-24px_rgba(15,23,42,0.48)] backdrop-blur-2xl">
       <ul
         className="grid gap-1"
         style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
