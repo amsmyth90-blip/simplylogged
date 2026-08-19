@@ -9,7 +9,7 @@ import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { gardenSections } from "@/lib/garden-sections";
 
-const gardenDocumentTerms = ["garden", "outdoor", "pet", "vet", "vaccination", "shed", "fence", "equipment"];
+const gardenDocumentTerms = ["garden", "outdoor", "pet", "vet", "vaccination", "shed", "fence", "equipment", "bin", "recycling"];
 
 function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -100,7 +100,7 @@ export function GardenWorkspace() {
               <Link href="/dashboard" aria-label="Back to Home" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/50 bg-white/20 shadow-lg backdrop-blur-xl transition hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
                 <UiIcon name="arrow-left" className="h-5 w-5" />
               </Link>
-              <span className="rounded-full border border-white/50 bg-white/20 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-xl">Garden</span>
+              <span className="rounded-full border border-white/50 bg-white/20 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-xl">Pets & Garden</span>
               <div className="flex gap-2">
                 <Link href="/search" aria-label="Search DiaryDock" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/50 bg-white/20 shadow-lg backdrop-blur-xl transition hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
                   <UiIcon name="search" className="h-5 w-5" />
@@ -119,11 +119,11 @@ export function GardenWorkspace() {
         </header>
 
         <Panel className="mt-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">Your Garden at a glance</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">Your Pets & Garden at a glance</p>
           <div className="mt-4 grid grid-cols-3 gap-2">
             {[
               [gardenReminders.length, "Active reminders"],
-              [gardenDocuments.length, "Garden files"],
+              [gardenDocuments.length, "Outdoor files"],
               [reviewDocuments.length, "To review"],
             ].map(([value, label]) => (
               <div key={label} className="rounded-[18px] bg-[#eef2e9] px-2 py-4 text-center">
@@ -133,7 +133,7 @@ export function GardenWorkspace() {
             ))}
           </div>
           {!gardenReminders.length && !gardenDocuments.length ? (
-            <p className="mt-4 rounded-2xl bg-[#faf9f4] px-4 py-3 text-[11px] leading-5 text-[#667068]">Your Garden starts quietly. Add a reminder or upload an outdoor record when you are ready.</p>
+            <p className="mt-4 rounded-2xl bg-[#faf9f4] px-4 py-3 text-[11px] leading-5 text-[#667068]">Your Pets & Garden area starts quietly. Add a reminder or upload an outdoor record when you are ready.</p>
           ) : null}
         </Panel>
 
@@ -156,7 +156,7 @@ export function GardenWorkspace() {
               ))}
             </div>
           ) : (
-            <EmptyPreview icon="check" title="Nothing needs review" detail="Recorded Garden reminders and documents that need checking will appear here." href="/reminders" action="Reminders" />
+            <EmptyPreview icon="check" title="Nothing needs review" detail="Pet, garden and outdoor records that need checking will appear here." href="/reminders" action="Reminders" />
           )}
         </Panel>
 
@@ -179,10 +179,10 @@ export function GardenWorkspace() {
           <h2 id="garden-previews-title" className="mt-1 font-serif text-3xl">Ready when you are</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Panel><h3 className="font-serif text-xl">Pets</h3><EmptyPreview icon="heart" title="No pet profiles connected" detail="Pet details will stay private and only appear here when you choose to add them." href="/garden/pets" action="Open" /></Panel>
-            <Panel><h3 className="font-serif text-xl">Outdoor jobs</h3>{gardenReminders.length ? <div className="mt-4 space-y-2">{gardenReminders.slice(0, 3).map((reminder) => <Link key={reminder.id} href="/reminders" className="flex min-h-14 items-center gap-3 rounded-2xl bg-[#faf9f4] px-3 text-xs"><UiIcon name="calendar" className="h-4 w-4 text-[#52705a]" /><span className="min-w-0 flex-1"><span className="block truncate font-semibold">{reminder.title}</span><span className="mt-1 block truncate text-[10px] text-[#667068]">{reminder.timeLabel}</span></span><UiIcon name="chevron-right" className="h-4 w-4 text-[#7b847d]" /></Link>)}</div> : <EmptyPreview icon="calendar" title="No outdoor jobs recorded" detail="Use the existing Reminder system to keep outdoor work visible." href="/garden/jobs" action="Open" />}</Panel>
+            <Panel><h3 className="font-serif text-xl">Garden jobs</h3>{gardenReminders.length ? <div className="mt-4 space-y-2">{gardenReminders.slice(0, 3).map((reminder) => <Link key={reminder.id} href="/reminders" className="flex min-h-14 items-center gap-3 rounded-2xl bg-[#faf9f4] px-3 text-xs"><UiIcon name="calendar" className="h-4 w-4 text-[#52705a]" /><span className="min-w-0 flex-1"><span className="block truncate font-semibold">{reminder.title}</span><span className="mt-1 block truncate text-[10px] text-[#667068]">{reminder.timeLabel}</span></span><UiIcon name="chevron-right" className="h-4 w-4 text-[#7b847d]" /></Link>)}</div> : <EmptyPreview icon="calendar" title="No garden jobs recorded" detail="Use the existing Reminder system to keep outdoor work and projects visible." href="/garden/jobs" action="Open" />}</Panel>
             <Panel><h3 className="font-serif text-xl">Next bin collection</h3><EmptyPreview icon="archive" title="No collection schedule yet" detail="Add schedules only after the dedicated collection workflow is ready." href="/garden/bins" action="Open" /></Panel>
-            <Panel><h3 className="font-serif text-xl">Garden projects</h3><EmptyPreview icon="briefcase" title="No projects recorded" detail="Quotes, tasks and project files will be organised here without duplicating documents." href="/garden/projects" action="Open" /></Panel>
-            <Panel className="sm:col-span-2"><h3 className="font-serif text-xl">Tools & equipment</h3><EmptyPreview icon="gear" title="No equipment needs attention" detail="Equipment servicing, manuals and warranties will use DiaryDock's existing files and reminder patterns." href="/garden/equipment" action="Open" /></Panel>
+            <Panel><h3 className="font-serif text-xl">Outdoor spaces</h3><EmptyPreview icon="sun" title="No outdoor space notes yet" detail="Patio, fence, gate and safety notes can be kept here when needed." href="/garden/outdoor-spaces" action="Open" /></Panel>
+            <Panel className="sm:col-span-2"><h3 className="font-serif text-xl">Tools & Shed</h3><EmptyPreview icon="home" title="No tools or shed records yet" detail="Shed notes, equipment servicing, manuals and warranties can live here." href="/garden/tools-shed" action="Open" /></Panel>
           </div>
         </section>
 
@@ -191,7 +191,7 @@ export function GardenWorkspace() {
 
       <ModalShell open={addOpen} title="Add to Garden" subtitle="Only actions already supported by DiaryDock are shown here." onClose={() => setAddOpen(false)}>
         <div className="space-y-2">
-          <Link href="/capture?room=garden" onClick={() => setAddOpen(false)} className="flex min-h-16 items-center gap-3 rounded-[18px] bg-[#eef2e9] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"><span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white text-[#52705a]"><UiIcon name="camera" className="h-4 w-4" /></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[#20352a]">Upload a Garden document</span><span className="mt-1 block text-[11px] text-[#667068]">Securely scan or upload an outdoor record.</span></span><UiIcon name="chevron-right" className="h-4 w-4 text-[#7b847d]" /></Link>
+          <Link href="/capture?room=garden" onClick={() => setAddOpen(false)} className="flex min-h-16 items-center gap-3 rounded-[18px] bg-[#eef2e9] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"><span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white text-[#52705a]"><UiIcon name="camera" className="h-4 w-4" /></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[#20352a]">Upload a Pets & Garden document</span><span className="mt-1 block text-[11px] text-[#667068]">Securely scan or upload a pet or outdoor record.</span></span><UiIcon name="chevron-right" className="h-4 w-4 text-[#7b847d]" /></Link>
           <Link href="/reminders" onClick={() => setAddOpen(false)} className="flex min-h-16 items-center gap-3 rounded-[18px] bg-[#faf9f4] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"><span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white text-[#52705a]"><UiIcon name="calendar" className="h-4 w-4" /></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[#20352a]">Add an outdoor reminder</span><span className="mt-1 block text-[11px] text-[#667068]">Use DiaryDock's existing reminder system.</span></span><UiIcon name="chevron-right" className="h-4 w-4 text-[#7b847d]" /></Link>
         </div>
       </ModalShell>

@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 import {
@@ -16,6 +15,7 @@ import {
 } from "@/lib/bill-document-analysis";
 import { insuranceDocumentAnalysisSchema, type InsuranceDocumentAnalysis } from "@/lib/insurance-document-analysis";
 import { receiptDocumentAnalysisSchema, type ReceiptDocumentAnalysis } from "@/lib/receipt-document-analysis";
+import { createVisionJsonResponse, type VisionJsonSchema } from "@/lib/brain/provider-adapters/openai";
 import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -95,8 +95,6 @@ export async function POST(request: Request) {
       return `data:${getMimeType(file)};base64,${buffer.toString("base64")}`;
     })
   );
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   const documentPrompt = [
     "You are extracting structured details from a photographed household document for a mobile app called DiaryDock.",
     `Read all ${files.length} page${files.length === 1 ? "" : "s"} carefully and treat them as one document in page order.`,
@@ -155,56 +153,99 @@ export async function POST(request: Request) {
   ].join(" ");
 
   try {
-    const response = await client.responses.create({
-      model: getVisionModel(),
-      input: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: analysisMode === "will" ? willPrompt : analysisMode === "bill" ? billPrompt : analysisMode === "insurance" ? insurancePrompt : analysisMode === "receipt" ? receiptPrompt : documentPrompt
-            },
-            ...dataUrls.map((imageUrl) => ({
-              type: "input_image" as const,
-              image_url: imageUrl,
-              detail: "high" as const
-            }))
-          ]
-        }
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: analysisMode === "will" ? "diarydock_will_document_analysis" : analysisMode === "bill" ? "diarydock_bill_document_analysis" : analysisMode === "insurance" ? "diarydock_insurance_document_analysis" : analysisMode === "receipt" ? "diarydock_vehicle_receipt_analysis" : "diarydock_document_extraction",
-          schema: analysisMode === "will" ? willDocumentAnalysisSchema : analysisMode === "bill" ? billDocumentAnalysisSchema : analysisMode === "insurance" ? insuranceDocumentAnalysisSchema : analysisMode === "receipt" ? receiptDocumentAnalysisSchema : documentExtractionSchema,
-          strict: true
-        }
-      }
-    });
-
-    const outputText = response.output_text;
-    if (!outputText) {
-      return NextResponse.json({ error: "The vision model did not return extractable text." }, { status: 502 });
-    }
+    const prompt =
+      analysisMode === "will"
+        ? willPrompt
+        : analysisMode === "bill"
+          ? billPrompt
+          : analysisMode === "insurance"
+            ? insurancePrompt
+            : analysisMode === "receipt"
+              ? receiptPrompt
+              : documentPrompt;
+    const schema =
+      analysisMode === "will"
+        ? willDocumentAnalysisSchema
+        : analysisMode === "bill"
+          ? billDocumentAnalysisSchema
+          : analysisMode === "insurance"
+            ? insuranceDocumentAnalysisSchema
+            : analysisMode === "receipt"
+              ? receiptDocumentAnalysisSchema
+              : documentExtractionSchema;
+    const schemaName =
+      analysisMode === "will"
+        ? "diarydock_will_document_analysis"
+        : analysisMode === "bill"
+          ? "diarydock_bill_document_analysis"
+          : analysisMode === "insurance"
+            ? "diarydock_insurance_document_analysis"
+            : analysisMode === "receipt"
+              ? "diarydock_vehicle_receipt_analysis"
+              : "diarydock_document_extraction";
 
     if (analysisMode === "will") {
-      return NextResponse.json({ willAnalysis: JSON.parse(outputText) as WillDocumentAnalysis });
+      return NextResponse.json({
+        willAnalysis: await createVisionJsonResponse<WillDocumentAnalysis>({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: getVisionModel(),
+          prompt,
+          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
+          schemaName,
+          schema: schema as VisionJsonSchema
+        })
+      });
     }
 
     if (analysisMode === "bill") {
-      return NextResponse.json({ billAnalysis: JSON.parse(outputText) as BillDocumentAnalysis });
+      return NextResponse.json({
+        billAnalysis: await createVisionJsonResponse<BillDocumentAnalysis>({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: getVisionModel(),
+          prompt,
+          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
+          schemaName,
+          schema: schema as VisionJsonSchema
+        })
+      });
     }
 
     if (analysisMode === "insurance") {
-      return NextResponse.json({ insuranceAnalysis: JSON.parse(outputText) as InsuranceDocumentAnalysis });
+      return NextResponse.json({
+        insuranceAnalysis: await createVisionJsonResponse<InsuranceDocumentAnalysis>({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: getVisionModel(),
+          prompt,
+          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
+          schemaName,
+          schema: schema as VisionJsonSchema
+        })
+      });
     }
 
     if (analysisMode === "receipt") {
-      return NextResponse.json({ receiptAnalysis: JSON.parse(outputText) as ReceiptDocumentAnalysis });
+      return NextResponse.json({
+        receiptAnalysis: await createVisionJsonResponse<ReceiptDocumentAnalysis>({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: getVisionModel(),
+          prompt,
+          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
+          schemaName,
+          schema: schema as VisionJsonSchema
+        })
+      });
     }
 
-    return NextResponse.json({ extraction: JSON.parse(outputText) as DocumentExtractionResult });
+    return NextResponse.json({
+      extraction: await createVisionJsonResponse<DocumentExtractionResult>({
+        apiKey: process.env.OPENAI_API_KEY,
+        model: getVisionModel(),
+        prompt,
+        pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
+        schemaName,
+        schema: schema as VisionJsonSchema
+      })
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to analyze the document right now.";
     return NextResponse.json({ error: message }, { status: 500 });

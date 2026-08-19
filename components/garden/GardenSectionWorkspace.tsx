@@ -62,58 +62,46 @@ const sectionMeta: Record<GardenSectionId, SectionMeta> = {
   },
   "outdoor-spaces": {
     eyebrow: "Outdoor spaces",
-    title: "Areas around your home",
+    title: "Outdoor spaces, boundaries and safety",
     description:
-      "Organise notes and documents for gardens, patios, balconies and outside spaces without pulling in vehicle or travel records.",
+      "Organise gardens, patios, fences, gates and outdoor safety notes without pulling in vehicle or travel records.",
     primaryAction: "Add outdoor reminder",
     emptyTitle: "No outdoor space records yet",
     emptyDetail:
-      "Use this for patio notes, garden condition photos, outdoor plans and work you want to remember.",
-    documentTerms: ["garden", "patio", "balcony", "outdoor", "deck", "lawn", "planting"],
-    reminderTerms: ["garden", "patio", "balcony", "outdoor", "lawn", "planting"],
-    guidance: ["Outdoor areas", "Condition notes", "Photos", "Linked jobs"],
+      "Use this for patio notes, boundary repairs, gate checks, outdoor lighting or garden condition photos.",
+    documentTerms: ["garden", "patio", "balcony", "outdoor", "deck", "lawn", "planting", "boundary", "fence", "gate", "wall", "safety", "outdoor light", "neighbour"],
+    reminderTerms: ["garden", "patio", "balcony", "outdoor", "lawn", "planting", "boundary", "fence", "gate", "wall", "safety", "outdoor light"],
+    guidance: ["Outdoor areas", "Fences & gates", "Condition photos", "Safety notes"],
+    notice:
+      "DiaryDock stores your notes and documents but does not determine legal boundary ownership, certify safety or replace advice from a qualified professional.",
     accent: "moss",
   },
   jobs: {
     eyebrow: "Jobs & maintenance",
-    title: "Outdoor jobs that need doing",
+    title: "Garden jobs and outdoor projects",
     description:
-      "Track recurring jobs, one-off outdoor repairs and seasonal maintenance using DiaryDock's existing reminder system.",
+      "Track recurring jobs, one-off outdoor repairs, seasonal maintenance and projects using DiaryDock's existing reminder system.",
     primaryAction: "Add garden job",
     emptyTitle: "No garden jobs yet",
     emptyDetail:
-      "Add a job such as hedge trimming, pressure washing, lawn care or seasonal checks.",
-    documentTerms: ["garden", "outdoor", "maintenance", "repair", "hedge", "lawn"],
-    reminderTerms: ["garden", "outdoor", "maintenance", "repair", "hedge", "lawn", "sprinkler"],
-    guidance: ["One-off jobs", "Recurring jobs", "Who is responsible", "History"],
+      "Add a job such as hedge trimming, pressure washing, lawn care, landscaping quotes or seasonal checks.",
+    documentTerms: ["garden", "outdoor", "maintenance", "repair", "hedge", "lawn", "sprinkler", "garden project", "landscaping", "quote", "outdoor project", "planting plan"],
+    reminderTerms: ["garden", "outdoor", "maintenance", "repair", "hedge", "lawn", "sprinkler", "garden project", "landscaping", "quote", "outdoor project", "planting plan"],
+    guidance: ["One-off jobs", "Recurring jobs", "Projects", "History"],
     accent: "gold",
   },
-  outbuildings: {
-    eyebrow: "Sheds & outbuildings",
-    title: "Sheds, greenhouses and garden rooms",
+  "tools-shed": {
+    eyebrow: "Tools & shed",
+    title: "Tools, equipment and outdoor storage",
     description:
-      "Keep documents and maintenance reminders for outbuildings here, while house insurance and deeds stay in the Office.",
-    primaryAction: "Add outbuilding reminder",
-    emptyTitle: "No outbuildings added yet",
+      "Store shed notes, greenhouse checks, tool manuals, servicing reminders and warranty files without duplicating appliance records from the Kitchen.",
+    primaryAction: "Add tools or shed reminder",
+    emptyTitle: "No tools or shed records yet",
     emptyDetail:
-      "Use this for shed repairs, greenhouse checks, garden office notes or outbuilding manuals.",
-    documentTerms: ["shed", "greenhouse", "outbuilding", "garden office", "summer house"],
-    reminderTerms: ["shed", "greenhouse", "outbuilding", "garden office", "summer house"],
-    guidance: ["Buildings", "Maintenance", "Repairs", "Documents"],
-    accent: "clay",
-  },
-  equipment: {
-    eyebrow: "Tools & equipment",
-    title: "Outdoor tools and equipment",
-    description:
-      "Store manuals, servicing reminders and warranty files for outdoor tools without duplicating appliance records from the Kitchen.",
-    primaryAction: "Add equipment reminder",
-    emptyTitle: "No equipment records yet",
-    emptyDetail:
-      "Add lawnmower servicing, pressure washer manuals, garden tool warranties or battery checks.",
-    documentTerms: ["tool", "equipment", "lawnmower", "mower", "pressure washer", "strimmer", "warranty", "manual"],
-    reminderTerms: ["tool", "equipment", "lawnmower", "mower", "pressure washer", "strimmer", "battery"],
-    guidance: ["Equipment list", "Servicing", "Warranties", "Manuals"],
+      "Add shed repairs, greenhouse checks, lawnmower servicing, pressure washer manuals or battery checks.",
+    documentTerms: ["shed", "greenhouse", "outbuilding", "garden office", "summer house", "tool", "equipment", "lawnmower", "mower", "pressure washer", "strimmer", "warranty", "manual"],
+    reminderTerms: ["shed", "greenhouse", "outbuilding", "garden office", "summer house", "tool", "equipment", "lawnmower", "mower", "pressure washer", "strimmer", "battery"],
+    guidance: ["Sheds", "Tools", "Servicing", "Manuals"],
     accent: "sage",
   },
   bins: {
@@ -129,36 +117,6 @@ const sectionMeta: Record<GardenSectionId, SectionMeta> = {
     reminderTerms: ["bin", "bins", "recycling", "waste", "collection", "garden waste"],
     guidance: ["Schedules", "Waste types", "Changes", "Reminders"],
     accent: "moss",
-  },
-  projects: {
-    eyebrow: "Garden projects",
-    title: "Outdoor plans and improvements",
-    description:
-      "Plan garden improvements, quotes and project files here. Contracts and bills can still live in the Office when they become formal paperwork.",
-    primaryAction: "Add project reminder",
-    emptyTitle: "No garden projects yet",
-    emptyDetail:
-      "Use this for landscaping ideas, quotes to chase, project tasks and outdoor plans.",
-    documentTerms: ["garden project", "landscaping", "quote", "outdoor project", "planting plan"],
-    reminderTerms: ["garden project", "landscaping", "quote", "outdoor project", "planting plan"],
-    guidance: ["Plans", "Quotes", "Tasks", "Project files"],
-    accent: "gold",
-  },
-  boundaries: {
-    eyebrow: "Boundaries & safety",
-    title: "Fences, gates and outdoor safety",
-    description:
-      "Keep notes and records about gates, fences, walls and outdoor safety without treating DiaryDock as a legal authority.",
-    primaryAction: "Add safety reminder",
-    emptyTitle: "No boundary or safety records yet",
-    emptyDetail:
-      "Add reminders for fence repairs, gate checks, outdoor lighting or safety reviews.",
-    documentTerms: ["boundary", "fence", "gate", "wall", "safety", "outdoor light", "neighbour"],
-    reminderTerms: ["boundary", "fence", "gate", "wall", "safety", "outdoor light"],
-    guidance: ["Fences & gates", "Condition notes", "Repairs", "Documents"],
-    notice:
-      "DiaryDock stores your notes and documents but does not determine legal boundary ownership, certify safety or replace advice from a qualified professional.",
-    accent: "clay",
   },
 };
 

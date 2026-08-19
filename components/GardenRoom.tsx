@@ -26,64 +26,40 @@ const gardenHotspots: GardenHotspot[] = [
     href: "/garden/pets",
     label: "Pets",
     title: "Pets",
-    className: "left-[2%] top-[30%] h-[58%] w-[42%]",
-    markerClassName: "left-[58%] top-[54%]",
+    className: "left-[2%] top-[26%] h-[54%] w-[38%]",
+    markerClassName: "left-[42%] top-[70%]",
     labelPosition: "right",
   },
   {
     href: "/garden/outdoor-spaces",
     label: "Outdoor Spaces",
     title: "Outdoor Spaces",
-    className: "left-[58%] top-[17%] h-[35%] w-[42%]",
-    markerClassName: "left-[35%] top-[62%]",
+    className: "left-[48%] top-[16%] h-[40%] w-[50%]",
+    markerClassName: "left-[48%] top-[60%]",
     labelPosition: "left",
   },
   {
     href: "/garden/jobs",
-    label: "Jobs & Maintenance",
-    title: "Jobs & Maintenance",
-    className: "left-[25%] top-[52%] h-[20%] w-[46%]",
-    markerClassName: "left-[52%] top-[60%]",
+    label: "Garden Jobs",
+    title: "Garden Jobs",
+    className: "left-[22%] top-[57%] h-[22%] w-[54%]",
+    markerClassName: "left-[52%] top-[54%]",
     labelPosition: "below",
   },
   {
-    href: "/garden/outbuildings",
-    label: "Sheds & Outbuildings",
-    title: "Sheds & Outbuildings",
-    className: "left-[10%] top-[11%] h-[23%] w-[56%]",
-    markerClassName: "left-[58%] top-[58%]",
-    labelPosition: "below-left",
-  },
-  {
-    href: "/garden/equipment",
-    label: "Tools & Equipment",
-    title: "Tools & Equipment",
-    className: "left-[0%] top-[39%] h-[17%] w-[55%]",
-    markerClassName: "left-[48%] top-[47%]",
+    href: "/garden/tools-shed",
+    label: "Tools & Shed",
+    title: "Tools & Shed",
+    className: "left-[0%] top-[36%] h-[22%] w-[54%]",
+    markerClassName: "left-[48%] top-[48%]",
     labelPosition: "right",
   },
   {
     href: "/garden/bins",
     label: "Bins & Collections",
     title: "Bins & Collections",
-    className: "left-[66%] top-[42%] h-[18%] w-[34%]",
-    markerClassName: "left-[34%] top-[49%]",
-    labelPosition: "left",
-  },
-  {
-    href: "/garden/projects",
-    label: "Projects",
-    title: "Garden Projects",
-    className: "left-[60%] top-[52%] h-[20%] w-[38%]",
-    markerClassName: "left-[38%] top-[54%]",
-    labelPosition: "left",
-  },
-  {
-    href: "/garden/boundaries",
-    label: "Boundaries & Safety",
-    title: "Boundaries & Safety",
-    className: "left-[66%] top-[23%] h-[22%] w-[33%]",
-    markerClassName: "left-[34%] top-[52%]",
+    className: "left-[66%] top-[39%] h-[24%] w-[34%]",
+    markerClassName: "left-[42%] top-[64%]",
     labelPosition: "left",
   },
 ];
@@ -156,7 +132,7 @@ export function GardenRoom() {
         </nav>
       </div>
 
-      <RoomSceneHeader roomName="Garden" />
+      <RoomSceneHeader roomName="Pets & Garden" />
       <BottomNav />
     </div>
   );

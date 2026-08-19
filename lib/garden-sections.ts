@@ -4,11 +4,8 @@ export type GardenSectionId =
   | "pets"
   | "outdoor-spaces"
   | "jobs"
-  | "outbuildings"
-  | "equipment"
-  | "bins"
-  | "projects"
-  | "boundaries";
+  | "tools-shed"
+  | "bins";
 
 export type GardenSection = {
   id: GardenSectionId;
@@ -29,30 +26,23 @@ export const gardenSections: GardenSection[] = [
   {
     id: "outdoor-spaces",
     title: "Outdoor Spaces",
-    description: "Organise gardens, patios, balconies, driveways and outdoor areas.",
+    description: "Organise outdoor areas, boundaries, gates and safety notes.",
     icon: "sun",
-    scope: ["Areas", "Photos", "Condition notes", "Linked jobs"],
+    scope: ["Areas", "Photos", "Boundaries", "Safety notes"],
   },
   {
     id: "jobs",
-    title: "Jobs & Maintenance",
-    description: "Track recurring jobs, repairs and seasonal outdoor work.",
+    title: "Garden Jobs",
+    description: "Track maintenance, seasonal work and outdoor projects.",
     icon: "calendar",
-    scope: ["One-off jobs", "Recurring jobs", "Assignments", "History"],
+    scope: ["Tasks", "Projects", "Seasonal work", "History"],
   },
   {
-    id: "outbuildings",
-    title: "Sheds & Outbuildings",
-    description: "Manage sheds, greenhouses, garden offices and outdoor buildings.",
+    id: "tools-shed",
+    title: "Tools & Shed",
+    description: "Keep shed, greenhouse, tool, machinery and equipment records together.",
     icon: "home",
-    scope: ["Buildings", "Maintenance", "Repairs", "Documents"],
-  },
-  {
-    id: "equipment",
-    title: "Tools & Equipment",
-    description: "Store records for outdoor tools, machinery and equipment.",
-    icon: "gear",
-    scope: ["Equipment", "Servicing", "Warranties", "Manuals"],
+    scope: ["Sheds", "Tools", "Equipment", "Manuals"],
   },
   {
     id: "bins",
@@ -60,20 +50,6 @@ export const gardenSections: GardenSection[] = [
     description: "Keep waste, recycling and collection dates easy to remember.",
     icon: "archive",
     scope: ["Schedules", "Waste types", "Changes", "Reminders"],
-  },
-  {
-    id: "projects",
-    title: "Garden Projects",
-    description: "Plan and track outdoor improvements from idea to completion.",
-    icon: "briefcase",
-    scope: ["Plans", "Quotes", "Tasks", "Project files"],
-  },
-  {
-    id: "boundaries",
-    title: "Boundaries & Safety",
-    description: "Keep fence, gate, boundary and outdoor safety records organised.",
-    icon: "shield",
-    scope: ["Fences & gates", "Condition notes", "Repairs", "Documents"],
   },
 ];
 
