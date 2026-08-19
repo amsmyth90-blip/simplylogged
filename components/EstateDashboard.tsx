@@ -117,6 +117,7 @@ export function EstateDashboard() {
 
           {estateAreas.map((area) => {
             const size = hitboxSize[area.id] ?? { width: "16%", height: "12%" };
+            const dashboardLabel = area.dashboardLabel ?? area.name;
 
             return (
               <Link
@@ -136,16 +137,16 @@ export function EstateDashboard() {
                   height: size.height,
                   transform: "translate(-50%, -50%)"
                 }}
-                aria-label={`Open ${area.name}`}
+                aria-label={`Open ${dashboardLabel}`}
                 title={area.name}
               >
                 {showRoomGuides ? (
                   <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1.5 text-[13px] font-bold shadow-sm">
-                    {area.name}
+                    {dashboardLabel}
                   </span>
                 ) : (
                   <EstateHotspotMarker
-                    label={area.name}
+                    label={dashboardLabel}
                     top={area.id === "front-gate" ? "28%" : area.id === "garden" ? "20%" : area.id === "driveway" ? "48%" : "50%"}
                     left={area.id === "garden" ? "65%" : area.id === "driveway" ? "50%" : "50%"}
                     labelPosition={area.id === "garden" ? "right" : "below"}

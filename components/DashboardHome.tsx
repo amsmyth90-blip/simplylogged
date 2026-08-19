@@ -86,7 +86,10 @@ export function DashboardHome() {
         }}
       >
         <section className="relative h-[100svh] overflow-hidden">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-3 sm:px-6 lg:px-8">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 sm:px-6 lg:px-8"
+            style={{ paddingTop: "max(30px, calc(env(safe-area-inset-top, 0px) + 12px))" }}
+          >
             <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
               <div className="min-w-0 rounded-full border border-white/40 bg-white/45 px-3.5 py-2 shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                 <p className="truncate text-[14px] font-semibold tracking-tight text-slate-900">
@@ -121,7 +124,10 @@ export function DashboardHome() {
             </div>
           </div>
           {todayItems.length ? (
-            <div className="absolute inset-x-0 top-[58px] z-20 overflow-x-auto px-3 pb-2 [scrollbar-width:none] sm:top-[66px] sm:px-6 lg:px-8">
+            <div
+              className="absolute inset-x-0 z-20 overflow-x-auto px-3 pb-2 [scrollbar-width:none] sm:px-6 lg:px-8"
+              style={{ top: "max(76px, calc(env(safe-area-inset-top, 0px) + 58px))" }}
+            >
               <div className="mx-auto flex max-w-6xl gap-2">
                 {todayItems.map((item) =>
                   item ? (
