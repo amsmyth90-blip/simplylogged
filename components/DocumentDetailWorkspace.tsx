@@ -7,7 +7,6 @@ import { EmptyState } from "@/components/EmptyState";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
-import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { documentCategoryOptions } from "@/lib/document-extraction";
@@ -338,21 +337,30 @@ export function DocumentDetailWorkspace({
 
   const isImage = document.mimeType?.startsWith("image/");
   const isPdf = document.mimeType === "application/pdf";
+  const needsReview = document.reviewStatus === "needs-review";
+  const filingDetails = [
+    { label: "Room", value: document.roomName ?? "All Files only" },
+    { label: "Category", value: document.category },
+    { label: "From", value: document.issuer ?? "Not captured" },
+    { label: "Due", value: document.dueDate || "No date" }
+  ];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        eyebrow={document.category}
-        title={document.title}
-        subtitle={document.extractionSummary ?? "Secure document details, filing, and AI capture notes."}
-        backHref={backHref}
-        backLabel={backLabel}
-        action={
+    <div className="space-y-3 pb-4">
+      <header className="rounded-[26px] border border-white/70 bg-white/82 p-3.5 shadow-soft backdrop-blur-md sm:p-4">
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={backHref}
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white/80 px-3 text-xs font-semibold text-ink/70 transition hover:bg-white"
+          >
+            <UiIcon name="arrow-left" className="h-3.5 w-3.5" />
+            {backLabel}
+          </Link>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={openCorrection}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/88 px-4 py-2 text-xs font-semibold text-ink shadow-soft"
+              className="inline-flex min-h-10 items-center rounded-full border border-black/10 bg-white/80 px-3 text-xs font-semibold text-ink/70 shadow-sm transition hover:bg-white"
             >
               Edit
             </button>
@@ -360,47 +368,71 @@ export function DocumentDetailWorkspace({
               <button
                 type="button"
                 onClick={() => void openStoredFile()}
-                className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white shadow-soft"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-ink px-3.5 text-xs font-semibold text-white shadow-soft"
               >
                 <UiIcon name="file" className="h-3.5 w-3.5" />
                 {isOpening ? "Opening" : "Open"}
               </button>
             ) : null}
           </div>
-        }
-        meta={
-          <>
-            <span className="estate-chip">{document.kind}</span>
-            <span className="estate-chip">{document.size}</span>
-            {document.roomName ? <span className="estate-chip">{document.roomName}</span> : null}
-            <span className="estate-chip">
-              {document.reviewStatus === "needs-review" ? "Needs review" : "Reviewed"}
-            </span>
-            {document.emergencyVisible ? <span className="estate-chip">Emergency visible</span> : null}
-          </>
-        }
-      />
+        </div>
 
-      <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-4">
-          <section className="estate-sheet overflow-hidden p-4">
-            <SectionHeader title="Original file" hint={document.originalFileName ?? "Stored DiaryDock document"} />
-            <div className="mt-4 overflow-hidden rounded-[28px] border border-white/70 bg-white/58">
+        <div className="mt-3 min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/42">{document.category}</p>
+          <h1 className="mt-1 line-clamp-2 text-[19px] font-semibold leading-snug tracking-tight text-ink sm:text-[22px]">
+            {document.title}
+          </h1>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="rounded-full bg-sage/60 px-2.5 py-1 text-[11px] font-semibold text-moss">{document.kind}</span>
+            <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-ink/55">{document.size}</span>
+            {document.roomName ? (
+              <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-ink/55">{document.roomName}</span>
+            ) : null}
+            <span
+              className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                needsReview ? "bg-amber-100 text-amber-800" : "bg-emerald-50 text-emerald-700"
+              }`}
+            >
+              {needsReview ? "Needs review" : "Reviewed"}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <section className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-3">
+          <section className="estate-sheet overflow-hidden p-3">
+            <div className="flex items-center justify-between gap-3 px-1">
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold tracking-tight text-ink">File preview</h2>
+                <p className="truncate text-xs text-ink/45">{document.originalFileName ?? "Stored DiaryDock document"}</p>
+              </div>
+              {document.storagePath ? (
+                <button
+                  type="button"
+                  onClick={() => void openStoredFile()}
+                  className="shrink-0 rounded-full border border-black/10 bg-white/75 px-3 py-1.5 text-xs font-semibold text-ink/60"
+                >
+                  Open
+                </button>
+              ) : null}
+            </div>
+            <div className="mt-3 overflow-hidden rounded-[20px] border border-white/70 bg-white/62">
               {signedUrl && isImage ? (
-                <img src={signedUrl} alt={document.title} className="max-h-[560px] w-full object-contain" />
+                <img src={signedUrl} alt={document.title} className="max-h-[56vh] w-full object-contain sm:max-h-[520px]" />
               ) : signedUrl && isPdf ? (
-                <iframe src={signedUrl} title={document.title} className="h-[560px] w-full bg-white" />
+                <iframe src={signedUrl} title={document.title} className="h-[54vh] min-h-[360px] w-full bg-white sm:h-[520px]" />
               ) : (
-                <div className="flex min-h-72 flex-col items-center justify-center px-6 py-10 text-center">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mist text-ink/45">
-                    <UiIcon name="file" className="h-7 w-7" />
+                <div className="flex min-h-52 flex-col items-center justify-center px-5 py-8 text-center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-mist text-ink/45">
+                    <UiIcon name="file" className="h-5 w-5" />
                   </span>
-                  <p className="mt-4 text-sm font-semibold text-ink">
+                  <p className="mt-3 text-sm font-semibold text-ink">
                     {document.storagePath ? "Secure original attached" : "No original file attached yet"}
                   </p>
-                  <p className="mt-1.5 max-w-sm text-sm leading-6 text-ink/55">
+                  <p className="mt-1 max-w-sm text-xs leading-5 text-ink/50">
                     {document.storagePath
-                      ? "Use Open to view the stored original in a secure temporary link."
+                      ? "Use Open to view the original securely."
                       : "Older demo documents have metadata only. New AI captures now store the original file."}
                   </p>
                 </div>
@@ -414,39 +446,62 @@ export function DocumentDetailWorkspace({
           </section>
 
           {document.extractedText ? (
-            <section className="estate-sheet p-5">
-              <SectionHeader title="OCR text" hint="Text DiaryDock read from the document" />
-              <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-ink/68">{document.extractedText}</p>
-            </section>
+            <details className="estate-sheet group p-3">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-1 text-sm font-semibold text-ink">
+                OCR text
+                <span className="rounded-full bg-white/75 px-2.5 py-1 text-[11px] text-ink/45 group-open:hidden">Show</span>
+                <span className="hidden rounded-full bg-white/75 px-2.5 py-1 text-[11px] text-ink/45 group-open:inline">Hide</span>
+              </summary>
+              <p className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap rounded-2xl bg-white/70 p-3 text-xs leading-5 text-ink/62">
+                {document.extractedText}
+              </p>
+            </details>
           ) : null}
         </div>
 
-        <div className="space-y-4">
-          {document.reviewStatus === "needs-review" ? (
-            <section className="estate-sheet border-amber-200/70 bg-amber-50/72 p-5">
-              <SectionHeader title="Needs review" hint="Check the AI capture before trusting these details" />
-              <div className="mt-4 space-y-2">
+        <div className="space-y-3">
+          {needsReview ? (
+            <section className="estate-sheet border-amber-200/70 bg-amber-50/78 p-3.5">
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/75 text-amber-700">
+                  <UiIcon name="alert" className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold text-ink">Please check this</h2>
+                  <p className="mt-0.5 text-xs leading-5 text-ink/55">Make sure the title, room and dates are right.</p>
+                </div>
+              </div>
+              <div className="mt-3 space-y-1.5">
                 {(document.reviewReasons?.length ? document.reviewReasons : ["Check AI filing details"]).map((reason) => (
-                  <div key={reason} className="flex items-start gap-2 rounded-2xl bg-white/72 px-3.5 py-3 text-sm text-amber-800">
+                  <div key={reason} className="flex items-start gap-2 rounded-2xl bg-white/72 px-3 py-2 text-xs leading-5 text-amber-800">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                     <span>{reason}</span>
                   </div>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => void markReviewed()}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white shadow-soft"
-              >
-                <UiIcon name="check" className="h-4 w-4" />
-                Mark as reviewed
-              </button>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={openCorrection}
+                  className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-black/10 bg-white/80 px-3 text-sm font-semibold text-ink/70"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void markReviewed()}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-ink px-3 text-sm font-semibold text-white shadow-soft"
+                >
+                  <UiIcon name="check" className="h-4 w-4" />
+                  Reviewed
+                </button>
+              </div>
             </section>
           ) : (
-            <section className="estate-sheet p-5">
+            <section className="estate-sheet p-3.5">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sage/60 text-moss">
-                  <UiIcon name="check" className="h-5 w-5" />
+                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-sage/60 text-moss">
+                  <UiIcon name="check" className="h-4 w-4" />
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-ink">Reviewed</p>
@@ -458,59 +513,25 @@ export function DocumentDetailWorkspace({
             </section>
           )}
 
-          <section className="estate-sheet p-5">
-            <SectionHeader title="Filing details" hint="Where DiaryDock placed this document" />
-            <div className={`mt-4 flex items-start gap-3 rounded-2xl border px-4 py-3 ${
-              document.reviewStatus === "needs-review"
-                ? "border-amber-200/80 bg-amber-50/80 text-amber-900"
-                : "border-[#cbd8c5] bg-[#edf3e9]/80 text-[#465b40]"
-            }`}>
-              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/75">
-                <UiIcon name={document.reviewStatus === "needs-review" ? "alert" : "check"} className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="text-sm font-semibold">
-                  {document.reviewStatus === "needs-review" ? "Please check these details" : "Details checked"}
-                </p>
-                <p className="mt-1 text-xs leading-5 opacity-75">
-                  {document.reviewStatus === "needs-review"
-                    ? "Compare the information below with the original document. Use Edit to correct anything before marking it as reviewed."
-                    : "These details have been reviewed. You can still use Edit if anything needs to be updated."}
-                </p>
-              </div>
+          <section className="estate-sheet p-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold tracking-tight text-ink">Details</h2>
+              <button type="button" onClick={openCorrection} className="text-xs font-semibold text-moss">
+                Edit
+              </button>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Room</p>
-                <p className="mt-1 font-semibold text-ink">{document.roomName ?? "All Files only"}</p>
-              </div>
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Category</p>
-                <p className="mt-1 font-semibold text-ink">{document.category}</p>
-              </div>
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Issuer</p>
-                <p className="mt-1 font-semibold text-ink">{document.issuer ?? "Not captured"}</p>
-              </div>
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Due date</p>
-                <p className="mt-1 font-semibold text-ink">{document.dueDate || "None visible"}</p>
-              </div>
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Detail check</p>
-                <p className="mt-1 font-semibold text-ink">
-                  {document.reviewStatus === "needs-review" ? "Please review" : "Checked"}
-                </p>
-              </div>
-              <div className="rounded-2xl bg-white/76 px-3.5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">Updated</p>
-                <p className="mt-1 font-semibold text-ink">{document.updated}</p>
-              </div>
+            <div className="mt-3 divide-y divide-black/5 overflow-hidden rounded-2xl bg-white/76">
+              {filingDetails.map((item) => (
+                <div key={item.label} className="grid grid-cols-[82px_1fr] gap-3 px-3 py-2.5 text-sm">
+                  <span className="text-xs font-semibold text-ink/42">{item.label}</span>
+                  <span className="min-w-0 truncate font-semibold text-ink/78">{item.value}</span>
+                </div>
+              ))}
             </div>
             {document.roomId ? (
               <Link
                 href={`/room/${document.roomId}`}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/78 px-4 py-3 text-sm font-semibold text-ink/70"
+                className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/78 px-4 text-sm font-semibold text-ink/70"
               >
                 Open {document.roomName}
                 <UiIcon name="chevron-right" className="h-4 w-4" />
@@ -519,18 +540,18 @@ export function DocumentDetailWorkspace({
           </section>
 
           {document.extractionSummary ? (
-            <section className="estate-sheet p-5">
-              <SectionHeader title="AI summary" hint="Captured during mobile intake" />
-              <p className="mt-4 text-sm leading-7 text-ink/68">{document.extractionSummary}</p>
+            <section className="estate-sheet p-3.5">
+              <h2 className="text-sm font-semibold tracking-tight text-ink">Summary</h2>
+              <p className="mt-2 text-xs leading-5 text-ink/62">{document.extractionSummary}</p>
             </section>
           ) : null}
 
           {document.actionItems?.length ? (
-            <section className="estate-sheet p-5">
-              <SectionHeader title="Action items" hint="Suggested follow-up from the scan" />
-              <div className="mt-4 space-y-2">
+            <section className="estate-sheet p-3.5">
+              <h2 className="text-sm font-semibold tracking-tight text-ink">Actions</h2>
+              <div className="mt-2 space-y-1.5">
                 {document.actionItems.map((item) => (
-                  <div key={item} className="flex items-start gap-2 rounded-2xl bg-white/70 px-3.5 py-3 text-sm text-ink/68">
+                  <div key={item} className="flex items-start gap-2 rounded-2xl bg-white/70 px-3 py-2 text-xs leading-5 text-ink/64">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-moss" />
                     <span>{item}</span>
                   </div>
@@ -540,9 +561,9 @@ export function DocumentDetailWorkspace({
           ) : null}
 
           {linkedReminders.length ? (
-            <section className="estate-sheet p-5">
-              <SectionHeader title="Linked reminders" hint="Follow-up connected to this document" />
-              <div className="mt-4 space-y-3">
+            <section className="estate-sheet p-3.5">
+              <h2 className="text-sm font-semibold tracking-tight text-ink">Linked reminders</h2>
+              <div className="mt-2 space-y-2">
                 {linkedReminders.map((reminder) => (
                   <ReminderCard key={reminder.id} reminder={reminder} compact href="/reminders" />
                 ))}
