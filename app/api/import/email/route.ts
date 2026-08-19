@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
 
@@ -25,6 +25,8 @@ type InboundAttachment = {
   mimeType: string;
   bytes: ArrayBuffer;
   size: number;
+  sourceEmailId?: string;
+  sourceAttachmentId?: string;
 };
 
 type AttachmentMetadata = {
@@ -117,6 +119,53 @@ function kindFromMimeType(mimeType: string) {
   if (mimeType === "application/pdf") return "PDF";
   if (mimeType.startsWith("image/")) return "Image";
   return "Scan";
+}
+
+function stableUuidFromText(value: string) {
+  const bytes = createHash("sha256").update(value).digest().subarray(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function documentIdForInboundAttachment({
+  userId,
+  recipientText,
+  subject,
+  sender,
+  attachment
+}: {
+  userId: string;
+  recipientText: string;
+  subject: string;
+  sender: string;
+  attachment: InboundAttachment;
+}) {
+  if (attachment.sourceEmailId && attachment.sourceAttachmentId) {
+    return stableUuidFromText(
+      [
+        "diarydock-resend-email-attachment",
+        userId,
+        attachment.sourceEmailId,
+        attachment.sourceAttachmentId
+      ].join("\u001f")
+    );
+  }
+
+  const fallbackIdentity = [
+    "diarydock-forwarded-email-attachment",
+    userId,
+    recipientText,
+    subject,
+    sender,
+    attachment.name,
+    attachment.mimeType,
+    String(attachment.size)
+  ].join("\u001f");
+
+  return fallbackIdentity.trim() ? stableUuidFromText(fallbackIdentity) : randomUUID();
 }
 
 function isFileLike(value: FormDataEntryValue): value is File {
@@ -275,7 +324,9 @@ async function parseResendPayload(request: NextRequest, resend: Resend, webhookS
       name: attachmentResult.data.filename ?? attachment.filename ?? "forwarded-attachment",
       mimeType: attachmentResult.data.content_type ?? attachment.content_type ?? "application/octet-stream",
       bytes,
-      size: bytes.byteLength
+      size: bytes.byteLength,
+      sourceEmailId: event.data.email_id,
+      sourceAttachmentId: id
     });
   }
 
@@ -351,6 +402,7 @@ export async function POST(request: NextRequest) {
   const subject = asString(payload.subject).trim();
   const sender = asString(payload.from) || asString(payload.sender) || "Forwarded email";
   const saved: { id: string; title: string }[] = [];
+  const skippedDuplicates: { id: string; title: string }[] = [];
 
   for (const attachment of attachments.slice(0, 12)) {
     const validationError = validateDocumentUpload({ type: attachment.mimeType, size: attachment.size });
@@ -359,12 +411,55 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const documentId = randomUUID();
     const safeName = sanitizeDocumentFileName(attachment.name) || "forwarded-attachment";
-    const storagePath = `${userId}/${documentId}/${safeName}`;
     const title = subject || titleFromFileName(attachment.name) || "Forwarded document";
     const sizeLabel = `${Math.max(1, Math.round(attachment.size / 1024))} KB`;
     const category = categoryFromText(`${subject} ${attachment.name}`);
+    const documentId = documentIdForInboundAttachment({
+      userId,
+      recipientText,
+      subject,
+      sender,
+      attachment
+    });
+    const storagePath = `${userId}/${documentId}/${safeName}`;
+
+    const { data: existingDocument, error: existingDocumentError } = await supabase
+      .from("documents")
+      .select("id,title")
+      .eq("user_id", userId)
+      .eq("id", documentId)
+      .maybeSingle();
+
+    if (existingDocumentError) {
+      return NextResponse.json({ error: "DiaryDock could not check for duplicate forwarded files." }, { status: 500 });
+    }
+
+    if (existingDocument) {
+      skippedDuplicates.push({ id: existingDocument.id, title: existingDocument.title ?? title });
+      continue;
+    }
+
+    const { data: matchingDocument, error: matchingDocumentError } = await supabase
+      .from("documents")
+      .select("id,title")
+      .eq("user_id", userId)
+      .eq("issuer", sender)
+      .eq("title", title)
+      .eq("original_file_name", attachment.name)
+      .eq("mime_type", attachment.mimeType)
+      .eq("size_label", sizeLabel)
+      .limit(1)
+      .maybeSingle();
+
+    if (matchingDocumentError) {
+      return NextResponse.json({ error: "DiaryDock could not check for duplicate forwarded files." }, { status: 500 });
+    }
+
+    if (matchingDocument) {
+      skippedDuplicates.push({ id: matchingDocument.id, title: matchingDocument.title ?? title });
+      continue;
+    }
 
     const { error: uploadError } = await supabase.storage.from(DOCUMENT_BUCKET).upload(storagePath, attachment.bytes, {
       contentType: attachment.mimeType,
@@ -408,9 +503,13 @@ export async function POST(request: NextRequest) {
     saved.push({ id: documentId, title });
   }
 
+  if (!saved.length && skippedDuplicates.length) {
+    return NextResponse.json({ ok: true, saved, skippedDuplicates });
+  }
+
   if (!saved.length) {
     return NextResponse.json({ error: "No supported PDF or image attachments were found." }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, saved });
+  return NextResponse.json({ ok: true, saved, skippedDuplicates });
 }
