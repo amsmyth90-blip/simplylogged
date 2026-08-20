@@ -203,7 +203,7 @@ function VaultWorkspaceInner() {
     const existingDocument = editingId ? documents.find((document) => document.id === editingId) : null;
     const nextDocument: VaultDocument = {
       ...existingDocument,
-      id: editingId ?? `v${Date.now()}`,
+      id: editingId ?? crypto.randomUUID(),
       title,
       category: draft.category,
       kind: draft.kind,
@@ -365,9 +365,9 @@ function VaultWorkspaceInner() {
         </section>
 
         {selectedFilter === "needs-review" ? (
-          <section className="estate-sheet border border-amber-200/65 bg-amber-50/72 p-5">
+          <section className="estate-sheet border border-amber-200/65 bg-amber-50/82 p-4">
             <div className="flex items-start gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/82 text-amber-700">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/88 text-amber-700">
                 <UiIcon name="alert" className="h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
@@ -379,21 +379,20 @@ function VaultWorkspaceInner() {
                       : "Scans and emailed files stay here until checked"
                   }
                 />
-                <p className="mt-2 text-sm leading-6 text-ink/62">
-                  Check each title, room, category and date against the original file. DiaryDock keeps imported email
-                  attachments private, but it never treats suggested details as confirmed until you review them.
+                <p className="mt-1.5 text-xs leading-5 text-ink/62">
+                  Incoming scans, shares and email attachments stay here until you confirm where they belong.
                 </p>
               </div>
             </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-3 gap-2">
               {[
-                { label: "Open the file", detail: "Compare the saved original with the suggested details." },
-                { label: "Move it", detail: "Choose the correct room, such as Office, Garage or Bedroom." },
-                { label: "Mark reviewed", detail: "Only confirm it once the important information looks right." }
+                { label: "Check", detail: "Open original" },
+                { label: "File", detail: "Choose room" },
+                { label: "Done", detail: "Mark reviewed" }
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-white/72 px-3.5 py-3">
+                <div key={item.label} className="rounded-2xl bg-white/78 px-3 py-2.5">
                   <p className="text-xs font-semibold text-ink">{item.label}</p>
-                  <p className="mt-1 text-[11px] leading-4 text-ink/50">{item.detail}</p>
+                  <p className="mt-0.5 text-[10px] leading-4 text-ink/50">{item.detail}</p>
                 </div>
               ))}
             </div>

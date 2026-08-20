@@ -5,6 +5,7 @@ import { Resend } from "resend";
 
 import { DOCUMENT_BUCKET, isAcceptedDocumentType, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 import { getInboundEmailSecret, verifyInboundEmailAddress } from "@/lib/inbound-email";
+import { createLifeInboxFingerprint } from "@/lib/life-inbox/dedupe";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -119,6 +120,16 @@ function kindFromMimeType(mimeType: string) {
   if (mimeType === "application/pdf") return "PDF";
   if (mimeType.startsWith("image/")) return "Image";
   return "Scan";
+}
+
+function isDuplicateError(error: { code?: string; message?: string; statusCode?: string } | null | undefined) {
+  const message = error?.message?.toLowerCase() ?? "";
+  return error?.code === "23505" || error?.statusCode === "409" || message.includes("duplicate") || message.includes("already exists");
+}
+
+function isMissingOptionalTableError(error: { code?: string; message?: string } | null | undefined) {
+  const message = error?.message?.toLowerCase() ?? "";
+  return error?.code === "42P01" || message.includes("could not find the table") || message.includes("schema cache");
 }
 
 function stableUuidFromText(value: string) {
@@ -423,6 +434,17 @@ export async function POST(request: NextRequest) {
       attachment
     });
     const storagePath = `${userId}/${documentId}/${safeName}`;
+    const fingerprint = createLifeInboxFingerprint({
+      userId,
+      sourceType: "email",
+      sourceId: attachment.sourceEmailId
+        ? `${attachment.sourceEmailId}:${attachment.sourceAttachmentId ?? attachment.name}`
+        : `${recipientText}:${sender}:${subject}`,
+      title,
+      fileName: attachment.name,
+      mimeType: attachment.mimeType,
+      size: attachment.size
+    });
 
     const { data: existingDocument, error: existingDocumentError } = await supabase
       .from("documents")
@@ -437,6 +459,22 @@ export async function POST(request: NextRequest) {
 
     if (existingDocument) {
       skippedDuplicates.push({ id: existingDocument.id, title: existingDocument.title ?? title });
+      continue;
+    }
+
+    const { data: existingInboxItem, error: existingInboxError } = await supabase
+      .from("life_inbox_items")
+      .select("id,document_id,title")
+      .eq("user_id", userId)
+      .eq("fingerprint", fingerprint)
+      .maybeSingle();
+
+    if (existingInboxError && !isMissingOptionalTableError(existingInboxError)) {
+      return NextResponse.json({ error: "DiaryDock could not check the import inbox for duplicate forwarded files." }, { status: 500 });
+    }
+
+    if (existingInboxItem?.document_id) {
+      skippedDuplicates.push({ id: existingInboxItem.document_id, title: existingInboxItem.title ?? title });
       continue;
     }
 
@@ -466,11 +504,11 @@ export async function POST(request: NextRequest) {
       upsert: false
     });
 
-    if (uploadError) {
+    if (uploadError && !isDuplicateError(uploadError)) {
       return NextResponse.json({ error: "DiaryDock could not securely store one of the forwarded files." }, { status: 500 });
     }
 
-    const { error: insertError } = await supabase.from("documents").insert({
+    const documentRow = {
       id: documentId,
       user_id: userId,
       title,
@@ -494,10 +532,47 @@ export async function POST(request: NextRequest) {
       reviewed_at: null,
       emergency_visible: false,
       shared_with: []
-    });
+    };
+
+    const { error: insertError } = await supabase.from("documents").insert(documentRow);
 
     if (insertError) {
+      if (isDuplicateError(insertError)) {
+        skippedDuplicates.push({ id: documentId, title });
+        continue;
+      }
+
       return NextResponse.json({ error: "DiaryDock could not save the forwarded document record." }, { status: 500 });
+    }
+
+    const { error: inboxInsertError } = await supabase.from("life_inbox_items").upsert(
+      {
+        user_id: userId,
+        document_id: documentId,
+        source_type: "email",
+        source_ref: attachment.sourceEmailId ?? sender,
+        fingerprint,
+        status: "needs_review",
+        title,
+        source_label: sender,
+        storage_bucket: DOCUMENT_BUCKET,
+        storage_path: storagePath,
+        suggested_room: "Mailbox",
+        suggested_category: category,
+        suggested_payload: {
+          subject,
+          sender,
+          fileName: attachment.name,
+          mimeType: attachment.mimeType,
+          size: attachment.size
+        },
+        review_notes: ["Forwarded by email — check the title, room, category and important dates."]
+      },
+      { onConflict: "user_id,fingerprint" }
+    );
+
+    if (inboxInsertError && !isMissingOptionalTableError(inboxInsertError)) {
+      return NextResponse.json({ error: "DiaryDock saved the document but could not update the review inbox." }, { status: 500 });
     }
 
     saved.push({ id: documentId, title });

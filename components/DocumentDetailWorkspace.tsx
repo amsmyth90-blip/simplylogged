@@ -346,12 +346,12 @@ export function DocumentDetailWorkspace({
   ];
 
   return (
-    <div className="space-y-3 pb-4">
-      <header className="rounded-[26px] border border-white/70 bg-white/82 p-3.5 shadow-soft backdrop-blur-md sm:p-4">
+    <div className="space-y-2.5 pb-4">
+      <header className="rounded-[22px] border border-white/70 bg-white/86 p-3 shadow-soft backdrop-blur-md sm:p-3.5">
         <div className="flex items-center justify-between gap-2">
           <Link
             href={backHref}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white/80 px-3 text-xs font-semibold text-ink/70 transition hover:bg-white"
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/82 px-2.5 text-[11px] font-semibold text-ink/70 transition hover:bg-white"
           >
             <UiIcon name="arrow-left" className="h-3.5 w-3.5" />
             {backLabel}
@@ -360,7 +360,7 @@ export function DocumentDetailWorkspace({
             <button
               type="button"
               onClick={openCorrection}
-              className="inline-flex min-h-10 items-center rounded-full border border-black/10 bg-white/80 px-3 text-xs font-semibold text-ink/70 shadow-sm transition hover:bg-white"
+              className="inline-flex min-h-9 items-center rounded-full border border-black/10 bg-white/82 px-3 text-[11px] font-semibold text-ink/70 shadow-sm transition hover:bg-white"
             >
               Edit
             </button>
@@ -368,7 +368,7 @@ export function DocumentDetailWorkspace({
               <button
                 type="button"
                 onClick={() => void openStoredFile()}
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-ink px-3.5 text-xs font-semibold text-white shadow-soft"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-ink px-3 text-[11px] font-semibold text-white shadow-soft"
               >
                 <UiIcon name="file" className="h-3.5 w-3.5" />
                 {isOpening ? "Opening" : "Open"}
@@ -377,12 +377,12 @@ export function DocumentDetailWorkspace({
           </div>
         </div>
 
-        <div className="mt-3 min-w-0">
+        <div className="mt-2.5 min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/42">{document.category}</p>
-          <h1 className="mt-1 line-clamp-2 text-[19px] font-semibold leading-snug tracking-tight text-ink sm:text-[22px]">
+          <h1 className="mt-0.5 line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight text-ink sm:text-[20px]">
             {document.title}
           </h1>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
             <span className="rounded-full bg-sage/60 px-2.5 py-1 text-[11px] font-semibold text-moss">{document.kind}</span>
             <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-ink/55">{document.size}</span>
             {document.roomName ? (
@@ -399,19 +399,19 @@ export function DocumentDetailWorkspace({
         </div>
       </header>
 
-      <section className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-3">
-          <section className="estate-sheet overflow-hidden p-3">
+      <section className="grid gap-2.5 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-2.5">
+          <section className="estate-sheet overflow-hidden p-2.5">
             <div className="flex items-center justify-between gap-3 px-1">
               <div className="min-w-0">
-                <h2 className="text-sm font-semibold tracking-tight text-ink">File preview</h2>
+                <h2 className="text-sm font-semibold tracking-tight text-ink">Original file</h2>
                 <p className="truncate text-xs text-ink/45">{document.originalFileName ?? "Stored DiaryDock document"}</p>
               </div>
               {document.storagePath ? (
                 <button
                   type="button"
                   onClick={() => void openStoredFile()}
-                  className="shrink-0 rounded-full border border-black/10 bg-white/75 px-3 py-1.5 text-xs font-semibold text-ink/60"
+                  className="shrink-0 rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold text-ink/60"
                 >
                   Open
                 </button>
@@ -419,21 +419,21 @@ export function DocumentDetailWorkspace({
             </div>
             <div className="mt-3 overflow-hidden rounded-[20px] border border-white/70 bg-white/62">
               {signedUrl && isImage ? (
-                <img src={signedUrl} alt={document.title} className="max-h-[56vh] w-full object-contain sm:max-h-[520px]" />
+                <img src={signedUrl} alt={document.title} className="max-h-[46vh] w-full object-contain sm:max-h-[500px]" />
               ) : signedUrl && isPdf ? (
-                <iframe src={signedUrl} title={document.title} className="h-[54vh] min-h-[360px] w-full bg-white sm:h-[520px]" />
+                <iframe src={signedUrl} title={document.title} className="h-[46vh] min-h-[310px] w-full bg-white sm:h-[500px]" />
               ) : (
-                <div className="flex min-h-52 flex-col items-center justify-center px-5 py-8 text-center">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-mist text-ink/45">
+                <div className="flex min-h-40 flex-col items-center justify-center px-4 py-6 text-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-mist text-ink/45">
                     <UiIcon name="file" className="h-5 w-5" />
                   </span>
-                  <p className="mt-3 text-sm font-semibold text-ink">
+                  <p className="mt-2.5 text-sm font-semibold text-ink">
                     {document.storagePath ? "Secure original attached" : "No original file attached yet"}
                   </p>
-                  <p className="mt-1 max-w-sm text-xs leading-5 text-ink/50">
+                  <p className="mt-1 max-w-xs text-xs leading-5 text-ink/50">
                     {document.storagePath
-                      ? "Use Open to view the original securely."
-                      : "Older demo documents have metadata only. New AI captures now store the original file."}
+                      ? "Open it securely when you need the full document."
+                      : "Older demo documents may only have saved details."}
                   </p>
                 </div>
               )}
@@ -459,16 +459,16 @@ export function DocumentDetailWorkspace({
           ) : null}
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {needsReview ? (
-            <section className="estate-sheet border-amber-200/70 bg-amber-50/78 p-3.5">
+            <section className="estate-sheet border-amber-200/70 bg-amber-50/82 p-3">
               <div className="flex items-start gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/75 text-amber-700">
                   <UiIcon name="alert" className="h-4 w-4" />
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-sm font-semibold text-ink">Please check this</h2>
-                  <p className="mt-0.5 text-xs leading-5 text-ink/55">Make sure the title, room and dates are right.</p>
+                  <p className="mt-0.5 text-xs leading-5 text-ink/55">Check the title, room and any dates before saving.</p>
                 </div>
               </div>
               <div className="mt-3 space-y-1.5">
