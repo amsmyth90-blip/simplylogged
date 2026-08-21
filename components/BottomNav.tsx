@@ -37,7 +37,7 @@ export function BottomNav() {
       return pathname === "/" || pathname === "/dashboard" || pathname.startsWith("/room") || pathname.startsWith("/wills") || pathname.startsWith("/office") || pathname.startsWith("/garage") || pathname.startsWith("/driveway") || pathname.startsWith("/bedroom") || pathname.startsWith("/garden");
     }
     if (item.id === "files") {
-      return pathname.startsWith("/files") || pathname.startsWith("/vault") || pathname.startsWith("/document");
+      return pathname.startsWith("/files") || pathname.startsWith("/review-inbox") || pathname.startsWith("/vault") || pathname.startsWith("/document");
     }
     return pathname.startsWith(item.href);
   };

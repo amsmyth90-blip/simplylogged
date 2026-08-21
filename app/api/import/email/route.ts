@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { DOCUMENT_BUCKET, isAcceptedDocumentType, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 import { getInboundEmailSecret, verifyInboundEmailAddress } from "@/lib/inbound-email";
 import { createLifeInboxFingerprint } from "@/lib/life-inbox/dedupe";
+import { suggestFilingDestination } from "@/lib/life-inbox/suggestions";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -426,6 +427,15 @@ export async function POST(request: NextRequest) {
     const title = subject || titleFromFileName(attachment.name) || "Forwarded document";
     const sizeLabel = `${Math.max(1, Math.round(attachment.size / 1024))} KB`;
     const category = categoryFromText(`${subject} ${attachment.name}`);
+    const filingSuggestion = suggestFilingDestination({
+      title,
+      category,
+      issuer: sender,
+      originalFileName: attachment.name,
+      extractionSummary: "Forwarded into DiaryDock by email. Please review the details before relying on them.",
+      roomId: "mailbox",
+      roomName: "Mailbox"
+    });
     const documentId = documentIdForInboundAttachment({
       userId,
       recipientText,
@@ -512,11 +522,11 @@ export async function POST(request: NextRequest) {
       id: documentId,
       user_id: userId,
       title,
-      category,
+      category: filingSuggestion.category,
       kind: kindFromMimeType(attachment.mimeType),
       size_label: sizeLabel,
-      room_id: "mailbox",
-      room_name: "Mailbox",
+      room_id: filingSuggestion.roomId,
+      room_name: filingSuggestion.roomName,
       issuer: sender,
       due_date: null,
       storage_bucket: DOCUMENT_BUCKET,
@@ -528,7 +538,11 @@ export async function POST(request: NextRequest) {
       action_items: [],
       confidence: null,
       review_status: "needs-review",
-      review_reasons: ["Forwarded by email — check the title, room, category and important dates."],
+      review_reasons: [
+        `Suggested filing: ${filingSuggestion.roomName} · ${filingSuggestion.category}.`,
+        filingSuggestion.reason,
+        "Forwarded by email — check the title, room, category and important dates."
+      ],
       reviewed_at: null,
       emergency_visible: false,
       shared_with: []
@@ -557,14 +571,16 @@ export async function POST(request: NextRequest) {
         source_label: sender,
         storage_bucket: DOCUMENT_BUCKET,
         storage_path: storagePath,
-        suggested_room: "Mailbox",
-        suggested_category: category,
+        suggested_room: filingSuggestion.roomName,
+        suggested_category: filingSuggestion.category,
         suggested_payload: {
           subject,
           sender,
           fileName: attachment.name,
           mimeType: attachment.mimeType,
-          size: attachment.size
+          size: attachment.size,
+          reason: filingSuggestion.reason,
+          confidence: filingSuggestion.confidence
         },
         review_notes: ["Forwarded by email — check the title, room, category and important dates."]
       },

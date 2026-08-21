@@ -415,7 +415,7 @@ export function SettingsWorkspace() {
 
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                   <Link
-                    href="/files?filter=needs-review"
+                    href="/review-inbox"
                     className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-4 text-sm font-semibold text-white shadow-soft"
                   >
                     Review inbox

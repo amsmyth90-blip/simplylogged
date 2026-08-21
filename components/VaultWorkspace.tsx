@@ -5,18 +5,20 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/EmptyState";
-import { DiaryDockDataProvider, useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
+import { suggestFilingDestination } from "@/lib/life-inbox/suggestions";
 import { remindersList, vaultCategories, vaultSecurity, type VaultDocument } from "@/lib/mock-data";
-import { upsertStructuredDocument } from "@/lib/structured-data";
+import { deleteStructuredDocument, upsertStructuredDocument } from "@/lib/structured-data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type VaultWorkspaceProps = {
   initialDocuments: VaultDocument[];
+  initialFilter?: VaultFilter;
 };
 
 type VaultFilter = "all" | "needs-review" | "shared" | "emergency" | "starred";
@@ -79,13 +81,13 @@ function isEmailImport(document: VaultDocument) {
   );
 }
 
-function VaultWorkspaceInner() {
+function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultFilter }) {
   const { state, repositoryMode, updateState } = useDiaryDockData();
   const searchParams = useSearchParams();
   const documents = state.vaultDocuments;
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedFilter, setSelectedFilter] = useState<VaultFilter>("all");
+  const [selectedFilter, setSelectedFilter] = useState<VaultFilter>(initialFilter);
   const [sortBy, setSortBy] = useState<VaultSort>("newest");
   const [selectedId, setSelectedId] = useState(documents[0]?.id ?? "");
   const [draft, setDraft] = useState<VaultDraft>(defaultDraft);
@@ -93,6 +95,7 @@ function VaultWorkspaceInner() {
   const [open, setOpen] = useState(false);
   const [fileMessage, setFileMessage] = useState<string | null>(null);
   const [openingFileId, setOpeningFileId] = useState<string | null>(null);
+  const [busyDocumentId, setBusyDocumentId] = useState<string | null>(null);
   const shareOptions = useMemo(
     () => state.householdMembers.filter((member) => member.accessTone !== "full" || member.name !== "Amy"),
     [state.householdMembers]
@@ -160,6 +163,7 @@ function VaultWorkspaceInner() {
   const selectedDocument =
     filteredDocuments.find((document) => document.id === selectedId) ?? filteredDocuments[0] ?? null;
   const starred = filteredDocuments.filter((document) => document.starred);
+  const reviewInboxMode = selectedFilter === "needs-review";
 
   useEffect(() => {
     const filter = searchParams.get("filter");
@@ -291,13 +295,69 @@ function VaultWorkspaceInner() {
     });
   };
 
+  const markDocumentReviewed = async (document: VaultDocument) => {
+    const reviewedDocument: VaultDocument = {
+      ...document,
+      reviewStatus: "reviewed",
+      reviewReasons: [],
+      reviewedAt: "Just now",
+      updated: "Just now"
+    };
+
+    setBusyDocumentId(document.id);
+    setFileMessage(null);
+    updateState((current) => ({
+      ...current,
+      vaultDocuments: current.vaultDocuments.map((item) => (item.id === document.id ? reviewedDocument : item))
+    }));
+
+    await upsertStructuredDocument(reviewedDocument).catch((error: unknown) => {
+      setFileMessage(error instanceof Error ? error.message : "DiaryDock could not mark this document as reviewed.");
+    });
+
+    setBusyDocumentId(null);
+  };
+
+  const deleteDuplicateDocument = async (document: VaultDocument) => {
+    const confirmed = window.confirm(`Delete duplicate "${document.title}" from DiaryDock?`);
+    if (!confirmed) {
+      return;
+    }
+
+    setBusyDocumentId(document.id);
+    setFileMessage(null);
+
+    updateState((current) => ({
+      ...current,
+      vaultDocuments: current.vaultDocuments.filter((item) => item.id !== document.id),
+      roomDocuments: Object.fromEntries(
+        Object.entries(current.roomDocuments).map(([roomId, roomDocuments]) => [
+          roomId,
+          roomDocuments.filter((item) => item.id !== `${roomId}-${document.id}` && item.title !== document.title)
+        ])
+      ),
+      reminders: current.reminders.filter((reminder) => reminder.documentId !== document.id),
+      mailboxItems: current.mailboxItems.filter((item) => item.title !== document.title)
+    }));
+
+    await deleteStructuredDocument(document).catch((error: unknown) => {
+      setFileMessage(error instanceof Error ? error.message : "DiaryDock could not delete this duplicate.");
+    });
+
+    setBusyDocumentId(null);
+  };
+
   return (
     <>
       <div className="immersive-page">
         <PageHeader
-          eyebrow="All files"
-          title="All Files"
-          subtitle="Every document, securely stored in one place."
+          eyebrow={reviewInboxMode ? "Review inbox" : "All files"}
+          title={reviewInboxMode ? "Review Inbox" : "All Files"}
+          subtitle={
+            reviewInboxMode
+              ? "Check new scans, shares and emailed documents before DiaryDock files them away."
+              : "Every document, securely stored in one place."
+          }
           heroImage="/images/pages/vault-hero.webp"
           heroPosition="center 44%"
           badge="Secure archive"
@@ -324,7 +384,8 @@ function VaultWorkspaceInner() {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search passports, policies, deeds..."
+            placeholder={reviewInboxMode ? "Search documents waiting for review..." : "Search passports, policies, deeds..."}
+            aria-label={reviewInboxMode ? "Search review inbox" : "Search files"}
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink/40"
           />
         </label>
@@ -364,7 +425,7 @@ function VaultWorkspaceInner() {
           </div>
         </section>
 
-        {selectedFilter === "needs-review" ? (
+        {reviewInboxMode ? (
           <section className="estate-sheet border border-amber-200/65 bg-amber-50/82 p-4">
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/88 text-amber-700">
@@ -380,14 +441,14 @@ function VaultWorkspaceInner() {
                   }
                 />
                 <p className="mt-1.5 text-xs leading-5 text-ink/62">
-                  Incoming scans, shares and email attachments stay here until you confirm where they belong.
+                  Open the original, check the suggested place, then mark it reviewed or delete obvious duplicates.
                 </p>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {[
                 { label: "Check", detail: "Open original" },
-                { label: "File", detail: "Choose room" },
+                { label: "File", detail: "Use suggestion" },
                 { label: "Done", detail: "Mark reviewed" }
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl bg-white/78 px-3 py-2.5">
@@ -488,45 +549,89 @@ function VaultWorkspaceInner() {
                   />
                 </div>
               ) : (
-                filteredDocuments.map((document) => (
-                  <button
-                    key={document.id}
-                    type="button"
-                    onClick={() => { window.location.href = `/document/${document.id}`; }}
-                    className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition hover:bg-white/60 ${
-                      selectedDocument?.id === document.id ? "bg-white/45" : ""
-                    }`}
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-[10px] font-bold text-ink/70">
-                      {document.kind}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-1.5">
-                        <span className="truncate text-sm font-semibold text-ink">{document.title}</span>
-                        {document.starred ? <UiIcon name="star" className="h-3.5 w-3.5 shrink-0 text-gold" /> : null}
-                        {document.emergencyVisible ? (
-                          <span className="shrink-0 rounded-full bg-blush px-2 py-0.5 text-[10px] font-semibold text-orange-700">
-                            Emergency
+                filteredDocuments.map((document) => {
+                  const suggestion = suggestFilingDestination(document);
+
+                  return (
+                    <article
+                      key={document.id}
+                      className={`px-3.5 py-3 transition hover:bg-white/60 ${
+                        selectedDocument?.id === document.id ? "bg-white/45" : ""
+                      }`}
+                    >
+                      <Link href={`/document/${document.id}`} className="flex items-center gap-3 text-left">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-[10px] font-bold text-ink/70">
+                          {document.kind}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-center gap-1.5">
+                            <span className="truncate text-sm font-semibold text-ink">{document.title}</span>
+                            {document.starred ? <UiIcon name="star" className="h-3.5 w-3.5 shrink-0 text-gold" /> : null}
+                            {document.emergencyVisible ? (
+                              <span className="shrink-0 rounded-full bg-blush px-2 py-0.5 text-[10px] font-semibold text-orange-700">
+                                Emergency
+                              </span>
+                            ) : null}
+                            {document.reviewStatus === "needs-review" ? (
+                              <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                                Review
+                              </span>
+                            ) : null}
+                            {isEmailImport(document) ? (
+                              <span className="shrink-0 rounded-full bg-sage/65 px-2 py-0.5 text-[10px] font-semibold text-moss">
+                                Email import
+                              </span>
+                            ) : null}
                           </span>
-                        ) : null}
-                        {document.reviewStatus === "needs-review" ? (
-                          <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                            Review
+                          <span className="mt-0.5 block text-xs text-ink/50">
+                            {document.category} - {document.size} - Updated {document.updated.toLowerCase()}
                           </span>
-                        ) : null}
-                        {isEmailImport(document) ? (
-                          <span className="shrink-0 rounded-full bg-sage/65 px-2 py-0.5 text-[10px] font-semibold text-moss">
-                            Email import
-                          </span>
-                        ) : null}
-                      </span>
-                      <span className="mt-0.5 block text-xs text-ink/50">
-                        {document.category} - {document.size} - Updated {document.updated.toLowerCase()}
-                      </span>
-                    </span>
-                    <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/25" />
-                  </button>
-                ))
+                        </span>
+                        <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-ink/25" />
+                      </Link>
+
+                      {reviewInboxMode ? (
+                        <div className="mt-2.5 rounded-2xl bg-white/62 px-3 py-2.5">
+                          <div className="flex items-start gap-2">
+                            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-sage/60 text-moss">
+                              <UiIcon name="folder" className="h-3.5 w-3.5" />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11px] font-semibold text-ink">
+                                Suggested: {suggestion.roomName} · {suggestion.category}
+                              </p>
+                              <p className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-ink/50">{suggestion.reason}</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-3 gap-1.5">
+                            <Link
+                              href={`/document/${document.id}`}
+                              className="inline-flex min-h-9 items-center justify-center rounded-xl border border-ink/10 bg-white/80 px-2 text-[10px] font-semibold text-ink/65"
+                            >
+                              Open
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => void markDocumentReviewed(document)}
+                              disabled={busyDocumentId === document.id}
+                              className="inline-flex min-h-9 items-center justify-center rounded-xl bg-[#2f5140] px-2 text-[10px] font-semibold text-white disabled:opacity-55"
+                            >
+                              Reviewed
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void deleteDuplicateDocument(document)}
+                              disabled={busyDocumentId === document.id}
+                              className="inline-flex min-h-9 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-2 text-[10px] font-semibold text-red-700 disabled:opacity-55"
+                            >
+                              Duplicate
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+                    </article>
+                  );
+                })
               )}
             </section>
 
@@ -918,6 +1023,6 @@ function VaultWorkspaceInner() {
   );
 }
 
-export function VaultWorkspace(_: VaultWorkspaceProps) {
-  return <VaultWorkspaceInner />;
+export function VaultWorkspace({ initialFilter = "all" }: VaultWorkspaceProps) {
+  return <VaultWorkspaceInner initialFilter={initialFilter} />;
 }

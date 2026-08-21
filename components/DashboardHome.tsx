@@ -53,7 +53,7 @@ export function DashboardHome() {
       : null,
     reviewCount > 0
       ? {
-          href: "/files",
+          href: "/review-inbox",
           icon: "alert" as const,
           title: "Review",
           detail: `${reviewCount} capture${reviewCount === 1 ? "" : "s"}`,

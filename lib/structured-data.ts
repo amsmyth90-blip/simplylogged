@@ -107,13 +107,55 @@ export async function upsertStructuredDocument(document: VaultDocument) {
   await upsertDocumentPermissions(document.id, arrayOrEmpty(document.sharedWith));
 }
 
-export async function upsertDocumentPermissions(documentId: string, sharedWith: string[]) {
+export async function deleteStructuredDocument(document: VaultDocument) {
   const client = getSupabaseBrowserClient();
   if (!client) {
     return;
   }
 
   const userId = await getAuthenticatedUserId();
+
+  if (document.storageBucket && document.storagePath) {
+    await client.storage.from(document.storageBucket).remove([document.storagePath]);
+  }
+
+  const { error: inboxDeleteError } = await client
+    .from("life_inbox_items")
+    .delete()
+    .eq("document_id", document.id)
+    .eq("user_id", userId);
+
+  if (inboxDeleteError && !isMissingOptionalTableError(inboxDeleteError)) {
+    throw new Error(inboxDeleteError.message);
+  }
+
+  const { error: permissionDeleteError } = await client
+    .from("document_permissions")
+    .delete()
+    .eq("document_id", document.id);
+
+  if (permissionDeleteError && !isMissingOptionalTableError(permissionDeleteError)) {
+    throw new Error(permissionDeleteError.message);
+  }
+
+  const { error } = await client
+    .from("documents")
+    .delete()
+    .eq("id", document.id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function upsertDocumentPermissions(documentId: string, sharedWith: string[]) {
+  const client = getSupabaseBrowserClient();
+  if (!client) {
+    return;
+  }
+
+  await getAuthenticatedUserId();
   const cleanNames = Array.from(new Set(sharedWith.map((name) => name.trim()).filter(Boolean)));
   const { error: deleteError } = await client.from("document_permissions").delete().eq("document_id", documentId);
 
