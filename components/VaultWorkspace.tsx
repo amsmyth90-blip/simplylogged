@@ -12,7 +12,7 @@ import { ReminderCard } from "@/components/ReminderCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { suggestFilingDestination } from "@/lib/life-inbox/suggestions";
-import { remindersList, vaultCategories, vaultSecurity, type VaultDocument } from "@/lib/mock-data";
+import { remindersList, vaultCategories, vaultSecurity, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
 import { deleteStructuredDocument, upsertStructuredDocument } from "@/lib/structured-data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -33,6 +33,49 @@ type VaultDraft = {
   emergencyVisible: boolean;
   starred: boolean;
 };
+
+type FilingDestination = {
+  roomId: string;
+  roomName: string;
+  category: string;
+};
+
+const filingDestinationOptions: FilingDestination[] = [
+  { roomId: "office", roomName: "Documents", category: "Important Correspondence" },
+  { roomId: "office", roomName: "Documents", category: "Identity" },
+  { roomId: "office", roomName: "Documents", category: "Legal & Estate" },
+  { roomId: "office", roomName: "Documents", category: "Finance" },
+  { roomId: "garage", roomName: "Vehicles", category: "Vehicle" },
+  { roomId: "bedroom", roomName: "Health", category: "Health & Medical" },
+  { roomId: "kitchen", roomName: "Home", category: "Recipes" },
+  { roomId: "garden", roomName: "Pets", category: "Pets" },
+  { roomId: "driveway", roomName: "Travel", category: "Travel" },
+  { roomId: "attic", roomName: "Memories", category: "Memories" }
+];
+
+function filingDestinationValue(destination: FilingDestination) {
+  return `${destination.roomId}::${destination.roomName}::${destination.category}`;
+}
+
+function parseFilingDestination(value: string): FilingDestination | null {
+  const [roomId, roomName, category] = value.split("::");
+
+  if (!roomId || !roomName || !category) {
+    return null;
+  }
+
+  return { roomId, roomName, category };
+}
+
+function buildRoomDocument(document: VaultDocument, destination: FilingDestination): RoomDocument {
+  return {
+    id: `${destination.roomId}-${document.id}`,
+    title: document.title,
+    kind: document.kind,
+    size: document.size,
+    updated: "Just now"
+  };
+}
 
 const defaultDraft: VaultDraft = {
   title: "",
@@ -96,6 +139,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   const [fileMessage, setFileMessage] = useState<string | null>(null);
   const [openingFileId, setOpeningFileId] = useState<string | null>(null);
   const [busyDocumentId, setBusyDocumentId] = useState<string | null>(null);
+  const [manualDestinationValues, setManualDestinationValues] = useState<Record<string, string>>({});
   const shareOptions = useMemo(
     () => state.householdMembers.filter((member) => member.accessTone !== "full" || member.name !== "Amy"),
     [state.householdMembers]
@@ -295,25 +339,53 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
     });
   };
 
-  const markDocumentReviewed = async (document: VaultDocument) => {
-    const reviewedDocument: VaultDocument = {
+  const fileDocumentToDestination = async (document: VaultDocument, destination: FilingDestination) => {
+    const filedDocument: VaultDocument = {
       ...document,
+      category: destination.category,
+      roomId: destination.roomId,
+      roomName: destination.roomName,
       reviewStatus: "reviewed",
       reviewReasons: [],
       reviewedAt: "Just now",
       updated: "Just now"
     };
+    const nextRoomDocument = buildRoomDocument(filedDocument, destination);
 
     setBusyDocumentId(document.id);
     setFileMessage(null);
     updateState((current) => ({
       ...current,
-      vaultDocuments: current.vaultDocuments.map((item) => (item.id === document.id ? reviewedDocument : item))
+      vaultDocuments: current.vaultDocuments.map((item) => (item.id === document.id ? filedDocument : item)),
+      roomDocuments: (() => {
+        const roomDocuments = Object.fromEntries(
+          Object.entries(current.roomDocuments).map(([roomId, roomDocuments]) => [
+            roomId,
+            roomDocuments.filter((item) => item.id !== `${roomId}-${document.id}` && item.title !== document.title)
+          ])
+        ) as Record<string, RoomDocument[]>;
+        const existing = roomDocuments[destination.roomId] ?? [];
+        roomDocuments[destination.roomId] = [
+          nextRoomDocument,
+          ...existing.filter((item) => item.id !== nextRoomDocument.id && item.title !== nextRoomDocument.title)
+        ].slice(0, 8);
+        return roomDocuments;
+      })(),
+      mailboxItems: current.mailboxItems.filter((item) => item.title !== document.title)
     }));
 
-    await upsertStructuredDocument(reviewedDocument).catch((error: unknown) => {
-      setFileMessage(error instanceof Error ? error.message : "DiaryDock could not mark this document as reviewed.");
-    });
+    await upsertStructuredDocument(filedDocument)
+      .then(() => {
+        setFileMessage(`Filed in ${destination.roomName} · ${destination.category}.`);
+        setManualDestinationValues((current) => {
+          const next = { ...current };
+          delete next[document.id];
+          return next;
+        });
+      })
+      .catch((error: unknown) => {
+        setFileMessage(error instanceof Error ? error.message : "DiaryDock could not file this document yet.");
+      });
 
     setBusyDocumentId(null);
   };
@@ -551,6 +623,14 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
               ) : (
                 filteredDocuments.map((document) => {
                   const suggestion = suggestFilingDestination(document);
+                  const suggestionValue = filingDestinationValue(suggestion);
+                  const destinationValue = manualDestinationValues[document.id] ?? suggestionValue;
+                  const selectedDestination: FilingDestination =
+                    parseFilingDestination(destinationValue) ?? suggestion;
+                  const destinationOptions = [
+                    suggestion,
+                    ...filingDestinationOptions.filter((option) => filingDestinationValue(option) !== suggestionValue)
+                  ];
 
                   return (
                     <article
@@ -604,20 +684,39 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
                             </div>
                           </div>
                           <div className="mt-2 grid grid-cols-3 gap-1.5">
+                            <label className="col-span-3">
+                              <span className="sr-only">Choose where to file {document.title}</span>
+                              <select
+                                value={destinationValue}
+                                onChange={(event) =>
+                                  setManualDestinationValues((current) => ({
+                                    ...current,
+                                    [document.id]: event.target.value
+                                  }))
+                                }
+                                className="min-h-9 w-full rounded-xl border border-ink/10 bg-white/88 px-3 text-[11px] font-semibold text-ink/70 outline-none transition focus:border-moss/40 focus:ring-2 focus:ring-moss/15"
+                              >
+                                {destinationOptions.map((option) => (
+                                  <option key={filingDestinationValue(option)} value={filingDestinationValue(option)}>
+                                    {option.roomName} · {option.category}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => void fileDocumentToDestination(document, selectedDestination)}
+                              disabled={busyDocumentId === document.id}
+                              className="inline-flex min-h-9 items-center justify-center rounded-xl bg-[#2f5140] px-2 text-[10px] font-semibold text-white disabled:opacity-55"
+                            >
+                              File here
+                            </button>
                             <Link
                               href={`/document/${document.id}`}
                               className="inline-flex min-h-9 items-center justify-center rounded-xl border border-ink/10 bg-white/80 px-2 text-[10px] font-semibold text-ink/65"
                             >
                               Open
                             </Link>
-                            <button
-                              type="button"
-                              onClick={() => void markDocumentReviewed(document)}
-                              disabled={busyDocumentId === document.id}
-                              className="inline-flex min-h-9 items-center justify-center rounded-xl bg-[#2f5140] px-2 text-[10px] font-semibold text-white disabled:opacity-55"
-                            >
-                              Reviewed
-                            </button>
                             <button
                               type="button"
                               onClick={() => void deleteDuplicateDocument(document)}
