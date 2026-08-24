@@ -11,6 +11,7 @@ import type { BillDocumentAnalysis } from "@/lib/bill-document-analysis";
 import { billCategories, effectiveBillStatus, formatBillDate, formatMoney, type BillRecord, type BillStatus } from "@/lib/bill-records";
 import { openPrivateDocument, uploadPrivateDocument } from "@/lib/document-storage";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
+import { dateTime as dateKey, daysUntil, documentKind, formatFileSize as fileSize } from "@/lib/presentation";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
 
 type BillsView = "dashboard" | "all" | "new" | "calendar" | "insights" | "inbox" | "detail";
@@ -23,10 +24,6 @@ const statusTone: Record<BillStatus, string> = {
   cancelled: "bg-[#ececec] text-[#6d716e]"
 };
 
-function dateKey(value: string) { return value ? new Date(`${value}T12:00:00`).getTime() : Number.POSITIVE_INFINITY; }
-function daysUntil(value: string) { return value ? Math.ceil((dateKey(value) - Date.now()) / 86400000) : Number.POSITIVE_INFINITY; }
-function documentKind(file: File): VaultDocument["kind"] { return file.type === "application/pdf" ? "PDF" : "Image"; }
-function fileSize(bytes: number) { return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`; }
 
 function BillRow({ bill }: { bill: BillRecord }) {
   const status = effectiveBillStatus(bill);

@@ -5,13 +5,10 @@ import Link from "next/link";
 import { BottomNav } from "@/components/BottomNav";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 
-const drivewayFeatureIds = [
-  "trips",
-  "travel-checklist",
-  "parking-permits",
-] as const;
-
-export type DrivewayFeatureId = (typeof drivewayFeatureIds)[number];
+export type DrivewayFeatureId =
+  | "trips"
+  | "travel-checklist"
+  | "parking-permits";
 
 const featureDetails: Record<
   DrivewayFeatureId,

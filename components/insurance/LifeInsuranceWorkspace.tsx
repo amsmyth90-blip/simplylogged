@@ -15,7 +15,6 @@ import {
 } from "@/components/bills/BillsUi";
 import { formatBillDate, formatMoney } from "@/lib/bill-records";
 import type {
-  InsurancePolicy,
   LifeBeneficiary,
   LifePolicyDetails,
 } from "@/lib/insurance-records";

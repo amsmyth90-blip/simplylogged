@@ -184,7 +184,7 @@ export function OnboardingWorkspace() {
               type="text"
               value={onboarding.householdMembers}
               onChange={(event) => updateHousehold("householdMembers", event.target.value)}
-              placeholder="Amy, Michael, Lily"
+              placeholder="Add the people in your household"
               className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
             />
           </label>

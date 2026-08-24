@@ -143,9 +143,11 @@ export function HouseholdProfilesWorkspace() {
   };
 
   const openEdit = (profile: HouseholdProfile) => {
-    const { id, linkedUserId: _linkedUserId, ...nextDraft } = profile;
-    setEditingId(id);
-    setDraft(nextDraft);
+    const nextDraft = { ...profile } as Partial<HouseholdProfile>;
+    delete nextDraft.id;
+    delete nextDraft.linkedUserId;
+    setEditingId(profile.id);
+    setDraft(nextDraft as ProfileDraft);
     setMessage("");
     setEditorOpen(true);
   };

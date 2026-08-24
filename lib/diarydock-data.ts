@@ -1,18 +1,7 @@
 "use client";
 
 import {
-  emergencyContacts,
-  emergencyPlans,
-  familyMembers,
-  homeInfo,
-  pendingInvite,
-  profile,
-  remindersList,
   roomDetails,
-  sharedAccess,
-  trustedContacts,
-  vaultDocuments,
-  vaultSecurity,
   type EmergencyContact,
   type EmergencyPlan,
   type FamilyMember,
@@ -33,7 +22,6 @@ import {
 import { loadStructuredDocumentsAndReminders } from "@/lib/structured-data";
 import type { MealPlan } from "@/lib/meal-planner";
 import {
-  starterKitchenRecipes,
   type KitchenCookingProgress,
   type KitchenRecipe,
 } from "@/lib/kitchen-recipes";
@@ -122,6 +110,19 @@ export type HouseholdMember = FamilyMember & {
   userId?: string;
   householdRole?: HouseholdRole;
   joinedAt?: string;
+};
+
+export type HomeInfoEntry = {
+  label: string;
+  value: string;
+};
+
+export type SettingsProfile = {
+  name: string;
+  email: string;
+  plan: string;
+  memberSince: string;
+  initials: string;
 };
 
 export type SettingRow =
@@ -261,8 +262,8 @@ export type DiaryDockAppState = {
   careContacts: CareContact[];
   emergencyContacts: EmergencyContact[];
   emergencyPlans: EmergencyPlan[];
-  homeInfo: typeof homeInfo;
-  settingsProfile: typeof profile;
+  homeInfo: HomeInfoEntry[];
+  settingsProfile: SettingsProfile;
   settingsGroups: SettingGroup[];
   roomTasks: Record<string, RoomTask[]>;
   roomDocuments: Record<string, RoomDocument[]>;
@@ -292,87 +293,9 @@ export type DiaryDockAppState = {
 
 export type RepositoryMode = "session" | "supabase";
 
-export const initialMailboxItems: MailItem[] = [
-  {
-    id: "mail-item-1",
-    title: "Council tax renewal",
-    source: "Richmond Council",
-    kind: "Letter",
-    suggestedRoom: "Office",
-    routeStatus: "new",
-  },
-  {
-    id: "mail-item-2",
-    title: "School trip consent form",
-    source: "Greyfriars Primary",
-    kind: "Form",
-    suggestedRoom: "Family Room",
-    routeStatus: "new",
-  },
-  {
-    id: "mail-item-3",
-    title: "Water bill Q2",
-    source: "Thames Water",
-    kind: "Bill",
-    suggestedRoom: "Office",
-    routeStatus: "new",
-  },
-];
+export const initialMailboxItems: MailItem[] = [];
 
-export const initialKitchenNoticeboard: KitchenNotice[] = [
-  {
-    id: "notice-school-trip",
-    title: "School trip form",
-    detail: "Sign and return the consent form.",
-    category: "School",
-    assignedTo: "Amy",
-    due: "Friday",
-    colour: "blue",
-    pinned: true,
-    completed: false,
-    archived: false,
-    createdAt: "2026-07-29T08:00:00.000Z",
-  },
-  {
-    id: "notice-bins",
-    title: "Bins out tonight",
-    detail: "Recycling and food waste this week.",
-    category: "Home",
-    assignedTo: "Michael",
-    due: "Tonight",
-    colour: "sage",
-    pinned: true,
-    completed: false,
-    archived: false,
-    createdAt: "2026-07-29T08:05:00.000Z",
-  },
-  {
-    id: "notice-dentist",
-    title: "Dentist - 3:30 pm",
-    detail: "Leave school at 3:00 pm.",
-    category: "Health",
-    assignedTo: "Family",
-    due: "Today",
-    colour: "cream",
-    pinned: true,
-    completed: false,
-    archived: false,
-    createdAt: "2026-07-29T08:10:00.000Z",
-  },
-  {
-    id: "notice-meal-plan",
-    title: "Meal plan updated",
-    detail: "The full week is ready in the Kitchen.",
-    category: "Plans",
-    assignedTo: "Family",
-    due: "This week",
-    colour: "clay",
-    pinned: true,
-    completed: false,
-    archived: false,
-    createdAt: "2026-07-29T08:15:00.000Z",
-  },
-];
+export const initialKitchenNoticeboard: KitchenNotice[] = [];
 
 export const initialWillsWishes: WillsWishesRecord = {
   fullName: "",
@@ -457,18 +380,18 @@ export const initialSettingGroups: SettingGroup[] = [
       {
         kind: "value",
         label: "Home address",
-        value: "42 Alder Lane, Richmond",
+        value: "Not added",
       },
       {
         kind: "link",
         label: "Family & access",
-        hint: "3 members, 1 invite pending",
+        hint: "Manage household members",
         href: "/family",
       },
       {
         kind: "link",
         label: "Emergency panel",
-        hint: "Reviewed today",
+        hint: "Keep important contacts ready",
         href: "/emergency",
       },
     ],
@@ -480,7 +403,7 @@ export const initialSettingGroups: SettingGroup[] = [
       {
         kind: "toggle",
         label: "Nightly backup",
-        hint: `Last ran ${vaultSecurity.lastBackup.toLowerCase()}`,
+        hint: "Configure secure backups",
         value: true,
       },
       {
@@ -496,18 +419,18 @@ export const initialSettingGroups: SettingGroup[] = [
 export function createInitialOnboardingState(): OnboardingState {
   return {
     completed: false,
-    householdName: "Amy's household",
-    householdMembers: "Amy, Michael, Lily",
-    selectedRooms: ["office", "safe-room", "bedroom", "family-room", "garage"],
-    emergencyContactAdded: true,
-    familyInviteAdded: true,
+    householdName: "",
+    householdMembers: "",
+    selectedRooms: [],
+    emergencyContactAdded: false,
+    familyInviteAdded: false,
     starterDocuments: [
       {
         id: "passport",
         title: "Passport or ID",
         roomId: "office",
         roomName: "Office",
-        done: true,
+        done: false,
       },
       {
         id: "home-insurance",
@@ -528,7 +451,7 @@ export function createInitialOnboardingState(): OnboardingState {
         title: "GP and health details",
         roomId: "bedroom",
         roomName: "Bedroom",
-        done: true,
+        done: false,
       },
       {
         id: "will",
@@ -573,38 +496,28 @@ export function getOnboardingProgress(onboarding: OnboardingState) {
 }
 
 function hydrateDiaryDockState(state: DiaryDockAppState): DiaryDockAppState {
-  const storedRecipes = state.kitchenRecipes?.length
-    ? state.kitchenRecipes
-    : starterKitchenRecipes;
-  const upgradedRecipes = storedRecipes.map((recipe) => {
-    const starter = starterKitchenRecipes.find((item) => item.id === recipe.id);
-    if (!starter || (recipe.version ?? 0) >= (starter.version ?? 0))
-      return recipe;
-    return { ...starter, favourite: recipe.favourite };
-  });
-  const kitchenRecipes = [
-    ...upgradedRecipes,
-    ...starterKitchenRecipes.filter(
-      (starter) => !upgradedRecipes.some((recipe) => recipe.id === starter.id),
-    ),
-  ];
-
   return {
     ...state,
-    vaultDocuments: mergeById(state.vaultDocuments ?? [], vaultDocuments),
-    householdMembers: state.householdMembers?.length
-      ? state.householdMembers
-      : familyMembers,
+    reminders: state.reminders ?? [],
+    vaultDocuments: state.vaultDocuments ?? [],
+    householdMembers: state.householdMembers ?? [],
+    familyInvites: state.familyInvites ?? [],
+    careContacts: state.careContacts ?? [],
+    emergencyContacts: state.emergencyContacts ?? [],
+    emergencyPlans: state.emergencyPlans ?? [],
+    homeInfo: state.homeInfo ?? [],
+    roomTasks: state.roomTasks ?? mapRoomEntries(() => []),
+    roomDocuments: state.roomDocuments ?? mapRoomEntries(() => []),
+    roomActivity: state.roomActivity ?? mapRoomEntries(() => []),
+    mailboxItems: state.mailboxItems ?? [],
     onboarding: {
       ...createInitialOnboardingState(),
       ...(state.onboarding ?? {}),
     },
     mealPlan: state.mealPlan ?? {},
-    kitchenRecipes,
+    kitchenRecipes: state.kitchenRecipes ?? [],
     kitchenCookingProgress: state.kitchenCookingProgress ?? null,
-    kitchenNoticeboard: state.kitchenNoticeboard?.length
-      ? state.kitchenNoticeboard
-      : initialKitchenNoticeboard,
+    kitchenNoticeboard: state.kitchenNoticeboard ?? [],
     familyCalendarEvents: state.familyCalendarEvents ?? [],
     kidSchedules: state.kidSchedules ?? [],
     householdProfiles: state.householdProfiles ?? [],
@@ -626,11 +539,7 @@ function hydrateDiaryDockState(state: DiaryDockAppState): DiaryDockAppState {
     travelChecklist: hydrateTravelChecklistRecord(state.travelChecklist),
     health: hydrateHealthRecord(state.health),
     familyStories: hydrateFamilyStories(state.familyStories),
-    kitchenItems: state.kitchenItems ?? [
-      { id: "milk", name: "Milk", checked: false, section: "Shopping" },
-      { id: "pasta", name: "Pasta", checked: true, section: "Pantry" },
-      { id: "rice", name: "Rice", checked: true, section: "Pantry" },
-    ],
+    kitchenItems: state.kitchenItems ?? [],
   };
 }
 
@@ -708,45 +617,31 @@ async function mergeStructuredData(state: DiaryDockAppState) {
 
 export function createInitialDiaryDockState(): DiaryDockAppState {
   return hydrateDiaryDockState({
-    reminders: remindersList,
-    vaultDocuments,
-    householdMembers: familyMembers,
-    familyInvites: [
-      {
-        id: "pending-rose",
-        name: pendingInvite.name,
-        relation: pendingInvite.relation,
-        access: "Viewer - Memories only",
-        sentAgo: pendingInvite.sentAgo,
-        initials: pendingInvite.initials,
-        status: "pending",
-      },
-    ],
-    careContacts: trustedContacts.map((contact) => ({
-      id: contact.id,
-      name: contact.name,
-      relation: contact.relation,
-      detail: contact.detail.replace("Â·", "-"),
-      phone: contact.phone,
-      initials: contact.initials,
-    })),
-    emergencyContacts,
-    emergencyPlans,
-    homeInfo,
+    reminders: [],
+    vaultDocuments: [],
+    householdMembers: [],
+    familyInvites: [],
+    careContacts: [],
+    emergencyContacts: [],
+    emergencyPlans: [],
+    homeInfo: [],
     settingsProfile: {
-      ...profile,
-      plan: profile.plan.replace("Â·", "-"),
+      name: "",
+      email: "",
+      plan: "DiaryDock",
+      memberSince: "",
+      initials: "",
     },
     settingsGroups: initialSettingGroups,
-    roomTasks: mapRoomEntries((roomId) => roomDetails[roomId].tasks),
-    roomDocuments: mapRoomEntries((roomId) => roomDetails[roomId].documents),
-    roomActivity: mapRoomEntries((roomId) => roomDetails[roomId].activity),
-    mailboxItems: initialMailboxItems,
+    roomTasks: mapRoomEntries(() => []),
+    roomDocuments: mapRoomEntries(() => []),
+    roomActivity: mapRoomEntries(() => []),
+    mailboxItems: [],
     onboarding: createInitialOnboardingState(),
     mealPlan: {},
-    kitchenRecipes: starterKitchenRecipes,
+    kitchenRecipes: [],
     kitchenCookingProgress: null,
-    kitchenNoticeboard: initialKitchenNoticeboard,
+    kitchenNoticeboard: [],
     familyCalendarEvents: [],
     kidSchedules: [],
     householdProfiles: [],
@@ -761,15 +656,11 @@ export function createInitialDiaryDockState(): DiaryDockAppState {
     travelChecklist: createInitialTravelChecklistRecord(),
     health: createInitialHealthRecord(),
     familyStories: [],
-    kitchenItems: [
-      { id: "milk", name: "Milk", checked: false, section: "Shopping" },
-      { id: "pasta", name: "Pasta", checked: true, section: "Pantry" },
-      { id: "rice", name: "Rice", checked: true, section: "Pantry" },
-    ],
+    kitchenItems: [],
   });
 }
 
-const SESSION_KEY = "diarydock-app-state";
+const SESSION_KEY = "diarydock-app-state-v2";
 
 export type DiaryDockRepository = {
   mode: RepositoryMode;

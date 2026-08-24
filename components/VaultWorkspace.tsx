@@ -141,7 +141,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   const [busyDocumentId, setBusyDocumentId] = useState<string | null>(null);
   const [manualDestinationValues, setManualDestinationValues] = useState<Record<string, string>>({});
   const shareOptions = useMemo(
-    () => state.householdMembers.filter((member) => member.accessTone !== "full" || member.name !== "Amy"),
+    () => state.householdMembers,
     [state.householdMembers]
   );
 
@@ -206,7 +206,6 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
 
   const selectedDocument =
     filteredDocuments.find((document) => document.id === selectedId) ?? filteredDocuments[0] ?? null;
-  const starred = filteredDocuments.filter((document) => document.starred);
   const reviewInboxMode = selectedFilter === "needs-review";
 
   useEffect(() => {
@@ -436,7 +435,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
           action={
             <div className="flex items-center gap-2">
               <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
-                {repositoryMode === "supabase" ? "Supabase live" : "Session demo"}
+                {repositoryMode === "supabase" ? "Secure sync" : "Local session"}
               </span>
               <button
                 type="button"
@@ -734,28 +733,6 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
               )}
             </section>
 
-            <section className="hidden">
-              <SectionHeader title="Starred" hint="Pinned for quick access" />
-              <div className="mt-4 flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {starred.map((document) => (
-                  <button
-                    key={document.id}
-                    type="button"
-                    onClick={() => { window.location.href = `/document/${document.id}`; }}
-                    className="estate-sheet w-44 shrink-0 p-4 text-left transition hover:-translate-y-0.5"
-                  >
-                    <div className="flex shrink-0 items-center">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-mist text-[10px] font-bold text-ink/70">
-                        {document.kind}
-                      </span>
-                      <UiIcon name="star" className="h-4 w-4 text-gold" />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold leading-snug text-ink">{document.title}</p>
-                    <p className="mt-1 text-xs text-ink/50">{document.category}</p>
-                  </button>
-                ))}
-              </div>
-            </section>
           </div>
 
           <div className="hidden">

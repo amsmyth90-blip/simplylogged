@@ -66,8 +66,6 @@ export function KitchenPantryPlanner() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const libraryInputRef = useRef<HTMLInputElement>(null);
 
-  const pantryItems = state.kitchenItems.filter(item => item.section === "Pantry");
-  const shoppingItems = state.kitchenItems.filter(item => item.section === "Shopping");
   const selectedMeal = analysis?.mealSuggestions[selectedMealIndex] ?? null;
 
   useEffect(() => {

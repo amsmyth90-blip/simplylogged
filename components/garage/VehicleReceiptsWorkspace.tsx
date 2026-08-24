@@ -11,6 +11,7 @@ import { ModalShell } from "@/components/ModalShell";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { openPrivateDocument, uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
 import type { VaultDocument } from "@/lib/mock-data";
+import { documentKind as fileKind, formatDate as sharedFormatDate, formatFileSize as fileSize } from "@/lib/presentation";
 import type { ReceiptDocumentAnalysis } from "@/lib/receipt-document-analysis";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { upsertStructuredDocument } from "@/lib/structured-data";
@@ -26,11 +27,9 @@ const categoryColours: Record<ExpenseCategory, string> = { Service: "#17643c", F
 const emptyDraft = { title: "", provider: "", date: "", amount: "", category: "Other" as ExpenseCategory, mileage: "", paymentMethod: "", receiptNumber: "", notes: "", linkedServiceId: "" };
 
 function money(value: number) { return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }).format(value); }
-function formatDate(value: string) { if (!value) return "Not recorded"; const date = new Date(`${value}T12:00:00`); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(date); }
+function formatDate(value: string) { return sharedFormatDate(value, "2-digit"); }
 function monthLabel(value: string) { const date = new Date(`${value}-01T12:00:00`); return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(date); }
 function numberOrNull(value: string) { if (!value.trim()) return null; const parsed = Number(value); return Number.isFinite(parsed) ? parsed : null; }
-function fileSize(value: number) { return value < 1024 * 1024 ? `${Math.max(1, Math.round(value / 1024))} KB` : `${(value / (1024 * 1024)).toFixed(1)} MB`; }
-function fileKind(file: File): VaultDocument["kind"] { return file.type === "application/pdf" ? "PDF" : "Image"; }
 function audit(action: string) { return { id: crypto.randomUUID(), action, createdAt: new Date().toISOString() }; }
 
 export function VehicleReceiptsWorkspace({ vehicleId, mode = "overview", receiptId }: { vehicleId: string; mode?: ReceiptsMode; receiptId?: string }) {

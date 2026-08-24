@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           title: "Cookies and local storage",
           body: [
             "DiaryDock uses essential authentication cookies from Supabase to keep you signed in and protect your account session.",
-            "DiaryDock also uses local browser storage for app preferences and draft/demo state, such as household style choices and temporary room data.",
+            "DiaryDock also uses local browser storage for app preferences and draft state, such as household style choices and temporary room data.",
             "We do not currently use advertising cookies, cross-site tracking cookies, or third-party marketing pixels. If that changes, we will update this policy and request consent where required."
           ]
         },

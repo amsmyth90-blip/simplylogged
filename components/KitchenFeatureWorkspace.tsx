@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { KitchenNoticeboard } from "@/components/KitchenNoticeboard";
 import { KitchenPantryPlanner } from "@/components/KitchenPantryPlanner";
@@ -258,37 +258,40 @@ function MealPlanner() {
   const suppressClickRef = useRef(false);
   const [diners, setDiners] = useStoredState<string[]>("diarydock-meal-diners-v2", []);
   const savedMealProfiles = state.householdProfiles.filter((profile) => profile.showInMeals);
-  const householdMealProfiles = [
-    ...savedMealProfiles,
-    ...state.householdMembers
-      .filter(
-        (member) =>
-          !savedMealProfiles.some(
-            (profile) =>
-              profile.id === member.id ||
-              profile.linkedUserId === member.userId ||
-              profile.name.toLowerCase() === member.name.toLowerCase()
-          )
-      )
-      .map((member, index) => ({
-        id: member.id,
-        name: member.name,
-        colour: (["sage", "blue", "clay", "gold"] as const)[index % 4]
-      }))
-  ];
-  const knownMealNames = householdMealProfiles.map((profile) => profile.name.toLowerCase());
-  const scheduleMealProfiles = Array.from(
-    new Set(state.kidSchedules.map((routine) => routine.childName.trim()).filter(Boolean))
-  )
-    .filter((name) => !knownMealNames.includes(name.toLowerCase()))
-    .map((name, index) => ({
-      id: `schedule-profile-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
-      name,
-      colour: (["sage", "blue", "clay", "gold"] as const)[
-        (householdMealProfiles.length + index) % 4
-      ]
-    }));
-  const mealProfiles = [...householdMealProfiles, ...scheduleMealProfiles];
+  const mealProfiles = useMemo(() => {
+    const householdMealProfiles = [
+      ...savedMealProfiles,
+      ...state.householdMembers
+        .filter(
+          (member) =>
+            !savedMealProfiles.some(
+              (profile) =>
+                profile.id === member.id ||
+                profile.linkedUserId === member.userId ||
+                profile.name.toLowerCase() === member.name.toLowerCase()
+            )
+        )
+        .map((member, index) => ({
+          id: member.id,
+          name: member.name,
+          colour: (["sage", "blue", "clay", "gold"] as const)[index % 4]
+        }))
+    ];
+    const knownMealNames = householdMealProfiles.map((profile) => profile.name.toLowerCase());
+    const scheduleMealProfiles = Array.from(
+      new Set(state.kidSchedules.map((routine) => routine.childName.trim()).filter(Boolean))
+    )
+      .filter((name) => !knownMealNames.includes(name.toLowerCase()))
+      .map((name, index) => ({
+        id: `schedule-profile-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+        name,
+        colour: (["sage", "blue", "clay", "gold"] as const)[
+          (householdMealProfiles.length + index) % 4
+        ]
+      }));
+
+    return [...householdMealProfiles, ...scheduleMealProfiles];
+  }, [savedMealProfiles, state.householdMembers, state.kidSchedules]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -752,17 +755,10 @@ function MealPlanner() {
   );
 }
 
-function Recipes() {
-  const recipes = [{ id:"roast",name:"Sunday roast chicken",time:"1 hr 30",note:"Family favourite" },{ id:"pasta",name:"Tomato garden pasta",time:"25 min",note:"Quick weekday meal" },{ id:"salmon",name:"Lemon herb salmon",time:"35 min",note:"Fresh and simple" }];
-  const [favourites,setFavourites] = useStoredState<string[]>("diarydock-favourite-recipes", ["roast"]);
-  return <FeatureShell title="Family recipes" subtitle="The recipes everyone asks for, kept together in the Kitchen."><div className="space-y-3">{recipes.map(recipe => <article key={recipe.id} className="rounded-[24px] border border-white/90 bg-white/76 p-4"><div className="flex items-start justify-between"><div><h2 className="font-semibold">{recipe.name}</h2><p className="mt-1 text-xs text-slate-500">{recipe.time} · {recipe.note}</p></div><button aria-label="Toggle favourite" onClick={() => setFavourites(current => current.includes(recipe.id) ? current.filter(id => id !== recipe.id) : [...current, recipe.id])} className={"flex h-9 w-9 items-center justify-center rounded-full " + (favourites.includes(recipe.id) ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400")}><UiIcon name="star" className="h-4 w-4" /></button></div></article>)}</div></FeatureShell>;
-}
-
 function KitchenDocuments() {
   const { state } = useDiaryDockData();
   const saved = state.vaultDocuments.filter(document => document.roomId === "kitchen" || document.roomName === "Kitchen");
-  const examples = saved.length ? saved : [{ id:"sample-warranty",title:"Dishwasher Warranty",category:"Home & Property",updated:"Today" },{ id:"sample-manual",title:"Oven User Manual",category:"Home & Property",updated:"Last month" },{ id:"sample-inventory",title:"Kitchen Appliance Inventory",category:"Home & Property",updated:"May" }];
-  return <FeatureShell title="Kitchen documents" subtitle="Manuals, warranties, appliance receipts and kitchen records."><Link href="/capture?room=kitchen" className="flex items-center justify-center gap-2 rounded-[22px] bg-[#263b35] py-3.5 text-sm font-semibold text-white"><UiIcon name="plus" className="h-4 w-4" />Add Kitchen document</Link><div className="mt-4 space-y-2.5">{examples.map(document => <article key={document.id} className="flex items-center gap-3 rounded-[22px] border border-white/90 bg-white/78 p-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e7f0e2] text-[#5b7751]"><UiIcon name="file" className="h-5 w-5" /></span><div className="min-w-0"><h2 className="truncate text-sm font-semibold">{document.title}</h2><p className="mt-0.5 text-[11px] text-slate-500">{document.category} · {document.updated}</p></div></article>)}</div></FeatureShell>;
+  return <FeatureShell title="Kitchen documents" subtitle="Manuals, warranties, appliance receipts and kitchen records."><Link href="/capture?room=kitchen" className="flex items-center justify-center gap-2 rounded-[22px] bg-[#263b35] py-3.5 text-sm font-semibold text-white"><UiIcon name="plus" className="h-4 w-4" />Add Kitchen document</Link>{saved.length ? <div className="mt-4 space-y-2.5">{saved.map(document => <article key={document.id} className="flex items-center gap-3 rounded-[22px] border border-white/90 bg-white/78 p-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e7f0e2] text-[#5b7751]"><UiIcon name="file" className="h-5 w-5" /></span><div className="min-w-0"><h2 className="truncate text-sm font-semibold">{document.title}</h2><p className="mt-0.5 text-[11px] text-slate-500">{document.category} · {document.updated}</p></div></article>)}</div> : <div className="mt-4 rounded-[22px] border border-[#20352a]/10 bg-white/80 p-5 text-center"><UiIcon name="file" className="mx-auto h-6 w-6 text-[#6f8e72]" /><h2 className="mt-2 text-sm font-semibold text-[#20352a]">No Kitchen documents yet</h2><p className="mt-1 text-xs text-[#667068]">Add a manual, warranty or receipt when you are ready.</p></div>}</FeatureShell>;
 }
 
 export function KitchenFeatureWorkspace({ feature }: { feature: KitchenFeature }) {

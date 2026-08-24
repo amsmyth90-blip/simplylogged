@@ -93,7 +93,8 @@ export async function upsertStructuredDocument(document: VaultDocument) {
 
   if (error) {
     if (error.message.includes("emergency_visible")) {
-      const { emergency_visible: _emergencyVisible, ...fallbackRow } = documentRow;
+      const { emergency_visible, ...fallbackRow } = documentRow;
+      void emergency_visible;
       const { error: fallbackError } = await client.from("documents").upsert(fallbackRow, { onConflict: "id" });
 
       if (fallbackError) {

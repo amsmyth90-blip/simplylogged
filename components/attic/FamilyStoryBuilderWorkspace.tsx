@@ -142,7 +142,7 @@ export function FamilyStoryBuilderWorkspace() {
                 id: `family-story-${storyId}`,
                 text: `Created family story "${title.trim()}" with ${files.length} photo${files.length === 1 ? "" : "s"}`,
                 when: "Just now",
-                by: "Amy",
+                by: "You",
               },
               ...(current.roomActivity.attic ?? []),
             ],
@@ -333,7 +333,7 @@ export function FamilyStoryBuilderWorkspace() {
                   <input
                     value={people}
                     onChange={(event) => setPeople(event.target.value)}
-                    placeholder="Amy, Rose, Grandad..."
+                    placeholder="Add the people in this story..."
                     className="mt-2 min-h-12 w-full rounded-[18px] border border-[#20352a]/10 bg-[#f7f5ef] px-4 text-sm outline-none focus:border-[#6f8e72] focus:ring-2 focus:ring-[#6f8e72]/20"
                   />
                 </label>

@@ -27,6 +27,13 @@ import {
 } from "@/lib/document-storage";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import {
+  dateTime,
+  daysUntil,
+  documentKind as fileKind,
+  formatDate,
+  formatFileSize as fileSize,
+} from "@/lib/presentation";
+import {
   upsertStructuredDocument,
   upsertStructuredReminder,
 } from "@/lib/structured-data";
@@ -38,35 +45,6 @@ type CorrespondenceView =
   | "detail"
   | "summary";
 
-function dateTime(value: string) {
-  return value
-    ? new Date(`${value}T12:00:00`).getTime()
-    : Number.POSITIVE_INFINITY;
-}
-function daysUntil(value: string) {
-  return value
-    ? Math.ceil((dateTime(value) - Date.now()) / 86400000)
-    : Number.POSITIVE_INFINITY;
-}
-function formatDate(value: string) {
-  if (!value) return "Not recorded";
-  const date = new Date(`${value}T12:00:00`);
-  return Number.isNaN(date.getTime())
-    ? value
-    : new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(date);
-}
-function fileKind(file: File): VaultDocument["kind"] {
-  return file.type === "application/pdf" ? "PDF" : "Image";
-}
-function fileSize(bytes: number) {
-  return bytes >= 1048576
-    ? `${(bytes / 1048576).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
 function isDueSoon(item: CorrespondenceRecord) {
   const days = daysUntil(item.deadline);
   return item.status !== "completed" && days >= 0 && days <= 14;

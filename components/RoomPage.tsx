@@ -18,7 +18,7 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { StatusChip } from "@/components/StatusChip";
 import { TaskChecklist } from "@/components/TaskChecklist";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { type AreaStatus, type RoomDetail, type RoomDocument, type RoomTask } from "@/lib/mock-data";
+import { type AreaStatus, type RoomDetail, type RoomDocument } from "@/lib/mock-data";
 
 const heroAccent: Record<AreaStatus, string> = {
   ready: "linear-gradient(180deg, rgba(94,124,103,0.12) 0%, rgba(56,48,35,0.18) 45%, rgba(39,32,24,0.48) 100%)",
@@ -194,13 +194,13 @@ export function RoomPage({ room }: RoomPageProps) {
     kind: "PDF" as RoomDocument["kind"],
     size: ""
   });
-  const [activityDraft, setActivityDraft] = useState({ text: "", by: "Amy" });
+  const [activityDraft, setActivityDraft] = useState({ text: "", by: "You" });
 
   const closeModal = () => {
     setModal(null);
     setTaskDraft({ label: "", due: "" });
     setDocumentDraft({ title: "", kind: "PDF", size: "" });
-    setActivityDraft({ text: "", by: "Amy" });
+    setActivityDraft({ text: "", by: "You" });
   };
 
   const addActivityEntry = (text: string, by = "DiaryDock") => {
@@ -304,7 +304,7 @@ export function RoomPage({ room }: RoomPageProps) {
       return;
     }
 
-    addActivityEntry(text, activityDraft.by.trim() || "Amy");
+    addActivityEntry(text, activityDraft.by.trim() || "You");
     closeModal();
   };
 
@@ -791,7 +791,7 @@ export function RoomPage({ room }: RoomPageProps) {
                 type="text"
                 value={activityDraft.by}
                 onChange={(event) => setActivityDraft((current) => ({ ...current, by: event.target.value }))}
-                placeholder="Amy"
+                placeholder="You"
                 className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
               />
             </label>

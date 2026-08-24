@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
@@ -22,9 +22,12 @@ import {
   type HomeInventoryItem,
   type HomeInventoryRoom,
   type InsuranceClaim,
-  type InsurancePolicy,
 } from "@/lib/insurance-records";
 import type { VaultDocument } from "@/lib/mock-data";
+import {
+  documentKind,
+  formatFileSize as fileSize,
+} from "@/lib/presentation";
 import { upsertStructuredDocument } from "@/lib/structured-data";
 
 type HomeInsuranceView =
@@ -47,14 +50,6 @@ function HomeInsuranceNotice() {
 function parseCoverValue(value: string) {
   const amount = Number(value.replace(/[^0-9.]/g, ""));
   return Number.isFinite(amount) ? amount : 0;
-}
-function fileSize(bytes: number) {
-  return bytes >= 1048576
-    ? `${(bytes / 1048576).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-function documentKind(file: File): VaultDocument["kind"] {
-  return file.type === "application/pdf" ? "PDF" : "Image";
 }
 
 function useHomePolicy() {

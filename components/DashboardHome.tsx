@@ -41,6 +41,7 @@ export function DashboardHome() {
   const activeReminderCount = state.reminders.filter((reminder) => reminder.group === "today" || reminder.group === "week").length;
   const onboardingProgress = getOnboardingProgress(state.onboarding);
   const showSetupNudge = !state.onboarding.completed;
+  const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] ?? "";
   const todayItems = [
     showSetupNudge
       ? {
@@ -93,7 +94,7 @@ export function DashboardHome() {
             <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
               <div className="min-w-0 rounded-full border border-white/40 bg-white/45 px-3.5 py-2 shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                 <p className="truncate text-[14px] font-semibold tracking-tight text-slate-900">
-                  {greeting}, Amy
+                  {firstName ? `${greeting}, ${firstName}` : greeting}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">

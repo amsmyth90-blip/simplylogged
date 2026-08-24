@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
@@ -36,6 +37,7 @@ function managedAreasForInvite(access: string) {
 }
 
 export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspaceProps) {
+  const router = useRouter();
   const [preview, setPreview] = useState<HouseholdInvitePreview | null>(null);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -99,7 +101,7 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
 
     try {
       await acceptHouseholdInvite(invite.id);
-      window.location.assign("/dashboard?joined=1");
+      router.push("/dashboard?joined=1");
     } catch (acceptError) {
       setError(acceptError instanceof Error ? acceptError.message : "The invite could not be accepted.");
       setAccepting(false);

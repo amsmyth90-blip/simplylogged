@@ -36,7 +36,8 @@ const defaultNote = {
   value: ""
 };
 
-export function EmergencyWorkspace(_: EmergencyWorkspaceProps) {
+export function EmergencyWorkspace(props: EmergencyWorkspaceProps) {
+  void props;
   const { state, repositoryMode, updateState } = useDiaryDockData();
   const contacts = state.emergencyContacts;
   const plans = state.emergencyPlans;
@@ -155,7 +156,7 @@ export function EmergencyWorkspace(_: EmergencyWorkspaceProps) {
           action={
             <div className="flex items-center gap-2">
               <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
-                {repositoryMode === "supabase" ? "Supabase live" : "Session demo"}
+                {repositoryMode === "supabase" ? "Secure sync" : "Local session"}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/14 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur-md">
                 <UiIcon name="check" className="h-3.5 w-3.5 text-white" />

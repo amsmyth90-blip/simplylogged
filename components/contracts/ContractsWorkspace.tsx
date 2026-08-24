@@ -28,6 +28,13 @@ import {
 } from "@/lib/document-storage";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import {
+  dateTime,
+  daysUntil,
+  documentKind as fileKind,
+  formatDate,
+  formatFileSize as fileSize,
+} from "@/lib/presentation";
+import {
   upsertStructuredDocument,
   upsertStructuredReminder,
 } from "@/lib/structured-data";
@@ -56,40 +63,11 @@ const statusTone: Record<ContractStatus, string> = {
   expired: "bg-[#f7e4df] text-[#924a40]",
 };
 
-function dateTime(value: string) {
-  return value
-    ? new Date(`${value}T12:00:00`).getTime()
-    : Number.POSITIVE_INFINITY;
-}
-function daysUntil(value: string) {
-  return value
-    ? Math.ceil((dateTime(value) - Date.now()) / 86400000)
-    : Number.POSITIVE_INFINITY;
-}
-function formatDate(value: string) {
-  if (!value) return "Not recorded";
-  const date = new Date(`${value}T12:00:00`);
-  return Number.isNaN(date.getTime())
-    ? value
-    : new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(date);
-}
 function formatMoney(value: number) {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
   }).format(value || 0);
-}
-function fileSize(bytes: number) {
-  return bytes >= 1048576
-    ? `${(bytes / 1048576).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-function fileKind(file: File): VaultDocument["kind"] {
-  return file.type === "application/pdf" ? "PDF" : "Image";
 }
 function cancellationDeadline(contract: ContractRecord) {
   if (!contract.renewalDate || contract.noticePeriodDays === null) return "";

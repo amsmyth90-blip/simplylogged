@@ -69,7 +69,7 @@ export function DocumentDetailWorkspace({
     []
   );
   const shareOptions = useMemo(
-    () => state.householdMembers.filter((member) => member.accessTone !== "full" || member.name !== "Amy"),
+    () => state.householdMembers,
     [state.householdMembers]
   );
   const linkedReminders = useMemo(() => {
@@ -279,7 +279,7 @@ export function DocumentDetailWorkspace({
                       ? `Moved and corrected ${title}`
                       : `Corrected document details for ${title}`,
                   when: "Just now",
-                  by: "Amy"
+                  by: "You"
                 },
                 ...(current.roomActivity[nextRoom.id] ?? [])
               ]
@@ -433,7 +433,7 @@ export function DocumentDetailWorkspace({
                   <p className="mt-1 max-w-xs text-xs leading-5 text-ink/50">
                     {document.storagePath
                       ? "Open it securely when you need the full document."
-                      : "Older demo documents may only have saved details."}
+                      : "This record currently contains saved details only."}
                   </p>
                 </div>
               )}

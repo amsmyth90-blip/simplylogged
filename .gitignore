@@ -2,6 +2,8 @@
 node_modules
 out
 *.log
+*.tsbuildinfo
+next-env.d.ts
 .DS_Store
 
 .vercel
@@ -22,3 +24,6 @@ ios/
 
 # Supabase local link/cache metadata
 supabase/.temp/
+
+# Local assistant/editor settings
+.claude/settings.local.json

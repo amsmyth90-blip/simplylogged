@@ -53,8 +53,8 @@ const sectionMeta: Record<GardenSectionId, SectionMeta> = {
     emptyTitle: "No pet care items yet",
     emptyDetail:
       "Add vaccination dates, flea treatment reminders, pet-sitter notes or upload a pet document when you are ready.",
-    documentTerms: ["pet", "vet", "veterinary", "vaccination", "microchip", "biscuit"],
-    reminderTerms: ["pet", "vet", "vaccination", "flea", "worm", "biscuit"],
+    documentTerms: ["pet", "vet", "veterinary", "vaccination", "microchip"],
+    reminderTerms: ["pet", "vet", "vaccination", "flea", "worm"],
     guidance: ["Pet profiles", "Vet records", "Vaccination dates", "Care routines"],
     notice:
       "DiaryDock helps organise pet information you provide. It does not diagnose, prescribe or replace advice from a qualified veterinary professional.",

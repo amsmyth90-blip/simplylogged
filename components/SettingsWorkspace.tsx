@@ -215,7 +215,7 @@ export function SettingsWorkspace() {
           badge="Estate control"
           action={
             <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
-              {repositoryMode === "supabase" ? "Supabase live" : "Session demo"}
+              {repositoryMode === "supabase" ? "Secure sync" : "Local session"}
             </span>
           }
         />

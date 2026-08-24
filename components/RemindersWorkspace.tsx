@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { DiaryDockDataProvider, useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { RemindersBoard } from "@/components/RemindersBoard";
@@ -218,7 +218,7 @@ function RemindersWorkspaceInner() {
                 </button>
               ) : null}
               <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
-                {repositoryMode === "supabase" ? "Supabase live" : "Session demo"}
+                {repositoryMode === "supabase" ? "Secure sync" : "Local session"}
               </span>
               <button
                 type="button"
@@ -507,6 +507,7 @@ function RemindersWorkspaceInner() {
   );
 }
 
-export function RemindersWorkspace(_: RemindersWorkspaceProps) {
+export function RemindersWorkspace(props: RemindersWorkspaceProps) {
+  void props;
   return <RemindersWorkspaceInner />;
 }

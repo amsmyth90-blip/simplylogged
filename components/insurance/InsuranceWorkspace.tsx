@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
@@ -31,6 +31,11 @@ import {
   type PolicyStatus,
 } from "@/lib/insurance-records";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
+import {
+  daysUntil as sharedDaysUntil,
+  documentKind,
+  formatFileSize as fileSize,
+} from "@/lib/presentation";
 import {
   upsertStructuredDocument,
   upsertStructuredReminder,
@@ -69,18 +74,7 @@ function InsuranceNotice() {
   );
 }
 function daysUntil(value: string) {
-  if (!value) return Number.POSITIVE_INFINITY;
-  return Math.ceil(
-    (new Date(`${value}T23:59:59`).getTime() - Date.now()) / 86400000,
-  );
-}
-function fileSize(bytes: number) {
-  return bytes >= 1048576
-    ? `${(bytes / 1048576).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-function documentKind(file: File): VaultDocument["kind"] {
-  return file.type === "application/pdf" ? "PDF" : "Image";
+  return sharedDaysUntil(value, "23:59:59");
 }
 
 function PolicyRow({ policy }: { policy: InsurancePolicy }) {

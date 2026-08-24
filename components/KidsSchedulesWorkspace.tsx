@@ -580,7 +580,7 @@ export function KidsSchedulesWorkspace({ previewEditable = false }: { previewEdi
                         responsibleAdult: event.target.value
                       }))
                     }
-                    placeholder="Self, Amy..."
+                    placeholder="Self, parent, carer..."
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#789469]"
                   />
                 </label>

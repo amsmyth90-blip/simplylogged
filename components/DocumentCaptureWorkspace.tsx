@@ -195,7 +195,6 @@ export function DocumentCaptureWorkspace() {
   const preferredRoom = preferredRoomId ? roomDetails[preferredRoomId] : null;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [preparedFiles, setPreparedFiles] = useState<File[]>([]);
   const [draft, setDraft] = useState<DocumentExtractionResult | null>(null);
   const [savedDocumentId, setSavedDocumentId] = useState<string | null>(null);
   const [processingStage, setProcessingStage] = useState<
@@ -213,7 +212,6 @@ export function DocumentCaptureWorkspace() {
 
   const resetResults = () => {
     setDraft(null);
-    setPreparedFiles([]);
     setSavedDocumentId(null);
     setErrorMessage(null);
     setCreateReminder(false);
@@ -404,7 +402,6 @@ export function DocumentCaptureWorkspace() {
       const shouldCreateReminder = Boolean(extraction.reminderTitle);
       const nextReminderTime = extraction.reminderTimeLabel || "This week";
       setDraft(extraction);
-      setPreparedFiles(preparedFiles);
       setCreateReminder(shouldCreateReminder);
       setReminderTimeLabel(nextReminderTime);
       setProcessingStage("organising");
@@ -421,12 +418,6 @@ export function DocumentCaptureWorkspace() {
     }
   }
 
-  const processingLabels = {
-    preparing: ["OPTIMISING PAGES", "Making every page crystal clear"],
-    reading: ["READING PAGES", `Reading ${selectedFiles.length} page${selectedFiles.length === 1 ? "" : "s"} together`],
-    organising: ["SMART FILING", "Finding its room, category and dates"],
-    saving: ["SECURE FILES", "Combining and saving your document"]
-  } as const;
   const activeProcessingStage =
     processingStage === "preparing" ||
     processingStage === "reading" ||
@@ -434,7 +425,6 @@ export function DocumentCaptureWorkspace() {
     processingStage === "saving"
       ? processingStage
       : null;
-  const processingSteps = ["Read", "Understand", "File"];
   const processingIndex = activeProcessingStage
     ? activeProcessingStage === "preparing" || activeProcessingStage === "reading"
       ? 0
