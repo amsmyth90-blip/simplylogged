@@ -21,6 +21,17 @@ type RecipeEditDraft = {
   instructions: string;
 };
 
+const emptyRecipe: KitchenRecipe = {
+  id: "empty-recipe-book",
+  name: "Your recipe book",
+  time: "",
+  servings: 4,
+  ingredients: [],
+  instructions: "",
+  image: "",
+  source: "diarydock"
+};
+
 function mealImageStyle(image: string) {
   return {
     backgroundImage: image
@@ -36,10 +47,8 @@ export function KitchenRecipes() {
   const recipes = state.kitchenRecipes;
   const scanInputRef = useRef<HTMLInputElement>(null);
   const deepLinkHandledRef = useRef(false);
-  const [selectedId, setSelectedId] = useState("salmon");
-  const [checked, setChecked] = useState<Record<string, string[]>>({
-    salmon: ["4 salmon fillets", "1 lemon", "2 tbsp chopped fresh herbs", "2 garlic cloves", "2 tbsp olive oil"]
-  });
+  const [selectedId, setSelectedId] = useState("");
+  const [checked, setChecked] = useState<Record<string, string[]>>({});
   const [cooking, setCooking] = useState(false);
   const [cookingMode, setCookingMode] = useState(false);
   const [cookingStep, setCookingStep] = useState(0);
@@ -58,7 +67,8 @@ export function KitchenRecipes() {
   const [onlineError, setOnlineError] = useState("");
   const [scanState, setScanState] = useState<"idle" | "reading" | "saved">("idle");
   const [scanMessage, setScanMessage] = useState("");
-  const selected = recipes.find(recipe => recipe.id === selectedId) ?? recipes[0];
+  const hasRecipes = recipes.length > 0;
+  const selected = recipes.find(recipe => recipe.id === selectedId) ?? recipes[0] ?? emptyRecipe;
   const selectedChecked = checked[selected.id] ?? [];
   const cookingSteps = getKitchenRecipeSteps(selected);
   const activeCookingStep = cookingSteps[cookingStep];
@@ -345,15 +355,24 @@ export function KitchenRecipes() {
             <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#718c65]">Kitchen</p>
             <h1 className="font-serif text-[21px] font-semibold leading-5 tracking-tight">Family recipes</h1>
           </div>
-          <button type="button" onClick={toggleFavourite} className={`flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)] ${selected.favourite ? "text-amber-500" : "text-slate-400"}`} aria-label={selected.favourite ? "Remove from favourites" : "Add to favourites"} aria-pressed={Boolean(selected.favourite)}>
-            <UiIcon name="star" className="h-4 w-4" />
-          </button>
-          <button type="button" onClick={() => setRecipeOptionsOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-[18px] font-bold tracking-widest text-slate-500 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Recipe options">
-            ···
-          </button>
+          {hasRecipes ? (
+            <>
+              <button type="button" onClick={toggleFavourite} className={`flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)] ${selected.favourite ? "text-amber-500" : "text-slate-400"}`} aria-label={selected.favourite ? "Remove from favourites" : "Add to favourites"} aria-pressed={Boolean(selected.favourite)}>
+                <UiIcon name="star" className="h-4 w-4" />
+              </button>
+              <button type="button" onClick={() => setRecipeOptionsOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-[18px] font-bold tracking-widest text-slate-500 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Recipe options">
+                ···
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={() => setDirectoryOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-[#66805c] shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Add your first recipe">
+              <UiIcon name="plus" className="h-4 w-4" />
+            </button>
+          )}
         </header>
 
         <main className="mt-2 flex min-h-0 flex-1 flex-col">
+          {hasRecipes ? <>
           <section className="relative grid h-[48svh] min-h-[300px] max-h-[420px] shrink-0 grid-cols-[1.05fr_0.95fr] overflow-hidden rounded-[25px] border border-[#e8e0d4] bg-[#fffdf8] shadow-[0_24px_55px_-32px_rgba(68,55,37,0.55)]">
             <div className="min-h-0 bg-cover bg-center" style={mealImageStyle(selected.image)} role="img" aria-label={selected.name} />
             <div className="relative min-h-0 px-3 pb-3 pt-4">
@@ -408,6 +427,24 @@ export function KitchenRecipes() {
               <UiIcon name="calendar" className="h-4 w-4" />Add to day
             </button>
           </div>
+          </> : (
+            <section className="flex min-h-0 flex-1 flex-col items-center justify-center rounded-[28px] border border-[#e8e0d4] bg-[#fffdf8] px-6 text-center shadow-[0_24px_55px_-32px_rgba(68,55,37,0.55)]">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#e6eee2] text-[#66805c]">
+                <UiIcon name="file" className="h-7 w-7" />
+              </span>
+              <h2 className="mt-5 font-serif text-2xl font-semibold text-[#263b35]">Start your recipe book</h2>
+              <p className="mt-2 max-w-xs text-sm leading-6 text-slate-500">Save a recipe from the online catalogue or scan one from a cookbook, recipe card or handwritten note.</p>
+              <div className="mt-6 grid w-full max-w-xs gap-3">
+                <button type="button" onClick={() => setDirectoryOpen(true)} className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#6f8f62] text-sm font-semibold text-white shadow-[0_13px_26px_-15px_rgba(67,101,55,0.75)]">
+                  <UiIcon name="search" className="h-4 w-4" />Find a recipe
+                </button>
+                <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white text-sm font-semibold text-[#607b55]">
+                  <UiIcon name="camera" className="h-4 w-4" />Scan a recipe
+                </button>
+                <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
+              </div>
+            </section>
+          )}
         </main>
       </div>
 
