@@ -61,9 +61,11 @@ export function KitchenRecipes() {
   const [shoppingMessage, setShoppingMessage] = useState("");
   const [plannerOpen, setPlannerOpen] = useState(false);
   const [plannedMessage, setPlannedMessage] = useState("");
+  const [canReturnToDirectory, setCanReturnToDirectory] = useState(false);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [onlineRecipes, setOnlineRecipes] = useState<KitchenRecipe[]>([]);
+  const [onlineCorrection, setOnlineCorrection] = useState("");
   const [onlineLoading, setOnlineLoading] = useState(false);
   const [onlineError, setOnlineError] = useState("");
   const [scanState, setScanState] = useState<"idle" | "reading" | "saved">("idle");
@@ -131,8 +133,8 @@ export function KitchenRecipes() {
     }
     setSelectedId(recipe.id);
     setServings(recipe.servings ?? 4);
+    setCanReturnToDirectory(directoryOpen);
     setDirectoryOpen(false);
-    setSearch("");
   };
 
   const toggleFavourite = () => {
@@ -157,6 +159,7 @@ export function KitchenRecipes() {
   };
 
   const openNewRecipeEditor = () => {
+    setCanReturnToDirectory(directoryOpen);
     setEditingNewRecipe(true);
     setDirectoryOpen(false);
     setEditDraft({
@@ -308,10 +311,13 @@ export function KitchenRecipes() {
       }
     }));
     setPlannedMessage(`${selected.name} added to ${date.toLocaleDateString("en-GB", { weekday: "long" })}.`);
-    window.setTimeout(() => {
-      setPlannerOpen(false);
-      setPlannedMessage("");
-    }, 900);
+  };
+
+  const returnToRecipeDirectory = () => {
+    setPlannerOpen(false);
+    setPlannedMessage("");
+    setCanReturnToDirectory(false);
+    setDirectoryOpen(true);
   };
 
   const searchOnline = async () => {
@@ -320,9 +326,10 @@ export function KitchenRecipes() {
     setOnlineError("");
     try {
       const response = await fetch(`/api/kitchen/recipes/search?q=${encodeURIComponent(search.trim())}`);
-      const payload = await response.json() as { recipes?: KitchenRecipe[]; error?: string };
+      const payload = await response.json() as { recipes?: KitchenRecipe[]; correctedQuery?: string; error?: string };
       if (!response.ok) throw new Error(payload.error || "Unable to search recipes.");
       setOnlineRecipes(payload.recipes ?? []);
+      setOnlineCorrection(payload.correctedQuery ?? "");
       if (!payload.recipes?.length) setOnlineError("No online recipes matched that search.");
     } catch (error) {
       setOnlineError(error instanceof Error ? error.message : "Unable to search recipes.");
@@ -381,9 +388,15 @@ export function KitchenRecipes() {
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.98),transparent_38%),linear-gradient(180deg,#fbfaf7_0%,#f7f4ee_57%,#f2f0e9_100%)] text-[#172033]">
       <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
         <header className="flex h-12 shrink-0 items-center gap-3">
-          <Link href="/room/kitchen" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to Kitchen">
-            <UiIcon name="arrow-left" className="h-4 w-4" />
-          </Link>
+          {canReturnToDirectory ? (
+            <button type="button" onClick={() => { setCanReturnToDirectory(false); setDirectoryOpen(true); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to recipe search">
+              <UiIcon name="arrow-left" className="h-4 w-4" />
+            </button>
+          ) : (
+            <Link href="/room/kitchen" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to Kitchen">
+              <UiIcon name="arrow-left" className="h-4 w-4" />
+            </Link>
+          )}
           <div className="min-w-0 flex-1">
             <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#718c65]">Kitchen</p>
             <h1 className="font-serif text-[21px] font-semibold leading-5 tracking-tight">Family recipes</h1>
@@ -485,7 +498,7 @@ export function KitchenRecipes() {
       </div>
 
       {directoryOpen ? (
-        <div data-testid="recipe-directory" className="absolute inset-0 z-[65] bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.98),transparent_40%),linear-gradient(180deg,#f7f6f1,#edf3e9)] px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
+        <div data-testid="recipe-directory" className="absolute inset-0 z-[65] bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.98),transparent_40%),linear-gradient(180deg,#f7f6f1,#edf3e9)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
           <div className="mx-auto flex h-full w-full max-w-lg flex-col">
             <header className="flex h-12 shrink-0 items-center gap-3">
               <button type="button" onClick={() => { setDirectoryOpen(false); setSearch(""); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Close recipe directory">
@@ -500,7 +513,7 @@ export function KitchenRecipes() {
 
             <label className="mt-3 flex h-11 shrink-0 items-center gap-2.5 rounded-[18px] border border-white/90 bg-[#fffdf8] px-3.5 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)] backdrop-blur-xl">
               <UiIcon name="search" className="h-4 w-4 text-slate-400" />
-              <input value={search} onChange={event => { setSearch(event.target.value); setOnlineRecipes([]); setOnlineError(""); }} onKeyDown={event => { if (event.key === "Enter") void searchOnline(); }} placeholder="Search dishes or ingredients" className="min-w-0 flex-1 bg-transparent text-xs font-medium outline-none placeholder:text-slate-400" />
+              <input value={search} onChange={event => { setSearch(event.target.value); setOnlineRecipes([]); setOnlineCorrection(""); setOnlineError(""); }} onKeyDown={event => { if (event.key === "Enter") void searchOnline(); }} placeholder="Search dishes or ingredients" className="min-w-0 flex-1 bg-transparent text-xs font-medium outline-none placeholder:text-slate-400" />
               <button type="button" onClick={() => void searchOnline()} disabled={search.trim().length < 2 || onlineLoading} className="rounded-full bg-[#6f8f62] px-3 py-1.5 text-[9px] font-semibold text-white disabled:opacity-40">
                 {onlineLoading ? "Searching" : "Search"}
               </button>
@@ -510,7 +523,7 @@ export function KitchenRecipes() {
               <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-10 items-center justify-center gap-2 rounded-[16px] bg-[#263b35] text-[10px] font-semibold text-white shadow-sm">
                 <UiIcon name="camera" className="h-4 w-4" />Scan recipe
               </button>
-              <button type="button" onClick={() => { setSearch(""); setOnlineRecipes([]); setOnlineError(""); }} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white text-[10px] font-semibold text-slate-700 shadow-sm">
+              <button type="button" onClick={() => { setSearch(""); setOnlineRecipes([]); setOnlineCorrection(""); setOnlineError(""); }} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white text-[10px] font-semibold text-slate-700 shadow-sm">
                 <UiIcon name="folder" className="h-4 w-4" />My recipes
               </button>
               <button type="button" onClick={openNewRecipeEditor} className="col-span-2 flex h-10 items-center justify-center gap-2 rounded-[16px] border border-[#d7e3d1] bg-[#fffdf8] text-[10px] font-semibold text-[#607b55] shadow-sm">
@@ -519,12 +532,17 @@ export function KitchenRecipes() {
               <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
             </div>
 
-            <main className="mt-3 min-h-0 flex-1 overflow-y-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <main className="mt-3 min-h-0 flex-1 overflow-y-auto pb-3 pr-1 [scrollbar-color:#a8bc9f_transparent] [scrollbar-width:thin]">
+              {onlineCorrection ? (
+                <p className="mb-3 rounded-2xl bg-[#e6eee2] px-3 py-2 text-center text-[10px] text-[#52684a]">
+                  Showing results for <span className="font-bold">{onlineCorrection}</span>
+                </p>
+              ) : null}
               {onlineRecipes.length ? (
                 <div className="mb-4">
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="font-serif text-[12px] font-semibold">Online recipes</h3>
-                    <span className="text-[8px] font-bold uppercase tracking-wide text-[#718c65]">Tap to save</span>
+                    <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-wide text-[#718c65]">Scroll to browse <span aria-hidden="true">↓</span></span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {onlineRecipes.map(recipe => (
@@ -755,7 +773,14 @@ export function KitchenRecipes() {
                 );
               })}
             </div>
-            {plannedMessage ? <p className="mt-3 rounded-2xl bg-[#e7f0e2] px-3 py-2 text-center text-[10px] font-semibold text-[#58704f]">{plannedMessage}</p> : null}
+            {plannedMessage ? (
+              <div className="mt-3 rounded-2xl bg-[#e7f0e2] p-3 text-center">
+                <p className="text-[10px] font-semibold text-[#58704f]">{plannedMessage}</p>
+                <button type="button" onClick={returnToRecipeDirectory} className="mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#263b35] text-[10px] font-semibold text-white">
+                  <UiIcon name="arrow-left" className="h-3.5 w-3.5" />Back to recipe search
+                </button>
+              </div>
+            ) : null}
           </section>
         </div>
       ) : null}

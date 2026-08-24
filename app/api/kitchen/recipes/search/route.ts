@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { KitchenRecipe } from "@/lib/kitchen-recipes";
 import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
+import { correctRecipeSearchQuery } from "@/lib/recipe-search";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 type MealDbMeal = Record<string, string | null>;
@@ -14,6 +15,29 @@ async function fetchMealDb(path: string) {
   const response = await fetch(path, { next: { revalidate: 3600 } });
   if (!response.ok) throw new Error("Recipe catalogue request failed.");
   return response.json() as Promise<MealDbPayload>;
+}
+
+async function getDetailedMeals(baseUrl: string, meals: MealDbMeal[]) {
+  const detailedMeals = await Promise.all(meals.slice(0, 12).map(async meal => {
+    const id = meal.idMeal?.trim();
+    if (!id) return null;
+    const details = await fetchMealDb(`${baseUrl}/lookup.php?i=${encodeURIComponent(id)}`);
+    return details.meals?.[0] ?? null;
+  }));
+  return detailedMeals.filter((meal): meal is MealDbMeal => Boolean(meal));
+}
+
+async function searchByIngredient(baseUrl: string, query: string) {
+  const terms = Array.from(new Set([
+    query,
+    ...query.split(/\s+/).filter(term => term.length >= 3).sort((left, right) => right.length - left.length)
+  ]));
+
+  for (const term of terms) {
+    const results = await fetchMealDb(`${baseUrl}/filter.php?i=${encodeURIComponent(term)}`);
+    if (results.meals?.length) return getDetailedMeals(baseUrl, results.meals);
+  }
+  return [];
 }
 
 function mapMeal(meal: MealDbMeal): KitchenRecipe {
@@ -80,18 +104,40 @@ export async function GET(request: Request) {
     // MealDB's name search does not include ingredients, despite DiaryDock's
     // directory allowing people to search by either. Resolve ingredient matches
     // to their complete records so instructions and ingredient lists are retained.
-    const ingredientResults = await fetchMealDb(`${baseUrl}/filter.php?i=${encodeURIComponent(query)}`);
-    const matchingMeals = (ingredientResults.meals ?? []).slice(0, 12);
-    const detailedMeals = await Promise.all(matchingMeals.map(async meal => {
-      const id = meal.idMeal?.trim();
-      if (!id) return null;
-      const details = await fetchMealDb(`${baseUrl}/lookup.php?i=${encodeURIComponent(id)}`);
-      return details.meals?.[0] ?? null;
-    }));
+    const ingredientMeals = await searchByIngredient(baseUrl, query);
+    if (ingredientMeals.length) {
+      return NextResponse.json({ recipes: ingredientMeals.map(mapMeal) });
+    }
 
-    return NextResponse.json({
-      recipes: detailedMeals.filter((meal): meal is MealDbMeal => Boolean(meal)).map(mapMeal)
-    });
+    const firstLetter = query.toLowerCase().match(/[a-z]/)?.[0] ?? "a";
+    const [ingredientIndex, mealIndex] = await Promise.all([
+      fetchMealDb(`${baseUrl}/list.php?i=list`),
+      fetchMealDb(`${baseUrl}/search.php?f=${encodeURIComponent(firstLetter)}`)
+    ]);
+    const correctedQuery = correctRecipeSearchQuery(query, [
+      ...(ingredientIndex.meals ?? []).map(meal => meal.strIngredient ?? ""),
+      ...(mealIndex.meals ?? []).map(meal => meal.strMeal ?? "")
+    ]);
+
+    if (correctedQuery !== query.toLowerCase()) {
+      const correctedNameResults = await fetchMealDb(`${baseUrl}/search.php?s=${encodeURIComponent(correctedQuery)}`);
+      if (correctedNameResults.meals?.length) {
+        return NextResponse.json({
+          recipes: correctedNameResults.meals.slice(0, 12).map(mapMeal),
+          correctedQuery
+        });
+      }
+
+      const correctedIngredientMeals = await searchByIngredient(baseUrl, correctedQuery);
+      if (correctedIngredientMeals.length) {
+        return NextResponse.json({
+          recipes: correctedIngredientMeals.map(mapMeal),
+          correctedQuery
+        });
+      }
+    }
+
+    return NextResponse.json({ recipes: [] });
   } catch {
     return NextResponse.json({ error: "The online recipe catalogue is unavailable right now." }, { status: 502 });
   }
