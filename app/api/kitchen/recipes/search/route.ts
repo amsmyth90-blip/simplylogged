@@ -6,6 +6,16 @@ import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supab
 
 type MealDbMeal = Record<string, string | null>;
 
+type MealDbPayload = {
+  meals: MealDbMeal[] | null;
+};
+
+async function fetchMealDb(path: string) {
+  const response = await fetch(path, { next: { revalidate: 3600 } });
+  if (!response.ok) throw new Error("Recipe catalogue request failed.");
+  return response.json() as Promise<MealDbPayload>;
+}
+
 function mapMeal(meal: MealDbMeal): KitchenRecipe {
   const ingredients = Array.from({ length: 20 }, (_, index) => {
     const ingredient = meal[`strIngredient${index + 1}`]?.trim();
@@ -59,13 +69,30 @@ export async function GET(request: Request) {
   }
 
   const apiKey = process.env.THEMEALDB_API_KEY || "1";
-  const response = await fetch(`https://www.themealdb.com/api/json/v1/${apiKey}/search.php?s=${encodeURIComponent(query)}`, {
-    next: { revalidate: 3600 }
-  });
-  if (!response.ok) {
+  const baseUrl = `https://www.themealdb.com/api/json/v1/${apiKey}`;
+
+  try {
+    const nameResults = await fetchMealDb(`${baseUrl}/search.php?s=${encodeURIComponent(query)}`);
+    if (nameResults.meals?.length) {
+      return NextResponse.json({ recipes: nameResults.meals.slice(0, 12).map(mapMeal) });
+    }
+
+    // MealDB's name search does not include ingredients, despite DiaryDock's
+    // directory allowing people to search by either. Resolve ingredient matches
+    // to their complete records so instructions and ingredient lists are retained.
+    const ingredientResults = await fetchMealDb(`${baseUrl}/filter.php?i=${encodeURIComponent(query)}`);
+    const matchingMeals = (ingredientResults.meals ?? []).slice(0, 12);
+    const detailedMeals = await Promise.all(matchingMeals.map(async meal => {
+      const id = meal.idMeal?.trim();
+      if (!id) return null;
+      const details = await fetchMealDb(`${baseUrl}/lookup.php?i=${encodeURIComponent(id)}`);
+      return details.meals?.[0] ?? null;
+    }));
+
+    return NextResponse.json({
+      recipes: detailedMeals.filter((meal): meal is MealDbMeal => Boolean(meal)).map(mapMeal)
+    });
+  } catch {
     return NextResponse.json({ error: "The online recipe catalogue is unavailable right now." }, { status: 502 });
   }
-
-  const payload = await response.json() as { meals: MealDbMeal[] | null };
-  return NextResponse.json({ recipes: (payload.meals ?? []).slice(0, 12).map(mapMeal) });
 }

@@ -56,6 +56,7 @@ export function KitchenRecipes() {
   const [showCookingIngredients, setShowCookingIngredients] = useState(false);
   const [recipeOptionsOpen, setRecipeOptionsOpen] = useState(false);
   const [editDraft, setEditDraft] = useState<RecipeEditDraft | null>(null);
+  const [editingNewRecipe, setEditingNewRecipe] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [shoppingMessage, setShoppingMessage] = useState("");
   const [plannerOpen, setPlannerOpen] = useState(false);
@@ -144,6 +145,7 @@ export function KitchenRecipes() {
   };
 
   const openRecipeEditor = () => {
+    setEditingNewRecipe(false);
     setRecipeOptionsOpen(false);
     setEditDraft({
       name: selected.name,
@@ -154,9 +156,39 @@ export function KitchenRecipes() {
     });
   };
 
+  const openNewRecipeEditor = () => {
+    setEditingNewRecipe(true);
+    setDirectoryOpen(false);
+    setEditDraft({
+      name: "",
+      time: "",
+      servings: 4,
+      ingredients: "",
+      instructions: ""
+    });
+  };
+
   const saveRecipeEdits = () => {
     if (!editDraft?.name.trim()) return;
     const ingredients = editDraft.ingredients.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+    if (editingNewRecipe) {
+      const recipe: KitchenRecipe = {
+        id: `recipe-${crypto.randomUUID()}`,
+        name: editDraft.name.trim(),
+        time: editDraft.time.trim() || "Recipe",
+        servings: Math.max(1, editDraft.servings),
+        ingredients,
+        instructions: editDraft.instructions.trim(),
+        image: "",
+        source: "diarydock"
+      };
+      updateState(current => ({ ...current, kitchenRecipes: [recipe, ...current.kitchenRecipes] }));
+      setSelectedId(recipe.id);
+      setServings(recipe.servings ?? 4);
+      setEditingNewRecipe(false);
+      setEditDraft(null);
+      return;
+    }
     updateState(current => ({
       ...current,
       kitchenRecipes: current.kitchenRecipes.map(recipe => recipe.id === selected.id ? {
@@ -169,6 +201,7 @@ export function KitchenRecipes() {
       } : recipe)
     }));
     setServings(Math.max(1, editDraft.servings));
+    setEditingNewRecipe(false);
     setEditDraft(null);
   };
 
@@ -441,6 +474,9 @@ export function KitchenRecipes() {
                 <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white text-sm font-semibold text-[#607b55]">
                   <UiIcon name="camera" className="h-4 w-4" />Scan a recipe
                 </button>
+                <button type="button" onClick={openNewRecipeEditor} className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white text-sm font-semibold text-[#607b55]">
+                  <UiIcon name="plus" className="h-4 w-4" />Add manually
+                </button>
                 <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
               </div>
             </section>
@@ -466,7 +502,7 @@ export function KitchenRecipes() {
               <UiIcon name="search" className="h-4 w-4 text-slate-400" />
               <input value={search} onChange={event => { setSearch(event.target.value); setOnlineRecipes([]); setOnlineError(""); }} onKeyDown={event => { if (event.key === "Enter") void searchOnline(); }} placeholder="Search dishes or ingredients" className="min-w-0 flex-1 bg-transparent text-xs font-medium outline-none placeholder:text-slate-400" />
               <button type="button" onClick={() => void searchOnline()} disabled={search.trim().length < 2 || onlineLoading} className="rounded-full bg-[#6f8f62] px-3 py-1.5 text-[9px] font-semibold text-white disabled:opacity-40">
-                {onlineLoading ? "Searching" : "Online"}
+                {onlineLoading ? "Searching" : "Search"}
               </button>
             </label>
 
@@ -476,6 +512,9 @@ export function KitchenRecipes() {
               </button>
               <button type="button" onClick={() => { setSearch(""); setOnlineRecipes([]); setOnlineError(""); }} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white text-[10px] font-semibold text-slate-700 shadow-sm">
                 <UiIcon name="folder" className="h-4 w-4" />My recipes
+              </button>
+              <button type="button" onClick={openNewRecipeEditor} className="col-span-2 flex h-10 items-center justify-center gap-2 rounded-[16px] border border-[#d7e3d1] bg-[#fffdf8] text-[10px] font-semibold text-[#607b55] shadow-sm">
+                <UiIcon name="plus" className="h-4 w-4" />Add recipe manually
               </button>
               <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
             </div>
@@ -723,12 +762,12 @@ export function KitchenRecipes() {
 
       {editDraft ? (
         <div className="absolute inset-0 z-[80] bg-[linear-gradient(180deg,#f8faf5,#f2eee6)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
-          <section className="mx-auto flex h-full w-full max-w-lg flex-col" role="dialog" aria-modal="true" aria-label="Edit recipe">
+          <section className="mx-auto flex h-full w-full max-w-lg flex-col" role="dialog" aria-modal="true" aria-label={editingNewRecipe ? "Add recipe" : "Edit recipe"}>
             <header className="flex h-12 shrink-0 items-center gap-3">
-              <button type="button" onClick={() => setEditDraft(null)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Cancel editing">
+              <button type="button" onClick={() => { setEditDraft(null); setEditingNewRecipe(false); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Cancel editing">
                 <UiIcon name="arrow-left" className="h-4 w-4" />
               </button>
-              <div className="min-w-0 flex-1"><p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#718c65]">Kitchen</p><h2 className="font-serif text-xl font-semibold">Edit recipe</h2></div>
+              <div className="min-w-0 flex-1"><p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[#718c65]">Kitchen</p><h2 className="font-serif text-xl font-semibold">{editingNewRecipe ? "Add recipe" : "Edit recipe"}</h2></div>
               <button type="button" onClick={saveRecipeEdits} className="rounded-full bg-[#263b35] px-4 py-2 text-[10px] font-bold text-white">Save</button>
             </header>
             <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[28px] border border-white bg-[#fffdf8] p-4 shadow-[0_25px_60px_-38px_rgba(32,48,39,0.55)]">
