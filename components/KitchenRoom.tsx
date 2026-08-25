@@ -106,9 +106,9 @@ export function KitchenRoom() {
 
         <span
           aria-hidden="true"
-          className="absolute left-[51%] top-[23.5%] z-10 h-[20%] w-[24%] rounded-2xl bg-[#d7d0c5] shadow-[0_8px_20px_rgba(71,62,50,0.08)]"
+          className="absolute left-[51%] top-[21.5%] z-10 h-[20%] w-[24%] rounded-2xl bg-[#d7d0c5] shadow-[0_8px_20px_rgba(71,62,50,0.08)]"
         />
-        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[52.5%] top-[24.5%] h-[19.5%] w-[22%]`}>
+        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[52.5%] top-[22.5%] h-[19.5%] w-[22%]`}>
           <MiniCalendar />
         </Link>
         <Link href="/kitchen/meal-planner" aria-label="Open weekly meal planner" title="Weekly meal planner" className={`${roomHotspotClass} group left-0 top-[23%] h-[36%] w-[24%]`}>
