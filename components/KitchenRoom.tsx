@@ -95,7 +95,7 @@ export function KitchenRoom() {
     >
       <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
         <Image
-          src="/images/kitchen-command-centre.webp"
+          src="/images/kitchen-english-country.webp"
           alt="Interactive DiaryDock Kitchen"
           fill
           priority
@@ -104,11 +104,11 @@ export function KitchenRoom() {
           className="object-fill"
         />
 
-        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[52.2%] top-[27.2%] h-[12.8%] w-[19%]`}>
+        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[35.2%] top-[24.2%] h-[18.7%] w-[21.7%]`}>
           <MiniCalendar />
         </Link>
-        <Link href="/kitchen/meal-planner" aria-label="Open weekly meal planner" title="Weekly meal planner" className={`${roomHotspotClass} group left-0 top-[23%] h-[36%] w-[24%]`}>
-          <span className="pointer-events-none absolute left-[43%] top-[18%] flex h-[38%] w-[54%] flex-col overflow-hidden rounded-[3px] border border-slate-700/25 bg-[#fbfaf6] p-[3px] shadow-[inset_0_0_12px_rgba(15,23,42,0.08)]">
+        <Link href="/kitchen/meal-planner" aria-label="Open weekly meal planner" title="Weekly meal planner" className={`${roomHotspotClass} group left-[4%] top-[20%] h-[44%] w-[30%]`}>
+          <span className="pointer-events-none absolute left-[26%] top-[24%] flex h-[38%] w-[61%] flex-col overflow-hidden rounded-[3px] border border-slate-700/25 bg-[#fbfaf6] p-[3px] shadow-[inset_0_0_12px_rgba(15,23,42,0.08)]">
             <span className="mb-[2px] block shrink-0 text-center text-[clamp(5px,1.25vw,7px)] font-bold uppercase tracking-[0.12em] text-[#627653]">
               This week
             </span>
@@ -137,19 +137,19 @@ export function KitchenRoom() {
               })}
             </span>
           </span>
-          <RoomHotspotMarker label="Meal planner" className="left-[70%] top-[49%]" labelPosition="right" />
+          <RoomHotspotMarker label="Meal planner" className="left-[80%] top-[70%]" labelPosition="right" />
         </Link>
-        <Link href="/kitchen/pantry" aria-label="Open pantry and shopping list" title="Pantry and shopping" className={`${roomHotspotClass} group left-[76%] top-[18%] h-[43%] w-[10%]`}>
-          <RoomHotspotMarker label="Pantry" className="left-[55%] top-[30%]" />
+        <Link href="/kitchen/pantry" aria-label="Open pantry and shopping list" title="Pantry and shopping" className={`${roomHotspotClass} group left-[79%] top-[19%] h-[41%] w-[21%]`}>
+          <RoomHotspotMarker label="Pantry" className="left-[20%] top-[20%]" labelPosition="left" />
         </Link>
-        <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[82%] top-[21%] h-[39%] w-[18%]`}>
-          <RoomHotspotMarker label="Noticeboard" className="left-[42%] top-[58%]" labelPosition="below-left" />
+        <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[58.5%] top-[24%] h-[20.5%] w-[22%]`}>
+          <RoomHotspotMarker label="Noticeboard" className="left-[53%] top-[44%]" labelPosition="below-left" />
         </Link>
-        <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[28%] top-[48%] h-[14%] w-[42%]`}>
-          <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[50%] top-[52%]" />
+        <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[50%] top-[48.5%] h-[13%] w-[50%]`}>
+          <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[57%] top-[50%]" labelPosition="left" />
         </Link>
-        <Link href="/kitchen/documents" aria-label="Open Kitchen documents" title="Kitchen documents" className={`${roomHotspotClass} group left-[18%] top-[62%] h-[16%] w-[49%]`}>
-          <RoomHotspotMarker label="Documents" className="left-[52%] top-[58%]" />
+        <Link href="/kitchen/documents" aria-label="Open Kitchen documents" title="Kitchen documents" className={`${roomHotspotClass} group left-[59%] top-[66%] h-[22%] w-[41%]`}>
+          <RoomHotspotMarker label="Documents" className="left-[51%] top-[49%]" labelPosition="left" />
         </Link>
 
       </div>
