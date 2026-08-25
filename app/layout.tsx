@@ -24,7 +24,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
   themeColor: "#f8f4ec"
 };
@@ -34,8 +33,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <DiaryDockDataProvider>
-          <div className="min-h-screen pb-28">
-            <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+          <div data-app-shell className="min-h-[100dvh]">
+            <main className="mx-auto flex min-h-[100dvh] w-full max-w-6xl flex-col overflow-x-clip px-4 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6 lg:px-8">
               {children}
             </main>
           </div>

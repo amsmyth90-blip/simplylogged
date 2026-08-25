@@ -6,8 +6,20 @@
   color-scheme: light;
 }
 
+html {
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   @apply bg-cream bg-aurora text-ink antialiased;
+  min-height: 100dvh;
+  width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
   background-image:
     radial-gradient(circle at top left, rgba(255, 248, 235, 0.92), rgba(255, 248, 235, 0) 38%),
     radial-gradient(circle at top right, rgba(232, 240, 234, 0.65), rgba(232, 240, 234, 0) 28%),
@@ -32,8 +44,34 @@ body.kids-schedules-immersive > div {
   padding-bottom: 0;
 }
 
+body:not(.family-immersive):not(.kids-schedules-immersive):has(nav[aria-label="Primary navigation"]) [data-app-shell] {
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+}
+
 * {
   @apply border-white/40;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 .glass-card {

@@ -36,7 +36,7 @@ export function GarageVehicleSectionNav({ vehicleId }: { vehicleId: string }) {
             href={`${base}${section.path}`}
             aria-current={active === section.id ? "page" : undefined}
             aria-label={section.label}
-            className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[14px] px-0.5 text-[8px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] sm:flex-row sm:gap-1.5 sm:px-2 sm:text-[10px] ${active === section.id ? "bg-[#355540] text-white" : "text-[#667068] hover:bg-[#eef2e9]"}`}
+            className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-[14px] px-0.5 text-[10px] font-semibold leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] sm:flex-row sm:gap-1.5 sm:px-2 ${active === section.id ? "bg-[#355540] text-white" : "text-[#667068] hover:bg-[#eef2e9]"}`}
           >
             <UiIcon name={section.icon} className="h-4 w-4 shrink-0" />
             <span>{section.shortLabel}</span>

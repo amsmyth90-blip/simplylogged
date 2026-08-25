@@ -46,14 +46,14 @@ export function LegalPage({ eyebrow, title, subtitle, effectiveDate, sections }:
         <SectionHeader title="Questions" hint="Privacy, data, and account support" />
         <p className="mt-3 text-sm leading-7 text-ink/62">
           For privacy questions, data export, account deletion, or terms questions, contact{" "}
-          <a href="mailto:hello@diarydock.com" className="font-semibold text-ink underline">
+          <a href="mailto:hello@diarydock.com" className="inline-flex min-h-11 items-center font-semibold text-ink underline">
             hello@diarydock.com
           </a>
           .
         </p>
         <Link
           href="/settings"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft"
+          className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft"
         >
           Back to Settings
           <UiIcon name="chevron-right" className="h-4 w-4" />

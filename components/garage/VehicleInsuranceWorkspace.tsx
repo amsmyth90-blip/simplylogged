@@ -258,7 +258,7 @@ export function VehicleInsuranceWorkspace({ vehicleId, view = "overview" }: { ve
 
     <GarageVehicleSectionNav vehicleId={vehicle.id} />
     <nav aria-label="Insurance views" className="rounded-[18px] border border-[#20352a]/[0.07] bg-white p-1.5 shadow-sm">
-      <div className="grid grid-cols-5 gap-1">{views.map((item) => <Link key={item.id} href={item.href} aria-current={view === item.id ? "page" : undefined} className={`flex min-h-11 min-w-0 items-center justify-center rounded-[12px] px-0.5 text-center text-[8px] font-semibold leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] sm:px-2 sm:text-[10px] ${view === item.id ? "bg-[#355540] text-white" : "text-[#667068] hover:bg-[#eef2e9]"}`}>{item.label}</Link>)}</div>
+      <div className="grid grid-cols-5 gap-1">{views.map((item) => <Link key={item.id} href={item.href} aria-current={view === item.id ? "page" : undefined} className={`flex min-h-11 min-w-0 items-center justify-center rounded-[12px] px-0.5 text-center text-[10px] font-semibold leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] sm:px-2 ${view === item.id ? "bg-[#355540] text-white" : "text-[#667068] hover:bg-[#eef2e9]"}`}>{item.label}</Link>)}</div>
     </nav>
 
     <VehicleSummary vehicle={vehicle} name={vehicleName} mileage={mileage?.mileage ?? null} />

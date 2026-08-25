@@ -30,8 +30,8 @@ export function ModalShell({ open, title, subtitle, onClose, children, footer }:
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/30 p-4 backdrop-blur-sm sm:items-center">
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="w-full max-w-xl overflow-hidden rounded-[32px] border border-white/70 bg-[#fffaf2]/95 shadow-[0_30px_80px_rgba(31,41,55,0.18)]">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/30 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-sm sm:items-center">
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="flex max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] w-full max-w-xl flex-col overflow-hidden rounded-[32px] border border-white/70 bg-[#fffaf2]/95 shadow-[0_30px_80px_rgba(31,41,55,0.18)]">
         <div className="flex items-start justify-between gap-4 border-b border-black/5 px-5 py-4 sm:px-6">
           <div className="min-w-0">
             <h2 id={titleId} className="text-xl font-semibold tracking-tight text-ink">{title}</h2>
@@ -46,7 +46,7 @@ export function ModalShell({ open, title, subtitle, onClose, children, footer }:
             <UiIcon name="plus" className="h-4 w-4 rotate-45" />
           </button>
         </div>
-        <div className="max-h-[70vh] overflow-x-hidden overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
         {footer ? <div className="border-t border-black/5 px-5 py-4 sm:px-6">{footer}</div> : null}
       </div>
     </div>
