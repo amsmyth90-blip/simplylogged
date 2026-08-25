@@ -23,28 +23,27 @@ function MiniCalendar() {
   const month = today.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const weekCount = Math.ceil((firstDay + daysInMonth) / 7);
-  const cells = Array.from({ length: weekCount * 7 }, (_, index) => {
+  const cells = Array.from({ length: 42 }, (_, index) => {
     const date = index - firstDay + 1;
     return date > 0 && date <= daysInMonth ? date : null;
   });
 
   return (
     <span className="flex h-full w-full flex-col overflow-hidden rounded-[18px] border border-white bg-white/96 p-2 text-slate-900 shadow-[0_12px_30px_rgba(48,43,32,0.28)] backdrop-blur-2xl">
-      <span className="mb-1 block whitespace-nowrap text-center text-[clamp(8px,2vw,10px)] font-bold uppercase tracking-[0.08em] text-[#657a57]">
+      <span className="mb-1 block whitespace-nowrap text-center text-[9px] font-bold uppercase tracking-[0.05em] text-[#657a57]">
         {today.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
       </span>
-      <span className="grid grid-cols-7 text-center text-[clamp(6px,1.4vw,7px)] font-bold text-slate-500">
+      <span className="grid shrink-0 grid-cols-7 gap-px text-center text-[7px] font-bold leading-none text-slate-500">
         {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}
       </span>
-      <span className="mt-0.5 grid flex-1 grid-cols-7 content-center gap-y-0.5 text-center text-[clamp(6.5px,1.55vw,8px)] font-semibold leading-none">
+      <span className="mt-1 grid min-h-0 flex-1 grid-cols-7 grid-rows-6 gap-px text-center text-[8px] font-semibold leading-none">
         {cells.map((date, index) => (
-          <span key={index} className={`flex h-[clamp(10px,1.9vw,14px)] items-center justify-center ${date === today.getDate() ? "rounded-full bg-[#799267] text-white" : "text-slate-800"}`}>
+          <span key={index} className={`flex min-h-0 min-w-0 items-center justify-center ${date === today.getDate() ? "rounded-full bg-[#799267] text-white" : "text-slate-800"}`}>
             {date ?? ""}
           </span>
         ))}
       </span>
-      <span className="mt-1 block shrink-0 rounded-full bg-[#657a57] px-2 py-0.5 text-center text-[clamp(7px,1.55vw,8px)] font-semibold text-white shadow-sm">
+      <span className="mt-1 block shrink-0 rounded-full bg-[#657a57] px-2 py-0.5 text-center text-[8px] font-semibold text-white shadow-sm">
         Open calendar
       </span>
     </span>
@@ -109,7 +108,7 @@ export function KitchenRoom() {
           aria-hidden="true"
           className="absolute left-[51%] top-[23.5%] z-10 h-[20%] w-[24%] rounded-2xl bg-[#d7d0c5] shadow-[0_8px_20px_rgba(71,62,50,0.08)]"
         />
-        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[53.5%] top-[24.5%] h-[19%] w-[20%]`}>
+        <Link href="/kitchen/calendar" aria-label="Open the Kitchen wall calendar" title="Kitchen wall calendar" className={`${roomHotspotClass} group left-[52.5%] top-[24.5%] h-[19.5%] w-[22%]`}>
           <MiniCalendar />
         </Link>
         <Link href="/kitchen/meal-planner" aria-label="Open weekly meal planner" title="Weekly meal planner" className={`${roomHotspotClass} group left-0 top-[23%] h-[36%] w-[24%]`}>
@@ -148,7 +147,7 @@ export function KitchenRoom() {
           <RoomHotspotMarker label="Pantry" className="left-[55%] top-[30%]" />
         </Link>
         <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[82%] top-[21%] h-[39%] w-[18%]`}>
-          <RoomHotspotMarker label="Noticeboard" className="left-[28%] top-[55%]" labelPosition="left" />
+          <RoomHotspotMarker label="Noticeboard" className="left-[72%] top-[82%]" labelPosition="below-left" />
         </Link>
         <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[28%] top-[48%] h-[14%] w-[42%]`}>
           <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[50%] top-[52%]" />
