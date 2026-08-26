@@ -6,11 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
-import {
-  roomImageLabelClass,
-  roomMarkerCircleClass,
-  roomMarkerHaloClass,
-} from "@/components/RoomSceneChrome";
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { createHouseholdInvite } from "@/lib/household-sharing";
 import type { HouseholdMember, Invite } from "@/lib/diarydock-data";
@@ -44,12 +40,9 @@ type FamilyInboxItem = {
 
 type HotspotProps = {
   label: string;
-  icon: IconName;
   position: { left: string; top: string };
   onClick?: () => void;
   href?: string;
-  labelSide?: "left" | "right" | "below";
-  badge?: number;
 };
 
 const defaultDraft: InviteDraft = {
@@ -66,7 +59,7 @@ const inviteAccessOptions = [
   "Partner - Full household access"
 ];
 
-const familyPosition = { left: "35%", top: "35.5%" };
+const familyPosition = { left: "47%", top: "26%" };
 const weekDayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const inboxStopWords = new Set(["and", "for", "form", "review", "sign", "the"]);
 
@@ -172,49 +165,21 @@ const householdStyles: Array<{
 
 function RoomHotspot({
   label,
-  icon,
   position,
   onClick,
   href,
-  labelSide = "right",
-  badge
 }: HotspotProps) {
-  const content = (
-    <>
-      <span className={roomMarkerCircleClass}>
-        <span className={roomMarkerHaloClass} />
-        <UiIcon name={icon} className="relative h-[17px] w-[17px]" />
-        {badge ? (
-          <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#aa5548] px-1 text-[9px] font-bold text-white">
-            {badge}
-          </span>
-        ) : null}
-      </span>
-      <span
-        className={`absolute ${roomImageLabelClass} ${
-          labelSide === "left"
-            ? "right-[calc(100%+6px)] top-1/2 -translate-y-1/2"
-            : labelSide === "below"
-              ? "left-1/2 top-[calc(100%+6px)] -translate-x-1/2"
-              : "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
-        }`}
-      >
-        {label}
-      </span>
-    </>
-  );
-
   const className =
-    "absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center transition duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white";
+    `group absolute z-20 flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center transition duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${roomImageLabelClass}`;
   const style = position;
 
   return href ? (
     <Link href={href} aria-label={label} className={className} style={style}>
-      {content}
+      {label}
     </Link>
   ) : (
     <button type="button" onClick={onClick} aria-label={label} className={className} style={style}>
-      {content}
+      {label}
     </button>
   );
 }
@@ -525,27 +490,20 @@ export function FamilyWorkspace() {
 
           <RoomHotspot
             label={hydrated && members.length ? `Family · ${members.length}` : "Family"}
-            icon="users"
             position={familyPosition}
             onClick={() => members[0] && setSelectedMember(members[0])}
-            labelSide="below"
           />
 
           <RoomHotspot
             label={householdStyleSet ? activeHouseholdStyle.scheduleLabel : "Set up schedules"}
-            icon="clock"
-            position={{ left: "84%", top: "16.5%" }}
+            position={{ left: "82%", top: "21%" }}
             onClick={() => setScheduleOpen(true)}
-            labelSide="left"
           />
 
           <RoomHotspot
             label={familyInboxItems.length ? `Family inbox · ${familyInboxItems.length}` : "Family inbox"}
-            icon="mail"
-            position={{ left: "65%", top: "36.8%" }}
+            position={{ left: "65%", top: "38%" }}
             onClick={() => setInboxOpen(true)}
-            badge={familyInboxItems.length || undefined}
-            labelSide="left"
           />
 
         </section>

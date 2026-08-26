@@ -6,12 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { ModalShell } from "@/components/ModalShell";
-import {
-  roomImageLabelClass,
-  roomMarkerCircleClass,
-  roomMarkerDotClass,
-  roomMarkerHaloClass,
-} from "@/components/RoomSceneChrome";
+import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { WillsWishesRecord } from "@/lib/diarydock-data";
 import type { VaultDocument } from "@/lib/mock-data";
@@ -25,12 +20,9 @@ type OfficeWorkspaceProps = {
 
 type OfficeHotspotProps = {
   label: string;
-  icon: IconName;
   position: { left: string; top: string };
   onClick?: () => void;
   href?: string;
-  labelSide?: "left" | "right" | "below";
-  badge?: number;
 };
 
 function OfficeHotspot({
@@ -38,36 +30,10 @@ function OfficeHotspot({
   position,
   onClick,
   href,
-  labelSide = "right",
-  badge,
 }: OfficeHotspotProps) {
   const visibleLabel = href === "/office/bills" ? "Household bills" : label;
-  const content = (
-    <>
-      <span className={roomMarkerCircleClass}>
-        <span className={roomMarkerHaloClass} />
-        <span className={roomMarkerDotClass} />
-        {badge ? (
-          <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#a65448] px-1 text-[9px] font-bold text-white">
-            {badge}
-          </span>
-        ) : null}
-      </span>
-      <span
-        className={`absolute ${roomImageLabelClass} ${
-          labelSide === "left"
-            ? "right-[calc(100%+6px)] top-1/2 -translate-y-1/2"
-            : labelSide === "below"
-              ? "left-1/2 top-[calc(100%+6px)] -translate-x-1/2"
-              : "left-[calc(100%+6px)] top-1/2 -translate-y-1/2"
-        }`}
-      >
-        {visibleLabel}
-      </span>
-    </>
-  );
   const className =
-    "group absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white";
+    `group absolute z-20 flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${roomImageLabelClass}`;
 
   return href ? (
     <Link
@@ -76,7 +42,7 @@ function OfficeHotspot({
       className={className}
       style={position}
     >
-      {content}
+      {visibleLabel}
     </Link>
   ) : (
     <button
@@ -86,7 +52,7 @@ function OfficeHotspot({
       className={className}
       style={position}
     >
-      {content}
+      {visibleLabel}
     </button>
   );
 }
@@ -1071,49 +1037,35 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
                 ? `Admin inbox · ${officeInbox.length}`
                 : "Admin inbox"
             }
-            icon="mail"
-            position={{ left: "18%", top: "49%" }}
+            position={{ left: "18%", top: "52%" }}
             onClick={() => setPanel("inbox")}
-            badge={officeInbox.length || undefined}
-            labelSide="right"
           />
           <OfficeHotspot
             label={
               adminCount ? `Today's admin · ${adminCount}` : "Today's admin"
             }
-            icon="briefcase"
-            position={{ left: "50%", top: "57%" }}
+            position={{ left: "50%", top: "53%" }}
             onClick={() => setPanel("admin")}
-            badge={adminCount || undefined}
-            labelSide="right"
           />
           <OfficeHotspot
             label={`Personal ID · ${drawerFiles.identity.length}`}
-            icon="file"
-            position={{ left: "78%", top: "20%" }}
+            position={{ left: "80%", top: "42%" }}
             onClick={() => openDocumentDrawer("identity")}
-            labelSide="left"
           />
           <OfficeHotspot
             label={`Wills & wishes · ${drawerFiles.wishes.length}`}
-            icon="lock"
-            position={{ left: "79%", top: "35.5%" }}
+            position={{ left: "79%", top: "32%" }}
             href="/wills"
-            labelSide="left"
           />
           <OfficeHotspot
             label={`Home & insurance · ${drawerFiles.home.length}`}
-            icon="home"
-            position={{ left: "87%", top: "61%" }}
+            position={{ left: "78%", top: "56%" }}
             onClick={() => openDocumentDrawer("home")}
-            labelSide="left"
           />
           <OfficeHotspot
             label={`Bills & contracts · ${drawerFiles.finance.length}`}
-            icon="chart"
-            position={{ left: "23%", top: "72%" }}
+            position={{ left: "25%", top: "61%" }}
             onClick={() => openDocumentDrawer("finance")}
-            labelSide="right"
           />
 
         </section>

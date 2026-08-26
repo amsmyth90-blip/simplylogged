@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 
 import { BottomNav } from "@/components/BottomNav";
 import {
-  RoomHotspotMarker,
   RoomSceneHeader,
   roomHotspotClass,
+  roomImageLabelClass,
 } from "@/components/RoomSceneChrome";
 
 export function BedroomRoom() {
@@ -62,55 +62,45 @@ export function BedroomRoom() {
           aria-label="Open Health Profile"
           className={`${roomHotspotClass} group left-[2%] top-[12%] h-[37%] w-[30%]`}
         >
-          <RoomHotspotMarker
-            label="Health Profile"
-            className="left-[48%] top-[58%]"
-            labelPosition="right"
-          />
+          <span className={`absolute left-[48%] top-[58%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+            Health Profile
+          </span>
         </Link>
         <Link
           href="/bedroom/medical-records"
           aria-label="Open Medical Records"
           className={`${roomHotspotClass} group left-[29%] top-[39%] h-[31%] w-[45%]`}
         >
-          <RoomHotspotMarker
-            label="Medical Records"
-            className="left-[25%] top-[45%]"
-            labelPosition="below-left"
-          />
+          <span className={`absolute left-[33%] top-[55%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+            Medical Records
+          </span>
         </Link>
         <Link
           href="/bedroom/medications"
           aria-label="Open Medications and Prescriptions"
           className={`${roomHotspotClass} group left-[75%] top-[26%] h-[36%] w-[24%]`}
         >
-          <RoomHotspotMarker
-            label="Medications"
-            className="left-[47%] top-[43%]"
-            labelPosition="left"
-          />
+          <span className={`absolute left-[46%] top-[43%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+            Medications
+          </span>
         </Link>
         <Link
           href="/bedroom/appointments"
           aria-label="Open Health Appointments"
           className={`${roomHotspotClass} group left-[1%] top-[56%] h-[30%] w-[36%]`}
         >
-          <RoomHotspotMarker
-            label="Appointments"
-            className="left-[49%] top-[47%]"
-            labelPosition="right"
-          />
+          <span className={`absolute left-[50%] top-[47%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+            Appointments
+          </span>
         </Link>
         <Link
           href="/bedroom/emergency"
           aria-label="Open Emergency Medical Information"
           className={`${roomHotspotClass} group left-[56%] top-[61%] h-[25%] w-[40%]`}
         >
-          <RoomHotspotMarker
-            label="Emergency Info"
-            className="left-[58%] top-[50%]"
-            labelPosition="left"
-          />
+          <span className={`absolute left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+            Emergency Info
+          </span>
         </Link>
       </div>
 

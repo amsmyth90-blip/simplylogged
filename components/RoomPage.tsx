@@ -11,8 +11,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { ReminderCard } from "@/components/ReminderCard";
 import {
   roomImageLabelClass,
-  roomMarkerCircleClass,
-  roomMarkerHaloClass,
 } from "@/components/RoomSceneChrome";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatusChip } from "@/components/StatusChip";
@@ -407,15 +405,11 @@ export function RoomPage({ room }: RoomPageProps) {
                 <Link
                   key={object.label}
                   href={object.href}
-                  className={`group pointer-events-auto absolute ${roomMarkerCircleClass} focus:outline-none`}
+                  className={`group pointer-events-auto absolute flex min-h-11 items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${roomImageLabelClass}`}
                   style={{ left: object.left, top: object.top, transform: "translate(-50%, -50%)" }}
                   aria-label={`${object.label}: ${object.detail}`}
                 >
-                  <span className={roomMarkerHaloClass} />
-                  <UiIcon name={object.icon} className="h-[18px] w-[18px]" />
-                  <span className={`absolute left-1/2 top-[calc(100%+6px)] -translate-x-1/2 ${roomImageLabelClass}`}>
-                    {object.label}
-                  </span>
+                  {object.label}
                 </Link>
               ))}
             </>

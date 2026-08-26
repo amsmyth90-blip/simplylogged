@@ -7,9 +7,9 @@ import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import {
-  RoomHotspotMarker,
   RoomSceneHeader,
   roomHotspotClass,
+  roomImageLabelClass,
 } from "@/components/RoomSceneChrome";
 
 const drivewaySections = [
@@ -18,24 +18,21 @@ const drivewaySections = [
     description: "Journeys, bookings and travel plans",
     href: "/driveway/trips",
     className: "left-[4%] top-[51%] h-[26%] w-[42%]",
-    markerClassName: "left-[63%] top-[52%]",
-    labelPosition: "right" as const,
+    labelClassName: "left-[63%] top-[52%]",
   },
   {
     label: "Travel Checklist",
     description: "Packing lists and departure checks",
     href: "/driveway/travel-checklist",
     className: "left-[49%] top-[59%] h-[22%] w-[49%]",
-    markerClassName: "left-[74%] top-[43%]",
-    labelPosition: "left" as const,
+    labelClassName: "left-[52%] top-[48%]",
   },
   {
     label: "Parking & Permits",
     description: "Visitor parking and access permits",
     href: "/driveway/parking-permits",
     className: "left-[63%] top-[46%] h-[13%] w-[15%]",
-    markerClassName: "left-[44%] top-[50%]",
-    labelPosition: "left" as const,
+    labelClassName: "left-[44%] top-[50%]",
   },
 ] as const;
 
@@ -109,11 +106,9 @@ export function DrivewayWorkspace() {
               <span className="sr-only">
                 {section.label}: {section.description}
               </span>
-              <RoomHotspotMarker
-                label={section.label}
-                className={section.markerClassName}
-                labelPosition={section.labelPosition}
-              />
+              <span className={`absolute -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass} ${section.labelClassName}`}>
+                {section.label}
+              </span>
             </Link>
           ))}
         </nav>

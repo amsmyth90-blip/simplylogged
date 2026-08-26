@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
-import { RoomHotspotMarker, RoomSceneHeader, roomHotspotClass } from "@/components/RoomSceneChrome";
+import { RoomSceneHeader, roomHotspotClass, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import type { IconName } from "@/components/UiIcon";
 import { DEFAULT_VEHICLE_ID } from "@/lib/vehicle-records";
 
@@ -136,7 +136,9 @@ export function GarageWorkspace() {
               return (
                 <Link key={section.id} href={`/garage/vehicles/${DEFAULT_VEHICLE_ID}${section.href}`} {...sharedProps}>
                   <span className="sr-only">{section.label}: {section.shortDescription}</span>
-                  <RoomHotspotMarker label={section.label} className="left-[94%] top-1/2" labelPosition="left" />
+                  <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+                    {section.label}
+                  </span>
                 </Link>
               );
             })}

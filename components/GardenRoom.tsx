@@ -7,9 +7,9 @@ import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import {
-  RoomHotspotMarker,
   RoomSceneHeader,
   roomHotspotClass,
+  roomImageLabelClass,
 } from "@/components/RoomSceneChrome";
 
 type GardenHotspot = {
@@ -17,8 +17,7 @@ type GardenHotspot = {
   label: string;
   title: string;
   className: string;
-  markerClassName: string;
-  labelPosition?: "below" | "below-left" | "left" | "right";
+  labelClassName: string;
 };
 
 const gardenHotspots: GardenHotspot[] = [
@@ -27,40 +26,35 @@ const gardenHotspots: GardenHotspot[] = [
     label: "Pets",
     title: "Pets",
     className: "left-[2%] top-[26%] h-[54%] w-[38%]",
-    markerClassName: "left-[42%] top-[70%]",
-    labelPosition: "right",
+    labelClassName: "left-[42%] top-[22%]",
   },
   {
     href: "/garden/outdoor-spaces",
     label: "Outdoor Spaces",
     title: "Outdoor Spaces",
     className: "left-[48%] top-[16%] h-[40%] w-[50%]",
-    markerClassName: "left-[48%] top-[60%]",
-    labelPosition: "left",
+    labelClassName: "left-[50%] top-[64%]",
   },
   {
     href: "/garden/jobs",
     label: "Garden Jobs",
     title: "Garden Jobs",
     className: "left-[22%] top-[57%] h-[22%] w-[54%]",
-    markerClassName: "left-[52%] top-[54%]",
-    labelPosition: "below",
+    labelClassName: "left-[52%] top-[54%]",
   },
   {
     href: "/garden/tools-shed",
     label: "Tools & Shed",
     title: "Tools & Shed",
     className: "left-[0%] top-[36%] h-[22%] w-[54%]",
-    markerClassName: "left-[48%] top-[48%]",
-    labelPosition: "right",
+    labelClassName: "left-[45%] top-[68%]",
   },
   {
     href: "/garden/bins",
     label: "Bins & Collections",
     title: "Bins & Collections",
     className: "left-[66%] top-[39%] h-[24%] w-[34%]",
-    markerClassName: "left-[42%] top-[64%]",
-    labelPosition: "left",
+    labelClassName: "left-[35%] top-[72%]",
   },
 ];
 
@@ -122,11 +116,9 @@ export function GardenRoom() {
               title={hotspot.title}
               className={`${roomHotspotClass} group ${hotspot.className}`}
             >
-              <RoomHotspotMarker
-                label={hotspot.label}
-                className={hotspot.markerClassName}
-                labelPosition={hotspot.labelPosition}
-              />
+              <span className={`absolute -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass} ${hotspot.labelClassName}`}>
+                {hotspot.label}
+              </span>
             </Link>
           ))}
         </nav>
