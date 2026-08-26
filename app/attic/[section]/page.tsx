@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { BottomNav } from "@/components/BottomNav";
 import { AtticSectionWorkspace } from "@/components/attic/AtticSectionWorkspace";
@@ -14,12 +14,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: AtticSectionPageProps): Promise<Metadata> {
   const { section } = await params;
+  if (section === "heirlooms") return { title: "Keepsakes & Heirlooms" };
   return { title: isAtticSection(section) ? getAtticSection(section).title : "Attic" };
 }
 
 export default async function AtticSectionPage({ params }: AtticSectionPageProps) {
   await requireUser();
   const { section } = await params;
+  if (section === "heirlooms") redirect("/attic/keepsakes");
   if (!isAtticSection(section)) notFound();
 
   return (

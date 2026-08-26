@@ -5,7 +5,6 @@ export type AtticSectionId =
   | "keepsakes"
   | "family-history"
   | "letters-journals"
-  | "heirlooms"
   | "memory-box";
 
 export type AtticSection = {
@@ -42,20 +41,20 @@ export const atticSections: AtticSection[] = [
   },
   {
     id: "keepsakes",
-    title: "Keepsakes",
-    description: "Record the story behind sentimental items without mixing them into legal storage.",
-    icon: "star",
-    scope: ["Item notes", "Photos", "Who it belonged to", "Where it is stored"],
-    intention: "Keep the meaning of sentimental things safe, even if the item itself stays in a box.",
-    primaryAction: "Add keepsake",
+    title: "Keepsakes & Heirlooms",
+    description: "Record meaningful family items, their stories and where the originals are kept.",
+    icon: "archive",
+    scope: ["Item notes", "Photos", "Who it belonged to", "Known history", "Storage location"],
+    intention: "Keep the meaning and history of treasured items together in one simple place.",
+    primaryAction: "Add item",
     secondaryAction: "Photograph item",
-    organiseBy: ["Person connected", "Item type", "Storage location", "Story or memory"],
+    organiseBy: ["Person or family line", "Item type", "Storage location", "Story or memory"],
     prompts: [
       "Who did this belong to?",
-      "Why does it matter?",
+      "Why does it matter, and how did it come into the family?",
       "Where is the original kept?",
     ],
-    notHere: ["High-value insurance schedules", "Legal ownership instructions", "Vehicle receipts"],
+    notHere: ["Formal valuations for insurance", "Will instructions", "Home inventory for claims"],
   },
   {
     id: "family-history",
@@ -90,23 +89,6 @@ export const atticSections: AtticSection[] = [
       "Does it need a typed transcription?",
     ],
     notHere: ["Letters of wishes", "Bills and correspondence", "Medical letters"],
-  },
-  {
-    id: "heirlooms",
-    title: "Heirlooms",
-    description: "Track meaningful family items, their history and where they are kept.",
-    icon: "archive",
-    scope: ["Valuable keepsakes", "Provenance", "Photos", "Storage location"],
-    intention: "Record family heirlooms and their background without making legal promises.",
-    primaryAction: "Add heirloom",
-    secondaryAction: "Add provenance",
-    organiseBy: ["Item", "Family line", "Storage location", "Known history"],
-    prompts: [
-      "What is the item?",
-      "How did it come into the family?",
-      "Is there supporting information or a photo?",
-    ],
-    notHere: ["Formal valuations for insurance", "Will instructions", "Home inventory for claims"],
   },
   {
     id: "memory-box",

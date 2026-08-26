@@ -7,9 +7,9 @@ import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import {
-  RoomHotspotMarker,
   RoomSceneHeader,
   roomHotspotClass,
+  roomImageLabelClass,
 } from "@/components/RoomSceneChrome";
 
 type AtticHotspot = {
@@ -17,8 +17,7 @@ type AtticHotspot = {
   label: string;
   description: string;
   className: string;
-  markerClassName: string;
-  labelPosition?: "below" | "below-left" | "left" | "right";
+  labelClassName: string;
 };
 
 const atticHotspots: AtticHotspot[] = [
@@ -26,49 +25,36 @@ const atticHotspots: AtticHotspot[] = [
     href: "/attic/photo-albums",
     label: "Photo Albums",
     description: "Scanned photos, captions and family album notes",
-    className: "left-[51%] top-[66%] h-[24%] w-[47%]",
-    markerClassName: "left-[53%] top-[25%]",
-    labelPosition: "below-left",
+    className: "left-[2%] top-[70%] h-[17%] w-[41%]",
+    labelClassName: "left-[50%] top-[42%]",
   },
   {
     href: "/attic/keepsakes",
-    label: "Keepsakes",
-    description: "Sentimental items and the stories behind them",
-    className: "left-[4%] top-[55%] h-[23%] w-[46%]",
-    markerClassName: "left-[76%] top-[43%]",
-    labelPosition: "left",
+    label: "Keepsakes & Heirlooms",
+    description: "Meaningful items, their stories and where they are kept",
+    className: "left-[26%] top-[34%] h-[25%] w-[33%]",
+    labelClassName: "left-[50%] top-[48%]",
   },
   {
     href: "/attic/family-history",
     label: "Family History",
     description: "Family stories, timelines and remembered details",
-    className: "left-[57%] top-[17%] h-[33%] w-[40%]",
-    markerClassName: "left-[31%] top-[54%]",
-    labelPosition: "left",
+    className: "left-[59%] top-[16%] h-[31%] w-[38%]",
+    labelClassName: "left-[52%] top-[46%]",
   },
   {
     href: "/attic/letters-journals",
     label: "Letters & Journals",
     description: "Old letters, journals and handwritten memories",
-    className: "left-[1%] top-[67%] h-[25%] w-[48%]",
-    markerClassName: "left-[48%] top-[59%]",
-    labelPosition: "right",
-  },
-  {
-    href: "/attic/heirlooms",
-    label: "Heirlooms",
-    description: "Meaningful family items, provenance and location notes",
-    className: "left-[28%] top-[33%] h-[25%] w-[39%]",
-    markerClassName: "left-[55%] top-[55%]",
-    labelPosition: "below",
+    className: "left-[3%] top-[52%] h-[18%] w-[34%]",
+    labelClassName: "left-[50%] top-[60%]",
   },
   {
     href: "/attic/memory-box",
     label: "Memory Box",
     description: "Voice notes, small memories and personal stories",
-    className: "left-[51%] top-[49%] h-[19%] w-[42%]",
-    markerClassName: "left-[52%] top-[56%]",
-    labelPosition: "left",
+    className: "left-[64%] top-[61%] h-[23%] w-[34%]",
+    labelClassName: "left-[46%] top-[50%]",
   },
 ];
 
@@ -142,11 +128,11 @@ export function AtticRoom() {
               <span className="sr-only">
                 {section.label}: {section.description}
               </span>
-              <RoomHotspotMarker
-                label={section.label}
-                className={section.markerClassName}
-                labelPosition={section.labelPosition}
-              />
+              <span
+                className={`absolute -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass} ${section.labelClassName}`}
+              >
+                {section.label}
+              </span>
             </Link>
           ))}
         </nav>
