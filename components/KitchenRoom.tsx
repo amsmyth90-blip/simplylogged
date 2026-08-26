@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
-import { RoomHotspotMarker, RoomSceneHeader, roomHotspotClass } from "@/components/RoomSceneChrome";
+import { RoomSceneHeader, roomHotspotClass, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { getPlannedMeal, getWeekDates } from "@/lib/meal-planner";
 
 function MiniCalendar() {
@@ -115,41 +115,30 @@ export function KitchenRoom() {
             <span className="grid min-h-0 flex-1 grid-rows-7 gap-px">
               {weekDates.map((date, index) => {
                 const meal = getPlannedMeal(state.mealPlan, date, index);
-                const imageIndex = meal?.imageIndex ?? index;
                 return (
-                <span key={date.toISOString()} className="grid min-h-0 grid-cols-[27%_1fr] items-center gap-[3px] overflow-hidden rounded-[2px] bg-white/85 pr-[2px]">
-                  <span
-                    className="block h-full min-h-0 w-full bg-cover bg-center"
-                    style={{
-                      backgroundImage: "url('/images/weekly-meal-thumbnails.png')",
-                      backgroundSize: "100% 700%",
-                      backgroundPosition: `center ${(imageIndex / 6) * 100}%`
-                    }}
-                  />
-                  <span className="min-w-0 leading-none">
-                    <span className="block text-[clamp(3.5px,0.85vw,5px)] font-bold uppercase tracking-wide text-[#7b8b70]">
+                  <span key={date.toISOString()} className="grid min-h-0 grid-cols-[28%_1fr] items-center gap-[2px] overflow-hidden rounded-[2px] bg-white/90 px-[3px]">
+                    <span className="block text-[clamp(4px,0.95vw,5.5px)] font-bold uppercase leading-none tracking-wide text-[#708064]">
                       {date.toLocaleDateString("en-GB", { weekday: "short" })}
                     </span>
-                    <span className="mt-px block truncate text-[clamp(4px,1vw,6px)] font-semibold text-slate-800">{meal?.name ?? "Not planned"}</span>
+                    <span className="block min-w-0 truncate text-[clamp(4.5px,1.05vw,6px)] font-semibold leading-none text-slate-800">{meal?.name ?? "Not planned"}</span>
                   </span>
-                </span>
                 );
               })}
             </span>
           </span>
-          <RoomHotspotMarker label="Meal planner" className="left-[16%] top-[76%]" labelPosition="left" />
+          <span className={`absolute left-[50%] top-[85%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Meal planner</span>
         </Link>
         <Link href="/kitchen/pantry" aria-label="Open pantry and shopping list" title="Pantry and shopping" className={`${roomHotspotClass} group left-[8%] top-[17%] h-[42%] w-[21%]`}>
-          <RoomHotspotMarker label="Pantry" className="left-[55%] top-[25%]" labelPosition="right" />
+          <span className={`absolute left-[46%] top-[27%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Pantry</span>
         </Link>
         <Link href="/kitchen/notes" aria-label="Open family noticeboard" title="Family notes" className={`${roomHotspotClass} group left-[30.8%] top-[38.3%] h-[12.5%] w-[31.4%]`}>
-          <RoomHotspotMarker label="Noticeboard" className="left-[45%] top-[45%]" labelPosition="right" />
+          <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Noticeboard</span>
         </Link>
         <Link href={recipeHref} aria-label={tonightRecipe ? `Cook tonight's ${tonightRecipe.name}` : "Open family recipes"} title={tonightRecipe ? `Tonight: ${tonightRecipe.name}` : "Family recipes"} className={`${roomHotspotClass} group left-[44%] top-[53.5%] h-[9%] w-[42%]`}>
-          <RoomHotspotMarker label={tonightRecipe ? "Cook tonight" : "Recipes"} className="left-[50%] top-[50%]" labelPosition="left" />
+          <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>{tonightRecipe ? "Cook tonight" : "Recipes"}</span>
         </Link>
         <Link href="/kitchen/documents" aria-label="Open Kitchen documents" title="Kitchen documents" className={`${roomHotspotClass} group left-[69%] top-[63.5%] h-[22%] w-[31%]`}>
-          <RoomHotspotMarker label="Documents" className="left-[28%] top-[45%]" labelPosition="left" />
+          <span className={`absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Documents</span>
         </Link>
 
       </div>
