@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { RoomSceneHeader, roomHotspotClass, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import type { IconName } from "@/components/UiIcon";
 import { DEFAULT_VEHICLE_ID } from "@/lib/vehicle-records";
@@ -85,8 +86,23 @@ export function GarageWorkspace() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Vehicles"
+        eyebrow="Garage"
+        description="Keep each vehicle’s identity, legal dates, insurance, maintenance and costs together."
+        image="/images/pages/garage-folio-hero-v5.webp"
+        imageAlt="A warm organised garage with a car and workbench"
+        imagePosition="center 46%"
+        items={garageSections.map((section) => ({
+          label: section.label,
+          description: section.shortDescription,
+          icon: section.icon,
+          href: `/garage/vehicles/${DEFAULT_VEHICLE_ID}${section.href}`,
+        }))}
+      />
       <main
-        className="fixed inset-0 z-30 overflow-hidden bg-[#4b4033] overscroll-none"
+        className="fixed inset-0 z-30 overflow-hidden bg-[#4b4033] overscroll-none lg:hidden"
         onTouchStart={(event) => {
           touchStartX.current = event.touches[0]?.clientX ?? null;
         }}
@@ -146,7 +162,8 @@ export function GarageWorkspace() {
 
         </section>
         <RoomSceneHeader roomName="Garage" />
-        <BottomNav />
       </main>
+      <BottomNav />
+    </>
   );
 }

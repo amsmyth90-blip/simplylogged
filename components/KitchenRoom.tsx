@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { RoomSceneHeader, roomHotspotClass, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { getPlannedMeal, getWeekDates } from "@/lib/meal-planner";
@@ -81,8 +82,25 @@ export function KitchenRoom() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Kitchen"
+        eyebrow="Home & everyday life"
+        description="Plan meals, keep household notes and stay on top of the everyday things that keep home running."
+        image="/images/kitchen-coastal-cottage.webp"
+        imageAlt="A light, welcoming family kitchen"
+        imagePosition="center"
+        items={[
+          { label: "Calendar", description: "Family dates and plans", icon: "calendar", href: "/kitchen/calendar" },
+          { label: "Meal planner", description: "Plan the week’s meals", icon: "briefcase", href: "/kitchen/meal-planner" },
+          { label: "Pantry", description: "Food, staples and shopping", icon: "archive", href: "/kitchen/pantry" },
+          { label: "Noticeboard", description: "Notes for the household", icon: "file", href: "/kitchen/notes" },
+          { label: "Recipes", description: "Find, save and cook favourites", icon: "heart", href: recipeHref },
+          { label: "Kitchen documents", description: "Appliance and home records", icon: "folder", href: "/kitchen/documents" },
+        ]}
+      />
     <div
-      className="fixed inset-0 z-30 overflow-hidden bg-[#1d251c] overscroll-none"
+      className="fixed inset-0 z-30 overflow-hidden bg-[#1d251c] overscroll-none lg:hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
@@ -126,7 +144,7 @@ export function KitchenRoom() {
               })}
             </span>
           </span>
-          <span className={`absolute left-[50%] top-[85%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Meal planner</span>
+          <span className={`absolute left-[35%] top-[85%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Meal planner</span>
         </Link>
         <Link href="/kitchen/pantry" aria-label="Open pantry and shopping list" title="Pantry and shopping" className={`${roomHotspotClass} group left-[8%] top-[17%] h-[42%] w-[21%]`}>
           <span className={`absolute left-[46%] top-[27%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Pantry</span>
@@ -138,14 +156,15 @@ export function KitchenRoom() {
           <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>{tonightRecipe ? "Cook tonight" : "Recipes"}</span>
         </Link>
         <Link href="/kitchen/documents" aria-label="Open Kitchen documents" title="Kitchen documents" className={`${roomHotspotClass} group left-[69%] top-[63.5%] h-[22%] w-[31%]`}>
-          <span className={`absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Documents</span>
+          <span className={`absolute left-[35%] top-[45%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>Documents</span>
         </Link>
 
       </div>
 
       <RoomSceneHeader roomName="Kitchen" />
 
-      <BottomNav />
     </div>
+      <BottomNav />
+    </>
   );
 }

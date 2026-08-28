@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import {
   RoomSceneHeader,
   roomHotspotClass,
@@ -74,8 +75,23 @@ export function GardenRoom() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Pets & garden"
+        eyebrow="Outdoor life"
+        description="Care for pets, outdoor spaces, seasonal jobs and everything that lives beyond the back door."
+        image="/images/pages/garden-command-centre-v2.webp"
+        imageAlt="A calm garden workspace with a cat and dog"
+        imagePosition="center 48%"
+        items={gardenHotspots.map((section, index) => ({
+          label: section.label,
+          description: (["Profiles, care and important dates", "Your garden and outdoor areas", "Seasonal tasks and maintenance", "Equipment and outbuildings", "Collection days and reminders"] as const)[index],
+          href: section.href,
+          icon: (["heart", "leaf", "check", "gear", "calendar"] as const)[index],
+        }))}
+      />
     <div
-      className="fixed inset-0 z-30 overflow-hidden bg-[#2f3626] overscroll-none"
+      className="fixed inset-0 z-30 overflow-hidden bg-[#2f3626] overscroll-none lg:hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
@@ -125,7 +141,8 @@ export function GardenRoom() {
       </div>
 
       <RoomSceneHeader roomName="Pets & Garden" />
-      <BottomNav />
     </div>
+      <BottomNav />
+    </>
   );
 }

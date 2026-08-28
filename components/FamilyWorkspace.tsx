@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { ModalShell } from "@/components/ModalShell";
 import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
@@ -444,7 +445,20 @@ export function FamilyWorkspace() {
 
   return (
     <>
-      <main className="fixed inset-0 overflow-hidden bg-[#bda888]">
+      <DesktopSpaceLanding
+        title="People"
+        eyebrow={household?.householdName ?? "Family room"}
+        description="Keep household profiles, shared schedules, invitations and the family inbox together."
+        image="/images/family-fireside-clean.webp"
+        imageAlt="A warm fireside family room"
+        items={[
+          { label: "Our household", description: `${members.length} household member${members.length === 1 ? "" : "s"}`, icon: "users", href: "/family/household" },
+          { label: householdStyleSet ? activeHouseholdStyle.scheduleLabel : "Schedules", description: "Plans, routines and shared responsibilities", icon: "calendar", href: "/family/schedules" },
+          { label: "Family inbox", description: familyInboxItems.length ? `${familyInboxItems.length} items need attention` : "Shared household items", icon: "mail", onClick: () => setInboxOpen(true) },
+          { label: "Invitations & access", description: "Invite people and manage access", icon: "shield", onClick: () => setInviteOpen(true) },
+        ]}
+      />
+      <main className="fixed inset-0 overflow-hidden bg-[#bda888] lg:hidden">
         <Image
           src="/images/family-fireside-clean.webp"
           alt=""

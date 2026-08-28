@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { ModalShell } from "@/components/ModalShell";
 import { roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
@@ -985,7 +986,23 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
 
   return (
     <>
-      <main className="fixed inset-0 overflow-hidden bg-[#7c634c]">
+      <DesktopSpaceLanding
+        title="Documents"
+        eyebrow="Office"
+        description="Organise personal documents, household administration, bills, correspondence and future wishes."
+        image="/images/office-interactive-v1.webp"
+        imageAlt="A warm organised home office"
+        imagePosition="center 45%"
+        items={[
+          { label: "Admin inbox", description: officeInbox.length ? `${officeInbox.length} incoming items` : "Incoming household paperwork", icon: "mail", onClick: () => setPanel("inbox") },
+          { label: "Today’s admin", description: adminCount ? `${adminCount} tasks and reminders` : "Tasks and reminders", icon: "check", onClick: () => setPanel("admin") },
+          { label: "Personal ID", description: "Passports, licences and certificates", icon: "file", onClick: () => openDocumentDrawer("identity") },
+          { label: "Wills & wishes", description: "Wills, wishes and trusted access", icon: "heart", href: "/wills" },
+          { label: "Home & insurance", description: "Home policies, deeds and mortgage", icon: "home", onClick: () => openDocumentDrawer("home") },
+          { label: "Bills & contracts", description: "Household finances and regular commitments", icon: "chart", href: "/office/bills" },
+        ]}
+      />
+      <main className="fixed inset-0 overflow-hidden bg-[#7c634c] lg:hidden">
         <Image
           src="/images/office-interactive-v1.webp"
           alt=""

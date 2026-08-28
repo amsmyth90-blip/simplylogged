@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import {
   RoomSceneHeader,
   roomHotspotClass,
@@ -28,8 +29,23 @@ export function BedroomRoom() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Health & wellbeing"
+        eyebrow="Private space"
+        description="Keep personal health details, appointments, medication and emergency information calm and easy to find."
+        image="/images/pages/bedroom-health-room-clean.webp"
+        imageAlt="A calm private bedroom"
+        items={[
+          { label: "My health", description: "Your personal health profile", icon: "heart", href: "/bedroom/health-profile" },
+          { label: "Health documents", description: "Records, letters and results", icon: "folder", href: "/bedroom/medical-records" },
+          { label: "Medications", description: "Medicines and prescriptions", icon: "briefcase", href: "/bedroom/medications" },
+          { label: "Appointments", description: "Upcoming and previous visits", icon: "calendar", href: "/bedroom/appointments" },
+          { label: "Emergency info", description: "Essential information when needed", icon: "alert", href: "/bedroom/emergency" },
+        ]}
+      />
     <div
-      className="fixed inset-0 z-30 overflow-hidden bg-[#3d4030] overscroll-none"
+      className="fixed inset-0 z-30 overflow-hidden bg-[#3d4030] overscroll-none lg:hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
@@ -105,7 +121,8 @@ export function BedroomRoom() {
       </div>
 
       <RoomSceneHeader roomName="Bedroom" />
-      <BottomNav />
     </div>
+      <BottomNav />
+    </>
   );
 }

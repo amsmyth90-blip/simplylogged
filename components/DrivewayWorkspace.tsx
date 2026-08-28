@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import {
   RoomSceneHeader,
   roomHotspotClass,
@@ -52,8 +53,23 @@ export function DrivewayWorkspace() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Plans & travel"
+        eyebrow="Driveway"
+        description="Keep trips, packing lists, parking and travel details ready for the moment you leave home."
+        image="/images/designs/driveway/08-car-boot-departure.webp"
+        imageAlt="A country driveway with a packed car and travel cases"
+        imagePosition="center 58%"
+        items={drivewaySections.map((section, index) => ({
+          label: section.label,
+          description: section.description,
+          href: section.href,
+          icon: (["map-pin", "check", "car"] as const)[index],
+        }))}
+      />
     <main
-      className="fixed inset-0 z-30 overflow-hidden bg-[#594b3b] overscroll-none"
+      className="fixed inset-0 z-30 overflow-hidden bg-[#594b3b] overscroll-none lg:hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
@@ -116,7 +132,8 @@ export function DrivewayWorkspace() {
       </section>
 
       <RoomSceneHeader roomName="Driveway" />
-      <BottomNav />
     </main>
+      <BottomNav />
+    </>
   );
 }

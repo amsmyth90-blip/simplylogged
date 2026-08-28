@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import {
   RoomSceneHeader,
   roomHotspotClass,
@@ -74,8 +75,22 @@ export function AtticRoom() {
   }, []);
 
   return (
+    <>
+      <DesktopSpaceLanding
+        title="Memories"
+        eyebrow="Attic"
+        description="Preserve family photographs, stories, meaningful objects and the memories attached to them."
+        image="/images/pages/attic-memory-room-v1.webp"
+        imageAlt="A warm attic filled with albums, keepsakes and family memories"
+        items={atticHotspots.map((section, index) => ({
+          label: section.label,
+          description: section.description,
+          href: section.href,
+          icon: (["camera", "archive", "users", "file", "heart"] as const)[index],
+        }))}
+      />
     <main
-      className="fixed inset-0 z-30 overflow-hidden bg-[#3d372c] overscroll-none"
+      className="fixed inset-0 z-30 overflow-hidden bg-[#3d372c] overscroll-none lg:hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
@@ -140,7 +155,8 @@ export function AtticRoom() {
       </section>
 
       <RoomSceneHeader roomName="Attic" />
-      <BottomNav />
     </main>
+      <BottomNav />
+    </>
   );
 }
