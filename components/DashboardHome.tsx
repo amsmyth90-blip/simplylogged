@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { DesktopDashboard } from "@/components/DesktopDashboard";
 import { EstateDashboard } from "@/components/EstateDashboard";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
@@ -86,7 +87,7 @@ export function DashboardHome() {
           if (distance < -72) router.push("/room/kitchen");
         }}
       >
-        <section className="relative h-[100svh] overflow-hidden">
+        <section className="relative h-[100svh] overflow-hidden lg:hidden">
           <div
             className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 sm:px-6 lg:hidden"
             style={{ paddingTop: "max(30px, calc(env(safe-area-inset-top, 0px) + 12px))" }}
@@ -151,67 +152,8 @@ export function DashboardHome() {
             </div>
           ) : null}
           <EstateDashboard />
-          <aside className="absolute bottom-7 right-7 top-7 z-30 hidden w-[19rem] overflow-y-auto rounded-[30px] border border-white/75 bg-[#fffdf8]/[0.92] p-5 shadow-[0_30px_80px_-36px_rgba(32,53,42,0.48)] backdrop-blur-2xl lg:block xl:w-[21rem]">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6f8e72]">Your digital home</p>
-                <h1 className="mt-2 font-serif text-[30px] leading-tight text-[#20352a]">
-                  {firstName ? `${greeting}, ${firstName}` : greeting}
-                </h1>
-              </div>
-              <div className="rounded-2xl bg-[#e8efe3] px-3 py-2 text-center">
-                <span className="block text-lg font-bold text-[#315443]">{readinessScore.score}%</span>
-                <span className="block text-[9px] font-semibold uppercase tracking-wide text-[#667068]">Ready</span>
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-2">
-              {todayItems.length ? todayItems.map((item) => item ? (
-                <Link key={item.href} href={item.href} className="flex min-h-16 items-center gap-3 rounded-2xl border border-[#20352a]/8 bg-white/75 p-3 transition hover:-translate-y-0.5 hover:bg-white">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${item.tone}`}>
-                    <UiIcon name={item.icon} className="h-4 w-4" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-[#20352a]">{item.title}</span>
-                    <span className="mt-0.5 block text-xs text-[#667068]">{item.detail}</span>
-                  </span>
-                  <UiIcon name="chevron-right" className="h-4 w-4 text-[#667068]" />
-                </Link>
-              ) : null) : (
-                <div className="rounded-2xl bg-[#e8efe3]/70 p-4">
-                  <p className="text-sm font-semibold text-[#315443]">Everything looks calm</p>
-                  <p className="mt-1 text-xs leading-5 text-[#667068]">No urgent reviews or reminders need your attention.</p>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#667068]">Quick actions</p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Link href="/capture" className="rounded-2xl bg-[#315443] p-3 text-white transition hover:bg-[#20352a]">
-                  <UiIcon name="plus" className="h-5 w-5" />
-                  <span className="mt-3 block text-sm font-semibold">Add or scan</span>
-                  <span className="mt-1 block text-[10px] text-white/65">Save something new</span>
-                </Link>
-                <Link href="/search" className="rounded-2xl bg-[#edf1e8] p-3 text-[#315443] transition hover:bg-[#e3eadf]">
-                  <UiIcon name="search" className="h-5 w-5" />
-                  <span className="mt-3 block text-sm font-semibold">Find anything</span>
-                  <span className="mt-1 block text-[10px] text-[#667068]">Search DiaryDock</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-[#20352a]/8 bg-white/60 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[#20352a]">Explore your home</p>
-                  <p className="mt-1 text-xs leading-5 text-[#667068]">Select any room in the house to open its records and tools.</p>
-                </div>
-                <UiIcon name="home" className="h-6 w-6 shrink-0 text-[#6f8e72]" />
-              </div>
-            </div>
-          </aside>
         </section>
+        <DesktopDashboard greeting={greeting} />
       </div>
       <BottomNav />
     </>

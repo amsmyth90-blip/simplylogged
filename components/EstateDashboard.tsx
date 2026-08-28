@@ -96,9 +96,9 @@ export function EstateDashboard() {
   }, []);
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#ddd7c9] lg:pr-[21rem] xl:pr-[23rem]">
+    <section className="relative min-h-[100svh] overflow-hidden bg-[#ddd7c9] lg:hidden">
       <div className="relative h-[100svh] w-full overflow-hidden bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.62),rgba(216,208,193,0.92))]">
-        <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2 lg:h-[100svh] lg:w-[56.22svh]">
+        <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.86vw)] w-[max(100vw,56.22svh)] -translate-x-1/2 -translate-y-1/2">
           <Image
             src="/images/estate-dashboard-country.webp"
             alt="DiaryDock digital estate with a cutaway attic, office, family dog and travel luggage"
