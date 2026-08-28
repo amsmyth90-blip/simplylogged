@@ -59,20 +59,20 @@ export function BedroomRoom() {
 
         <Link
           href="/bedroom/health-profile"
-          aria-label="Open Health Profile"
+          aria-label="Open My Health"
           className={`${roomHotspotClass} group left-[2%] top-[12%] h-[37%] w-[30%]`}
         >
           <span className={`absolute left-[92%] top-[58%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
-            Health Profile
+            My Health
           </span>
         </Link>
         <Link
           href="/bedroom/medical-records"
-          aria-label="Open Medical Records"
+          aria-label="Open Health Documents"
           className={`${roomHotspotClass} group left-[29%] top-[39%] h-[31%] w-[45%]`}
         >
           <span className={`absolute left-[33%] top-[55%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
-            Medical Records
+            Health Documents
           </span>
         </Link>
         <Link
