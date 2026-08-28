@@ -62,7 +62,7 @@ export function BedroomRoom() {
           aria-label="Open Health Profile"
           className={`${roomHotspotClass} group left-[2%] top-[12%] h-[37%] w-[30%]`}
         >
-          <span className={`absolute left-[48%] top-[58%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+          <span className={`absolute left-[92%] top-[58%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
             Health Profile
           </span>
         </Link>
@@ -80,7 +80,7 @@ export function BedroomRoom() {
           aria-label="Open Medications and Prescriptions"
           className={`${roomHotspotClass} group left-[75%] top-[26%] h-[36%] w-[24%]`}
         >
-          <span className={`absolute left-[46%] top-[43%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+          <span className={`absolute left-[-10%] top-[43%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
             Medications
           </span>
         </Link>
@@ -89,7 +89,7 @@ export function BedroomRoom() {
           aria-label="Open Health Appointments"
           className={`${roomHotspotClass} group left-[1%] top-[56%] h-[30%] w-[36%]`}
         >
-          <span className={`absolute left-[50%] top-[47%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+          <span className={`absolute left-[75%] top-[47%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
             Appointments
           </span>
         </Link>
@@ -98,7 +98,7 @@ export function BedroomRoom() {
           aria-label="Open Emergency Medical Information"
           className={`${roomHotspotClass} group left-[56%] top-[61%] h-[25%] w-[40%]`}
         >
-          <span className={`absolute left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+          <span className={`absolute left-[35%] top-[50%] -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
             Emergency Info
           </span>
         </Link>
