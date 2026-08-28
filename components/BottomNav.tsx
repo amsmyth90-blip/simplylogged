@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -25,11 +26,13 @@ const navItems: NavItem[] = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { household } = useDiaryDockData();
+  const { household, state } = useDiaryDockData();
   const visibleNavItems =
     household?.role === "viewer"
       ? navItems.filter((item) => item.id === "home" || item.id === "family")
       : navItems;
+  const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] || "Your home";
+  const initials = state.settingsProfile.initials || firstName.slice(0, 2).toUpperCase();
 
   const isActive = (item: NavItem) => {
     if (item.central) return pathname.startsWith("/capture");
@@ -42,48 +45,127 @@ export function BottomNav() {
     return pathname.startsWith(item.href);
   };
 
-  return (
-    <nav aria-label="Primary navigation" className="fixed bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.875rem))] left-1/2 z-50 w-[calc(100%-1rem)] max-w-[54rem] -translate-x-1/2 rounded-[25px] border border-white/90 bg-white/[0.96] p-1.5 shadow-[0_22px_48px_-24px_rgba(15,23,42,0.48)] backdrop-blur-2xl">
-      <ul
-        className="grid gap-1"
-        style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
-      >
-        {visibleNavItems.map((item) => {
-          const active = isActive(item);
+  const desktopUtilities: NavItem[] = [
+    { id: "search", href: "/search", label: "Search", icon: "search" },
+    { id: "settings", href: "/settings", label: "Settings", icon: "gear" }
+  ];
 
-          return (
-            <li key={item.id}>
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`relative flex min-h-[54px] flex-col items-center justify-center rounded-[18px] px-1.5 text-center text-[10px] font-semibold leading-tight transition ${
-                  item.central
-                    ? "text-slate-800"
-                    : active
-                      ? "bg-[#edf4e9] text-[#4f7046] shadow-[inset_0_0_0_1px_rgba(128,160,110,0.14)]"
-                      : "text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                {item.central ? (
-                  <span className={`mb-0.5 flex h-11 w-11 items-center justify-center rounded-full text-white ring-4 ring-white shadow-[0_16px_28px_-15px_rgba(44,69,48,0.72)] ${active ? "bg-[#769b67]" : "bg-[linear-gradient(145deg,#263b35,#152823)]"}`}>
-                    <UiIcon name={item.icon} className="h-5 w-5" />
-                  </span>
-                ) : (
-                  <span className="relative mb-1">
-                    <UiIcon name={item.icon} className="h-[19px] w-[19px]" />
+  return (
+    <>
+      <nav aria-label="Primary navigation" className="fixed bottom-[max(1rem,calc(env(safe-area-inset-bottom)+0.875rem))] left-1/2 z-50 w-[calc(100%-1rem)] max-w-[54rem] -translate-x-1/2 rounded-[25px] border border-white/90 bg-white/[0.96] p-1.5 shadow-[0_22px_48px_-24px_rgba(15,23,42,0.48)] backdrop-blur-2xl lg:hidden">
+        <ul
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
+        >
+          {visibleNavItems.map((item) => {
+            const active = isActive(item);
+
+            return (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative flex min-h-[54px] flex-col items-center justify-center rounded-[18px] px-1.5 text-center text-[10px] font-semibold leading-tight transition ${
+                    item.central
+                      ? "text-slate-800"
+                      : active
+                        ? "bg-[#edf4e9] text-[#4f7046] shadow-[inset_0_0_0_1px_rgba(128,160,110,0.14)]"
+                        : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {item.central ? (
+                    <span className={`mb-0.5 flex h-11 w-11 items-center justify-center rounded-full text-white ring-4 ring-white shadow-[0_16px_28px_-15px_rgba(44,69,48,0.72)] ${active ? "bg-[#769b67]" : "bg-[linear-gradient(145deg,#263b35,#152823)]"}`}>
+                      <UiIcon name={item.icon} className="h-5 w-5" />
+                    </span>
+                  ) : (
+                    <span className="relative mb-1">
+                      <UiIcon name={item.icon} className="h-[19px] w-[19px]" />
+                      {item.badge ? (
+                        <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow-sm">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                    </span>
+                  )}
+                  <span className={item.central ? "-mt-0.5" : ""}>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <aside className="desktop-primary-nav fixed inset-y-0 left-0 z-[70] hidden w-[17rem] flex-col border-r border-[#20352a]/10 bg-[#fffdf8]/[0.97] px-4 py-5 shadow-[20px_0_60px_-48px_rgba(32,53,42,0.42)] backdrop-blur-2xl lg:flex">
+        <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2">
+          <Image src="/icons/icon-192.png" alt="" width={44} height={44} className="rounded-[13px] shadow-sm" />
+          <span>
+            <span className="block font-serif text-[25px] leading-none text-[#20352a]">DiaryDock</span>
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6f8e72]">Your digital home</span>
+          </span>
+        </Link>
+
+        <nav aria-label="Desktop primary navigation" className="mt-8 flex-1">
+          <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#667068]">Your DiaryDock</p>
+          <ul className="mt-2 space-y-1">
+            {visibleNavItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`group flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm font-semibold transition ${
+                      active
+                        ? "bg-[#e8efe3] text-[#315443] shadow-[inset_0_0_0_1px_rgba(111,142,114,0.12)]"
+                        : "text-[#536058] hover:bg-[#f4f5ee] hover:text-[#20352a]"
+                    }`}
+                  >
+                    <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${item.central ? "bg-[#315443] text-white" : active ? "bg-white/80 text-[#315443]" : "bg-[#f2f3ec] text-[#6f766f] group-hover:bg-white"}`}>
+                      <UiIcon name={item.icon} className="h-[17px] w-[17px]" />
+                    </span>
+                    <span className="flex-1">{item.central ? "Add or scan" : item.label}</span>
                     {item.badge ? (
-                      <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow-sm">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
                         {item.badge}
                       </span>
                     ) : null}
-                  </span>
-                )}
-                <span className={item.central ? "-mt-0.5" : ""}>{item.label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <p className="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#667068]">Quick access</p>
+          <ul className="mt-2 space-y-1">
+            {desktopUtilities.map((item) => {
+              const active = pathname.startsWith(item.href);
+              return (
+                <li key={item.id}>
+                  <Link href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-semibold transition ${active ? "bg-[#e8efe3] text-[#315443]" : "text-[#667068] hover:bg-[#f4f5ee] hover:text-[#20352a]"}`}>
+                    <UiIcon name={item.icon} className="h-[18px] w-[18px]" />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="space-y-2 border-t border-[#20352a]/8 pt-4">
+          <Link href="/support" className="flex min-h-10 items-center gap-3 rounded-xl px-3 text-xs font-semibold text-[#667068] transition hover:bg-[#f4f5ee] hover:text-[#20352a]">
+            <UiIcon name="heart" className="h-4 w-4" />
+            Contact support
+          </Link>
+          <Link href="/settings" className="flex items-center gap-3 rounded-2xl bg-[#f4f5ee] p-3 transition hover:bg-[#edf1e8]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#315443] text-xs font-bold text-white">{initials}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-[#20352a]">{firstName}</span>
+              <span className="block truncate text-[10px] text-[#667068]">Account & dashboard</span>
+            </span>
+            <UiIcon name="chevron-right" className="h-4 w-4 text-[#667068]" />
+          </Link>
+        </div>
+      </aside>
+    </>
   );
 }

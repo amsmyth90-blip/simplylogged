@@ -48,6 +48,23 @@ body:not(.family-immersive):not(.kids-schedules-immersive):has(nav[aria-label="P
   padding-bottom: calc(7rem + env(safe-area-inset-bottom));
 }
 
+@media (min-width: 1024px) {
+  body:has(.desktop-primary-nav) [data-app-shell] {
+    padding-left: 17rem;
+    padding-bottom: 0 !important;
+  }
+
+  body:has(.desktop-primary-nav) [data-app-shell] > main {
+    max-width: 96rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  body:has(.desktop-primary-nav) [data-app-shell] .fixed.inset-0 {
+    left: 17rem;
+  }
+}
+
 * {
   @apply border-white/40;
 }
