@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { roomImageLabelClass } from "@/components/RoomSceneChrome";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
+import { isDashboardAreaVisible } from "@/lib/dashboard-areas";
 import { estateAreas } from "@/lib/mock-data";
 
 const roomSceneImages = [
@@ -73,7 +75,11 @@ function EstateHotspotMarker({
 }
 
 export function EstateDashboard() {
+  const { state, hydrated } = useDiaryDockData();
   const [showRoomGuides, setShowRoomGuides] = useState(false);
+  const visibleAreas = hydrated
+    ? estateAreas.filter((area) => isDashboardAreaVisible(area.id, state.onboarding))
+    : estateAreas;
 
   useEffect(() => {
     setShowRoomGuides(new URLSearchParams(window.location.search).get("showRooms") === "1");
@@ -115,7 +121,7 @@ export function EstateDashboard() {
             />
           ) : null}
 
-          {estateAreas.map((area) => {
+          {visibleAreas.map((area) => {
             const size = hitboxSize[area.id] ?? { width: "16%", height: "12%" };
             const dashboardLabel = area.dashboardLabel ?? area.name;
 

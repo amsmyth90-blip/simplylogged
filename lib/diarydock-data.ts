@@ -246,6 +246,7 @@ export type OnboardingStarterDocument = {
 
 export type OnboardingState = {
   completed: boolean;
+  dashboardAreasConfigured: boolean;
   householdName: string;
   householdMembers: string;
   selectedRooms: string[];
@@ -419,6 +420,7 @@ export const initialSettingGroups: SettingGroup[] = [
 export function createInitialOnboardingState(): OnboardingState {
   return {
     completed: false,
+    dashboardAreasConfigured: false,
     householdName: "",
     householdMembers: "",
     selectedRooms: [],
@@ -480,10 +482,9 @@ function mapRoomEntries<T>(selector: (roomId: string) => T) {
 export function getOnboardingProgress(onboarding: OnboardingState) {
   const checks = [
     Boolean(onboarding.householdName.trim()),
+    Boolean(onboarding.householdMembers.trim()),
     onboarding.selectedRooms.length >= 4,
-    onboarding.starterDocuments.some((document) => document.done),
-    onboarding.emergencyContactAdded,
-    onboarding.familyInviteAdded,
+    onboarding.completed,
   ];
 
   const completed = checks.filter(Boolean).length;

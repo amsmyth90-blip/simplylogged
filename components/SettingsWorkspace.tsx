@@ -9,7 +9,8 @@ import { ModalShell } from "@/components/ModalShell";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
-import { vaultSecurity } from "@/lib/mock-data";
+import { OPTIONAL_DASHBOARD_AREAS, normaliseDashboardAreaIds } from "@/lib/dashboard-areas";
+import { estateAreas, vaultSecurity } from "@/lib/mock-data";
 
 type ProfileDraft = {
   name: string;
@@ -203,6 +204,25 @@ export function SettingsWorkspace() {
     }));
   };
 
+  const toggleDashboardArea = (roomId: string) => {
+    updateState((current) => {
+      const existingSelection = current.onboarding.dashboardAreasConfigured
+        ? current.onboarding.selectedRooms
+        : normaliseDashboardAreaIds(OPTIONAL_DASHBOARD_AREAS.map((area) => area.roomId));
+      const selectedRooms = existingSelection.includes(roomId)
+        ? existingSelection.filter((id) => id !== roomId)
+        : [...existingSelection, roomId];
+      return {
+        ...current,
+        onboarding: {
+          ...current.onboarding,
+          dashboardAreasConfigured: true,
+          selectedRooms: normaliseDashboardAreaIds(selectedRooms)
+        }
+      };
+    });
+  };
+
   return (
     <>
       <div className="immersive-page">
@@ -236,6 +256,41 @@ export function SettingsWorkspace() {
           >
             Edit
           </button>
+        </section>
+
+        <section className="space-y-3">
+          <SectionHeader title="Dashboard areas" hint="Show only the parts of DiaryDock that are useful to you" />
+          <div className="estate-sheet divide-y divide-white/60 overflow-hidden">
+            {OPTIONAL_DASHBOARD_AREAS.map((question) => {
+              const area = estateAreas.find((item) => item.id === question.roomId);
+              const enabled = !state.onboarding.dashboardAreasConfigured || state.onboarding.selectedRooms.includes(question.roomId);
+              if (!area) return null;
+              return (
+                <div key={question.roomId} className="flex items-center gap-3.5 px-4 py-3.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/55 text-moss">
+                    <UiIcon name={area.icon} className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-ink">{area.dashboardLabel ?? area.name}</span>
+                    <span className="mt-0.5 block text-xs text-ink/50">{question.detail}</span>
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={enabled}
+                    aria-label={`Show ${area.dashboardLabel ?? area.name} on dashboard`}
+                    onClick={() => toggleDashboardArea(question.roomId)}
+                    className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${enabled ? "bg-moss" : "bg-slate-300/80"}`}
+                  >
+                    <span className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-all ${enabled ? "left-[22px]" : "left-0.5"}`} />
+                  </button>
+                </div>
+              );
+            })}
+            <div className="bg-white/35 px-4 py-3 text-xs leading-5 text-ink/50">
+              Home, Documents, Inbox and Settings always stay on your dashboard.
+            </div>
+          </div>
         </section>
 
         {groups.map((group) => (
