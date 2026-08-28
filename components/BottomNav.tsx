@@ -33,6 +33,7 @@ export function BottomNav() {
       : navItems;
   const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] || "Your home";
   const initials = state.settingsProfile.initials || firstName.slice(0, 2).toUpperCase();
+  const showDesktopSidebar = pathname !== "/" && pathname !== "/dashboard";
 
   const isActive = (item: NavItem) => {
     if (item.central) return pathname.startsWith("/capture");
@@ -95,7 +96,7 @@ export function BottomNav() {
         </ul>
       </nav>
 
-      <aside className="desktop-primary-nav fixed inset-y-0 left-0 z-[70] hidden w-[17rem] flex-col border-r border-[#20352a]/10 bg-[#fffdf8]/[0.97] px-4 py-5 shadow-[20px_0_60px_-48px_rgba(32,53,42,0.42)] backdrop-blur-2xl lg:flex">
+      {showDesktopSidebar ? <aside className="desktop-primary-nav fixed inset-y-0 left-0 z-[70] hidden w-[17rem] flex-col border-r border-[#20352a]/10 bg-[#fffdf8]/[0.97] px-4 py-5 shadow-[20px_0_60px_-48px_rgba(32,53,42,0.42)] backdrop-blur-2xl lg:flex">
         <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2">
           <Image src="/icons/icon-192.png" alt="" width={44} height={44} className="rounded-[13px] shadow-sm" />
           <span>
@@ -165,7 +166,7 @@ export function BottomNav() {
             <UiIcon name="chevron-right" className="h-4 w-4 text-[#667068]" />
           </Link>
         </div>
-      </aside>
+      </aside> : null}
     </>
   );
 }
