@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
@@ -176,7 +177,7 @@ export function KitchenPantryPlanner() {
                   <button type="button" onClick={() => setSelectedFiles([])} className="text-[10px] font-semibold text-slate-500">Clear</button>
                 </div>
                 <div className="mt-2 flex gap-2 overflow-hidden">
-                  {previewUrls.map((url, index) => <img key={url} src={url} alt={`Kitchen photo ${index + 1}`} className="h-14 w-14 rounded-xl object-cover" />)}
+                  {previewUrls.map((url, index) => <Image key={url} src={url} alt={`Kitchen photo ${index + 1}`} width={56} height={56} unoptimized className="h-14 w-14 rounded-xl object-cover" />)}
                   {selectedFiles.length < 8 ? <button type="button" onClick={() => cameraInputRef.current?.click()} className="flex h-14 w-14 items-center justify-center rounded-xl border border-dashed border-[#91a889] bg-[#f2f6ef] text-[#64805b]" aria-label="Add another photo"><UiIcon name="plus" className="h-4 w-4" /></button> : null}
                 </div>
                 <button type="button" onClick={analysePhotos} className="mt-3 h-10 w-full rounded-2xl bg-[#263b35] text-xs font-semibold text-white">Check my kitchen</button>

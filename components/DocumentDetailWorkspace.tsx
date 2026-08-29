@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/EmptyState";
@@ -419,7 +420,7 @@ export function DocumentDetailWorkspace({
             </div>
             <div className="mt-3 overflow-hidden rounded-[20px] border border-white/70 bg-white/62">
               {signedUrl && isImage ? (
-                <img src={signedUrl} alt={document.title} className="max-h-[46vh] w-full object-contain sm:max-h-[500px]" />
+                <Image src={signedUrl} alt={document.title} width={1200} height={1600} unoptimized className="max-h-[46vh] w-full object-contain sm:max-h-[500px]" />
               ) : signedUrl && isPdf ? (
                 <iframe src={signedUrl} title={document.title} className="h-[46vh] min-h-[310px] w-full bg-white sm:h-[500px]" />
               ) : (

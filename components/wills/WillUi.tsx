@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 import { UiIcon, type IconName } from "@/components/UiIcon";
@@ -14,9 +15,11 @@ export function WillPageHeader({
 }) {
   return (
     <header className="relative overflow-hidden rounded-[28px] border border-[#20352a]/[0.07] bg-[#f5f4ed] px-5 pb-7 pt-5 shadow-[0_18px_42px_-32px_rgba(32,53,42,0.38)] sm:px-7 sm:pb-8">
-      <img
+      <Image
         src="/images/wills-botanical-leaves.svg"
         alt=""
+        width={224}
+        height={224}
         aria-hidden="true"
         className="pointer-events-none absolute -right-9 -top-16 h-56 w-56 opacity-40"
       />

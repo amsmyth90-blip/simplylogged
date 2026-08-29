@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
@@ -275,7 +276,7 @@ export function FamilyStoryBuilderWorkspace() {
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {previewUrls.map((url, index) => (
                   <div key={url} className="group relative overflow-hidden rounded-[18px] bg-[#e8eee3]">
-                    <img src={url} alt={`Family story upload ${index + 1}`} className="aspect-[4/5] w-full object-cover" />
+                    <Image src={url} alt={`Family story upload ${index + 1}`} width={320} height={400} unoptimized className="aspect-[4/5] w-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}

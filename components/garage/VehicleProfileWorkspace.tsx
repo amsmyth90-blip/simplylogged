@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 
@@ -189,7 +190,7 @@ function PrivateVehicleImage({ document, alt, className }: { document?: VaultDoc
   }, [document?.storageBucket, document?.storagePath]);
 
   if (!url) return null;
-  return <img src={url} alt={alt} className={className} />;
+  return <Image src={url} alt={alt} width={1200} height={800} unoptimized className={className} />;
 }
 
 function SectionHeading({ icon, title, detail, action }: { icon: IconName; title: string; detail?: string; action?: React.ReactNode }) {

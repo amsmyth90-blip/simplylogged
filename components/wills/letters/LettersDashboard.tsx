@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
@@ -22,7 +23,7 @@ export function LettersDashboard() {
       <WillPageHeader title="Letters of Wishes" subtitle="Share your thoughts, love and guidance with the people who matter most." backHref="/wills" />
 
       <section className="relative min-h-[180px] overflow-hidden rounded-[24px] border border-[#20352a]/[0.07] bg-[#eae5d8] p-5 shadow-[0_20px_42px_-34px_rgba(32,53,42,0.5)] sm:p-6">
-        <img src="/images/wills-botanical-leaves.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-8 -top-14 h-60 w-60 rotate-6 opacity-45" />
+        <Image src="/images/wills-botanical-leaves.svg" alt="" width={240} height={240} aria-hidden="true" className="pointer-events-none absolute -right-8 -top-14 h-60 w-60 rotate-6 opacity-45" />
         <div className="relative z-10 max-w-[25rem]"><p className="font-serif text-[25px] leading-[1.18] tracking-[-0.025em] text-[#20352a]">The words we leave behind can be the greatest gift of all.</p><div className="mt-5 flex items-center gap-2 text-[#52705a]"><span className="h-px w-10 bg-[#6f8e72]/50" /><UiIcon name="heart" className="h-5 w-5" /></div></div>
       </section>
 

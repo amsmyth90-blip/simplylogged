@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { KitchenNoticeboard } from "@/components/KitchenNoticeboard";
@@ -494,9 +495,11 @@ function MealPlanner() {
           </div>
 
           <section className="relative min-h-[225px] flex-1 overflow-hidden rounded-[28px] border border-white/90 bg-[#f7f8f3] shadow-[0_18px_42px_-30px_rgba(35,54,43,0.5)]">
-            <img
+            <Image
               src="/images/meal-planner-family-table.png"
               alt=""
+              width={900}
+              height={900}
               aria-hidden="true"
               className="pointer-events-none absolute left-1/2 top-[55%] h-[106%] w-[66%] -translate-x-1/2 -translate-y-1/2 object-contain mix-blend-multiply"
               style={{

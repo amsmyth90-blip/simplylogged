@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
@@ -18,7 +19,7 @@ export function LetterPreviewWorkspace({ letterId }: { letterId: string }) {
       <WillPageHeader title="Envelope preview" subtitle="A calm preview of how this personal letter could be presented." backHref={`/wills/letters-of-wishes/${letterId}`} />
       <LetterSubpageNav letterId={letterId} />
       <section className="relative overflow-hidden rounded-[28px] border border-[#20352a]/10 bg-[#ece7db] px-5 py-12 text-center shadow-[0_28px_60px_-42px_rgba(32,53,42,0.6)] sm:px-10 sm:py-16">
-        <img src="/images/wills-botanical-leaves.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 opacity-35" />
+        <Image src="/images/wills-botanical-leaves.svg" alt="" width={288} height={288} aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 opacity-35" />
         <div className="relative mx-auto max-w-md rounded-[22px] border border-white/70 bg-[#fffdf8] px-6 py-10 shadow-[0_22px_45px_-34px_rgba(32,53,42,0.6)]">
           <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#dde6d8] text-[#45604d]"><UiIcon name="heart" className="h-6 w-6" /></span>
           <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#6f8e72]">For {letter.recipientName || recipientLabel(letter.recipientType)}</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
@@ -84,7 +85,7 @@ export function LetterDeliveryWorkspace({ letterId }: { letterId: string }) {
       <LetterSubpageNav letterId={letterId} />
 
       <WillCard className="relative overflow-hidden bg-[#f5f1e7] text-center">
-        <img src="/images/wills-botanical-leaves.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -left-16 -top-20 h-52 w-52 -rotate-12 opacity-25" />
+        <Image src="/images/wills-botanical-leaves.svg" alt="" width={208} height={208} aria-hidden="true" className="pointer-events-none absolute -left-16 -top-20 h-52 w-52 -rotate-12 opacity-25" />
         <span className="relative mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#6f8e72]/30 bg-white/70 text-[#52705a]"><UiIcon name="heart" className="h-6 w-6" /></span>
         <h2 className="relative mt-3 font-serif text-2xl text-[#20352a]">When should this letter be available?</h2>
         <p className="relative mt-1 text-xs text-[#667068]">You can change this preference at any time.</p>

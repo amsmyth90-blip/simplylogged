@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -439,9 +440,11 @@ export function DocumentCaptureWorkspace() {
 
   return (
     <div className="relative -mx-4 -mt-5 min-h-[100svh] overflow-hidden bg-[linear-gradient(180deg,#dcecf7_0%,#f7fbfc_48%,#edf5ee_100%)] pb-28 text-slate-900 sm:-mx-6">
-      <img
+      <NextImage
         src="/images/estate-dashboard-country.png"
         alt=""
+        fill
+        sizes="100vw"
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 h-full w-full object-cover object-center transition duration-700 ${
           activeProcessingStage || (draft && processingStage === "complete") ? "opacity-72" : "scale-105 opacity-32 blur-[2px]"
@@ -479,12 +482,14 @@ export function DocumentCaptureWorkspace() {
                   <>
                     <span className="absolute h-28 w-20 translate-x-5 rotate-[7deg] rounded-2xl border border-slate-200 bg-white/85 shadow-lg" />
                     <span className="absolute h-28 w-20 -translate-x-4 -rotate-6 rounded-2xl border border-slate-200 bg-white/95 shadow-xl" />
-                    <img src={previewUrls[0]} alt="First selected page" className="relative z-10 h-28 w-20 rounded-2xl border-4 border-white object-cover shadow-xl" />
+                    <NextImage src={previewUrls[0]} alt="First selected page" width={80} height={112} unoptimized className="relative z-10 h-28 w-20 rounded-2xl border-4 border-white object-cover shadow-xl" />
                   </>
                 ) : (
-                  <img
+                  <NextImage
                     src="/images/capture-document-stack.png"
                     alt="A secure stack of household documents ready to add"
+                    width={160}
+                    height={160}
                     className="relative z-10 h-40 w-40 rounded-[24px] object-contain mix-blend-multiply drop-shadow-[0_18px_18px_rgba(71,85,105,0.18)]"
                   />
                 )}
@@ -547,7 +552,7 @@ export function DocumentCaptureWorkspace() {
                   <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {previewUrls.map((url, index) => (
                       <div key={`${url}-${index}`} className="relative h-24 w-[70px] shrink-0 overflow-hidden rounded-[14px] border-2 border-white bg-white p-1 shadow-md">
-                        <img src={url} alt={`Document page ${index + 1}`} className="h-full w-full rounded-[10px] object-cover" />
+                        <NextImage src={url} alt={`Document page ${index + 1}`} width={62} height={88} unoptimized className="h-full w-full rounded-[10px] object-cover" />
                         <span className="absolute bottom-1.5 left-1/2 flex h-5 min-w-5 -translate-x-1/2 items-center justify-center rounded-full bg-slate-800 px-1 text-[9px] font-bold text-white">{index + 1}</span>
                         <button type="button" aria-label={`Remove page ${index + 1}`} onClick={() => removePage(index)} className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-slate-700 shadow">
                           <UiIcon name="plus" className="h-3 w-3 rotate-45" />
@@ -575,14 +580,16 @@ export function DocumentCaptureWorkspace() {
               <span className="absolute inset-0 translate-x-4 rotate-6 rounded-[18px] border border-slate-200 bg-white/78 shadow-lg" />
               <span className="absolute inset-0 -translate-x-3 -rotate-6 rounded-[18px] border border-slate-200 bg-white/88 shadow-lg" />
               {previewUrls[0] ? (
-                <img src={previewUrls[0]} alt="Document being organised" className="relative z-10 h-full w-full rounded-[18px] border-4 border-white object-cover shadow-xl" />
+                <NextImage src={previewUrls[0]} alt="Document being organised" width={112} height={144} unoptimized className="relative z-10 h-full w-full rounded-[18px] border-4 border-white object-cover shadow-xl" />
               ) : null}
             </div>
 
             <div className="relative mt-5 overflow-hidden rounded-[30px] border border-white/85 bg-white/35 shadow-[0_28px_65px_-38px_rgba(30,61,72,0.55)] backdrop-blur-sm">
-              <img
+              <NextImage
                 src="/images/estate-dashboard-country.png"
                 alt="DiaryDock estate"
+                width={1200}
+                height={700}
                 className="h-[280px] w-full object-cover transition-[object-position] duration-700"
                 style={{ objectPosition: `center ${filingTarget.imagePosition}%` }}
               />
@@ -620,7 +627,7 @@ export function DocumentCaptureWorkspace() {
         {draft && processingStage === "complete" ? (
           <main className="flex flex-1 flex-col justify-end pb-2 pt-6">
             <div className="pointer-events-none absolute inset-x-0 top-20 h-[52%] overflow-hidden">
-              <img src="/images/estate-dashboard-country.png" alt="" className="h-full w-full object-cover object-[center_32%]" />
+              <NextImage src="/images/estate-dashboard-country.png" alt="" fill sizes="100vw" className="object-cover object-[center_32%]" />
               <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/85" />
             </div>
             <section className="relative rounded-[30px] border border-white/90 bg-white/84 p-5 shadow-[0_28px_65px_-34px_rgba(31,61,69,0.55)] backdrop-blur-2xl">
