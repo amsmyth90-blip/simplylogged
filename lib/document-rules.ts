@@ -11,13 +11,18 @@ export const ACCEPTED_DOCUMENT_TYPES = [
 export type AcceptedDocumentType = (typeof ACCEPTED_DOCUMENT_TYPES)[number];
 
 export function sanitizeDocumentFileName(name: string) {
-  return name
+  const sanitized = name
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9.]+/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 96);
+    .replace(/-+\./g, ".")
+    .replace(/\.{2,}/g, ".")
+    .replace(/^[.-]+|[.-]+$/g, "")
+    .slice(0, 96)
+    .replace(/[.-]+$/g, "");
+
+  return sanitized || "document";
 }
 
 export function isAcceptedDocumentType(mimeType: string) {
