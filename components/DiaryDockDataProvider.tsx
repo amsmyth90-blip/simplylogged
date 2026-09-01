@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -12,8 +13,12 @@ import {
 import {
   createInitialDiaryDockState,
   createDiaryDockRepository,
+  hydrateDiaryDockBootstrap,
+  type DiaryDockBootstrapPayload,
   type DiaryDockAppState,
-  type RepositoryMode
+  type RepositoryMode,
+  familyInvitesFromDirectory,
+  householdMembersFromDirectory
 } from "@/lib/diarydock-data";
 import {
   loadHouseholdDirectory,
@@ -27,10 +32,23 @@ type DiaryDockDataContextValue = {
   household: HouseholdDirectory | null;
   canManageHousehold: boolean;
   canEditShared: boolean;
+  refreshHousehold: (reloadState?: boolean) => Promise<HouseholdDirectory | null>;
   updateState: (updater: (current: DiaryDockAppState) => DiaryDockAppState) => void;
 };
 
 const DiaryDockDataContext = createContext<DiaryDockDataContextValue | null>(null);
+
+async function loadServerBootstrap() {
+  const response = await fetch("/api/diarydock/bootstrap", {
+    cache: "no-store",
+    credentials: "same-origin"
+  });
+  const payload = await response.json().catch((): { error?: string } => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error ?? "DiaryDock could not load your secure data.");
+  }
+  return payload as DiaryDockBootstrapPayload;
+}
 
 export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
   const repository = useMemo(() => createDiaryDockRepository(), []);
@@ -42,30 +60,56 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     const load = async () => {
-      const [stateResult, householdResult] = await Promise.allSettled([
-        repository.load(),
-        repository.mode === "supabase"
-          ? loadHouseholdDirectory().catch(() => null)
-          : Promise.resolve(null)
-      ]);
+      if (repository.mode === "supabase") {
+        const bootstrap = await loadServerBootstrap();
+        if (!cancelled) {
+          setState(hydrateDiaryDockBootstrap(bootstrap));
+          setHousehold(bootstrap.household);
+          setHydrated(true);
+        }
+        return;
+      }
+
+      const stateResult = await repository.load();
 
       if (!cancelled) {
-        if (stateResult.status === "fulfilled") {
-          setState(stateResult.value);
-        }
-        if (householdResult.status === "fulfilled") {
-          setHousehold(householdResult.value);
-        }
+        setState(stateResult);
         setHydrated(true);
       }
     };
 
-    void load();
+    void load().catch(() => {
+      if (!cancelled) setHydrated(true);
+    });
 
     return () => {
       cancelled = true;
     };
   }, [repository]);
+
+  const refreshHousehold = useCallback(async (reloadState = false) => {
+    if (repository.mode !== "supabase") {
+      return household;
+    }
+
+    if (reloadState) {
+      const bootstrap = await loadServerBootstrap();
+      setHousehold(bootstrap.household);
+      setState(hydrateDiaryDockBootstrap(bootstrap));
+      return bootstrap.household;
+    }
+
+    const nextHousehold = await loadHouseholdDirectory();
+    setHousehold(nextHousehold);
+    if (nextHousehold) {
+      setState((current) => ({
+        ...current,
+        householdMembers: householdMembersFromDirectory(nextHousehold),
+        familyInvites: familyInvitesFromDirectory(nextHousehold)
+      }));
+    }
+    return nextHousehold;
+  }, [household, repository]);
 
   const updateState = (updater: (current: DiaryDockAppState) => DiaryDockAppState) => {
     setState((current) => {
@@ -87,6 +131,7 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
           household?.role === "owner" ||
           household?.role === "member" ||
           repository.mode === "session",
+        refreshHousehold,
         updateState
       }}
     >

@@ -7,18 +7,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { ModalShell } from "@/components/ModalShell";
-import { roomImageLabelClass } from "@/components/RoomSceneChrome";
+import { RoomSceneHeader, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { createHouseholdInvite } from "@/lib/household-sharing";
-import type { HouseholdMember, Invite } from "@/lib/diarydock-data";
+import type { HouseholdMember } from "@/lib/diarydock-data";
 import { upsertStructuredReminder } from "@/lib/structured-data";
-
-type InviteDraft = {
-  email: string;
-  name: string;
-  relation: string;
-  access: string;
-};
 
 type HouseholdStyle = "children" | "adults" | "shared" | "solo";
 
@@ -45,20 +37,6 @@ type HotspotProps = {
   onClick?: () => void;
   href?: string;
 };
-
-const defaultDraft: InviteDraft = {
-  email: "",
-  name: "",
-  relation: "",
-  access: "Family viewer - Family Room, Garden, reminders"
-};
-
-const inviteAccessOptions = [
-  "Family viewer - Family Room, Garden, reminders",
-  "Viewer - Memories only",
-  "Emergency fallback - Safe Room essentials only",
-  "Partner - Full household access"
-];
 
 const familyPosition = { left: "47%", top: "26%" };
 const weekDayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -191,13 +169,9 @@ export function FamilyWorkspace() {
   const invites = state.familyInvites;
   const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
   const [inboxOpen, setInboxOpen] = useState(false);
-  const [inviteOpen, setInviteOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [householdStyle, setHouseholdStyle] = useState<HouseholdStyle>("children");
   const [householdStyleSet, setHouseholdStyleSet] = useState(false);
-  const [draft, setDraft] = useState(defaultDraft);
-  const [inviteBusy, setInviteBusy] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const previousHtmlOverflow = document.documentElement.style.overflow;
@@ -306,17 +280,13 @@ export function FamilyWorkspace() {
         };
       });
     const sharedDocuments = state.vaultDocuments
-      .filter(
-        (document) =>
-          document.roomId === "family-room" ||
-          document.sharedWith?.some((person) => person.toLowerCase() === "everyone")
-      )
+      .filter((document) => document.visibility === "HOUSEHOLD")
       .map<FamilyInboxItem>((document) => ({
         id: `document-${document.id}`,
         sourceId: document.id,
         sourceType: "document",
         title: document.title,
-        detail: `${document.category} · Shared with everyone`,
+        detail: `${document.category} · Shared with your household`,
         status: "Secure shortcut",
         statusTone: "bg-[#dfe8ee] text-[#506b7a]",
         icon: "folder",
@@ -342,12 +312,6 @@ export function FamilyWorkspace() {
     [members, state.householdProfiles]
   );
   const activeKidRoutines = state.kidSchedules.filter((routine) => !routine.paused).slice(0, 3);
-
-  const closeInvite = () => {
-    setInviteOpen(false);
-    setDraft(defaultDraft);
-    setMessage("");
-  };
 
   const updateInboxItem = (
     item: FamilyInboxItem,
@@ -393,56 +357,6 @@ export function FamilyWorkspace() {
     }
   };
 
-  const sendInvite = async () => {
-    const email = draft.email.trim().toLowerCase();
-    const name = draft.name.trim();
-    const relation = draft.relation.trim();
-
-    if (!email || !name || !relation || !email.includes("@")) {
-      setMessage("Add their name, relationship and a valid email address.");
-      return;
-    }
-
-    setInviteBusy(true);
-    setMessage("");
-
-    try {
-      const token = await createHouseholdInvite({
-        email,
-        name,
-        relation,
-        access: draft.access
-      });
-      const initials =
-        name
-          .split(" ")
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part[0]?.toUpperCase())
-          .join("") || "N";
-      const invite: Invite = {
-        id: token,
-        email,
-        name,
-        relation,
-        access: draft.access,
-        sentAgo: "Just now",
-        initials,
-        status: "pending"
-      };
-
-      updateState((current) => ({
-        ...current,
-        familyInvites: [...current.familyInvites, invite]
-      }));
-      closeInvite();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "The invitation could not be created.");
-    } finally {
-      setInviteBusy(false);
-    }
-  };
-
   return (
     <>
       <DesktopSpaceLanding
@@ -455,7 +369,7 @@ export function FamilyWorkspace() {
           { label: "Our household", description: `${members.length} household member${members.length === 1 ? "" : "s"}`, icon: "users", href: "/family/household" },
           { label: householdStyleSet ? activeHouseholdStyle.scheduleLabel : "Schedules", description: "Plans, routines and shared responsibilities", icon: "calendar", href: "/family/schedules" },
           { label: "Family inbox", description: familyInboxItems.length ? `${familyInboxItems.length} items need attention` : "Shared household items", icon: "mail", onClick: () => setInboxOpen(true) },
-          { label: "Invitations & access", description: "Invite people and manage access", icon: "shield", onClick: () => setInviteOpen(true) },
+          { label: "Invitations & access", description: "Invite people and manage access", icon: "shield", href: "/family/household" },
         ]}
       />
       <main className="fixed inset-0 overflow-hidden bg-[#bda888] lg:hidden">
@@ -473,7 +387,7 @@ export function FamilyWorkspace() {
 
         <section
           aria-label="Interactive family room"
-          className="relative mx-auto h-full w-full max-w-[34rem] overflow-hidden bg-[#d5c3a7] shadow-[0_0_70px_rgba(38,28,19,0.35)]"
+          className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#d5c3a7] shadow-[0_0_70px_rgba(38,28,19,0.35)]"
         >
           <Image
             src="/images/family-fireside-clean.webp"
@@ -486,21 +400,6 @@ export function FamilyWorkspace() {
           />
           <div className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-[#382b20]/45 via-[#382b20]/8 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 z-10 h-44 bg-gradient-to-t from-[#2f251c]/40 via-[#2f251c]/8 to-transparent" />
-
-          <Link
-            href="/dashboard"
-            aria-label="Back to dashboard"
-            className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/65 bg-white/65 text-[#273126] shadow-[0_12px_30px_rgba(42,33,24,0.18)] backdrop-blur-xl"
-          >
-            <UiIcon name="arrow-left" className="h-5 w-5" />
-          </Link>
-
-          <div className="absolute left-1/2 top-[max(1rem,env(safe-area-inset-top))] z-30 -translate-x-1/2 rounded-full border border-white/70 bg-white/70 px-5 py-2 text-center shadow-[0_12px_30px_rgba(42,33,24,0.16)] backdrop-blur-xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#6c795f]">
-              {household?.householdName ?? "DiaryDock"}
-            </p>
-            <h1 className="text-base font-semibold tracking-tight text-[#1f281e]">Family Room</h1>
-          </div>
 
           <RoomHotspot
             label={hydrated && members.length ? `Family · ${members.length}` : "Family"}
@@ -521,6 +420,10 @@ export function FamilyWorkspace() {
           />
 
         </section>
+        <RoomSceneHeader
+          roomName="Family Room"
+          eyebrow={household?.householdName ?? "DiaryDock"}
+        />
       </main>
 
       <ModalShell
@@ -535,14 +438,10 @@ export function FamilyWorkspace() {
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#24372f] px-4 py-3 text-sm font-semibold text-white shadow-sm"
             >
               <UiIcon name="users" className="h-4 w-4" />
-              Manage profiles
+              People & sharing
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedMember(null);
-                setInviteOpen(true);
-              }}
+            <Link
+              href="/family/household"
               className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#718068]/20 bg-[#e7ede1] px-4 py-3 text-sm font-semibold text-[#4e6048]"
             >
               <UiIcon name="mail" className="h-4 w-4" />
@@ -552,7 +451,7 @@ export function FamilyWorkspace() {
                   {invites.length}
                 </span>
               ) : null}
-            </button>
+            </Link>
           </div>
         }
       >
@@ -810,99 +709,6 @@ export function FamilyWorkspace() {
         </div>
       </ModalShell>
 
-      <ModalShell
-        open={inviteOpen}
-        title={canManageHousehold ? "Invite someone" : "Household invitations"}
-        subtitle={
-          canManageHousehold
-            ? "Welcome someone into your DiaryDock household."
-            : "Only the household owner can create invitations."
-        }
-        onClose={closeInvite}
-        footer={
-          canManageHousehold ? (
-            <button
-              type="button"
-              onClick={() => void sendInvite()}
-              disabled={inviteBusy}
-              className="w-full rounded-2xl bg-[#24372f] px-4 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-55"
-            >
-              {inviteBusy ? "Creating secure invitation..." : "Create invitation"}
-            </button>
-          ) : undefined
-        }
-      >
-        {canManageHousehold ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-ink/60">Name</span>
-                <input
-                  value={draft.name}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, name: event.target.value }))
-                  }
-                  placeholder="Their name"
-                  className="w-full rounded-2xl border border-black/10 bg-white/80 px-3 py-3 text-sm text-ink outline-none focus:border-[#738767]"
-                />
-              </label>
-              <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-ink/60">Relationship</span>
-                <input
-                  value={draft.relation}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, relation: event.target.value }))
-                  }
-                  placeholder="Partner, parent..."
-                  className="w-full rounded-2xl border border-black/10 bg-white/80 px-3 py-3 text-sm text-ink outline-none focus:border-[#738767]"
-                />
-              </label>
-            </div>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-semibold text-ink/60">Email address</span>
-              <input
-                type="email"
-                value={draft.email}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, email: event.target.value }))
-                }
-                placeholder="family@example.com"
-                autoComplete="email"
-                className="w-full rounded-2xl border border-black/10 bg-white/80 px-3 py-3 text-sm text-ink outline-none focus:border-[#738767]"
-              />
-            </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-semibold text-ink/60">Starting access</span>
-              <select
-                value={draft.access}
-                onChange={(event) =>
-                  setDraft((current) => ({ ...current, access: event.target.value }))
-                }
-                className="w-full rounded-2xl border border-black/10 bg-white/80 px-3 py-3 text-sm text-ink outline-none focus:border-[#738767]"
-              >
-                {inviteAccessOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            {invites.length ? (
-              <div className="rounded-2xl border border-[#d8c9ad] bg-[#f4ead7]/80 px-4 py-3 text-xs font-medium text-ink/60">
-                {invites.length} invitation{invites.length === 1 ? "" : "s"} currently waiting.
-              </div>
-            ) : null}
-            {message ? (
-              <p className="rounded-2xl bg-[#fff3d8] px-4 py-3 text-xs font-semibold text-ink/65">
-                {message}
-              </p>
-            ) : null}
-          </div>
-        ) : (
-          <div className="rounded-3xl border border-white/75 bg-white/65 p-5 text-sm leading-6 text-ink/60">
-            You can view the people in this household. The owner manages invitations and access
-            from the Front Gate.
-          </div>
-        )}
-      </ModalShell>
     </>
   );
 }

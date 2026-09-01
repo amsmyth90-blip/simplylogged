@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types tests/*.test.mts",
+    "test:rls:household": "node --experimental-strip-types tools/test-household-sharing-rls.ts",
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "promo:render": "remotion render promo-video/index.ts DiaryDockPromo output/diarydock-promo.mp4",
     "icons:generate": "node tools/generate-app-icons.mjs",

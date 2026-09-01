@@ -17,6 +17,7 @@ import {
 } from "@/lib/supabase/client";
 import {
   loadHouseholdDirectory,
+  type HouseholdDirectory,
   type HouseholdRole,
 } from "@/lib/household-sharing";
 import { loadStructuredDocumentsAndReminders } from "@/lib/structured-data";
@@ -84,6 +85,7 @@ import {
   hydrateFamilyStories,
   type FamilyStoryRecord,
 } from "@/lib/family-story-records";
+import { removeNonOwnedDocumentsFromCache } from "@/lib/resource-cache";
 
 export type Invite = {
   id: string;
@@ -349,19 +351,23 @@ export const initialSettingGroups: SettingGroup[] = [
     title: "Privacy & security",
     icon: "shield",
     rows: [
-      { kind: "toggle", label: "Unlock with Face ID", value: true },
-      { kind: "value", label: "Two-factor authentication", value: "On" },
       {
         kind: "value",
-        label: "Vault auto-lock",
-        hint: "After inactivity",
-        value: "5 minutes",
+        label: "Document storage",
+        hint: "Authenticated access with short-lived file links",
+        value: "Private",
+      },
+      {
+        kind: "value",
+        label: "End-to-end encryption",
+        hint: "Not currently enabled for Vault documents",
+        value: "Not enabled",
       },
       {
         kind: "link",
-        label: "Recovery codes",
-        hint: "Last verified this week",
-        href: "/room/office",
+        label: "Account recovery",
+        hint: "Use the secure password reset flow",
+        href: "/forgot-password",
       },
     ],
   },
@@ -600,8 +606,24 @@ function mergeStructuredRoomDocuments(
   return roomDocuments;
 }
 
-async function mergeStructuredData(state: DiaryDockAppState) {
-  const structured = await loadStructuredDocumentsAndReminders();
+function removeNonOwnedDocumentCache(state: DiaryDockAppState, userId: string) {
+  const filtered = removeNonOwnedDocumentsFromCache({
+    userId,
+    documents: state.vaultDocuments,
+    roomDocuments: state.roomDocuments,
+  });
+
+  return hydrateDiaryDockState({
+    ...state,
+    vaultDocuments: filtered.documents,
+    roomDocuments: filtered.roomDocuments,
+  });
+}
+
+function applyStructuredData(
+  state: DiaryDockAppState,
+  structured: Awaited<ReturnType<typeof loadStructuredDocumentsAndReminders>>,
+) {
   const nextState = hydrateDiaryDockState({
     ...state,
     vaultDocuments: mergeById(structured.documents, state.vaultDocuments),
@@ -614,6 +636,13 @@ async function mergeStructuredData(state: DiaryDockAppState) {
   );
 
   return nextState;
+}
+
+async function mergeStructuredData(state: DiaryDockAppState) {
+  return applyStructuredData(
+    state,
+    await loadStructuredDocumentsAndReminders(),
+  );
 }
 
 export function createInitialDiaryDockState(): DiaryDockAppState {
@@ -680,10 +709,19 @@ const householdStateKeys = [
   "householdProfiles",
 ] as const satisfies ReadonlyArray<keyof DiaryDockAppState>;
 
-type HouseholdState = Pick<
+export type HouseholdState = Pick<
   DiaryDockAppState,
   (typeof householdStateKeys)[number]
 >;
+
+export type DiaryDockBootstrapPayload = {
+  userId: string;
+  privateState: DiaryDockAppState | null;
+  householdState: Partial<HouseholdState> | null;
+  household: HouseholdDirectory | null;
+  documents: VaultDocument[];
+  reminders: Reminder[];
+};
 
 function pickHouseholdState(state: DiaryDockAppState): HouseholdState {
   return Object.fromEntries(
@@ -736,15 +774,8 @@ function inviteAge(createdAt: string) {
   return `${days} ${days === 1 ? "day" : "days"} ago`;
 }
 
-function applyHouseholdDirectory(
-  state: DiaryDockAppState,
-  directory: Awaited<ReturnType<typeof loadHouseholdDirectory>>,
-) {
-  if (!directory) return state;
-
-  return hydrateDiaryDockState({
-    ...state,
-    householdMembers: directory.members.map((member) => ({
+export function householdMembersFromDirectory(directory: HouseholdDirectory): HouseholdMember[] {
+  return directory.members.map((member) => ({
       id: member.userId,
       userId: member.userId,
       householdRole: member.role,
@@ -778,8 +809,11 @@ function applyHouseholdDirectory(
             : [],
       lastActive:
         member.userId === directory.currentUserId ? "Now" : "Recently",
-    })),
-    familyInvites: directory.invites.map((invite) => ({
+    }));
+}
+
+export function familyInvitesFromDirectory(directory: HouseholdDirectory): Invite[] {
+  return directory.invites.map((invite) => ({
       id: invite.token,
       email: invite.email,
       expiresAt: invite.expiresAt,
@@ -789,7 +823,38 @@ function applyHouseholdDirectory(
       sentAgo: inviteAge(invite.createdAt),
       initials: initialsForName(invite.name),
       status: "pending",
-    })),
+    }));
+}
+
+function applyHouseholdDirectory(
+  state: DiaryDockAppState,
+  directory: Awaited<ReturnType<typeof loadHouseholdDirectory>>,
+) {
+  if (!directory) return state;
+
+  return hydrateDiaryDockState({
+    ...state,
+    householdMembers: householdMembersFromDirectory(directory),
+    familyInvites: familyInvitesFromDirectory(directory),
+  });
+}
+
+export function hydrateDiaryDockBootstrap(
+  payload: DiaryDockBootstrapPayload,
+): DiaryDockAppState {
+  let state = payload.privateState
+    ? hydrateDiaryDockState(payload.privateState)
+    : createInitialDiaryDockState();
+
+  state = removeNonOwnedDocumentCache(state, payload.userId);
+  state = applyHouseholdState(state, payload.householdState);
+  state = applyHouseholdDirectory(state, payload.household);
+
+  return applyStructuredData(state, {
+    documents: payload.documents,
+    reminders: payload.reminders,
+    householdMembers: [],
+    familyInvites: [],
   });
 }
 
@@ -863,15 +928,7 @@ function createSupabaseRepository(): DiaryDockRepository {
           ? hydrateDiaryDockState(privateData.payload as DiaryDockAppState)
           : createInitialDiaryDockState();
 
-      if (!privateData?.payload) {
-        await client.from("app_state").upsert(
-          {
-            id: userId,
-            payload: privateState,
-          },
-          { onConflict: "id" },
-        );
-      }
+      privateState = removeNonOwnedDocumentCache(privateState, userId);
 
       const { data: householdId, error: householdError } = await client.rpc(
         "ensure_user_household",
@@ -910,10 +967,12 @@ function createSupabaseRepository(): DiaryDockRepository {
         return;
       }
 
+      const privateState = removeNonOwnedDocumentCache(state, userId);
+
       await client.from("app_state").upsert(
         {
           id: userId,
-          payload: state,
+          payload: privateState,
         },
         { onConflict: "id" },
       );
@@ -926,7 +985,7 @@ function createSupabaseRepository(): DiaryDockRepository {
         await client.from("household_state").upsert(
           {
             household_id: householdId,
-            payload: pickHouseholdState(state),
+            payload: pickHouseholdState(privateState),
           },
           { onConflict: "household_id" },
         );

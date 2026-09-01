@@ -7,7 +7,14 @@ import { useEffect, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import { type DocumentExtractionResult, type SuggestedRoom } from "@/lib/document-extraction";
+import {
+  documentCategoryOptions,
+  suggestedRoomOptions,
+  type DocumentExtractionResult,
+  type SuggestedRoom
+} from "@/lib/document-extraction";
+import { reviewMessageForConfidence } from "@/lib/brain/extraction/confidence";
+import { canConfirmCapture, getCaptureReviewReasons } from "@/lib/capture-review";
 import { sanitizeDocumentFileName, uploadPrivateDocument } from "@/lib/document-storage";
 import { roomDetails, type Reminder, type RoomActivity, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
@@ -167,28 +174,6 @@ const categoryToDocumentKind: Record<VaultDocument["category"], VaultDocument["k
   Memories: "Image"
 };
 
-function buildReviewReasons(extraction: DocumentExtractionResult) {
-  const reasons: string[] = [];
-
-  if (extraction.confidence < 0.85) {
-    reasons.push("This document needs a quick confidence check");
-  }
-
-  if (!extraction.issuer.trim() || extraction.issuer.toLowerCase().includes("unknown")) {
-    reasons.push("Issuer needs checking");
-  }
-
-  if (!extraction.title.trim() || extraction.title.toLowerCase().includes("document")) {
-    reasons.push("Title may need a clearer name");
-  }
-
-  if (!extraction.extractedText.trim()) {
-    reasons.push("OCR text is missing");
-  }
-
-  return reasons;
-}
-
 export function DocumentCaptureWorkspace() {
   const { repositoryMode, updateState } = useDiaryDockData();
   const searchParams = useSearchParams();
@@ -199,11 +184,13 @@ export function DocumentCaptureWorkspace() {
   const [draft, setDraft] = useState<DocumentExtractionResult | null>(null);
   const [savedDocumentId, setSavedDocumentId] = useState<string | null>(null);
   const [processingStage, setProcessingStage] = useState<
-    "idle" | "preparing" | "reading" | "organising" | "saving" | "complete" | "error"
+    "idle" | "preparing" | "reading" | "organising" | "review" | "saving" | "complete" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createReminder, setCreateReminder] = useState(false);
   const [reminderTimeLabel, setReminderTimeLabel] = useState("This week");
+  const [pendingOriginalFiles, setPendingOriginalFiles] = useState<File[]>([]);
+  const [pendingPreparedFiles, setPendingPreparedFiles] = useState<File[]>([]);
 
   useEffect(() => {
     const urls = selectedFiles.map((file) => URL.createObjectURL(file));
@@ -217,6 +204,8 @@ export function DocumentCaptureWorkspace() {
     setErrorMessage(null);
     setCreateReminder(false);
     setReminderTimeLabel("This week");
+    setPendingOriginalFiles([]);
+    setPendingPreparedFiles([]);
     setProcessingStage("idle");
   };
 
@@ -262,7 +251,7 @@ export function DocumentCaptureWorkspace() {
 
     try {
       const storedFile = repositoryMode === "supabase" ? await uploadPrivateDocument(storedUpload, documentId) : null;
-      const reviewReasons = buildReviewReasons(extraction);
+      const reviewReasons = getCaptureReviewReasons(extraction);
       const nextDocument: VaultDocument = {
         id: documentId,
         title: extraction.title,
@@ -282,9 +271,9 @@ export function DocumentCaptureWorkspace() {
         extractedText: extraction.extractedText,
         actionItems: extraction.actionItems,
         confidence: extraction.confidence,
-        reviewStatus: reviewReasons.length ? "needs-review" : "reviewed",
+        reviewStatus: "reviewed",
         reviewReasons,
-        reviewedAt: reviewReasons.length ? undefined : "Just now"
+        reviewedAt: new Date().toISOString()
       };
       const nextRoomDocument: RoomDocument = {
         id: `${roomId}-${documentId}`,
@@ -405,14 +394,12 @@ export function DocumentCaptureWorkspace() {
       setDraft(extraction);
       setCreateReminder(shouldCreateReminder);
       setReminderTimeLabel(nextReminderTime);
+      setPendingOriginalFiles(files);
+      setPendingPreparedFiles(preparedFiles);
       setProcessingStage("organising");
-      // Keep the confirmed route visible long enough to understand where the document is going.
+      // Keep the proposed route visible briefly, then let the user review it before anything is saved.
       await new Promise((resolve) => window.setTimeout(resolve, 1800));
-      await saveToDiaryDock(files, preparedFiles, extraction, {
-        createReminder: shouldCreateReminder,
-        reminderTimeLabel: nextReminderTime,
-        reminderPriority: extraction.dueDate ? "high" : "normal"
-      });
+      setProcessingStage("review");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Unable to read this document right now.");
       setProcessingStage("error");
@@ -439,7 +426,7 @@ export function DocumentCaptureWorkspace() {
   const filingRoutePath = `M170 24 C170 72 ${filingTargetX} 76 ${filingTargetX} 140`;
 
   return (
-    <div className="relative -mx-4 -mt-5 min-h-[100svh] overflow-hidden bg-[linear-gradient(180deg,#dcecf7_0%,#f7fbfc_48%,#edf5ee_100%)] pb-28 text-slate-900 sm:-mx-6">
+    <div className="relative -mx-4 -mt-5 min-h-[100svh] overflow-x-hidden bg-[linear-gradient(180deg,#dcecf7_0%,#f7fbfc_48%,#edf5ee_100%)] pb-28 text-slate-900 sm:-mx-6">
       <NextImage
         src="/images/estate-dashboard-country.png"
         alt=""
@@ -463,10 +450,18 @@ export function DocumentCaptureWorkspace() {
           </Link>
           <div className="text-center">
             <h1 className="text-[18px] font-semibold tracking-[-0.025em] text-slate-900">
-              {activeProcessingStage ? "Organising" : draft && processingStage === "complete" ? (savedDocumentId ? "Saved" : "Ready") : "Add document"}
+              {activeProcessingStage
+                ? "Organising"
+                : draft && processingStage === "review"
+                  ? "Check details"
+                  : draft && processingStage === "complete"
+                    ? (savedDocumentId ? "Saved" : "Ready")
+                    : "Add document"}
             </h1>
             {!activeProcessingStage && !(draft && processingStage === "complete") ? (
-              <p className="mt-0.5 text-[11px] font-medium text-slate-500">Add every page in reading order</p>
+              <p className="mt-0.5 text-[11px] font-medium text-slate-500">
+                {processingStage === "review" ? "Nothing is saved until you confirm" : "Add every page in reading order"}
+              </p>
             ) : null}
           </div>
           <span className="flex min-w-10 items-center justify-center rounded-full border border-white/85 bg-white/72 px-3 py-2 text-[11px] font-semibold text-slate-600 shadow-sm backdrop-blur-xl">
@@ -624,6 +619,92 @@ export function DocumentCaptureWorkspace() {
           </main>
         ) : null}
 
+        {draft && processingStage === "review" ? (
+          <main className="flex flex-1 flex-col py-6">
+            <section className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_28px_65px_-34px_rgba(31,61,69,0.55)] backdrop-blur-2xl">
+              <div className="flex items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e8f0e4] text-[#5d8350]">
+                  <UiIcon name="search" className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#66815f]">We found these details</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-900">Please check before saving</h2>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">{reviewMessageForConfidence(draft.confidence)}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-4">
+                <label className="block">
+                  <span className="text-xs font-semibold text-slate-700">Document name</span>
+                  <input value={draft.title} onChange={(event) => setDraft((current) => current ? { ...current, title: event.target.value } : current)} className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-semibold text-slate-700">Who issued it</span>
+                  <input value={draft.issuer} onChange={(event) => setDraft((current) => current ? { ...current, issuer: event.target.value } : current)} placeholder="Leave blank if it is not shown" className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="text-xs font-semibold text-slate-700">Area</span>
+                    <select value={draft.suggestedRoom} onChange={(event) => setDraft((current) => current ? { ...current, suggestedRoom: event.target.value as DocumentExtractionResult["suggestedRoom"] } : current)} className="mt-1.5 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none focus:border-[#86a774]">
+                      {suggestedRoomOptions.map((room) => <option key={room} value={room}>{room}</option>)}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-semibold text-slate-700">Category</span>
+                    <select value={draft.category} onChange={(event) => setDraft((current) => current ? { ...current, category: event.target.value as DocumentExtractionResult["category"] } : current)} className="mt-1.5 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none focus:border-[#86a774]">
+                      {documentCategoryOptions.map((category) => <option key={category} value={category}>{category}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <label className="block">
+                  <span className="text-xs font-semibold text-slate-700">Useful date</span>
+                  <input type="date" value={draft.dueDate} onChange={(event) => setDraft((current) => current ? { ...current, dueDate: event.target.value } : current)} className="mt-1.5 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-semibold text-slate-700">Summary</span>
+                  <textarea value={draft.summary} onChange={(event) => setDraft((current) => current ? { ...current, summary: event.target.value } : current)} rows={3} className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-6 text-slate-900 outline-none focus:border-[#86a774]" />
+                </label>
+              </div>
+
+              <div className="mt-5 rounded-[20px] border border-[#dce8d7] bg-[#f2f7ef] p-4">
+                <label className="flex items-start gap-3">
+                  <input type="checkbox" checked={createReminder} onChange={(event) => setCreateReminder(event.target.checked)} className="mt-0.5 h-5 w-5 accent-[#6f9462]" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-slate-800">Create a reminder</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-slate-500">This is optional and will be linked to this document.</span>
+                  </span>
+                </label>
+                {createReminder ? (
+                  <input value={reminderTimeLabel} onChange={(event) => setReminderTimeLabel(event.target.value)} aria-label="When to remind me" className="mt-3 w-full rounded-2xl border border-[#d4e2cf] bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
+                ) : null}
+              </div>
+
+              {getCaptureReviewReasons(draft).length ? (
+                <ul className="mt-4 space-y-1.5 rounded-[18px] bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-800">
+                  {getCaptureReviewReasons(draft).map((reason) => <li key={reason}>• {reason}</li>)}
+                </ul>
+              ) : null}
+
+              <button
+                type="button"
+                disabled={!canConfirmCapture(draft) || !pendingOriginalFiles.length || !pendingPreparedFiles.length}
+                onClick={() => void saveToDiaryDock(pendingOriginalFiles, pendingPreparedFiles, draft, {
+                  createReminder,
+                  reminderTimeLabel: reminderTimeLabel.trim() || "This week",
+                  reminderPriority: draft.dueDate ? "high" : "normal"
+                })}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-[19px] bg-[#86a774] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_30px_-20px_rgba(67,102,63,0.7)] disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <UiIcon name="check" className="h-4 w-4" />
+                Confirm and save
+              </button>
+              <button type="button" onClick={() => { setDraft(null); setPendingOriginalFiles([]); setPendingPreparedFiles([]); setProcessingStage("idle"); }} className="mt-3 w-full text-center text-sm font-semibold text-slate-500">
+                Go back without saving
+              </button>
+            </section>
+          </main>
+        ) : null}
+
         {draft && processingStage === "complete" ? (
           <main className="flex flex-1 flex-col justify-end pb-2 pt-6">
             <div className="pointer-events-none absolute inset-x-0 top-20 h-[52%] overflow-hidden">
@@ -637,7 +718,7 @@ export function DocumentCaptureWorkspace() {
                 </span>
                 <div className="min-w-0">
                   <h2 className="line-clamp-2 text-xl font-semibold tracking-tight text-slate-900">{draft.title}</h2>
-                  <p className="mt-1 text-xs text-slate-500">{selectedFiles.length} page{selectedFiles.length === 1 ? "" : "s"} filed automatically</p>
+                  <p className="mt-1 text-xs text-slate-500">{selectedFiles.length} page{selectedFiles.length === 1 ? "" : "s"} saved after your review</p>
                 </div>
               </div>
 

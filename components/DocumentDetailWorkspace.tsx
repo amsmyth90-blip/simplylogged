@@ -11,7 +11,9 @@ import { ReminderCard } from "@/components/ReminderCard";
 import { UiIcon } from "@/components/UiIcon";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { documentCategoryOptions } from "@/lib/document-extraction";
+import { setDocumentSharing } from "@/lib/document-sharing";
 import { roomDetails, type Reminder, type VaultDocument } from "@/lib/mock-data";
+import type { ResourceVisibility } from "@/lib/resource-access";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -30,7 +32,8 @@ type DocumentCorrectionDraft = {
   extractionSummary: string;
   extractedText: string;
   actionItems: string;
-  sharedWith: string[];
+  visibility: ResourceVisibility;
+  sharedWithUserIds: string[];
   emergencyVisible: boolean;
 };
 
@@ -44,7 +47,8 @@ function buildDraft(document: VaultDocument): DocumentCorrectionDraft {
     extractionSummary: document.extractionSummary ?? "",
     extractedText: document.extractedText ?? "",
     actionItems: document.actionItems?.join("\n") ?? "",
-    sharedWith: document.sharedWith ?? [],
+    visibility: document.visibility ?? (document.sharedWith?.length ? "SELECTED_MEMBERS" : "PRIVATE"),
+    sharedWithUserIds: document.sharedWithUserIds ?? [],
     emergencyVisible: Boolean(document.emergencyVisible)
   };
 }
@@ -54,7 +58,7 @@ export function DocumentDetailWorkspace({
   backHref = "/files",
   backLabel = "All Files"
 }: DocumentDetailWorkspaceProps) {
-  const { state, hydrated, updateState } = useDiaryDockData();
+  const { state, hydrated, repositoryMode, updateState } = useDiaryDockData();
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [fileMessage, setFileMessage] = useState<string | null>(null);
   const [isOpening, setIsOpening] = useState(false);
@@ -62,6 +66,7 @@ export function DocumentDetailWorkspace({
   const [draft, setDraft] = useState<DocumentCorrectionDraft | null>(null);
 
   const document = state.vaultDocuments.find((item) => item.id === documentId) ?? null;
+  const canManageDocument = document?.isOwnedByCurrentUser !== false;
   const roomOptions = useMemo(
     () =>
       Object.values(roomDetails)
@@ -70,8 +75,16 @@ export function DocumentDetailWorkspace({
     []
   );
   const shareOptions = useMemo(
-    () => state.householdMembers,
-    [state.householdMembers]
+    () => state.householdMembers.filter((member) => {
+      if (!member.userId) {
+        return false;
+      }
+
+      return document?.ownerId
+        ? member.userId !== document.ownerId
+        : member.lastActive !== "Now";
+    }),
+    [document, state.householdMembers]
   );
   const linkedReminders = useMemo(() => {
     if (!document) {
@@ -152,7 +165,7 @@ export function DocumentDetailWorkspace({
   };
 
   const markReviewed = async () => {
-    if (!document) {
+    if (!document || !canManageDocument) {
       return;
     }
 
@@ -175,11 +188,18 @@ export function DocumentDetailWorkspace({
   };
 
   const openCorrection = () => {
-    if (!document) {
+    if (!document || !canManageDocument) {
       return;
     }
 
-    setDraft(buildDraft(document));
+    const nextDraft = buildDraft(document);
+    if (!nextDraft.sharedWithUserIds.length && document.sharedWith?.length) {
+      nextDraft.sharedWithUserIds = shareOptions
+        .filter((member) => document.sharedWith?.includes(member.name))
+        .map((member) => member.userId)
+        .filter((userId): userId is string => Boolean(userId));
+    }
+    setDraft(nextDraft);
     setEditing(true);
   };
 
@@ -189,7 +209,7 @@ export function DocumentDetailWorkspace({
   };
 
   const saveCorrection = async () => {
-    if (!document || !draft) {
+    if (!document || !draft || !canManageDocument) {
       return;
     }
 
@@ -204,32 +224,48 @@ export function DocumentDetailWorkspace({
       .split("\n")
       .map((item) => item.trim())
       .filter(Boolean);
-    const sharedWith = draft.sharedWith;
+    const selectedUserIds = draft.visibility === "SELECTED_MEMBERS" ? draft.sharedWithUserIds : [];
+    const sharedWith = shareOptions
+      .filter((member) => member.userId && selectedUserIds.includes(member.userId))
+      .map((member) => member.name);
+    const correctedDocument: VaultDocument = {
+      ...document,
+      title,
+      issuer: draft.issuer.trim() || undefined,
+      category: draft.category,
+      roomId: nextRoom?.id,
+      roomName: nextRoom?.name,
+      dueDate: draft.dueDate.trim(),
+      extractionSummary: draft.extractionSummary.trim() || undefined,
+      extractedText: draft.extractedText.trim() || undefined,
+      actionItems: nextActionItems,
+      sharedWith,
+      visibility: draft.visibility,
+      sharedWithUserIds: selectedUserIds,
+      emergencyVisible: draft.emergencyVisible,
+      reviewStatus: "reviewed",
+      reviewReasons: [],
+      reviewedAt: "Just now",
+      updated: "Just now"
+    };
 
-    let nextStructuredDocument: VaultDocument | null = null;
+    if (repositoryMode === "supabase") {
+      try {
+        await upsertStructuredDocument(correctedDocument);
+        await setDocumentSharing({
+          documentId: document.id,
+          visibility: draft.visibility,
+          selectedUserIds
+        });
+      } catch (error) {
+        setFileMessage(error instanceof Error ? error.message : "Sharing could not be updated.");
+        return;
+      }
+    }
+
     let nextStructuredReminders: Reminder[] = [];
 
     updateState((current) => {
-      const correctedDocument: VaultDocument = {
-        ...document,
-        title,
-        issuer: draft.issuer.trim() || undefined,
-        category: draft.category,
-        roomId: nextRoom?.id,
-        roomName: nextRoom?.name,
-        dueDate: draft.dueDate.trim(),
-        extractionSummary: draft.extractionSummary.trim() || undefined,
-        extractedText: draft.extractedText.trim() || undefined,
-        actionItems: nextActionItems,
-        sharedWith,
-        emergencyVisible: draft.emergencyVisible,
-        reviewStatus: "reviewed",
-        reviewReasons: [],
-        reviewedAt: "Just now",
-        updated: "Just now"
-      };
-      nextStructuredDocument = correctedDocument;
-
       const roomDocuments = { ...current.roomDocuments };
 
       if (previousRoomId) {
@@ -300,10 +336,6 @@ export function DocumentDetailWorkspace({
       };
     });
 
-    if (nextStructuredDocument) {
-      await upsertStructuredDocument(nextStructuredDocument);
-    }
-
     await Promise.all(nextStructuredReminders.map((reminder) => upsertStructuredReminder(reminder)));
 
     closeCorrection();
@@ -358,13 +390,17 @@ export function DocumentDetailWorkspace({
             {backLabel}
           </Link>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={openCorrection}
-              className="inline-flex min-h-9 items-center rounded-full border border-black/10 bg-white/82 px-3 text-[11px] font-semibold text-ink/70 shadow-sm transition hover:bg-white"
-            >
-              Edit
-            </button>
+            {canManageDocument ? (
+              <button
+                type="button"
+                onClick={openCorrection}
+                className="inline-flex min-h-9 items-center rounded-full border border-black/10 bg-white/82 px-3 text-[11px] font-semibold text-ink/70 shadow-sm transition hover:bg-white"
+              >
+                Edit
+              </button>
+            ) : (
+              <span className="rounded-full bg-sage/60 px-3 py-1.5 text-[11px] font-semibold text-moss">Shared with you</span>
+            )}
             {document.storagePath ? (
               <button
                 type="button"
@@ -480,23 +516,29 @@ export function DocumentDetailWorkspace({
                   </div>
                 ))}
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={openCorrection}
-                  className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-black/10 bg-white/80 px-3 text-sm font-semibold text-ink/70"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void markReviewed()}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-ink px-3 text-sm font-semibold text-white shadow-soft"
-                >
-                  <UiIcon name="check" className="h-4 w-4" />
-                  Reviewed
-                </button>
-              </div>
+              {canManageDocument ? (
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={openCorrection}
+                    className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-black/10 bg-white/80 px-3 text-sm font-semibold text-ink/70"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void markReviewed()}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-ink px-3 text-sm font-semibold text-white shadow-soft"
+                  >
+                    <UiIcon name="check" className="h-4 w-4" />
+                    Reviewed
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-3 rounded-2xl bg-white/72 px-3 py-2 text-xs leading-5 text-ink/55">
+                  The document owner can review or correct these details.
+                </p>
+              )}
             </section>
           ) : (
             <section className="estate-sheet p-3.5">
@@ -517,9 +559,11 @@ export function DocumentDetailWorkspace({
           <section className="estate-sheet p-3.5">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-sm font-semibold tracking-tight text-ink">Details</h2>
-              <button type="button" onClick={openCorrection} className="text-xs font-semibold text-moss">
-                Edit
-              </button>
+              {canManageDocument ? (
+                <button type="button" onClick={openCorrection} className="text-xs font-semibold text-moss">
+                  Edit
+                </button>
+              ) : null}
             </div>
             <div className="mt-3 divide-y divide-black/5 overflow-hidden rounded-2xl bg-white/76">
               {filingDetails.map((item) => (
@@ -690,58 +734,65 @@ export function DocumentDetailWorkspace({
               />
             </label>
 
-            <section className="space-y-2">
+            <section className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-ink">Who can see this?</span>
                 <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-ink/45">
-                  {draft.sharedWith.length ? `${draft.sharedWith.length} selected` : "Private"}
+                  {draft.visibility === "PRIVATE"
+                    ? "Only you"
+                    : draft.visibility === "HOUSEHOLD"
+                      ? "Household"
+                      : `${draft.sharedWithUserIds.length} selected`}
                 </span>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {shareOptions.map((member) => {
-                  const checked = draft.sharedWith.includes(member.name);
-
-                  return (
-                    <label
-                      key={member.id}
-                      className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-3 transition ${
-                        checked
-                          ? "border-moss/30 bg-sage/55 shadow-[0_16px_30px_-24px_rgba(50,80,56,0.42)]"
-                          : "border-black/10 bg-white/72 hover:bg-white"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={(event) =>
-                          setDraft((current) => {
-                            if (!current) {
-                              return current;
-                            }
-
-                            return {
-                              ...current,
-                              sharedWith: event.target.checked
-                                ? [...current.sharedWith, member.name]
-                                : current.sharedWith.filter((name) => name !== member.name)
-                            };
-                          })
-                        }
-                        className="h-4 w-4 rounded border-black/20 text-moss"
-                      />
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/82 text-xs font-semibold text-ink/62">
-                        {member.initials}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-ink">{member.name}</span>
-                        <span className="block truncate text-xs text-ink/45">{member.access}</span>
-                      </span>
-                    </label>
-                  );
-                })}
+              <div className="grid gap-2 sm:grid-cols-3">
+                {([
+                  ["PRIVATE", "Only me", "Private unless you change it"],
+                  ["HOUSEHOLD", "My household", "All active household members can view"],
+                  ["SELECTED_MEMBERS", "Choose people", "Only the people you select can view"]
+                ] as const).map(([visibility, label, detail]) => (
+                  <button
+                    key={visibility}
+                    type="button"
+                    onClick={() => setDraft((current) => current ? { ...current, visibility } : current)}
+                    aria-pressed={draft.visibility === visibility}
+                    className={`rounded-2xl border px-3 py-3 text-left ${draft.visibility === visibility ? "border-moss/35 bg-sage/55" : "border-black/10 bg-white/72"}`}
+                  >
+                    <span className="block text-sm font-semibold text-ink">{label}</span>
+                    <span className="mt-1 block text-[11px] leading-4 text-ink/45">{detail}</span>
+                  </button>
+                ))}
               </div>
+              {draft.visibility === "SELECTED_MEMBERS" ? (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {shareOptions.map((member) => {
+                    const memberUserId = member.userId;
+                    if (!memberUserId) return null;
+                    const checked = draft.sharedWithUserIds.includes(memberUserId);
+
+                    return (
+                      <label key={member.id} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-3 transition ${checked ? "border-moss/30 bg-sage/55" : "border-black/10 bg-white/72"}`}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(event) => setDraft((current) => current ? {
+                            ...current,
+                            sharedWithUserIds: event.target.checked
+                              ? [...new Set([...current.sharedWithUserIds, memberUserId])]
+                              : current.sharedWithUserIds.filter((userId) => userId !== memberUserId)
+                          } : current)}
+                          className="h-4 w-4 rounded border-black/20 text-moss"
+                        />
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/82 text-xs font-semibold text-ink/62">{member.initials}</span>
+                        <span className="min-w-0"><span className="block truncate text-sm font-semibold text-ink">{member.name}</span><span className="block truncate text-xs text-ink/45">{member.access}</span></span>
+                      </label>
+                    );
+                  })}
+                  {!shareOptions.length ? <p className="text-xs text-ink/45">Invite someone to your household before selecting them here.</p> : null}
+                </div>
+              ) : null}
               <p className="text-xs leading-5 text-ink/45">
-                Unticked means private to the main household organisers. These choices are saved as document permissions.
+                DiaryDock checks this permission again whenever someone opens the record or its file.
               </p>
             </section>
 
@@ -757,7 +808,7 @@ export function DocumentDetailWorkspace({
               <span>
                 <span className="block text-sm font-semibold text-ink">Show in Emergency Access Mode</span>
                 <span className="mt-0.5 block text-xs leading-5 text-ink/45">
-                  Use this only for records trusted people may need in a crisis.
+                  Adds this to your emergency preview. It does not grant another person access.
                 </span>
               </span>
             </label>

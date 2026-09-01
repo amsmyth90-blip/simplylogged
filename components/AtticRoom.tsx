@@ -117,7 +117,7 @@ export function AtticRoom() {
 
       <section
         aria-label="Interactive Attic"
-        className="relative mx-auto h-full w-[min(100vw,56.3svh,34rem)] overflow-hidden bg-[#7b6a55] shadow-[0_0_70px_rgba(36,29,21,0.5)]"
+        className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#7b6a55] shadow-[0_0_70px_rgba(36,29,21,0.5)]"
       >
         <Image
           src="/images/pages/attic-memory-room-v1.webp"

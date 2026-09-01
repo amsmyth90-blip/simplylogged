@@ -127,7 +127,7 @@ export function GarageWorkspace() {
 
         <section
           aria-label="Interactive Garage"
-          className="relative mx-auto h-full w-[min(100vw,56.5svh,34rem)] overflow-hidden bg-[#514536] shadow-[0_0_70px_rgba(28,23,17,0.5)]"
+          className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#514536] shadow-[0_0_70px_rgba(28,23,17,0.5)]"
         >
           <Image
             src="/images/pages/garage-folio-hero-v5.webp"

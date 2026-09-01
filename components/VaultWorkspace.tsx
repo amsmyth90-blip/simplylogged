@@ -12,7 +12,9 @@ import { ReminderCard } from "@/components/ReminderCard";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { suggestFilingDestination } from "@/lib/life-inbox/suggestions";
+import { setDocumentSharing } from "@/lib/document-sharing";
 import { remindersList, vaultCategories, vaultSecurity, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
+import type { ResourceVisibility } from "@/lib/resource-access";
 import { deleteStructuredDocument, upsertStructuredDocument } from "@/lib/structured-data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -29,7 +31,8 @@ type VaultDraft = {
   category: string;
   kind: VaultDocument["kind"];
   size: string;
-  sharedWith: string[];
+  visibility: ResourceVisibility;
+  sharedWithUserIds: string[];
   emergencyVisible: boolean;
   starred: boolean;
 };
@@ -82,7 +85,8 @@ const defaultDraft: VaultDraft = {
   category: "Identity",
   kind: "PDF",
   size: "",
-  sharedWith: [],
+  visibility: "PRIVATE",
+  sharedWithUserIds: [],
   emergencyVisible: false,
   starred: false
 };
@@ -97,7 +101,8 @@ function buildDraft(document?: VaultDocument): VaultDraft {
     category: document.category,
     kind: document.kind,
     size: document.size,
-    sharedWith: document.sharedWith ?? [],
+    visibility: document.visibility ?? (document.sharedWith?.length ? "SELECTED_MEMBERS" : "PRIVATE"),
+    sharedWithUserIds: document.sharedWithUserIds ?? [],
     emergencyVisible: Boolean(document.emergencyVisible),
     starred: Boolean(document.starred)
   };
@@ -141,7 +146,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   const [busyDocumentId, setBusyDocumentId] = useState<string | null>(null);
   const [manualDestinationValues, setManualDestinationValues] = useState<Record<string, string>>({});
   const shareOptions = useMemo(
-    () => state.householdMembers,
+    () => state.householdMembers.filter((member) => Boolean(member.userId) && member.lastActive !== "Now"),
     [state.householdMembers]
   );
 
@@ -150,7 +155,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
     .slice(0, 3);
   const reviewQueue = documents.filter((document) => document.reviewStatus === "needs-review");
   const emailImportQueue = reviewQueue.filter(isEmailImport);
-  const sharedQueue = documents.filter((document) => document.sharedWith?.length);
+  const sharedQueue = documents.filter((document) => document.visibility && document.visibility !== "PRIVATE");
   const emergencyQueue = documents.filter((document) => document.emergencyVisible);
 
   const filterOptions: { id: VaultFilter; label: string; count: number }[] = [
@@ -167,7 +172,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
       const matchesFilter =
         selectedFilter === "all" ||
         (selectedFilter === "needs-review" && document.reviewStatus === "needs-review") ||
-        (selectedFilter === "shared" && Boolean(document.sharedWith?.length)) ||
+        (selectedFilter === "shared" && Boolean(document.visibility && document.visibility !== "PRIVATE")) ||
         (selectedFilter === "emergency" && Boolean(document.emergencyVisible)) ||
         (selectedFilter === "starred" && Boolean(document.starred));
       const haystack = [
@@ -230,8 +235,19 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   };
 
   const openEdit = (document: VaultDocument) => {
+    if (document.isOwnedByCurrentUser === false) {
+      setFileMessage("You can view this shared document, but only its owner can change it.");
+      return;
+    }
     setEditingId(document.id);
-    setDraft(buildDraft(document));
+    const nextDraft = buildDraft(document);
+    if (!nextDraft.sharedWithUserIds.length && document.sharedWith?.length) {
+      nextDraft.sharedWithUserIds = shareOptions
+        .filter((member) => document.sharedWith?.includes(member.name))
+        .map((member) => member.userId)
+        .filter((userId): userId is string => Boolean(userId));
+    }
+    setDraft(nextDraft);
     setOpen(true);
   };
 
@@ -241,13 +257,17 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
     setDraft(defaultDraft);
   };
 
-  const saveDocument = () => {
+  const saveDocument = async () => {
     const title = draft.title.trim();
     if (!title) {
       return;
     }
 
     const existingDocument = editingId ? documents.find((document) => document.id === editingId) : null;
+    const selectedUserIds = draft.visibility === "SELECTED_MEMBERS" ? draft.sharedWithUserIds : [];
+    const sharedWith = shareOptions
+      .filter((member) => member.userId && selectedUserIds.includes(member.userId))
+      .map((member) => member.name);
     const nextDocument: VaultDocument = {
       ...existingDocument,
       id: editingId ?? crypto.randomUUID(),
@@ -256,10 +276,26 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
       kind: draft.kind,
       size: draft.size.trim() || "Pending upload",
       updated: "Just now",
-      sharedWith: draft.sharedWith,
+      sharedWith,
+      visibility: draft.visibility,
+      sharedWithUserIds: selectedUserIds,
       emergencyVisible: draft.emergencyVisible,
       starred: draft.starred
     };
+
+    if (repositoryMode === "supabase") {
+      try {
+        await upsertStructuredDocument(nextDocument);
+        await setDocumentSharing({
+          documentId: nextDocument.id,
+          visibility: draft.visibility,
+          selectedUserIds
+        });
+      } catch (error) {
+        setFileMessage(error instanceof Error ? error.message : "The document sharing choice could not be saved.");
+        return;
+      }
+    }
 
     updateState((current) => ({
       ...current,
@@ -268,7 +304,6 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
         : [nextDocument, ...current.vaultDocuments]
     }));
 
-    void upsertStructuredDocument(nextDocument);
     setSelectedId(nextDocument.id);
     closeModal();
   };
@@ -302,6 +337,10 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   };
 
   const updateDocument = (nextDocument: VaultDocument) => {
+    if (nextDocument.isOwnedByCurrentUser === false) {
+      setFileMessage("Only the document owner can change this shared record.");
+      return;
+    }
     updateState((current) => ({
       ...current,
       vaultDocuments: current.vaultDocuments.map((document) =>
@@ -339,6 +378,11 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   };
 
   const fileDocumentToDestination = async (document: VaultDocument, destination: FilingDestination) => {
+    if (document.isOwnedByCurrentUser === false) {
+      setFileMessage("Only the document owner can file or review this shared record.");
+      return;
+    }
+
     const filedDocument: VaultDocument = {
       ...document,
       category: destination.category,
@@ -390,6 +434,10 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
   };
 
   const deleteDuplicateDocument = async (document: VaultDocument) => {
+    if (document.isOwnedByCurrentUser === false) {
+      setFileMessage("Only the document owner can delete this shared record.");
+      return;
+    }
     const confirmed = window.confirm(`Delete duplicate "${document.title}" from DiaryDock?`);
     if (!confirmed) {
       return;
@@ -777,18 +825,22 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
                             Needs review
                           </span>
                         ) : null}
-                        <button
-                          type="button"
-                          onClick={() => openEdit(selectedDocument)}
-                          className="rounded-full border border-black/10 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-ink/70 transition hover:bg-white"
-                        >
-                          Edit
-                        </button>
+                        {selectedDocument.isOwnedByCurrentUser !== false ? (
+                          <button
+                            type="button"
+                            onClick={() => openEdit(selectedDocument)}
+                            className="rounded-full border border-black/10 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-ink/70 transition hover:bg-white"
+                          >
+                            Edit
+                          </button>
+                        ) : (
+                          <span className="rounded-full bg-sage/60 px-3 py-1.5 text-xs font-semibold text-moss">Shared with you</span>
+                        )}
                       </div>
                     </div>
                     <h3 className="mt-4 text-lg font-semibold tracking-tight text-ink">{selectedDocument.title}</h3>
                     <p className="mt-1 text-sm text-ink/55">{selectedDocument.category}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    {selectedDocument.isOwnedByCurrentUser !== false ? <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
                         onClick={() => toggleSelectedFlag("starred")}
@@ -816,7 +868,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
                           Mark reviewed
                         </button>
                       ) : null}
-                    </div>
+                    </div> : null}
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                       <div className="rounded-2xl bg-white/80 px-3.5 py-3">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">File type</p>
@@ -835,7 +887,11 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
                           Shared with
                         </p>
                         <p className="mt-1 font-semibold text-ink">
-                          {selectedDocument.sharedWith?.join(", ") || "Private"}
+                          {selectedDocument.visibility === "HOUSEHOLD"
+                            ? "Your household"
+                            : selectedDocument.visibility === "SELECTED_MEMBERS"
+                              ? selectedDocument.sharedWith?.join(", ") || "Selected household members"
+                              : "Only you"}
                         </p>
                       </div>
                       <div className="rounded-2xl bg-white/80 px-3.5 py-3">
@@ -905,22 +961,8 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
                     <UiIcon name="shield" className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-ink">{vaultSecurity.encryption}</p>
-                    <p className="mt-0.5 text-xs text-ink/55">
-                      Backed up {vaultSecurity.lastBackup.toLowerCase()} - {vaultSecurity.devices} trusted devices
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between text-xs font-medium text-ink/55">
-                    <span>{vaultSecurity.storageUsed} used</span>
-                    <span>{vaultSecurity.storageTotal}</span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-mist">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-moss to-sage"
-                      style={{ width: `${vaultSecurity.storagePercent}%` }}
-                    />
+                    <p className="text-sm font-semibold text-ink">{vaultSecurity.protection}</p>
+                    <p className="mt-0.5 text-xs leading-5 text-ink/55">{vaultSecurity.detail}</p>
                   </div>
                 </div>
               </div>
@@ -954,7 +996,7 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
             </button>
             <button
               type="button"
-              onClick={saveDocument}
+              onClick={() => void saveDocument()}
               className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-ink/90"
             >
               Save document
@@ -1022,50 +1064,48 @@ function VaultWorkspaceInner({ initialFilter = "all" }: { initialFilter?: VaultF
               />
             </label>
 
-            <section className="space-y-2">
+            <section className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-ink">Who can see this?</span>
                 <span className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-ink/45">
-                  {draft.sharedWith.length ? `${draft.sharedWith.length} selected` : "Private"}
+                  {draft.visibility === "PRIVATE" ? "Only you" : draft.visibility === "HOUSEHOLD" ? "Household" : `${draft.sharedWithUserIds.length} selected`}
                 </span>
               </div>
               <div className="grid gap-2">
-                {shareOptions.map((member) => {
-                  const checked = draft.sharedWith.includes(member.name);
-
-                  return (
-                    <label
-                      key={member.id}
-                      className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-3 transition ${
-                        checked
-                          ? "border-moss/30 bg-sage/55 shadow-[0_16px_30px_-24px_rgba(50,80,56,0.42)]"
-                          : "border-black/10 bg-white/72 hover:bg-white"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={(event) =>
-                          setDraft((current) => ({
-                            ...current,
-                            sharedWith: event.target.checked
-                              ? [...current.sharedWith, member.name]
-                              : current.sharedWith.filter((name) => name !== member.name)
-                          }))
-                        }
-                        className="h-4 w-4 rounded border-black/20 text-moss"
-                      />
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/82 text-xs font-semibold text-ink/62">
-                        {member.initials}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-ink">{member.name}</span>
-                        <span className="block truncate text-xs text-ink/45">{member.access}</span>
-                      </span>
-                    </label>
-                  );
-                })}
+                {([
+                  ["PRIVATE", "Only me", "Private unless you change it"],
+                  ["HOUSEHOLD", "My household", "All active household members can view"],
+                  ["SELECTED_MEMBERS", "Choose people", "Only selected members can view"]
+                ] as const).map(([visibility, label, detail]) => (
+                  <button key={visibility} type="button" onClick={() => setDraft((current) => ({ ...current, visibility }))} aria-pressed={draft.visibility === visibility} className={`rounded-2xl border px-3.5 py-3 text-left ${draft.visibility === visibility ? "border-moss/30 bg-sage/55" : "border-black/10 bg-white/72"}`}>
+                    <span className="block text-sm font-semibold text-ink">{label}</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-ink/45">{detail}</span>
+                  </button>
+                ))}
               </div>
+              {draft.visibility === "SELECTED_MEMBERS" ? (
+                <div className="grid gap-2">
+                  {shareOptions.map((member) => {
+                    const memberUserId = member.userId;
+                    if (!memberUserId) return null;
+                    const checked = draft.sharedWithUserIds.includes(memberUserId);
+
+                    return (
+                      <label key={member.id} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-3 ${checked ? "border-moss/30 bg-sage/55" : "border-black/10 bg-white/72"}`}>
+                        <input type="checkbox" checked={checked} onChange={(event) => setDraft((current) => ({
+                          ...current,
+                          sharedWithUserIds: event.target.checked
+                            ? [...new Set([...current.sharedWithUserIds, memberUserId])]
+                            : current.sharedWithUserIds.filter((userId) => userId !== memberUserId)
+                        }))} className="h-4 w-4 rounded border-black/20 text-moss" />
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/82 text-xs font-semibold text-ink/62">{member.initials}</span>
+                        <span className="min-w-0"><span className="block truncate text-sm font-semibold text-ink">{member.name}</span><span className="block truncate text-xs text-ink/45">{member.access}</span></span>
+                      </label>
+                    );
+                  })}
+                  {!shareOptions.length ? <p className="text-xs leading-5 text-ink/45">Invite someone to your household before selecting them here.</p> : null}
+                </div>
+              ) : null}
             </section>
           </div>
 

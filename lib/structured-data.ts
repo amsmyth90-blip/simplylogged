@@ -2,6 +2,7 @@
 
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import type { HouseholdMember, Invite } from "@/lib/diarydock-data";
+import type { ResourceVisibility } from "@/lib/resource-access";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 function arrayOrEmpty<T>(value: T[] | undefined) {
@@ -18,6 +19,10 @@ function asDocumentKind(value: unknown): VaultDocument["kind"] {
 
 function asReviewStatus(value: unknown): VaultDocument["reviewStatus"] {
   return value === "needs-review" || value === "reviewed" ? value : "reviewed";
+}
+
+function asResourceVisibility(value: unknown): ResourceVisibility {
+  return value === "HOUSEHOLD" || value === "SELECTED_MEMBERS" ? value : "PRIVATE";
 }
 
 function asReminderGroup(value: unknown): Reminder["group"] {
@@ -83,7 +88,9 @@ export async function upsertStructuredDocument(document: VaultDocument) {
     review_reasons: arrayOrEmpty(document.reviewReasons),
     reviewed_at: document.reviewedAt ?? null,
     emergency_visible: Boolean(document.emergencyVisible),
-    shared_with: arrayOrEmpty(document.sharedWith)
+    // Display-name permissions are legacy metadata, never an authorization source.
+    // New grants are written atomically through set_document_sharing.
+    shared_with: [] as string[]
   };
 
   const { error } = await client.from("documents").upsert(
@@ -104,8 +111,6 @@ export async function upsertStructuredDocument(document: VaultDocument) {
       throw new Error(error.message);
     }
   }
-
-  await upsertDocumentPermissions(document.id, arrayOrEmpty(document.sharedWith));
 }
 
 export async function deleteStructuredDocument(document: VaultDocument) {
@@ -324,12 +329,30 @@ export async function loadStructuredDocumentsAndReminders() {
     };
   }
 
-  const [documentsResult, remindersResult, permissionsResult, membersResult, invitesResult] = await Promise.all([
+  const currentUserId = await getAuthenticatedUserId();
+
+  const [
+    documentsResult,
+    remindersResult,
+    permissionsResult,
+    membersResult,
+    invitesResult,
+    sharedResourcesResult,
+    resourcePermissionsResult
+  ] = await Promise.all([
     client.from("documents").select("*").order("updated_at", { ascending: false }),
     client.from("reminders").select("*").order("updated_at", { ascending: false }),
     client.from("document_permissions").select("document_id, subject_name").order("created_at", { ascending: true }),
     client.from("household_members").select("*").order("created_at", { ascending: true }),
-    client.from("family_invites").select("*").order("created_at", { ascending: true })
+    client.from("family_invites").select("*").order("created_at", { ascending: true }),
+    client
+      .from("shared_resources")
+      .select("id, owner_id, resource_id, visibility")
+      .eq("resource_type", "document"),
+    client
+      .from("resource_permissions")
+      .select("shared_resource_id, subject_user_id")
+      .is("revoked_at", null)
   ]);
 
   if (documentsResult.error || remindersResult.error) {
@@ -349,31 +372,58 @@ export async function loadStructuredDocumentsAndReminders() {
     });
   }
 
-  const documents: VaultDocument[] = (documentsResult.data ?? []).map((row) => ({
-    id: row.id,
-    title: row.title,
-    category: row.category,
-    kind: asDocumentKind(row.kind),
-    size: row.size_label,
-    updated: "Just now",
-    storageBucket: row.storage_bucket ?? undefined,
-    storagePath: row.storage_path ?? undefined,
-    originalFileName: row.original_file_name ?? undefined,
-    mimeType: row.mime_type ?? undefined,
-    roomId: row.room_id ?? undefined,
-    roomName: row.room_name ?? undefined,
-    issuer: row.issuer ?? undefined,
-    dueDate: row.due_date ?? undefined,
-    extractionSummary: row.extraction_summary ?? undefined,
-    extractedText: row.extracted_text ?? undefined,
-    actionItems: asStringArray(row.action_items),
-    confidence: typeof row.confidence === "number" ? row.confidence : undefined,
-    reviewStatus: asReviewStatus(row.review_status),
-    reviewReasons: asStringArray(row.review_reasons),
-    reviewedAt: row.reviewed_at ?? undefined,
-    emergencyVisible: Boolean(row.emergency_visible),
-    sharedWith: permissionMap.get(row.id) ?? asStringArray(row.shared_with)
-  }));
+  const sharedResourceMap = new Map<string, { id: string; ownerId: string; visibility: ResourceVisibility }>();
+  if (!sharedResourcesResult.error) {
+    (sharedResourcesResult.data ?? []).forEach((row) => {
+      sharedResourceMap.set(String(row.resource_id), {
+        id: String(row.id),
+        ownerId: String(row.owner_id),
+        visibility: asResourceVisibility(row.visibility)
+      });
+    });
+  }
+
+  const selectedMemberMap = new Map<string, string[]>();
+  if (!resourcePermissionsResult.error) {
+    (resourcePermissionsResult.data ?? []).forEach((row) => {
+      const resourceId = String(row.shared_resource_id);
+      const current = selectedMemberMap.get(resourceId) ?? [];
+      selectedMemberMap.set(resourceId, [...current, String(row.subject_user_id)]);
+    });
+  }
+
+  const documents: VaultDocument[] = (documentsResult.data ?? []).map((row) => {
+    const sharedResource = sharedResourceMap.get(String(row.id));
+    return {
+      id: row.id,
+      title: row.title,
+      category: row.category,
+      kind: asDocumentKind(row.kind),
+      size: row.size_label,
+      updated: "Just now",
+      ownerId: String(row.user_id),
+      isOwnedByCurrentUser: String(row.user_id) === currentUserId,
+      storageBucket: row.storage_bucket ?? undefined,
+      storagePath: row.storage_path ?? undefined,
+      originalFileName: row.original_file_name ?? undefined,
+      mimeType: row.mime_type ?? undefined,
+      roomId: row.room_id ?? undefined,
+      roomName: row.room_name ?? undefined,
+      issuer: row.issuer ?? undefined,
+      dueDate: row.due_date ?? undefined,
+      extractionSummary: row.extraction_summary ?? undefined,
+      extractedText: row.extracted_text ?? undefined,
+      actionItems: asStringArray(row.action_items),
+      confidence: typeof row.confidence === "number" ? row.confidence : undefined,
+      reviewStatus: asReviewStatus(row.review_status),
+      reviewReasons: asStringArray(row.review_reasons),
+      reviewedAt: row.reviewed_at ?? undefined,
+      emergencyVisible: Boolean(row.emergency_visible),
+      visibility: sharedResource?.visibility ?? "PRIVATE",
+      sharedWithUserIds: sharedResource ? selectedMemberMap.get(sharedResource.id) ?? [] : [],
+      sharedWith: permissionMap.get(row.id) ?? asStringArray(row.shared_with)
+    };
+  });
 
   const reminders: Reminder[] = (remindersResult.data ?? []).map((row) => ({
     id: row.id,

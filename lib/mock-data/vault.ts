@@ -1,4 +1,5 @@
 import type { AreaIcon } from "@/lib/mock-data/estate";
+import type { ResourceVisibility } from "@/lib/resource-access";
 
 export type VaultCategory = {
   id: string;
@@ -28,6 +29,10 @@ export type VaultDocument = {
   size: string;
   updated: string;
   sharedWith?: string[];
+  visibility?: ResourceVisibility;
+  sharedWithUserIds?: string[];
+  ownerId?: string;
+  isOwnedByCurrentUser?: boolean;
   starred?: boolean;
   storageBucket?: string;
   storagePath?: string;
@@ -50,10 +55,6 @@ export type VaultDocument = {
 export const vaultDocuments: VaultDocument[] = [];
 
 export const vaultSecurity = {
-  encryption: "Encrypted private storage",
-  lastBackup: "Not configured",
-  devices: 0,
-  storageUsed: "0 GB",
-  storageTotal: "10 GB",
-  storagePercent: 0,
+  protection: "Private authenticated storage",
+  detail: "Files open with short-lived secure links. This is not end-to-end encryption.",
 };

@@ -15,15 +15,15 @@ export function EmergencyAccessWorkspace() {
   return (
     <div className="immersive-page">
       <PageHeader
-        eyebrow="Emergency access"
+        eyebrow="Emergency preview"
         title="Essential Help, Only"
-        subtitle="A limited view for trusted people in a crisis."
+        subtitle="Preview the information you have chosen for an emergency view."
         backHref="/emergency"
         backLabel="Emergency"
         heroImage="/images/pages/emergency-hero.webp"
         heroPosition="center 44%"
         heroTone="linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(95,24,20,0.16) 44%, rgba(47,28,24,0.58) 100%)"
-        badge="Limited view"
+        badge="Account preview"
       />
 
       <section className="estate-sheet border-red-200/70 bg-red-50/72 p-5">
@@ -32,9 +32,9 @@ export function EmergencyAccessWorkspace() {
             <UiIcon name="alert" className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-ink">Emergency mode is intentionally limited</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">This is a preview inside your account</h2>
             <p className="mt-1 text-sm leading-6 text-ink/60">
-              This screen shows only emergency-approved information. Private documents stay hidden unless you mark them visible.
+              It shows only information you marked for emergencies. It does not yet give another person access; private documents stay hidden unless you choose otherwise.
             </p>
           </div>
         </div>

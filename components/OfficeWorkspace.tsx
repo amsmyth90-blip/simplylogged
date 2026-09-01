@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { ModalShell } from "@/components/ModalShell";
-import { roomImageLabelClass } from "@/components/RoomSceneChrome";
+import { RoomSceneHeader, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import type { WillsWishesRecord } from "@/lib/diarydock-data";
 import type { VaultDocument } from "@/lib/mock-data";
@@ -1017,7 +1017,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
 
         <section
           aria-label="Interactive Office"
-          className="relative mx-auto h-full w-full max-w-[34rem] overflow-hidden bg-[#c9ae8d] shadow-[0_0_70px_rgba(38,28,19,0.4)]"
+          className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#c9ae8d] shadow-[0_0_70px_rgba(38,28,19,0.4)]"
         >
           <Image
             src="/images/office-interactive-v1.webp"
@@ -1030,23 +1030,6 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
           />
           <div className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-[#33261c]/42 via-[#33261c]/8 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-t from-[#2f251c]/46 via-[#2f251c]/10 to-transparent" />
-
-          <Link
-            href="/dashboard"
-            aria-label="Back to dashboard"
-            className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/65 bg-white/68 text-[#273126] shadow-[0_12px_30px_rgba(42,33,24,0.2)] backdrop-blur-xl"
-          >
-            <UiIcon name="arrow-left" className="h-5 w-5" />
-          </Link>
-
-          <div className="absolute left-1/2 top-[max(1rem,env(safe-area-inset-top))] z-30 -translate-x-1/2 rounded-full border border-white/70 bg-white/72 px-5 py-2 text-center shadow-[0_12px_30px_rgba(42,33,24,0.18)] backdrop-blur-xl">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#6c795f]">
-              Household administration
-            </p>
-            <h1 className="text-base font-semibold tracking-tight text-[#1f281e]">
-              Office
-            </h1>
-          </div>
 
           <OfficeHotspot
             label={
@@ -1086,6 +1069,7 @@ export function OfficeWorkspace({ initialDrawer }: OfficeWorkspaceProps) {
           />
 
         </section>
+        <RoomSceneHeader roomName="Office" eyebrow="Household administration" />
       </main>
 
       <ModalShell

@@ -525,15 +525,15 @@ export function SettingsWorkspace() {
           <SectionHeader title="DiaryDock status" hint="At-a-glance confidence checks" />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="rounded-3xl bg-white/65 p-4">
-              <p className="text-sm font-semibold text-ink">Backups</p>
+              <p className="text-sm font-semibold text-ink">Document storage</p>
               <p className="mt-1 text-xs leading-5 text-ink/55">
-                Nightly backup is on and last completed {vaultSecurity.lastBackup.toLowerCase()}.
+                {vaultSecurity.protection}. Backup status is not shown in DiaryDock.
               </p>
             </div>
             <div className="rounded-3xl bg-white/65 p-4">
-              <p className="text-sm font-semibold text-ink">Devices</p>
+              <p className="text-sm font-semibold text-ink">Sign-in protection</p>
               <p className="mt-1 text-xs leading-5 text-ink/55">
-                {vaultSecurity.devices} trusted devices can open the estate and All Files.
+                Your current Supabase sign-in protects this account. No trusted-device list is configured.
               </p>
             </div>
             <div className="rounded-3xl bg-white/65 p-4">
