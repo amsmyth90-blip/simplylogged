@@ -184,6 +184,8 @@ Rules are deterministic, versioned, idempotent, non-alarmist, and covered with b
 
 Phases covered: 7, 8, and 20.
 
+Status: implemented. Existing onboarding now records explicit applicability for home tenure, vehicles, pets, international travel, household collaboration, private document storage and reminders. The editable Life Check produces a deterministic 0–100 score, category breakdown and direct recommendations from a configuration-driven registry. Areas marked “No / not applicable” are excluded rather than penalised, and the static mock readiness score has been removed from the dashboard.
+
 ### Work
 
 - Extend the current onboarding rather than replace it.

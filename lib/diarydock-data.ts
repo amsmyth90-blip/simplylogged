@@ -246,6 +246,20 @@ export type OnboardingStarterDocument = {
   done: boolean;
 };
 
+export type ApplicabilityAnswer = "not-set" | "yes" | "no";
+export type HomeTenureAnswer = "not-set" | "own" | "rent" | "other" | "not-applicable";
+
+export type LifeCheckState = {
+  homeTenure: HomeTenureAnswer;
+  vehicles: ApplicabilityAnswer;
+  pets: ApplicabilityAnswer;
+  internationalTravel: ApplicabilityAnswer;
+  householdCollaboration: ApplicabilityAnswer;
+  documentStorage: ApplicabilityAnswer;
+  reminders: ApplicabilityAnswer;
+  completedAt?: string;
+};
+
 export type OnboardingState = {
   completed: boolean;
   dashboardAreasConfigured: boolean;
@@ -255,6 +269,7 @@ export type OnboardingState = {
   starterDocuments: OnboardingStarterDocument[];
   emergencyContactAdded: boolean;
   familyInviteAdded: boolean;
+  lifeCheck: LifeCheckState;
 };
 
 export type DiaryDockAppState = {
@@ -432,6 +447,15 @@ export function createInitialOnboardingState(): OnboardingState {
     selectedRooms: [],
     emergencyContactAdded: false,
     familyInviteAdded: false,
+    lifeCheck: {
+      homeTenure: "not-set",
+      vehicles: "not-set",
+      pets: "not-set",
+      internationalTravel: "not-set",
+      householdCollaboration: "not-set",
+      documentStorage: "not-set",
+      reminders: "not-set",
+    },
     starterDocuments: [
       {
         id: "passport",
@@ -503,6 +527,7 @@ export function getOnboardingProgress(onboarding: OnboardingState) {
 }
 
 function hydrateDiaryDockState(state: DiaryDockAppState): DiaryDockAppState {
+  const initialOnboarding = createInitialOnboardingState();
   return {
     ...state,
     reminders: state.reminders ?? [],
@@ -518,8 +543,12 @@ function hydrateDiaryDockState(state: DiaryDockAppState): DiaryDockAppState {
     roomActivity: state.roomActivity ?? mapRoomEntries(() => []),
     mailboxItems: state.mailboxItems ?? [],
     onboarding: {
-      ...createInitialOnboardingState(),
+      ...initialOnboarding,
       ...(state.onboarding ?? {}),
+      lifeCheck: {
+        ...initialOnboarding.lifeCheck,
+        ...(state.onboarding?.lifeCheck ?? {}),
+      },
     },
     mealPlan: state.mealPlan ?? {},
     kitchenRecipes: state.kitchenRecipes ?? [],

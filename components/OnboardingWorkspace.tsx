@@ -11,6 +11,8 @@ import {
   normaliseDashboardAreaIds
 } from "@/lib/dashboard-areas";
 import { estateAreas } from "@/lib/mock-data";
+import { calculateOrganisationScore, isLifeCheckComplete } from "@/lib/organisation-score";
+import type { ApplicabilityAnswer, HomeTenureAnswer, LifeCheckState } from "@/lib/diarydock-data";
 
 const householdChoices = [
   { value: "Just me", title: "Just me", detail: "A private DiaryDock for your own life admin.", icon: "heart" },
@@ -19,7 +21,7 @@ const householdChoices = [
   { value: "Other shared household", title: "Other household", detail: "For relatives, housemates or another shared setup.", icon: "users" }
 ] as const;
 
-const stepTitles = ["Your profile", "Your household", "Choose your areas", "Your dashboard"] as const;
+const stepTitles = ["Your profile", "Your household", "Your life", "Your preferences", "Choose your areas", "Your dashboard"] as const;
 
 function initialsForName(name: string) {
   return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
@@ -36,6 +38,7 @@ export function OnboardingWorkspace() {
     [onboarding.selectedRooms]
   );
   const selectedAreas = estateAreas.filter((area) => selectedAreaIds.includes(area.id));
+  const score = calculateOrganisationScore(state);
 
   const updateProfile = (field: "name" | "householdName", value: string) => {
     updateState((current) => ({
@@ -85,22 +88,57 @@ export function OnboardingWorkspace() {
     });
   };
 
+  const updateLifeCheck = <K extends keyof Omit<LifeCheckState, "completedAt">>(key: K, value: LifeCheckState[K]) => {
+    updateState((current) => {
+      const roomForKey: Partial<Record<keyof Omit<LifeCheckState, "completedAt">, string>> = {
+        vehicles: "garage",
+        pets: "garden",
+        internationalTravel: "driveway",
+        householdCollaboration: "family-room"
+      };
+      const roomId = roomForKey[key];
+      const nextRooms = roomId
+        ? value === "yes"
+          ? [...current.onboarding.selectedRooms, roomId]
+          : current.onboarding.selectedRooms.filter((id) => id !== roomId)
+        : current.onboarding.selectedRooms;
+      const lifeCheck = { ...current.onboarding.lifeCheck, [key]: value, completedAt: undefined };
+      return {
+        ...current,
+        onboarding: {
+          ...current.onboarding,
+          completed: false,
+          lifeCheck,
+          selectedRooms: normaliseDashboardAreaIds(nextRooms)
+        }
+      };
+    });
+  };
+
   const canContinue = step === 0
     ? Boolean(state.settingsProfile.name.trim() && onboarding.householdName.trim())
     : step === 1
       ? Boolean(onboarding.householdMembers.trim())
-      : true;
+      : step === 2
+        ? onboarding.lifeCheck.homeTenure !== "not-set" && onboarding.lifeCheck.vehicles !== "not-set" && onboarding.lifeCheck.pets !== "not-set"
+        : step === 3
+          ? [onboarding.lifeCheck.internationalTravel, onboarding.lifeCheck.householdCollaboration, onboarding.lifeCheck.documentStorage, onboarding.lifeCheck.reminders].every((answer) => answer !== "not-set")
+          : true;
 
   const finishSetup = () => {
-    updateState((current) => ({
-      ...current,
-      onboarding: {
-        ...current.onboarding,
-        completed: true,
-        dashboardAreasConfigured: true,
-        selectedRooms: normaliseDashboardAreaIds(current.onboarding.selectedRooms)
-      }
-    }));
+    updateState((current) => {
+      const lifeCheck = current.onboarding.lifeCheck;
+      return {
+        ...current,
+        onboarding: {
+          ...current.onboarding,
+          completed: true,
+          dashboardAreasConfigured: true,
+          selectedRooms: normaliseDashboardAreaIds(current.onboarding.selectedRooms),
+          lifeCheck: { ...lifeCheck, completedAt: isLifeCheckComplete(lifeCheck) ? new Date().toISOString() : undefined }
+        }
+      };
+    });
     router.push("/dashboard");
   };
 
@@ -159,6 +197,38 @@ export function OnboardingWorkspace() {
 
       {step === 2 ? (
         <section className="space-y-4">
+          <div className="px-1"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">Your life</p><h1 className="mt-2 font-serif text-3xl text-ink">What applies to you?</h1><p className="mt-2 text-sm leading-6 text-ink/55">This keeps your organisation score fair. Choosing “No” excludes that area rather than counting it as missing.</p></div>
+          <div className="estate-sheet space-y-5 p-5">
+            <LifeCheckQuestion title="Your home" detail="Which best describes your current home?">
+              <ChoiceButton selected={onboarding.lifeCheck.homeTenure === "own"} onClick={() => updateLifeCheck("homeTenure", "own" as HomeTenureAnswer)}>Own</ChoiceButton>
+              <ChoiceButton selected={onboarding.lifeCheck.homeTenure === "rent"} onClick={() => updateLifeCheck("homeTenure", "rent" as HomeTenureAnswer)}>Rent</ChoiceButton>
+              <ChoiceButton selected={onboarding.lifeCheck.homeTenure === "other"} onClick={() => updateLifeCheck("homeTenure", "other" as HomeTenureAnswer)}>Other</ChoiceButton>
+              <ChoiceButton selected={onboarding.lifeCheck.homeTenure === "not-applicable"} onClick={() => updateLifeCheck("homeTenure", "not-applicable" as HomeTenureAnswer)}>Not applicable</ChoiceButton>
+            </LifeCheckQuestion>
+            <LifeCheckQuestion title="Vehicles" detail="Do you own or regularly manage a vehicle?">
+              <YesNoChoices value={onboarding.lifeCheck.vehicles} onChange={(value) => updateLifeCheck("vehicles", value)} />
+            </LifeCheckQuestion>
+            <LifeCheckQuestion title="Pets" detail="Do you have pet records or care to organise?">
+              <YesNoChoices value={onboarding.lifeCheck.pets} onChange={(value) => updateLifeCheck("pets", value)} />
+            </LifeCheckQuestion>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 ? (
+        <section className="space-y-4">
+          <div className="px-1"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">Your preferences</p><h1 className="mt-2 font-serif text-3xl text-ink">How can DiaryDock help?</h1><p className="mt-2 text-sm leading-6 text-ink/55">These choices only personalise your checklist. They do not share anything or turn on notifications.</p></div>
+          <div className="estate-sheet space-y-5 p-5">
+            <LifeCheckQuestion title="International travel" detail="Would you like to organise passports, cover or overseas trips?"><YesNoChoices value={onboarding.lifeCheck.internationalTravel} onChange={(value) => updateLifeCheck("internationalTravel", value)} /></LifeCheckQuestion>
+            <LifeCheckQuestion title="Household collaboration" detail="Would you like to organise some things with another person?"><YesNoChoices value={onboarding.lifeCheck.householdCollaboration} onChange={(value) => updateLifeCheck("householdCollaboration", value)} /></LifeCheckQuestion>
+            <LifeCheckQuestion title="Private document storage" detail="Would you like DiaryDock to hold important files?"><YesNoChoices value={onboarding.lifeCheck.documentStorage} onChange={(value) => updateLifeCheck("documentStorage", value)} /></LifeCheckQuestion>
+            <LifeCheckQuestion title="Reminders" detail="Would you like DiaryDock to keep useful dates in view?"><YesNoChoices value={onboarding.lifeCheck.reminders} onChange={(value) => updateLifeCheck("reminders", value)} /></LifeCheckQuestion>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 ? (
+        <section className="space-y-4">
           <div className="px-1"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">Personalise your home</p><h1 className="mt-2 font-serif text-3xl text-ink">What belongs in your DiaryDock?</h1><p className="mt-2 text-sm leading-6 text-ink/55">Switch on only what is useful now. You can add anything later in Settings.</p></div>
           <div className="grid gap-3 sm:grid-cols-2">
             {OPTIONAL_DASHBOARD_AREAS.map((question) => {
@@ -171,9 +241,9 @@ export function OnboardingWorkspace() {
         </section>
       ) : null}
 
-      {step === 3 ? (
+      {step === 5 ? (
         <section className="estate-sheet overflow-hidden">
-          <div className="bg-[#315443] p-5 text-white"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/65">Ready to begin</p><h1 className="mt-2 font-serif text-3xl">Your DiaryDock dashboard</h1><p className="mt-2 text-sm leading-6 text-white/72">We’ll show these {selectedAreas.length} areas. Hidden areas remain safe and can be added from Settings whenever life changes.</p></div>
+          <div className="bg-[#315443] p-5 text-white"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/65">Ready to begin</p><div className="mt-2 flex items-end justify-between gap-4"><div><h1 className="font-serif text-3xl">Your DiaryDock dashboard</h1><p className="mt-2 text-sm leading-6 text-white/72">We’ll show these {selectedAreas.length} areas. Hidden areas remain safe and can be added from Settings whenever life changes.</p></div><div className="shrink-0 text-right"><span className="block font-serif text-4xl">{score.score}%</span><span className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/60">Starting score</span></div></div></div>
           <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-4">
             {selectedAreas.map((area) => <div key={area.id} className="rounded-2xl bg-[#f5f4ed] p-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#dde6d8] text-[#315443]"><UiIcon name={area.icon as IconName} className="h-4 w-4" /></span><p className="mt-2 text-sm font-semibold text-ink">{area.dashboardLabel ?? area.name}</p><p className="mt-0.5 text-[10px] leading-4 text-ink/48">{area.domain}</p></div>)}
           </div>
@@ -187,4 +257,16 @@ export function OnboardingWorkspace() {
       </div>
     </div>
   );
+}
+
+function LifeCheckQuestion({ title, detail, children }: { title: string; detail: string; children: React.ReactNode }) {
+  return <fieldset><legend className="text-sm font-semibold text-ink">{title}</legend><p className="mt-1 text-xs leading-5 text-ink/52">{detail}</p><div className="mt-3 flex flex-wrap gap-2">{children}</div></fieldset>;
+}
+
+function ChoiceButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
+  return <button type="button" aria-pressed={selected} onClick={onClick} className={`min-h-11 rounded-xl border px-4 text-sm font-semibold transition ${selected ? "border-moss bg-moss text-white" : "border-ink/10 bg-white/80 text-ink/65"}`}>{children}</button>;
+}
+
+function YesNoChoices({ value, onChange }: { value: ApplicabilityAnswer; onChange: (value: ApplicabilityAnswer) => void }) {
+  return <><ChoiceButton selected={value === "yes"} onClick={() => onChange("yes")}>Yes</ChoiceButton><ChoiceButton selected={value === "no"} onClick={() => onChange("no")}>No / not applicable</ChoiceButton></>;
 }

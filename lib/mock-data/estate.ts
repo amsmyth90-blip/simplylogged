@@ -41,12 +41,6 @@ export const estateAreas: EstateArea[] = [
   { id: "front-gate", name: "Front Gate", dashboardLabel: "Settings", domain: "Access & Security", icon: "lock", href: "/settings", left: "50%", top: "83%", status: "secure" }
 ];
 
-export const readinessScore = {
-  score: 94,
-  label: "Estate Readiness",
-  message: "Everything important in your life, under one roof."
-};
-
 /* ------------------------------------------------------------------ */
 /* Rooms                                                               */
 /* ------------------------------------------------------------------ */

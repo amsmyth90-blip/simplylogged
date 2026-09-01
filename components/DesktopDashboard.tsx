@@ -7,6 +7,7 @@ import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { isDashboardAreaVisible } from "@/lib/dashboard-areas";
 import { estateAreas } from "@/lib/mock-data";
+import { calculateOrganisationScore } from "@/lib/organisation-score";
 
 const areaImages: Record<string, string> = {
   attic: "/images/pages/attic-memory-room-v1.webp",
@@ -50,6 +51,7 @@ export function DesktopDashboard({ greeting, guardianCount }: { greeting: string
   const activeReminders = state.reminders.filter((reminder) => reminder.group !== "done");
   const latestDocument = state.vaultDocuments.at(-1);
   const nextReminder = activeReminders[0];
+  const organisationScore = calculateOrganisationScore(state);
   const dateLabel = new Intl.DateTimeFormat("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -95,6 +97,7 @@ export function DesktopDashboard({ greeting, guardianCount }: { greeting: string
             <div className="mx-auto mt-3 flex w-36 items-center gap-3 text-[#b89a5c]" aria-hidden="true">
               <span className="h-px flex-1 bg-current/60" /><span className="text-sm">◆</span><span className="h-px flex-1 bg-current/60" />
             </div>
+            <Link href="/life-check" className="mx-auto mt-3 inline-flex min-h-9 items-center gap-2 rounded-full border border-[#345143]/10 bg-white/65 px-4 text-[11px] font-semibold text-[#54705e] shadow-sm transition hover:bg-white"><UiIcon name="chart" className="h-3.5 w-3.5" />{organisationScore.score}% organised · Life Check</Link>
           </section>
 
           <section aria-label="Your main DiaryDock spaces" className="mx-auto mt-5 grid max-w-[1430px] grid-cols-4 items-center gap-4 xl:grid-cols-[150px_repeat(4,minmax(0,1fr))_150px] xl:gap-5">

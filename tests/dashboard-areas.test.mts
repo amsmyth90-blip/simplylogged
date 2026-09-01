@@ -18,6 +18,15 @@ function onboarding(overrides: Partial<OnboardingState> = {}): OnboardingState {
     starterDocuments: [],
     emergencyContactAdded: false,
     familyInviteAdded: false,
+    lifeCheck: {
+      homeTenure: "not-set",
+      vehicles: "not-set",
+      pets: "not-set",
+      internationalTravel: "not-set",
+      householdCollaboration: "not-set",
+      documentStorage: "not-set",
+      reminders: "not-set",
+    },
     ...overrides,
   };
 }

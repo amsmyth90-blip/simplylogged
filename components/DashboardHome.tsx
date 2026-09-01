@@ -10,7 +10,7 @@ import { EstateDashboard } from "@/components/EstateDashboard";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { getOnboardingProgress } from "@/lib/diarydock-data";
-import { readinessScore } from "@/lib/mock-data";
+import { calculateOrganisationScore } from "@/lib/organisation-score";
 
 export function DashboardHome() {
   const router = useRouter();
@@ -56,6 +56,7 @@ export function DashboardHome() {
   const onboardingProgress = getOnboardingProgress(state.onboarding);
   const showSetupNudge = !state.onboarding.completed;
   const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] ?? "";
+  const organisationScore = calculateOrganisationScore(state);
   const todayItems = [
     showSetupNudge
       ? {
@@ -135,15 +136,15 @@ export function DashboardHome() {
                 >
                   <UiIcon name="phone" className="h-3.5 w-3.5" />
                 </Link>
-                <div className="pointer-events-auto rounded-full border border-white/40 bg-white/45 px-2.5 py-1.5 shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+                <Link href="/life-check" aria-label={`Organisation score ${organisationScore.score}%`} className="pointer-events-auto rounded-full border border-white/40 bg-white/45 px-2.5 py-1.5 shadow-[0_18px_30px_-22px_rgba(15,23,42,0.35)] backdrop-blur-xl transition hover:bg-white/80">
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-lime-500" />
                     <span className="hidden text-[11px] font-semibold text-slate-600 min-[380px]:inline">Ready</span>
                     <span className="text-[12px] font-semibold tracking-tight text-slate-900">
-                      {readinessScore.score}%
+                      {organisationScore.score}%
                     </span>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
