@@ -7,7 +7,7 @@ Status: implemented as first-party, opt-in analytics. Product analytics is separ
 - Provider: DiaryDock's existing Supabase Postgres project; no advertising, cross-site analytics or additional analytics SDK.
 - Consent: off by default. A signed-in user opts in or out from Settings → Product analytics.
 - Region: the same configured Supabase project region as the rest of the account data. The geographic project region must be verified in the provider console before store/legal declarations are finalised.
-- Retention: each product event expires after 90 days. Expired rows are pruned as events are recorded and can also be removed by scheduled maintenance later.
+- Retention: each product event expires after 90 days. Row-level security makes expired events unreadable automatically; expired rows are also pruned as events are recorded and can be removed by scheduled maintenance later.
 - Deletion: opting out immediately deletes all product events for that account; the foreign key also cascades account deletion.
 - Subscription linkage: only the internal authenticated user ID and the fixed `FREE`, `PLUS` or `FAMILY` tier are accepted. No payment-provider ID, email or transaction detail is an analytics property.
 
@@ -22,4 +22,3 @@ The event catalogue covers signup, onboarding, first home/vehicle/pet/document/s
 ## Data minimisation
 
 Never include questions or AI answers; document titles, content, filenames, extracted text or notes; names, contact details or addresses; policy/account/registration/serial numbers; Vault keys/recovery material; or security audit contents. Score views use one of four broad bands, not Life Check answers. Analytics failures never block the user's primary task.
-

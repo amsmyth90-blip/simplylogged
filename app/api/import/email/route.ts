@@ -3,7 +3,8 @@ import { createHash, randomUUID } from "crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
 
-import { DOCUMENT_BUCKET, isAcceptedDocumentType, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
+import { captureScannerIsRequired, getCaptureSecurityScanner, inspectCaptureFile } from "@/lib/capture/file-security";
+import { DOCUMENT_BUCKET, MAX_DOCUMENT_BYTES, isAcceptedDocumentType, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 import { getInboundEmailSecret, verifyInboundEmailAddress } from "@/lib/inbound-email";
 import { createLifeInboxFingerprint } from "@/lib/life-inbox/dedupe";
 import { suggestFilingDestination } from "@/lib/life-inbox/suggestions";
@@ -11,6 +12,32 @@ import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabas
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const MAX_WEBHOOK_BYTES = 1024 * 1024;
+
+async function readBoundedStream(stream: ReadableStream<Uint8Array>, maximumBytes: number) {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maximumBytes) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
 
 type JsonAttachment = {
   filename?: unknown;
@@ -25,7 +52,7 @@ type JsonAttachment = {
 type InboundAttachment = {
   name: string;
   mimeType: string;
-  bytes: ArrayBuffer;
+  bytes: ArrayBuffer | Uint8Array;
   size: number;
   sourceEmailId?: string;
   sourceAttachmentId?: string;
@@ -266,12 +293,22 @@ async function parseInboundPayload(request: NextRequest) {
   };
 }
 
-function hasResendSignature(request: NextRequest) {
+function hasAnyResendSignature(request: NextRequest) {
   return Boolean(
     request.headers.get("webhook-id") ||
       request.headers.get("svix-id") ||
       request.headers.get("resend-signature") ||
       request.headers.get("webhook-signature")
+  );
+}
+
+function hasCompleteResendSignature(request: NextRequest) {
+  return Boolean(
+    getResendHeader(request, "webhook-id", "svix-id") &&
+      getResendHeader(request, "webhook-timestamp", "svix-timestamp") &&
+      (request.headers.get("webhook-signature") ??
+        request.headers.get("svix-signature") ??
+        request.headers.get("resend-signature"))
   );
 }
 
@@ -287,7 +324,14 @@ function isResendReceivedEvent(value: unknown): value is ResendReceivedEvent {
 }
 
 async function parseResendPayload(request: NextRequest, resend: Resend, webhookSecret: string) {
-  const payload = await request.text();
+  const declaredLength = Number(request.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_WEBHOOK_BYTES) {
+    throw new Error("Webhook body is too large");
+  }
+  if (!request.body) throw new Error("Webhook body is missing");
+  const payloadBytes = await readBoundedStream(request.body, MAX_WEBHOOK_BYTES);
+  if (!payloadBytes) throw new Error("Webhook body is too large");
+  const payload = Buffer.from(payloadBytes).toString("utf8");
   const event = resend.webhooks.verify({
     payload,
     webhookSecret,
@@ -331,7 +375,17 @@ async function parseResendPayload(request: NextRequest, resend: Resend, webhookS
       continue;
     }
 
-    const bytes = await response.arrayBuffer();
+    const attachmentLength = Number(response.headers.get("content-length") ?? "0");
+    if (Number.isFinite(attachmentLength) && attachmentLength > MAX_DOCUMENT_BYTES) {
+      continue;
+    }
+    if (!response.body) {
+      continue;
+    }
+    const bytes = await readBoundedStream(response.body, MAX_DOCUMENT_BYTES);
+    if (!bytes) {
+      continue;
+    }
     attachments.push({
       name: attachmentResult.data.filename ?? attachment.filename ?? "forwarded-attachment",
       mimeType: attachmentResult.data.content_type ?? attachment.content_type ?? "application/octet-stream",
@@ -370,7 +424,10 @@ export async function POST(request: NextRequest) {
 
   let parsedPayload: Awaited<ReturnType<typeof parseInboundPayload>>;
 
-  if (hasResendSignature(request)) {
+  if (hasAnyResendSignature(request)) {
+    if (!hasCompleteResendSignature(request)) {
+      return unauthorized("DiaryDock could not verify this Resend webhook.");
+    }
     if (!resendApiKey) {
       return NextResponse.json({ error: "Resend API access is not configured yet." }, { status: 503 });
     }
@@ -422,6 +479,18 @@ export async function POST(request: NextRequest) {
     if (validationError || !isAcceptedDocumentType(attachment.mimeType)) {
       continue;
     }
+    const bytes = new Uint8Array(attachment.bytes);
+    const inspection = inspectCaptureFile({ declaredMimeType: attachment.mimeType, bytes });
+    if (!inspection.ok) {
+      continue;
+    }
+    const scanResult = await getCaptureSecurityScanner().scan([
+      { bytes, mimeType: inspection.detectedMimeType },
+    ]);
+    if (scanResult.status === "BLOCKED" || (captureScannerIsRequired() && scanResult.status !== "PASSED")) {
+      continue;
+    }
+    const mimeType = inspection.detectedMimeType;
 
     const safeName = sanitizeDocumentFileName(attachment.name) || "forwarded-attachment";
     const title = subject || titleFromFileName(attachment.name) || "Forwarded document";
@@ -452,7 +521,7 @@ export async function POST(request: NextRequest) {
         : `${recipientText}:${sender}:${subject}`,
       title,
       fileName: attachment.name,
-      mimeType: attachment.mimeType,
+      mimeType,
       size: attachment.size
     });
 
@@ -495,7 +564,7 @@ export async function POST(request: NextRequest) {
       .eq("issuer", sender)
       .eq("title", title)
       .eq("original_file_name", attachment.name)
-      .eq("mime_type", attachment.mimeType)
+      .eq("mime_type", mimeType)
       .eq("size_label", sizeLabel)
       .limit(1)
       .maybeSingle();
@@ -509,8 +578,8 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const { error: uploadError } = await supabase.storage.from(DOCUMENT_BUCKET).upload(storagePath, attachment.bytes, {
-      contentType: attachment.mimeType,
+    const { error: uploadError } = await supabase.storage.from(DOCUMENT_BUCKET).upload(storagePath, bytes, {
+      contentType: mimeType,
       upsert: false
     });
 
@@ -523,7 +592,7 @@ export async function POST(request: NextRequest) {
       user_id: userId,
       title,
       category: filingSuggestion.category,
-      kind: kindFromMimeType(attachment.mimeType),
+      kind: kindFromMimeType(mimeType),
       size_label: sizeLabel,
       room_id: filingSuggestion.roomId,
       room_name: filingSuggestion.roomName,
@@ -532,7 +601,7 @@ export async function POST(request: NextRequest) {
       storage_bucket: DOCUMENT_BUCKET,
       storage_path: storagePath,
       original_file_name: attachment.name,
-      mime_type: attachment.mimeType,
+      mime_type: mimeType,
       extraction_summary: "Forwarded into DiaryDock by email. Please review the details before relying on them.",
       extracted_text: null,
       action_items: [],
@@ -577,7 +646,7 @@ export async function POST(request: NextRequest) {
           subject,
           sender,
           fileName: attachment.name,
-          mimeType: attachment.mimeType,
+          mimeType,
           size: attachment.size,
           reason: filingSuggestion.reason,
           confidence: filingSuggestion.confidence

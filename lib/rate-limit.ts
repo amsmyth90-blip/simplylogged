@@ -116,8 +116,16 @@ function parseRateLimitRow(value: unknown): RateLimitRpcRow | null {
 export async function checkSharedRateLimit(
   supabase: SupabaseClient,
   key: string,
-  options: RateLimitOptions
+  options: RateLimitOptions,
+  failureMode: "memory" | "deny" = "memory",
 ): Promise<RateLimitResult> {
+  const onFailure = () => failureMode === "deny"
+    ? { allowed: false, remaining: 0, retryAfterSeconds: 60 }
+    : checkRateLimit(key, options);
+
+  if (key.length > 256) {
+    return { allowed: false, remaining: 0, retryAfterSeconds: 60 };
+  }
   try {
     const { data, error } = await supabase.rpc("check_rate_limit", {
       bucket_key: key,
@@ -126,12 +134,12 @@ export async function checkSharedRateLimit(
     });
 
     if (error) {
-      return checkRateLimit(key, options);
+      return onFailure();
     }
 
     const row = parseRateLimitRow(data);
     if (!row) {
-      return checkRateLimit(key, options);
+      return onFailure();
     }
 
     return {
@@ -140,6 +148,6 @@ export async function checkSharedRateLimit(
       retryAfterSeconds: Math.max(0, row.retry_after_seconds)
     };
   } catch {
-    return checkRateLimit(key, options);
+    return onFailure();
   }
 }

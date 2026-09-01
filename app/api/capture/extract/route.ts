@@ -21,7 +21,7 @@ import {
   getCaptureSecurityScanner,
   inspectCaptureFile
 } from "@/lib/capture/file-security";
-import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_PAGE_COUNT = 12;
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "You must be signed in to use document capture." }, { status: 401 });
   }
 
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("api:capture:extract", user.id), {
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("api:capture:extract", user.id), {
     limit: 20,
     windowMs: 10 * 60 * 1000
   });

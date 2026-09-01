@@ -330,6 +330,8 @@ Automated tests reject unknown event names and sensitive payload keys; legal/coo
 
 Phases covered: 16, 19, 20, 21.
 
+Status: complete. The canonical repository security scan reported eight validated issues; all were fixed before release and the linked empty database passed 51 cross-user/RLS checks with clean schema lint. Production CSP no longer permits `unsafe-eval`; nonce/SRI conversion was not adopted because the installed Next.js guidance makes nonce CSP all-dynamic and SRI remains experimental. The architecture, product, security and completion documents now describe implemented facts and explicit deferrals.
+
 ### Work
 
 - Run full authorization, RLS, upload, AI, token, rate-limit, audit, privacy, and account-deletion review.

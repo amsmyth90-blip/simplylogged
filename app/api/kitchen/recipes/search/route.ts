@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import type { KitchenRecipe } from "@/lib/kitchen-recipes";
-import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { correctRecipeSearchQuery } from "@/lib/recipe-search";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "You must be signed in to search recipes." }, { status: 401 });
   }
 
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("api:kitchen:recipe-search", user.id), {
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("api:kitchen:recipe-search", user.id), {
     limit: 60,
     windowMs: 10 * 60 * 1000
   });

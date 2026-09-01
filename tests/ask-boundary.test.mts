@@ -28,7 +28,7 @@ test("Ask is bounded, private, rate-limited and does not log questions", async (
   const retrieval = await readFile(retrievalPath, "utf8");
   assert.match(route, /status: 401/);
   assert.match(route, /Cache-Control": "private, no-store, max-age=0"/);
-  assert.match(route, /checkSharedRateLimit/);
+  assert.match(route, /checkServerRateLimit/);
   assert.match(route, /question\.length < 2 \|\| question\.length > 300/);
   assert.match(route, /contentLength > 4_096/);
   assert.match(retrieval, /Math\.min\(limit, 8\)/);

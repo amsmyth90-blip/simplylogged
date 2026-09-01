@@ -8,7 +8,7 @@ export {
   sanitizeDocumentFileName,
   validateDocumentUpload
 } from "@/lib/document-rules";
-import { DOCUMENT_BUCKET, sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
+import { sanitizeDocumentFileName, validateDocumentUpload } from "@/lib/document-rules";
 
 export function validateDocumentFile(file: File) {
   return validateDocumentUpload(file);
@@ -18,26 +18,20 @@ export async function uploadPrivateDocument(file: File, documentId: string) {
   const validationError = validateDocumentFile(file);
   if (validationError) throw new Error(validationError);
 
-  const client = getSupabaseBrowserClient();
-  if (!client) throw new Error("Secure document storage is not available in this session.");
-
-  const {
-    data: { user },
-    error: userError
-  } = await client.auth.getUser();
-
-  if (userError || !user) throw new Error("Please sign in again before saving this document.");
-
-  const safeName = sanitizeDocumentFileName(file.name || "document");
-  const storagePath = `${user.id}/${documentId}/${safeName || "document"}`;
-  const { error } = await client.storage.from(DOCUMENT_BUCKET).upload(storagePath, file, {
-    contentType: file.type,
-    upsert: false
+  const response = await fetch("/api/documents/upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": file.type,
+      "X-DiaryDock-Document-Id": documentId,
+      "X-DiaryDock-File-Name": encodeURIComponent(file.name || "document"),
+    },
+    body: file,
   });
-
-  if (error) throw new Error(error.message);
-
-  return { bucket: DOCUMENT_BUCKET, path: storagePath };
+  const payload = await response.json().catch((): Record<string, unknown> => ({}));
+  if (!response.ok || typeof payload.path !== "string" || typeof payload.bucket !== "string") {
+    throw new Error(typeof payload.error === "string" ? payload.error : "DiaryDock could not securely store this document.");
+  }
+  return { bucket: payload.bucket, path: payload.path };
 }
 
 export async function openPrivateDocument(bucket: string | undefined, path: string | undefined) {
@@ -45,7 +39,8 @@ export async function openPrivateDocument(bucket: string | undefined, path: stri
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Secure document viewing is not available in this session.");
 
-  const { data, error } = await client.storage.from(bucket).createSignedUrl(path, 60);
+  const downloadName = sanitizeDocumentFileName(path.split("/").pop() || "diarydock-document");
+  const { data, error } = await client.storage.from(bucket).createSignedUrl(path, 60, { download: downloadName });
   if (error || !data?.signedUrl) throw new Error(error?.message ?? "Unable to open this document.");
 
   window.open(data.signedUrl, "_blank", "noopener,noreferrer");

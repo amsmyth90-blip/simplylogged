@@ -1,7 +1,8 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { checkSharedRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
+import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 type DeletionRequestBody = {
@@ -33,10 +34,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "You must be signed in to request account deletion." }, { status: 401 });
   }
 
+  if (!hasRecentAuthentication(user.last_sign_in_at)) {
+    return NextResponse.json(
+      { error: "For your security, sign out and sign in again before requesting account deletion.", code: "RECENT_AUTH_REQUIRED" },
+      { status: 403 },
+    );
+  }
+
   const requestHeaders = await headers();
   const clientIp = getForwardedClientIp(requestHeaders);
-  const rateLimit = await checkSharedRateLimit(
-    supabase,
+  const rateLimit = await checkServerRateLimit(
     createRateLimitKey("account:deletion:request", user.id, clientIp),
     { limit: 4, windowMs: 60 * 60 * 1000 }
   );

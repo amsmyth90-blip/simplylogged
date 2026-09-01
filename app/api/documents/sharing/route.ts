@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { resourceVisibilities, type ResourceVisibility } from "@/lib/resource-access";
+import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -65,6 +66,12 @@ export async function POST(request: Request) {
   const { supabase, user } = await authenticatedClient();
   if (!user) {
     return NextResponse.json({ error: "Please sign in again to change sharing." }, { status: 401 });
+  }
+  if (!hasRecentAuthentication(user.last_sign_in_at)) {
+    return NextResponse.json(
+      { error: "For your security, sign out and sign in again before changing document access.", code: "RECENT_AUTH_REQUIRED" },
+      { status: 403 },
+    );
   }
 
   const { error } = await supabase.rpc("set_document_sharing", {

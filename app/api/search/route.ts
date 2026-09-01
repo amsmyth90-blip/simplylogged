@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { loadAuthorizedSearchCandidates } from "@/lib/search/authorized";
 import { filterAndRankSearchResults, searchCategories, searchDateFilters, type SearchCategory, type SearchDateFilter } from "@/lib/search/results";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const requestedCategory = url.searchParams.get("category") || "all";
   const requestedDate = url.searchParams.get("date") || "all";
   if (!searchCategories.includes(requestedCategory as SearchCategory) || !searchDateFilters.includes(requestedDate as SearchDateFilter)) return NextResponse.json({ error: "Choose valid search filters." }, { status: 400 });
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("search", authData.user.id), { limit: 90, windowMs: 5 * 60 * 1000 });
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("search", authData.user.id), { limit: 90, windowMs: 5 * 60 * 1000 });
   if (!rateLimit.allowed) return NextResponse.json({ error: "Search is busy. Please wait a moment and try again." }, { status: 429 });
 
   const authorized = await loadAuthorizedSearchCandidates(supabase, authData.user.id);

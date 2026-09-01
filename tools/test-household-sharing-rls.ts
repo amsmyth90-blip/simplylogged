@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { assertDisposableRlsTarget } from "./household-sharing-rls-safety.ts";
@@ -109,13 +109,13 @@ async function joinHousehold(owner: Actor, member: Actor) {
   assertNo(accepted.error, `accept ${member.label} invite`);
 }
 
-async function createDocument(owner: Actor, label: string, trackedPaths: string[]) {
+async function createDocument(admin: Client, owner: Actor, label: string, trackedPaths: string[]) {
   const id = randomUUID();
   const storagePath = `${owner.userId}/${id}/${label}.pdf`;
   const title = `RLS ${label} ${id.slice(0, 8)}`;
   const pdf = Buffer.from(`%PDF-1.1\n% DiaryDock RLS ${label}\n%%EOF\n`, "utf8");
 
-  const uploaded = await owner.client.storage.from(BUCKET).upload(storagePath, pdf, {
+  const uploaded = await admin.storage.from(BUCKET).upload(storagePath, pdf, {
     contentType: "application/pdf",
     upsert: false,
   });
@@ -281,6 +281,64 @@ async function main() {
     await joinHousehold(owner, selected);
     await joinHousehold(owner, householdOnly);
     await joinHousehold(owner, removed);
+
+    const publicLimiter = await testClient(url, anonKey).rpc("check_rate_limit", {
+      bucket_key: createHash("sha256").update(randomUUID()).digest("hex"),
+      max_requests: 1,
+      window_seconds: 60,
+    });
+    addCheck(
+      checks,
+      "anonymous callers cannot write arbitrary shared rate-limit buckets",
+      Boolean(publicLimiter.error),
+      publicLimiter.error?.message,
+    );
+
+    const ownerDeletionPreparation = await admin.rpc("prepare_account_deletion", {
+      input_user_id: owner.userId,
+    });
+    const householdAfterBlockedDeletion = await admin
+      .from("households")
+      .select("id")
+      .eq("id", ownerHousehold.data)
+      .maybeSingle();
+    addCheck(
+      checks,
+      "owner deletion is blocked while another active household member exists",
+      Boolean(ownerDeletionPreparation.error) && householdAfterBlockedDeletion.data?.id === ownerHousehold.data,
+      ownerDeletionPreparation.error?.message,
+    );
+
+    const actionRequestId = randomUUID();
+    const insertedAction = await owner.client.from("action_requests").insert({
+      id: actionRequestId,
+      user_id: owner.userId,
+      action_type: "create_reminder",
+      risk_level: "low",
+      status: "proposed",
+      title: "RLS audit test",
+      summary: "Verify atomic action completion auditing.",
+      proposed_payload: {},
+      requested_by: "system",
+    });
+    assertNo(insertedAction.error, "create action request for audit test");
+    const finalizedAction = await owner.client.rpc("finalize_action_request", {
+      input_action_request_id: actionRequestId,
+      input_decision: "approve",
+      input_completed: true,
+    });
+    const completedAudit = await admin
+      .from("audit_events")
+      .select("id")
+      .eq("action_request_id", actionRequestId)
+      .eq("event_type", "ACTION_COMPLETED");
+    addCheck(
+      checks,
+      "action completion and its audit event commit through one database RPC",
+      !finalizedAction.error && (completedAudit.data ?? []).length === 1,
+      finalizedAction.error?.message ?? completedAudit.error?.message,
+    );
+
     const unrelatedHousehold = await unrelated.client.rpc("ensure_user_household");
     assertNo(unrelatedHousehold.error, "create unrelated household");
     addCheck(
@@ -289,13 +347,13 @@ async function main() {
       Boolean(ownerHousehold.data && unrelatedHousehold.data && ownerHousehold.data !== unrelatedHousehold.data),
     );
 
-    const privateDocument = await createDocument(owner, "private", storagePaths);
+    const privateDocument = await createDocument(admin, owner, "private", storagePaths);
     documents.push(privateDocument);
-    const selectedDocument = await createDocument(owner, "selected", storagePaths);
+    const selectedDocument = await createDocument(admin, owner, "selected", storagePaths);
     documents.push(selectedDocument);
-    const householdDocument = await createDocument(owner, "household", storagePaths);
+    const householdDocument = await createDocument(admin, owner, "household", storagePaths);
     documents.push(householdDocument);
-    const revokedDocument = await createDocument(owner, "revoked", storagePaths);
+    const revokedDocument = await createDocument(admin, owner, "revoked", storagePaths);
     documents.push(revokedDocument);
 
     await setSharing(owner, privateDocument, "PRIVATE");
@@ -312,6 +370,41 @@ async function main() {
     await checkDocumentAccess(checks, selected, selectedDocument, true, "selected members");
     await checkDocumentAccess(checks, householdOnly, selectedDocument, false, "selected members");
     await checkDocumentAccess(checks, unrelated, selectedDocument, false, "selected members");
+
+    const directOwnerUploadPath = `${owner.userId}/${randomUUID()}/bypass.pdf`;
+    storagePaths.push(directOwnerUploadPath);
+    const directOwnerUpload = await owner.client.storage.from(BUCKET).upload(
+      directOwnerUploadPath,
+      Buffer.from("%PDF-1.1\n%%EOF\n", "utf8"),
+      { contentType: "application/pdf", upsert: false },
+    );
+    addCheck(
+      checks,
+      "authenticated clients cannot bypass server-side file inspection",
+      Boolean(directOwnerUpload.error),
+      directOwnerUpload.error?.message,
+    );
+
+    const clonedDocumentId = randomUUID();
+    const clonedPath = await selected.client.from("documents").insert({
+      id: clonedDocumentId,
+      user_id: selected.userId,
+      title: "Cloned path attempt",
+      category: "Test",
+      kind: "PDF",
+      size_label: "1 KB",
+      storage_bucket: BUCKET,
+      storage_path: selectedDocument.storagePath,
+      original_file_name: "clone.pdf",
+      mime_type: "application/pdf",
+      review_status: "reviewed",
+    });
+    addCheck(
+      checks,
+      "shared recipient cannot bind another owner's storage path to their own document",
+      Boolean(clonedPath.error),
+      clonedPath.error?.message,
+    );
 
     await checkDocumentAccess(checks, owner, householdDocument, true, "whole household");
     await checkDocumentAccess(checks, selected, householdDocument, true, "whole household");

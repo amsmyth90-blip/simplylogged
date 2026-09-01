@@ -37,7 +37,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "That suggestion decision was not valid." }, { status: 400 });
   }
 
-  const now = new Date().toISOString();
   const { data: existing, error: existingError } = await auth.supabase
     .from("action_requests")
     .select("id, action_type, title, proposed_payload, source_document_id")
@@ -79,24 +78,13 @@ export async function POST(request: Request) {
   }
 
   const { data, error } = await auth.supabase
-    .from("action_requests")
-    .update(decision === "approve"
-      ? { status: completed ? "completed" : "approved", confirmed_at: now, completed_at: completed ? now : null, cancelled_at: null }
-      : { status: "dismissed", cancelled_at: now })
-    .eq("id", proposalId)
-    .eq("user_id", auth.user.id)
-    .eq("status", "proposed")
-    .select("id, status")
-    .maybeSingle();
+    .rpc("finalize_action_request", {
+      input_action_request_id: proposalId,
+      input_decision: decision,
+      input_completed: completed,
+    })
+    .single();
   if (error) return NextResponse.json({ error: "That suggestion could not be updated." }, { status: 500 });
   if (!data) return NextResponse.json({ error: "That suggestion is no longer waiting for a decision." }, { status: 409 });
-  if (completed) {
-    await auth.supabase.from("audit_events").insert({
-      user_id: auth.user.id,
-      event_type: "ACTION_COMPLETED",
-      action_request_id: proposalId,
-      metadata: { actionType: "create_reminder" }
-    });
-  }
   return NextResponse.json({ proposal: data });
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { hashPhysicalSecret, physicalLookupPattern, physicalSecretPattern } from "@/lib/physical-links";
-import { checkSharedRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 function privateRedirect(url: URL) {
@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ publ
   const supabase = await getSupabaseServerClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) return privateRedirect(login);
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("physical-link:resolve", authData.user.id, getForwardedClientIp(request.headers)), { limit: 30, windowMs: 5 * 60 * 1000 });
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("physical-link:resolve", authData.user.id, getForwardedClientIp(request.headers)), { limit: 30, windowMs: 5 * 60 * 1000 });
   const unavailable = new URL("/physical-link-unavailable", request.url);
   if (!rateLimit.allowed) return privateRedirect(unavailable);
   const { publicId, secret } = await params;

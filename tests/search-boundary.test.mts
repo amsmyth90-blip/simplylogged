@@ -26,5 +26,5 @@ test("search responses are private and fail closed when signed out", async () =>
   const source = await readFile(routePath, "utf8");
   assert.match(source, /status: 401/);
   assert.match(source, /Cache-Control": "private, no-store, max-age=0"/);
-  assert.match(source, /checkSharedRateLimit/);
+  assert.match(source, /checkServerRateLimit/);
 });
