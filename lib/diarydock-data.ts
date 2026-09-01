@@ -384,6 +384,12 @@ export const initialSettingGroups: SettingGroup[] = [
         hint: "Use the secure password reset flow",
         href: "/forgot-password",
       },
+      {
+        kind: "link",
+        label: "Product analytics",
+        hint: "Off by default; choose what to share",
+        href: "/analytics-privacy",
+      },
     ],
   },
   {

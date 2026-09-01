@@ -313,6 +313,8 @@ Nothing transfers by inheritance from household/home association alone; every in
 
 Phases covered: 18 and part of 17/20.
 
+Status: implemented as first-party, opt-in analytics using the existing Supabase project. Collection is off by default, event names and exact enum-only payloads are centrally typed and revalidated by the API and database, events expire after 90 days, and opting out deletes the account's product events. Questions, record content, filenames, contact details, identifiers, Vault material and audit contents are structurally excluded. Initial real funnel hooks cover onboarding, Organisation Score, Guardian actions, Physical Links and Ask DiaryDock; the full catalogue is ready for remaining first-use/subscription producers.
+
 ### Work
 
 - Decide provider, consent, region, retention, deletion, and subscription identifiers.

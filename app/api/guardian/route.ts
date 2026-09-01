@@ -171,5 +171,6 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (error) return NextResponse.json({ error: "That Guardian item could not be updated." }, { status: 500 });
   if (!data) return NextResponse.json({ error: "That Guardian item is no longer waiting." }, { status: 409 });
+  try { await auth.supabase.rpc("record_product_analytics_event", { input_event_name: "first_guardian_action", input_properties: { action: decision.toUpperCase() } }); } catch { /* Analytics never blocks a Guardian choice. */ }
   return NextResponse.json({ finding: data });
 }

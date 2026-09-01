@@ -50,5 +50,7 @@ export async function POST(request: Request) {
     }
   }
 
+  try { await supabase.rpc("record_product_analytics_event", { input_event_name: "first_ai_question", input_properties: { surface: "ASK" } }); } catch { /* Analytics never blocks an answer. */ }
+
   return NextResponse.json({ answer, citations: cited.map((citation) => ({ id: citation.id, category: citation.category, title: citation.title, detail: citation.detail, href: citation.href, dueAt: citation.dueAt, badge: citation.badge })), usedAI }, { headers: privateHeaders });
 }

@@ -13,6 +13,7 @@ import {
 import { estateAreas } from "@/lib/mock-data";
 import { calculateOrganisationScore, isLifeCheckComplete } from "@/lib/organisation-score";
 import type { ApplicabilityAnswer, HomeTenureAnswer, LifeCheckState } from "@/lib/diarydock-data";
+import { PRODUCT_ANALYTICS_EVENTS, trackProductAnalytics } from "@/lib/product-analytics";
 
 const householdChoices = [
   { value: "Just me", title: "Just me", detail: "A private DiaryDock for your own life admin.", icon: "heart" },
@@ -139,6 +140,7 @@ export function OnboardingWorkspace() {
         }
       };
     });
+    void trackProductAnalytics(PRODUCT_ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {});
     router.push("/dashboard");
   };
 

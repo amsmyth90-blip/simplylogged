@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { UiIcon } from "@/components/UiIcon";
 import type { ApplicabilityAnswer, HomeTenureAnswer, LifeCheckState } from "@/lib/diarydock-data";
 import { calculateOrganisationScore, isLifeCheckComplete } from "@/lib/organisation-score";
+import { organisationScoreBand, PRODUCT_ANALYTICS_EVENTS, trackProductAnalytics } from "@/lib/product-analytics";
 
 const answerLabels: Record<Exclude<ApplicabilityAnswer, "not-set">, string> = { yes: "Yes", no: "No / not applicable" };
 
@@ -14,6 +16,10 @@ export function LifeCheckWorkspace() {
   const { state, updateState } = useDiaryDockData();
   const lifeCheck = state.onboarding.lifeCheck;
   const result = calculateOrganisationScore(state);
+
+  useEffect(() => {
+    void trackProductAnalytics(PRODUCT_ANALYTICS_EVENTS.ORGANISATION_SCORE_VIEWED, { scoreBand: organisationScoreBand(result.score) });
+  }, [result.score]);
 
   const updateAnswer = <K extends keyof Omit<LifeCheckState, "completedAt">>(key: K, value: LifeCheckState[K]) => {
     updateState((current) => {

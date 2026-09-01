@@ -24,6 +24,7 @@ import {
   loadHouseholdDirectory,
   type HouseholdDirectory
 } from "@/lib/household-sharing";
+import { PRODUCT_ANALYTICS_EVENTS, trackProductAnalytics } from "@/lib/product-analytics";
 
 type DiaryDockDataContextValue = {
   repositoryMode: RepositoryMode;
@@ -86,6 +87,12 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [repository]);
+
+  useEffect(() => {
+    if (hydrated && repository.mode === "supabase") {
+      void trackProductAnalytics(PRODUCT_ANALYTICS_EVENTS.RETURN_SESSION, {});
+    }
+  }, [hydrated, repository]);
 
   const refreshHousehold = useCallback(async (reloadState = false) => {
     if (repository.mode !== "supabase") {

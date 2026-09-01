@@ -10,7 +10,7 @@ export default function CookiePolicyPage() {
       eyebrow="Cookies"
       title="Cookie Policy"
       subtitle="How DiaryDock uses cookies and local storage."
-      effectiveDate="17 August 2026"
+      effectiveDate="1 September 2026"
       sections={[
         {
           title: "Essential cookies",
@@ -30,7 +30,8 @@ export default function CookiePolicyPage() {
           title: "Analytics and advertising",
           body: [
             "DiaryDock does not currently use advertising cookies, third-party marketing pixels, or cross-app tracking.",
-            "If analytics or non-essential cookies are added later, DiaryDock should add a consent flow where required and update this policy before release."
+            "Optional first-party product analytics is off by default and can be enabled or disabled from Product analytics in Settings. It does not use a cross-site identifier or advertising cookie. Turning it off deletes your stored product events.",
+            "Opted-in events use your authenticated DiaryDock account only to deduplicate first-use events and honour deletion, and automatically expire after 90 days. Questions, document content, filenames, names, contact details, policy numbers, Vault material and security audit contents are not analytics properties."
           ]
         },
         {

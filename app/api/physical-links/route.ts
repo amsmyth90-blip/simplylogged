@@ -78,6 +78,9 @@ export async function POST(request: Request) {
       ? await auth.supabase.rpc("create_asset_physical_link", { input_asset_id: assetId, input_name: shortText(body.name, 120) || "Physical tag", input_public_id: token.publicId, input_secret_hash: token.secretHash, input_expires_at: optionalDate(body.expiresAt) })
       : await auth.supabase.rpc("replace_asset_physical_link", { input_link_id: linkId, input_public_id: token.publicId, input_secret_hash: token.secretHash });
     if (result.error) return NextResponse.json({ error: "That physical link could not be created." }, { status: 400 });
+    if (operation === "CREATE_LINK") {
+      try { await auth.supabase.rpc("record_product_analytics_event", { input_event_name: "first_nfc_link", input_properties: { resourceType: "ASSET" } }); } catch { /* Analytics never blocks a tag. */ }
+    }
     return NextResponse.json({ link: { id: result.data, path: physicalLinkPath(token.publicId, token.secret) } }, { status: 201 });
   }
 
