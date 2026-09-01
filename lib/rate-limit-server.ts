@@ -21,5 +21,16 @@ export async function checkServerRateLimit(
     return checkRateLimit(key, options);
   }
 
-  return checkSharedRateLimit(getSupabaseAdminClient(), key, options, "deny");
+  const admin = getSupabaseAdminClient();
+  const result = await checkSharedRateLimit(admin, key, options, "deny");
+
+  // Cleanup is deliberately rare so the hot rate-limit path stays an indexed upsert.
+  if (Math.random() < 0.0002) {
+    await Promise.all([
+      admin.rpc("cleanup_rate_limit_buckets"),
+      admin.rpc("cleanup_document_upload_reservations"),
+    ]).catch(() => undefined);
+  }
+
+  return result;
 }

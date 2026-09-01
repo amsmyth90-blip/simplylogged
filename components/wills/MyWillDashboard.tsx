@@ -13,7 +13,7 @@ import {
   WillSectionHeading,
   formatWillDate
 } from "@/components/wills/WillUi";
-import { openPrivateDocument, uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
+import { analysePrivateDocument, openPrivateDocument, uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
 import type { DiaryDockAppState } from "@/lib/diarydock-data";
 import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
@@ -44,13 +44,9 @@ function readableFileSize(bytes: number) {
   return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-async function analyseWillFile(file: File) {
-  const formData = new FormData();
-  formData.append("files", file);
-  formData.append("analysisMode", "will");
-  const response = await fetch("/api/capture/extract", { method: "POST", body: formData });
-  const payload = (await response.json().catch(() => null)) as { willAnalysis?: WillDocumentAnalysis; error?: string } | null;
-  if (!response.ok || !payload?.willAnalysis) throw new Error(payload?.error ?? "The document could not be analysed.");
+async function analyseWillFile(stored: { bucket: string; path: string }) {
+  const payload = await analysePrivateDocument<{ willAnalysis?: WillDocumentAnalysis; error?: string }>(stored, "will");
+  if (!payload.willAnalysis) throw new Error(payload.error ?? "The document could not be analysed.");
   return payload.willAnalysis;
 }
 
@@ -179,7 +175,7 @@ export function MyWillDashboard() {
 
       setUploadStage("processing");
       try {
-        const analysis = await analyseWillFile(selectedFile);
+        const analysis = await analyseWillFile(storedFile);
         const analysedDocument: VaultDocument = {
           ...nextDocument,
           extractionSummary: analysis.overview,
@@ -315,7 +311,7 @@ export function MyWillDashboard() {
             <label className="block">
               <span className="text-sm font-semibold text-[#20352a]">Will file</span>
               <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,application/pdf,image/jpeg,image/png,image/webp,image/heic" onChange={(event) => { const file = event.target.files?.[0] ?? null; setSelectedFile(file); setMessage(file ? validateDocumentFile(file) ?? "" : ""); }} className="mt-2 block min-h-12 w-full rounded-[15px] border border-dashed border-[#6f8e72]/45 bg-[#f8f8f2] px-3 py-3 text-sm text-[#59655d] file:mr-3 file:rounded-full file:border-0 file:bg-[#dde6d8] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#294436] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]" />
-              <span className="mt-1.5 block text-[11px] leading-4 text-[#758078]">PDF, JPEG, PNG, WebP or HEIC, up to 10 MB.</span>
+              <span className="mt-1.5 block text-[11px] leading-4 text-[#758078]">PDF, JPEG, PNG, WebP or HEIC, up to 4 MB.</span>
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block"><span className="text-sm font-semibold text-[#20352a]">Copy type</span><select value={versionStatus} onChange={(event) => setVersionStatus(event.target.value as WillVersionStatus)} className="mt-2 min-h-12 w-full rounded-[15px] border border-[#20352a]/10 bg-white px-3 text-sm text-[#20352a] outline-none focus:border-[#6f8e72]"><option value="signed">Signed copy</option><option value="draft">Draft</option></select></label>

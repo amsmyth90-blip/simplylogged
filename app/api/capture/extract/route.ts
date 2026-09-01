@@ -22,9 +22,28 @@ import {
   inspectCaptureFile
 } from "@/lib/capture/file-security";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
+import { isOwnedStoredDocument, type StoredDocumentReference } from "@/lib/document-upload";
+import { MAX_DOCUMENT_BYTES } from "@/lib/document-rules";
+import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
+const MAX_FILE_SIZE = MAX_DOCUMENT_BYTES;
+const MAX_LEGACY_REQUEST_BYTES = 4 * 1024 * 1024;
 const MAX_PAGE_COUNT = 12;
+
+type AnalysisMode = "document" | "will" | "bill" | "insurance" | "receipt";
+type CaptureFile = Pick<File, "size" | "type" | "arrayBuffer">;
+
+function getAnalysisMode(value: unknown): AnalysisMode {
+  return value === "will" || value === "bill" || value === "insurance" || value === "receipt"
+    ? value
+    : "document";
+}
+
+function isStoredReference(value: unknown): value is StoredDocumentReference {
+  if (typeof value !== "object" || value === null) return false;
+  const record = value as Record<string, unknown>;
+  return typeof record.bucket === "string" && typeof record.path === "string";
+}
 
 function getVisionModel() {
   return process.env.OPENAI_VISION_MODEL || "gpt-5";
@@ -68,12 +87,36 @@ export async function POST(request: Request) {
     );
   }
 
-  const formData = await request.formData();
-  const requestedMode = formData.get("analysisMode");
-  const analysisMode = requestedMode === "will" || requestedMode === "bill" || requestedMode === "insurance" || requestedMode === "receipt" ? requestedMode : "document";
-  const uploadedPages = formData.getAll("files").filter((entry): entry is File => entry instanceof File);
-  const legacyFile = formData.get("file");
-  const files = uploadedPages.length ? uploadedPages : legacyFile instanceof File ? [legacyFile] : [];
+  let analysisMode: AnalysisMode = "document";
+  let files: CaptureFile[] = [];
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    if (!isSupabaseAdminConfigured()) {
+      return NextResponse.json({ error: "Secure document analysis is not configured." }, { status: 503 });
+    }
+    const body = await request.json().catch(() => null) as { analysisMode?: unknown; storedFiles?: unknown } | null;
+    analysisMode = getAnalysisMode(body?.analysisMode);
+    const storedFiles = Array.isArray(body?.storedFiles) ? body.storedFiles.filter(isStoredReference) : [];
+    if (!storedFiles.length || storedFiles.length > MAX_PAGE_COUNT || storedFiles.some((file) => !isOwnedStoredDocument(user.id, file))) {
+      return NextResponse.json({ error: "The stored document reference is invalid." }, { status: 400 });
+    }
+    const admin = getSupabaseAdminClient();
+    const downloads = await Promise.all(storedFiles.map(async (reference) => {
+      const { data, error } = await admin.storage.from(reference.bucket).download(reference.path);
+      return error || !data ? null : data;
+    }));
+    if (downloads.some((file) => !file)) {
+      return NextResponse.json({ error: "One of the stored document pages could not be loaded." }, { status: 404 });
+    }
+    files = downloads.filter((file): file is Blob => Boolean(file));
+  } else {
+    const formData = await request.formData();
+    analysisMode = getAnalysisMode(formData.get("analysisMode"));
+    const uploadedPages = formData.getAll("files").filter((entry): entry is File => entry instanceof File);
+    const legacyFile = formData.get("file");
+    files = uploadedPages.length ? uploadedPages : legacyFile instanceof File ? [legacyFile] : [];
+  }
 
   if (!files.length) {
     return NextResponse.json({ error: "Please upload at least one document page." }, { status: 400 });
@@ -84,7 +127,11 @@ export async function POST(request: Request) {
   }
 
   if (files.some((file) => file.size > MAX_FILE_SIZE)) {
-    return NextResponse.json({ error: "One of the pages is too large. Please keep each page under 8 MB." }, { status: 400 });
+    return NextResponse.json({ error: "One of the pages is too large. Please keep each page under 4 MB." }, { status: 400 });
+  }
+
+  if (!contentType.includes("application/json") && files.reduce((total, file) => total + file.size, 0) > MAX_LEGACY_REQUEST_BYTES) {
+    return NextResponse.json({ error: "Please keep the combined document pages under 4 MB." }, { status: 400 });
   }
 
   const inspectedFiles = await Promise.all(

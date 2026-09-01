@@ -75,14 +75,16 @@ test("keeps shared rate-limit writes behind the service role", async () => {
 
 test("routes browser and email uploads through byte inspection and the scanner boundary", async () => {
   const browserStorage = await source("../lib/document-storage.ts");
-  assert.match(browserStorage, /fetch\("\/api\/documents\/upload"/);
+  assert.match(browserStorage, /fetch\("\/api\/documents\/uploads\/prepare"/);
+  assert.match(browserStorage, /uploadToSignedUrl/);
+  assert.match(browserStorage, /fetch\("\/api\/documents\/uploads\/commit"/);
   assert.doesNotMatch(browserStorage, /\.storage\.from\(DOCUMENT_BUCKET\)\.upload/);
 
-  const uploadRoute = await source("../app/api/documents/upload/route.ts");
-  assert.match(uploadRoute, /readBoundedBody/);
-  assert.match(uploadRoute, /inspectCaptureFile/);
-  assert.match(uploadRoute, /getCaptureSecurityScanner\(\)\.scan/);
-  assert.match(uploadRoute, /getSupabaseAdminClient\(\)\.storage/);
+  const commitRoute = await source("../app/api/documents/uploads/commit/route.ts");
+  assert.match(commitRoute, /DOCUMENT_QUARANTINE_BUCKET/);
+  assert.match(commitRoute, /inspectCaptureFile/);
+  assert.match(commitRoute, /getCaptureSecurityScanner\(\)\.scan/);
+  assert.match(commitRoute, /\.from\(DOCUMENT_BUCKET\)[\s\S]*\.upload/);
 
   const emailRoute = await source("../app/api/import/email/route.ts");
   assert.match(emailRoute, /hasCompleteResendSignature/);

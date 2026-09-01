@@ -16,6 +16,7 @@ import {
 } from "@/components/bills/BillsUi";
 import { formatBillDate, formatMoney } from "@/lib/bill-records";
 import {
+  analysePrivateDocument,
   openPrivateDocument,
   uploadPrivateDocument,
 } from "@/lib/document-storage";
@@ -466,17 +467,10 @@ function NewPolicy() {
     const id = crypto.randomUUID();
     try {
       const stored = await uploadPrivateDocument(file, id);
-      const form = new FormData();
-      form.append("analysisMode", "insurance");
-      form.append("files", file);
-      const response = await fetch("/api/capture/extract", {
-        method: "POST",
-        body: form,
-      });
-      const payload = (await response.json()) as {
+      const payload = await analysePrivateDocument<{
         insuranceAnalysis?: InsuranceDocumentAnalysis;
         error?: string;
-      };
+      }>(stored, "insurance");
       const a = payload.insuranceAnalysis;
       const now = new Date().toISOString();
       const doc: VaultDocument = {
@@ -571,7 +565,7 @@ function NewPolicy() {
         <BillsSectionTitle
           icon="camera"
           title="Upload a policy document"
-          detail="PDF, JPEG, PNG, WebP or HEIC · up to 10 MB"
+          detail="PDF, JPEG, PNG, WebP or HEIC · up to 4 MB"
         />
         <label className="mt-5 flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-[20px] border border-dashed border-[#6f8e72]/45 bg-[#f7f7f1] px-5 text-center">
           <UiIcon name="plus" className="h-8 w-8 text-[#52705a]" />

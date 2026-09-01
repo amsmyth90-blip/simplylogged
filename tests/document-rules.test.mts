@@ -43,7 +43,7 @@ test("rejects empty, oversized and unsupported uploads", () => {
   );
   assert.equal(
     validateDocumentUpload({ type: "application/pdf", size: MAX_DOCUMENT_BYTES + 1 }),
-    "Please choose a file smaller than 10 MB.",
+    "Please choose a file no larger than 4 MB.",
   );
   assert.equal(
     validateDocumentUpload({ type: "application/pdf", size: 0 }),

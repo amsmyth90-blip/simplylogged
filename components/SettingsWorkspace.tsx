@@ -15,7 +15,13 @@ import { estateAreas, vaultSecurity } from "@/lib/mock-data";
 type ProfileDraft = {
   name: string;
   email: string;
-  plan: string;
+};
+
+type StorageSummary = {
+  tier: string;
+  usedBytes: number;
+  reservedBytes: number;
+  limitBytes: number;
 };
 
 type DataModalMode = "profile" | "export" | "delete" | null;
@@ -43,9 +49,9 @@ export function SettingsWorkspace() {
   const [forwardingAddress, setForwardingAddress] = useState<ForwardingAddressState>({ status: "loading" });
   const [profileDraft, setProfileDraft] = useState<ProfileDraft>({
     name: profileState.name,
-    email: profileState.email,
-    plan: profileState.plan
+    email: profileState.email
   });
+  const [storageSummary, setStorageSummary] = useState<StorageSummary | null>(null);
   const reviewQueue = state.vaultDocuments.filter((document) => document.reviewStatus === "needs-review");
   const emailedReviewQueue = reviewQueue.filter(
     (document) =>
@@ -103,6 +109,18 @@ export function SettingsWorkspace() {
     };
   }, []);
 
+  useEffect(() => {
+    if (repositoryMode !== "supabase") return;
+    let cancelled = false;
+    void fetch("/api/storage/summary", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() as Promise<StorageSummary> : null)
+      .then((summary) => {
+        if (!cancelled && summary) setStorageSummary(summary);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [repositoryMode]);
+
   const copyForwardingAddress = async () => {
     if (forwardingAddress.status !== "ready") return;
 
@@ -117,8 +135,7 @@ export function SettingsWorkspace() {
     setRequestMessage(null);
     setProfileDraft({
       name: profileState.name,
-      email: profileState.email,
-      plan: profileState.plan
+      email: profileState.email
     });
   };
 
@@ -182,15 +199,14 @@ export function SettingsWorkspace() {
   const saveProfile = () => {
     const name = profileDraft.name.trim();
     const email = profileDraft.email.trim();
-    const plan = profileDraft.plan.trim();
 
-    if (!name || !email || !plan) {
+    if (!name || !email) {
       return;
     }
 
     updateState((current) => ({
       ...current,
-      settingsProfile: { ...current.settingsProfile, name, email, plan }
+      settingsProfile: { ...current.settingsProfile, name, email }
     }));
     closeModal();
   };
@@ -246,7 +262,7 @@ export function SettingsWorkspace() {
             <h2 className="text-lg font-semibold tracking-tight text-ink">{profileState.name}</h2>
             <p className="mt-0.5 truncate text-sm text-ink/55">{profileState.email}</p>
             <p className="mt-1 text-xs text-ink/45">
-              {profileState.plan} - Member since {profileState.memberSince}
+              Member since {profileState.memberSince}
             </p>
           </div>
           <button
@@ -257,6 +273,23 @@ export function SettingsWorkspace() {
             Edit
           </button>
         </section>
+
+        {storageSummary ? (
+          <section className="estate-sheet p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-ink">Document storage</p>
+                <p className="mt-1 text-xs text-ink/50">
+                  {(storageSummary.usedBytes / 1024 / 1024).toFixed(1)} MB used of {storageSummary.limitBytes >= 1024 * 1024 * 1024 ? `${(storageSummary.limitBytes / 1024 / 1024 / 1024).toFixed(0)} GB` : `${Math.round(storageSummary.limitBytes / 1024 / 1024)} MB`}
+                </p>
+              </div>
+              <span className="rounded-full bg-sage/55 px-3 py-1 text-xs font-semibold capitalize text-moss">{storageSummary.tier}</span>
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-ink/10" aria-label="Document storage used">
+              <div className="h-full rounded-full bg-moss" style={{ width: `${Math.min(100, (storageSummary.usedBytes / storageSummary.limitBytes) * 100)}%` }} />
+            </div>
+          </section>
+        ) : null}
 
         <section className="space-y-3">
           <SectionHeader title="Dashboard areas" hint="Show only the parts of DiaryDock that are useful to you" />
@@ -636,15 +669,6 @@ export function SettingsWorkspace() {
               type="email"
               value={profileDraft.email}
               onChange={(event) => setProfileDraft((current) => ({ ...current, email: event.target.value }))}
-              className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
-            />
-          </label>
-          <label className="block space-y-2">
-            <span className="text-sm font-semibold text-ink">Plan label</span>
-            <input
-              type="text"
-              value={profileDraft.plan}
-              onChange={(event) => setProfileDraft((current) => ({ ...current, plan: event.target.value }))}
               className="w-full rounded-2xl border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition focus:border-moss"
             />
           </label>

@@ -22,6 +22,7 @@ import {
 } from "@/lib/correspondence-records";
 import type { DocumentExtractionResult } from "@/lib/document-extraction";
 import {
+  analysePrivateDocument,
   openPrivateDocument,
   uploadPrivateDocument,
 } from "@/lib/document-storage";
@@ -436,17 +437,11 @@ function NewCorrespondence() {
     const id = crypto.randomUUID();
     try {
       const stored = await uploadPrivateDocument(file, id);
-      const form = new FormData();
-      form.append("files", file);
-      const response = await fetch("/api/capture/extract", {
-        method: "POST",
-        body: form,
-      });
-      const payload = (await response.json()) as {
+      const payload = await analysePrivateDocument<{
         extraction?: DocumentExtractionResult;
         error?: string;
-      };
-      if (!response.ok || !payload.extraction)
+      }>(stored);
+      if (!payload.extraction)
         throw new Error(payload.error || "The letter could not be read.");
       const extraction = payload.extraction;
       const now = new Date().toISOString();
@@ -544,7 +539,7 @@ function NewCorrespondence() {
         <BillsSectionTitle
           icon="camera"
           title="Scan or upload a letter"
-          detail="PDF, JPEG, PNG, WebP or HEIC · up to 10 MB"
+          detail="PDF, JPEG, PNG, WebP or HEIC · up to 4 MB"
         />
         <label className="mt-5 flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-[20px] border border-dashed border-[#6f8e72]/45 bg-[#f7f7f1] px-5 text-center focus-within:ring-2 focus-within:ring-[#6f8e72]">
           <UiIcon name="plus" className="h-7 w-7 text-[#52705a]" />

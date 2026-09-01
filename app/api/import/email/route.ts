@@ -472,6 +472,7 @@ export async function POST(request: NextRequest) {
   const sender = asString(payload.from) || asString(payload.sender) || "Forwarded email";
   const saved: { id: string; title: string }[] = [];
   const skippedDuplicates: { id: string; title: string }[] = [];
+  const skippedStorageLimit: { title: string }[] = [];
 
   for (const attachment of attachments.slice(0, 12)) {
     const validationError = validateDocumentUpload({ type: attachment.mimeType, size: attachment.size });
@@ -512,7 +513,7 @@ export async function POST(request: NextRequest) {
       sender,
       attachment
     });
-    const storagePath = `${userId}/${documentId}/${safeName}`;
+    let storagePath = `${userId}/${documentId}/${safeName}`;
     const fingerprint = createLifeInboxFingerprint({
       userId,
       sourceType: "email",
@@ -578,12 +579,40 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
+    const { data: reservationData, error: reservationError } = await supabase.rpc("reserve_document_upload", {
+      input_user_id: userId,
+      input_document_id: documentId,
+      input_safe_name: safeName,
+      input_mime_type: mimeType,
+      input_expected_bytes: attachment.size,
+    });
+    if (reservationError) {
+      if (reservationError.message.includes("STORAGE_LIMIT_EXCEEDED")) {
+        skippedStorageLimit.push({ title });
+        continue;
+      }
+      return NextResponse.json({ error: "DiaryDock could not reserve storage for a forwarded file." }, { status: 500 });
+    }
+    const reservation = (Array.isArray(reservationData) ? reservationData[0] : reservationData) as {
+      reservation_id?: string;
+      final_path?: string;
+    } | null;
+    if (!reservation?.reservation_id || !reservation.final_path) {
+      return NextResponse.json({ error: "DiaryDock could not reserve storage for a forwarded file." }, { status: 500 });
+    }
+    storagePath = reservation.final_path;
+
     const { error: uploadError } = await supabase.storage.from(DOCUMENT_BUCKET).upload(storagePath, bytes, {
       contentType: mimeType,
       upsert: false
     });
 
     if (uploadError && !isDuplicateError(uploadError)) {
+      await supabase.rpc("finish_document_upload", {
+        input_user_id: userId,
+        input_reservation_id: reservation.reservation_id,
+        input_commit: false,
+      });
       return NextResponse.json({ error: "DiaryDock could not securely store one of the forwarded files." }, { status: 500 });
     }
 
@@ -621,11 +650,37 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       if (isDuplicateError(insertError)) {
+        await supabase.rpc("finish_document_upload", {
+          input_user_id: userId,
+          input_reservation_id: reservation.reservation_id,
+          input_commit: true,
+        });
         skippedDuplicates.push({ id: documentId, title });
         continue;
       }
 
+      await Promise.all([
+        supabase.storage.from(DOCUMENT_BUCKET).remove([storagePath]),
+        supabase.rpc("finish_document_upload", {
+          input_user_id: userId,
+          input_reservation_id: reservation.reservation_id,
+          input_commit: false,
+        }),
+      ]);
       return NextResponse.json({ error: "DiaryDock could not save the forwarded document record." }, { status: 500 });
+    }
+
+    const { data: reservationFinished, error: reservationFinishError } = await supabase.rpc("finish_document_upload", {
+      input_user_id: userId,
+      input_reservation_id: reservation.reservation_id,
+      input_commit: true,
+    });
+    if (reservationFinishError || reservationFinished !== true) {
+      await Promise.all([
+        supabase.from("documents").delete().eq("user_id", userId).eq("id", documentId),
+        supabase.storage.from(DOCUMENT_BUCKET).remove([storagePath]),
+      ]);
+      return NextResponse.json({ error: "DiaryDock could not confirm storage for a forwarded file." }, { status: 500 });
     }
 
     const { error: inboxInsertError } = await supabase.from("life_inbox_items").upsert(
@@ -664,12 +719,16 @@ export async function POST(request: NextRequest) {
   }
 
   if (!saved.length && skippedDuplicates.length) {
-    return NextResponse.json({ ok: true, saved, skippedDuplicates });
+    return NextResponse.json({ ok: true, saved, skippedDuplicates, skippedStorageLimit });
+  }
+
+  if (!saved.length && skippedStorageLimit.length) {
+    return NextResponse.json({ ok: true, saved, skippedDuplicates, skippedStorageLimit, storageLimitReached: true });
   }
 
   if (!saved.length) {
     return NextResponse.json({ error: "No supported PDF or image attachments were found." }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, saved, skippedDuplicates });
+  return NextResponse.json({ ok: true, saved, skippedDuplicates, skippedStorageLimit });
 }

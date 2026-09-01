@@ -10,6 +10,9 @@ import type { Reminder, VaultDocument } from "@/lib/mock-data";
 import type { ResourceVisibility } from "@/lib/resource-access";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
+const MAX_BOOTSTRAP_DOCUMENTS = 2_000;
+const MAX_BOOTSTRAP_REMINDERS = 5_000;
+
 function stringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
@@ -87,8 +90,8 @@ export async function GET() {
       .eq("household_id", householdId)
       .eq("status", "pending")
       .order("created_at", { ascending: true }),
-    supabase.from("documents").select("*").order("updated_at", { ascending: false }),
-    supabase.from("reminders").select("*").order("updated_at", { ascending: false }),
+    supabase.from("documents").select("*").order("updated_at", { ascending: false }).limit(MAX_BOOTSTRAP_DOCUMENTS + 1),
+    supabase.from("reminders").select("*").order("updated_at", { ascending: false }).limit(MAX_BOOTSTRAP_REMINDERS + 1),
     supabase
       .from("document_permissions")
       .select("document_id, subject_name")
@@ -113,6 +116,13 @@ export async function GET() {
           "DiaryDock data could not be loaded.",
       },
       { status: 500 },
+    );
+  }
+
+  if ((documentsResult.data?.length ?? 0) > MAX_BOOTSTRAP_DOCUMENTS || (remindersResult.data?.length ?? 0) > MAX_BOOTSTRAP_REMINDERS) {
+    return NextResponse.json(
+      { error: "This account has more records than DiaryDock can safely load at once. Please contact support so we can migrate it without hiding any data." },
+      { status: 507 },
     );
   }
 

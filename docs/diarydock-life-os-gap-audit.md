@@ -96,7 +96,7 @@ The migration set is not consolidated into `supabase/schema.sql`; a new environm
 
 ### Storage
 
-- `diarydock-documents` is private, limited to 10 MB, and restricts declared MIME types.
+- `diarydock-documents` is private, limited to 4 MB, and restricts declared MIME types.
 - object names use `{auth.user.id}/{documentId}/{sanitisedName}`;
 - storage RLS restricts a user to their prefix;
 - signed preview/open links currently last 300/60 seconds;

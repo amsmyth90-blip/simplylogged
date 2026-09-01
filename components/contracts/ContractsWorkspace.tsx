@@ -23,6 +23,7 @@ import {
   type ContractStatus,
 } from "@/lib/contract-records";
 import {
+  analysePrivateDocument,
   openPrivateDocument,
   uploadPrivateDocument,
 } from "@/lib/document-storage";
@@ -656,17 +657,10 @@ function NewContract() {
     const id = crypto.randomUUID();
     try {
       const stored = await uploadPrivateDocument(file, id);
-      const form = new FormData();
-      form.append("analysisMode", "bill");
-      form.append("files", file);
-      const response = await fetch("/api/capture/extract", {
-        method: "POST",
-        body: form,
-      });
-      const payload = (await response.json()) as {
+      const payload = await analysePrivateDocument<{
         billAnalysis?: BillDocumentAnalysis;
         error?: string;
-      };
+      }>(stored, "bill");
       const analysis = payload.billAnalysis;
       const now = new Date().toISOString();
       const contract: ContractRecord = {
@@ -774,7 +768,7 @@ function NewContract() {
         <BillsSectionTitle
           icon="camera"
           title="Upload a contract document"
-          detail="PDF, JPEG, PNG, WebP or HEIC · up to 10 MB"
+          detail="PDF, JPEG, PNG, WebP or HEIC · up to 4 MB"
         />
         <label className="mt-5 flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-[20px] border border-dashed border-[#6f8e72]/45 bg-[#f7f7f1] px-5 text-center focus-within:ring-2 focus-within:ring-[#6f8e72]">
           <UiIcon name="plus" className="h-7 w-7 text-[#52705a]" />

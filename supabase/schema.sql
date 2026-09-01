@@ -39,7 +39,7 @@ values (
   'diarydock-documents',
   'diarydock-documents',
   false,
-  10485760,
+  4194304,
   array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf']
 )
 on conflict (id) do update

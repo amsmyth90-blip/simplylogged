@@ -1,5 +1,5 @@
 export const DOCUMENT_BUCKET = "diarydock-documents";
-export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+export const MAX_DOCUMENT_BYTES = 4 * 1024 * 1024;
 export const ACCEPTED_DOCUMENT_TYPES = [
   "application/pdf",
   "image/jpeg",
@@ -34,7 +34,7 @@ export function validateDocumentUpload(input: { type: string; size: number }) {
     return "Choose a PDF, JPEG, PNG, WebP or HEIC file.";
   }
   if (input.size > MAX_DOCUMENT_BYTES) {
-    return "Please choose a file smaller than 10 MB.";
+    return "Please choose a file no larger than 4 MB.";
   }
   if (input.size === 0) {
     return "This file is empty. Please choose another file.";

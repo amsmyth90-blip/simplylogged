@@ -25,6 +25,7 @@ import {
   type HouseholdDirectory
 } from "@/lib/household-sharing";
 import { PRODUCT_ANALYTICS_EVENTS, trackProductAnalytics } from "@/lib/product-analytics";
+import { createCoalescedSaver } from "@/lib/coalesced-save";
 
 type DiaryDockDataContextValue = {
   repositoryMode: RepositoryMode;
@@ -53,6 +54,10 @@ async function loadServerBootstrap() {
 
 export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
   const repository = useMemo(() => createDiaryDockRepository(), []);
+  const stateSaver = useMemo(
+    () => createCoalescedSaver<DiaryDockAppState>((next) => repository.save(next)),
+    [repository],
+  );
   const [state, setState] = useState<DiaryDockAppState>(createInitialDiaryDockState);
   const [household, setHousehold] = useState<HouseholdDirectory | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -94,6 +99,25 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     }
   }, [hydrated, repository]);
 
+  useEffect(() => {
+    const flushWhenHidden = () => {
+      if (document.visibilityState === "hidden") {
+        void stateSaver.flush().catch(() => undefined);
+      }
+    };
+    const flushBeforeLeaving = () => {
+      void stateSaver.flush().catch(() => undefined);
+    };
+
+    document.addEventListener("visibilitychange", flushWhenHidden);
+    window.addEventListener("pagehide", flushBeforeLeaving);
+    return () => {
+      document.removeEventListener("visibilitychange", flushWhenHidden);
+      window.removeEventListener("pagehide", flushBeforeLeaving);
+      void stateSaver.flush().catch(() => undefined).finally(() => stateSaver.dispose());
+    };
+  }, [stateSaver]);
+
   const refreshHousehold = useCallback(async (reloadState = false) => {
     if (repository.mode !== "supabase") {
       return household;
@@ -118,13 +142,13 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     return nextHousehold;
   }, [household, repository]);
 
-  const updateState = (updater: (current: DiaryDockAppState) => DiaryDockAppState) => {
+  const updateState = useCallback((updater: (current: DiaryDockAppState) => DiaryDockAppState) => {
     setState((current) => {
       const next = updater(current);
-      void repository.save(next).catch(() => undefined);
+      stateSaver.schedule(next);
       return next;
     });
-  };
+  }, [stateSaver]);
 
   return (
     <DiaryDockDataContext.Provider
