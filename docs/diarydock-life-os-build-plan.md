@@ -98,6 +98,8 @@ No supported household member can access a resource solely because it appears in
 
 Phases covered: 2, immediate part of 3, 16, and 20.
 
+Status: in progress. General capture now verifies binary signatures, uses a replaceable scanner and provider boundary, creates an owner-scoped durable capture job, stores only a minimal proposed-field summary, and records user confirmation against the saved document. The review-before-save UX remains enforced and 55 automated tests pass. A production malware-scanner adapter, durable pre-validation quarantine, PDF page rendering in general capture, and final-confirmation integration for the specialist bill/policy/will/vehicle-receipt screens remain.
+
 ### Work
 
 - Introduce durable capture jobs: received, validated, quarantined/scanning, extracting, needs review, confirmed, rejected, failed.

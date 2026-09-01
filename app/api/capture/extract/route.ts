@@ -15,7 +15,12 @@ import {
 } from "@/lib/bill-document-analysis";
 import { insuranceDocumentAnalysisSchema, type InsuranceDocumentAnalysis } from "@/lib/insurance-document-analysis";
 import { receiptDocumentAnalysisSchema, type ReceiptDocumentAnalysis } from "@/lib/receipt-document-analysis";
-import { createVisionJsonResponse, type VisionJsonSchema } from "@/lib/brain/provider-adapters/openai";
+import { getCaptureAnalysisProvider } from "@/lib/capture/provider";
+import {
+  captureScannerIsRequired,
+  getCaptureSecurityScanner,
+  inspectCaptureFile
+} from "@/lib/capture/file-security";
 import { checkSharedRateLimit, createRateLimitKey } from "@/lib/rate-limit";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -25,16 +30,9 @@ function getVisionModel() {
   return process.env.OPENAI_VISION_MODEL || "gpt-5";
 }
 
-function getMimeType(file: File) {
-  if (file.type) {
-    return file.type;
-  }
-
-  return "image/jpeg";
-}
-
 export async function POST(request: Request) {
-  if (!process.env.OPENAI_API_KEY) {
+  const provider = getCaptureAnalysisProvider();
+  if (!provider) {
     return NextResponse.json(
       { error: "OPENAI_API_KEY is not configured on the server yet." },
       { status: 503 }
@@ -89,11 +87,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "One of the pages is too large. Please keep each page under 8 MB." }, { status: 400 });
   }
 
-  const dataUrls = await Promise.all(
+  const inspectedFiles = await Promise.all(
     files.map(async (file) => {
       const buffer = Buffer.from(await file.arrayBuffer());
-      return `data:${getMimeType(file)};base64,${buffer.toString("base64")}`;
+      const inspection = inspectCaptureFile({ declaredMimeType: file.type, bytes: buffer });
+      return { buffer, inspection };
     })
+  );
+  const invalidFile = inspectedFiles.find((entry) => !entry.inspection.ok);
+  if (invalidFile && !invalidFile.inspection.ok) {
+    return NextResponse.json({ error: invalidFile.inspection.error }, { status: 400 });
+  }
+
+  const safeFiles = inspectedFiles.map((entry) => ({
+    bytes: entry.buffer,
+    mimeType: entry.inspection.ok ? entry.inspection.detectedMimeType : "application/octet-stream"
+  }));
+  const scanResult = await getCaptureSecurityScanner().scan(safeFiles);
+  if (scanResult.status === "BLOCKED" || (captureScannerIsRequired() && scanResult.status !== "PASSED")) {
+    return NextResponse.json(
+      { error: "This document could not pass the configured security check." },
+      { status: 422 }
+    );
+  }
+
+  const captureJobId = crypto.randomUUID();
+  const { error: jobError } = await supabase.from("capture_jobs").insert({
+    id: captureJobId,
+    user_id: user.id,
+    status: "EXTRACTING",
+    analysis_mode: analysisMode,
+    page_count: files.length,
+    detected_mime_types: safeFiles.map((file) => file.mimeType),
+    security_scan_status: scanResult.status,
+    scanner_name: scanResult.scanner,
+    provider_name: provider.name
+  });
+  if (jobError) {
+    return NextResponse.json({ error: "DiaryDock could not start a secure capture job." }, { status: 503 });
+  }
+
+  const dataUrls = safeFiles.map(
+    (file) => `data:${file.mimeType};base64,${Buffer.from(file.bytes).toString("base64")}`
   );
   const documentPrompt = [
     "You are extracting structured details from a photographed household document for a mobile app called DiaryDock.",
@@ -185,69 +220,65 @@ export async function POST(request: Request) {
               ? "diarydock_vehicle_receipt_analysis"
               : "diarydock_document_extraction";
 
+    const completeJob = async (result: Record<string, unknown>) => {
+      const proposedFields = {
+        title: typeof result.title === "string" ? result.title : undefined,
+        category: typeof result.category === "string" ? result.category : undefined,
+        suggestedRoom: typeof result.suggestedRoom === "string" ? result.suggestedRoom : undefined,
+        detectedDocumentType:
+          typeof result.detectedDocumentType === "string" ? result.detectedDocumentType : undefined,
+        dueDate: typeof result.dueDate === "string" ? result.dueDate : undefined,
+        confidence: typeof result.confidence === "number" ? result.confidence : undefined,
+        source: "uploaded_document",
+        userConfirmed: false
+      };
+      await supabase
+        .from("capture_jobs")
+        .update({ status: "NEEDS_REVIEW", proposed_fields: proposedFields })
+        .eq("id", captureJobId);
+    };
+
     if (analysisMode === "will") {
-      return NextResponse.json({
-        willAnalysis: await createVisionJsonResponse<WillDocumentAnalysis>({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: getVisionModel(),
-          prompt,
-          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
-          schemaName,
-          schema: schema as VisionJsonSchema
-        })
-      });
-    }
-
-    if (analysisMode === "bill") {
-      return NextResponse.json({
-        billAnalysis: await createVisionJsonResponse<BillDocumentAnalysis>({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: getVisionModel(),
-          prompt,
-          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
-          schemaName,
-          schema: schema as VisionJsonSchema
-        })
-      });
-    }
-
-    if (analysisMode === "insurance") {
-      return NextResponse.json({
-        insuranceAnalysis: await createVisionJsonResponse<InsuranceDocumentAnalysis>({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: getVisionModel(),
-          prompt,
-          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
-          schemaName,
-          schema: schema as VisionJsonSchema
-        })
-      });
-    }
-
-    if (analysisMode === "receipt") {
-      return NextResponse.json({
-        receiptAnalysis: await createVisionJsonResponse<ReceiptDocumentAnalysis>({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: getVisionModel(),
-          prompt,
-          pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
-          schemaName,
-          schema: schema as VisionJsonSchema
-        })
-      });
-    }
-
-    return NextResponse.json({
-      extraction: await createVisionJsonResponse<DocumentExtractionResult>({
-        apiKey: process.env.OPENAI_API_KEY,
+      const willAnalysis = await provider.analyse<WillDocumentAnalysis>({
         model: getVisionModel(),
         prompt,
         pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })),
         schemaName,
-        schema: schema as VisionJsonSchema
-      })
-    });
+        schema
+      });
+      await completeJob(willAnalysis as unknown as Record<string, unknown>);
+      return NextResponse.json({
+        captureJobId,
+        willAnalysis
+      });
+    }
+
+    if (analysisMode === "bill") {
+      const billAnalysis = await provider.analyse<BillDocumentAnalysis>({ model: getVisionModel(), prompt, pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })), schemaName, schema });
+      await completeJob(billAnalysis as unknown as Record<string, unknown>);
+      return NextResponse.json({ captureJobId, billAnalysis });
+    }
+
+    if (analysisMode === "insurance") {
+      const insuranceAnalysis = await provider.analyse<InsuranceDocumentAnalysis>({ model: getVisionModel(), prompt, pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })), schemaName, schema });
+      await completeJob(insuranceAnalysis as unknown as Record<string, unknown>);
+      return NextResponse.json({ captureJobId, insuranceAnalysis });
+    }
+
+    if (analysisMode === "receipt") {
+      const receiptAnalysis = await provider.analyse<ReceiptDocumentAnalysis>({ model: getVisionModel(), prompt, pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })), schemaName, schema });
+      await completeJob(receiptAnalysis as unknown as Record<string, unknown>);
+      return NextResponse.json({ captureJobId, receiptAnalysis });
+    }
+
+    const extraction = await provider.analyse<DocumentExtractionResult>({ model: getVisionModel(), prompt, pages: dataUrls.map((imageUrl) => ({ imageUrl, detail: "high" })), schemaName, schema });
+    await completeJob(extraction as unknown as Record<string, unknown>);
+    return NextResponse.json({ captureJobId, extraction });
   } catch (error) {
+    await supabase
+      .from("capture_jobs")
+      .update({ status: "FAILED", failure_code: "PROVIDER_FAILURE" })
+      .eq("id", captureJobId);
     const message = error instanceof Error ? error.message : "Unable to analyze the document right now.";
     return NextResponse.json({ error: message }, { status: 500 });
   }

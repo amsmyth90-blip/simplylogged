@@ -206,11 +206,11 @@ Dependencies: security/audit contracts, stable member identifiers, server-side a
 | Feature | Status | What exists / gap / security implication |
 |---|---|---|
 | Camera/photo/image capture | `PARTIAL` | Multi-page photographed image capture exists; the general capture picker does not accept PDF despite storage supporting it. Feature-specific upload flows also exist. |
-| Upload validation | `PARTIAL` | Size, page count, filename, and declared MIME checks exist. File signatures, quarantine, malware scanning, and security scan status do not. |
+| Upload validation | `PARTIAL` | Size, page count, filename, declared MIME, and binary-signature checks exist. The scanner interface and durable security status are present, but the default honestly reports scanner unavailability; production malware scanning and pre-validation quarantine remain. |
 | OCR/classification/extraction | `PARTIAL` | AI vision supplies text, room/category suggestions, dates and confidence. Requested extensible document classes and per-field provenance/confirmation are absent. |
-| Provider abstraction | `PARTIAL` | One OpenAI adapter exists, but business prompts and provider payload assumptions remain in route code. |
+| Provider abstraction | `PARTIAL` | Capture analysis now uses a provider-neutral interface with OpenAI as the current adapter. Business prompts remain in the route and should move into versioned classifiers as automatic record proposals are added. |
 | Confidence and review | `PARTIAL` | The post-audit slice adds explicit editable confirmation before persistence. Per-field `{value, confidence, source, userConfirmed}` facts and durable capture jobs remain outstanding. |
-| Processing job lifecycle | `MISSING` | No durable upload/job/quarantine/extraction/review/confirmation state machine exists. |
+| Processing job lifecycle | `PARTIAL` | Owner-scoped `capture_jobs` persist extraction, review, confirmation and failure states without retaining original bytes or OCR text. Earlier received/validated/quarantine persistence and specialist-workflow confirmation links remain. |
 
 Dependencies: private file policy, capture job schema, provider interface, provenance/facts, and explicit confirmation UI.
 
@@ -386,7 +386,7 @@ Executed on 31 August 2026:
 | Addressed in first slice | Emergency “trusted person” wording exceeded implementation | The screen is now clearly an owner account preview pending a real trusted-contact grant flow. |
 | P1 | Display-name document permissions are not authorization identities | Migrate to membership/user IDs and recipient-aware RLS/file access. |
 | P1 | Life OS tables are disconnected owner-only scaffolding | Add services, constraints, household-aware policies, and migration adapters before depending on them. |
-| P1 | Upload trust is based on declared MIME and direct AI processing | Add signature inspection, quarantine/scan adapter, and safe failure states. |
+| Partially addressed | Upload trust is based on declared MIME and direct AI processing | Binary signatures, a replaceable scanner boundary, provider abstraction and durable safe failure states are implemented. A real malware-scanner adapter and quarantine storage still remain. |
 | Resolved | No negative database authorization tests | A fail-closed five-actor Supabase harness now verifies document and storage allow/deny paths, removal, and cleanup. |
 | P2 | CSP permits unsafe script execution modes | Review nonce/hashing feasibility after current Next.js guidance and deployed behaviour are measured. |
 

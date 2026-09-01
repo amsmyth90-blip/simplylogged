@@ -140,6 +140,7 @@ async function readCaptureApiPayload(response: Response) {
   if (contentType.includes("application/json")) {
     return (await response.json()) as {
       extraction?: DocumentExtractionResult;
+      captureJobId?: string;
       error?: string;
     };
   }
@@ -183,6 +184,7 @@ export function DocumentCaptureWorkspace() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [draft, setDraft] = useState<DocumentExtractionResult | null>(null);
   const [savedDocumentId, setSavedDocumentId] = useState<string | null>(null);
+  const [captureJobId, setCaptureJobId] = useState<string | null>(null);
   const [processingStage, setProcessingStage] = useState<
     "idle" | "preparing" | "reading" | "organising" | "review" | "saving" | "complete" | "error"
   >("idle");
@@ -201,6 +203,7 @@ export function DocumentCaptureWorkspace() {
   const resetResults = () => {
     setDraft(null);
     setSavedDocumentId(null);
+    setCaptureJobId(null);
     setErrorMessage(null);
     setCreateReminder(false);
     setReminderTimeLabel("This week");
@@ -349,6 +352,13 @@ export function DocumentCaptureWorkspace() {
       if (repositoryMode === "supabase") {
         await upsertStructuredDocument(nextDocument);
         if (nextReminder) await upsertStructuredReminder(nextReminder);
+        if (captureJobId) {
+          await fetch("/api/capture/jobs/confirm", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ captureJobId, documentId })
+          });
+        }
       }
 
       setSavedDocumentId(documentId);
@@ -392,6 +402,7 @@ export function DocumentCaptureWorkspace() {
       const shouldCreateReminder = Boolean(extraction.reminderTitle);
       const nextReminderTime = extraction.reminderTimeLabel || "This week";
       setDraft(extraction);
+      setCaptureJobId(payload.captureJobId ?? null);
       setCreateReminder(shouldCreateReminder);
       setReminderTimeLabel(nextReminderTime);
       setPendingOriginalFiles(files);
