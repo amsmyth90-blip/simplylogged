@@ -152,21 +152,17 @@ export function EmergencyWorkspace(props: EmergencyWorkspaceProps) {
           heroImage="/images/pages/emergency-hero.webp"
           heroPosition="center 44%"
           heroTone="linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(95,24,20,0.12) 42%, rgba(47,28,24,0.5) 100%)"
-          badge="Reassurance ready"
+          badge="Owner view"
           action={
             <div className="flex items-center gap-2">
               <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
                 {repositoryMode === "supabase" ? "Secure sync" : "Local session"}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/14 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur-md">
-                <UiIcon name="check" className="h-3.5 w-3.5 text-white" />
-                Reviewed today
-              </span>
               <Link
                 href="/emergency/access"
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/18 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-white/24"
               >
-                Limited view
+                Trusted access
               </Link>
             </div>
           }
@@ -353,16 +349,16 @@ export function EmergencyWorkspace(props: EmergencyWorkspaceProps) {
             <UiIcon name="lock" className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-ink">Sealed documents ready</p>
+            <p className="text-sm font-semibold text-ink">Manage trusted emergency access</p>
             <p className="mt-0.5 text-xs leading-5 text-ink/55">
-              {emergencyDocuments.length} approved records are available in the limited emergency view.
+              Choose a trusted person and share only specific approved items.
             </p>
           </div>
           <Link
             href="/emergency/access"
             className="shrink-0 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-ink/90"
           >
-            Open
+            Manage
           </Link>
         </section>
       </div>

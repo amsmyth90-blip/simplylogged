@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           body: [
             "To store and organise your documents, show reminders, and route items to the correct room in your digital home.",
             "When you choose to use AI document, photo, recipe, noticeboard, bill, receipt, will, insurance, kitchen reading, or Ask DiaryDock, the content you submit is sent to our AI provider, OpenAI, solely to provide that feature. Ask DiaryDock sends your question with no more than eight relevant, stripped-down record summaries; it does not send your full account, raw documents, private notes, or contact details. Under OpenAI's API terms, content submitted through the API is not used to train their models. AI results can be incomplete or wrong, so DiaryDock asks you to check linked records before relying on important details.",
-            "To operate family sharing and Emergency Access Mode exactly as you configure them, and to respond to support requests.",
+            "To operate family sharing and trusted Emergency Access exactly as you configure them, including checking that an invitation is accepted by the email address you selected, and to respond to support requests.",
             "We do not sell your personal data, and we do not use your documents or photos for advertising."
           ]
         },
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
           title: "Security",
           body: [
             "DiaryDock uses account authentication, database-level row security so accounts can only see their own records, and private file storage by default.",
-            "Documents are private unless you choose to share them with an invited family member or mark them visible in Emergency Access Mode. Emergency Access Mode only ever shows the specific records you have approved for that purpose."
+            "Documents are private unless you choose to share them with an invited family member or explicitly grant a trusted person emergency access. Trusted Emergency Access only shows the individual records you selected, is read-only, and can be revoked."
           ]
         },
         {

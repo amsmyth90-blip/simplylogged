@@ -256,6 +256,8 @@ Every factual DiaryDock answer cites an authorized record; inaccessible records 
 
 Phases covered: 11, 16, 17, and 20.
 
+Status: implemented. Trusted contacts are separate from household members and use expiring, email-bound, one-time invitations. Owners grant individual approved documents, instructions, contacts or home facts after recent authentication; grants are read-only, independently revocable and audited. Selected files use short-lived signed URLs with an active-grant storage policy. Vault, complete-account and automatic inactivity/legacy release are explicitly excluded.
+
 ### Work
 
 - Model trusted contacts separately from household membership.

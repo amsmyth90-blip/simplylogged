@@ -71,7 +71,7 @@ begin
       due_at, source_due_at, origin, reminder_type, source_resource_type, source_resource_id,
       source_date_key, rule_id, rule_version, dedupe_key, schedule_offset_days
     ) values (
-      'sys-' || md5(current_user_id::text || ':' || reminder_key), current_user_id, left(input_title, 240), left(input_note, 1000),
+      gen_random_uuid(), current_user_id, left(input_title, 240), left(input_note, 1000),
       input_room_id, input_room_name,
       case when reminder_at::date <= current_date then 'today' when reminder_at::date <= current_date + 7 then 'week' else 'later' end,
       case when current_offset = 0 then 'Due today' when current_offset = 1 then '1 day before' else current_offset::text || ' days before' end,
