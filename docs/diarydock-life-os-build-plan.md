@@ -282,6 +282,8 @@ Phases covered: 12 and security documentation from 21.
 
 The documents must decide browser/mobile trust boundaries, key hierarchy, authenticated encryption, derivation, device enrolment, multi-device key wrapping, recovery, password changes, lost devices, rotation, metadata leakage, backups, deletion, logout, and offline storage. They must state exactly what the server can decrypt and what happens when recovery material is lost.
 
+Status: design gate completed; implementation intentionally deferred. The source-backed threat model confirms current Vault/All Files content is private server-managed plaintext, not E2EE. The target architecture requires a separate versioned encrypted-object pilot, reviewed AEAD/KDF construction, native secure key storage and an independently signed client before claiming protection from the DiaryDock server. The recovery model uses enrolled devices or offline high-entropy recovery material and explicitly makes loss of both unrecoverable.
+
 ### Decision gate
 
 Proceed only after architecture/security approval and a reviewed library/platform choice. Implement a small versioned encrypted-object pilot with known-answer and recovery tests before migrating real content. If the current hosted-web/Capacitor model cannot provide the agreed trusted-client guarantees, document the required native/platform migration and defer E2EE.
