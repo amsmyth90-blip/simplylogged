@@ -166,6 +166,8 @@ Changing an MOT/insurance/warranty date updates only its generated reminder set;
 
 Phases covered: 4 and part of 5/20.
 
+Status: implemented for authoritative structured dates. Guardian now persists owner-scoped, versioned and deduplicated findings; reconciles expiry, renewal, service and vaccination dates from the central reminder engine; uses source time zones; and provides a calm briefing with source, resolve, dismiss and seven-day snooze controls. Boundary, daylight-saving, dedupe and migration-policy tests cover the implemented registry. Missing-link, stale-review and travel-readiness adapters remain dependent on their future authoritative module records.
+
 ### Work
 
 - Add `guardian_findings` with type, severity, resource, status, due dates, rule version, timestamps, and household scope.

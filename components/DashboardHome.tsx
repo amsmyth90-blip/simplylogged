@@ -16,6 +16,7 @@ export function DashboardHome() {
   const router = useRouter();
   const touchStartX = useRef<number | null>(null);
   const [greeting, setGreeting] = useState("Welcome");
+  const [guardianCount, setGuardianCount] = useState(0);
 
   useEffect(() => {
     const previousHtmlOverflow = document.documentElement.style.overflow;
@@ -35,6 +36,18 @@ export function DashboardHome() {
       document.documentElement.style.overflow = previousHtmlOverflow;
       document.body.style.overflow = previousBodyOverflow;
     };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/guardian", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json() as { findings?: unknown[] };
+        if (active) setGuardianCount(payload.findings?.length ?? 0);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
   }, []);
 
   const { state } = useDiaryDockData();
@@ -69,6 +82,15 @@ export function DashboardHome() {
           title: "Today",
           detail: `${activeReminderCount} action${activeReminderCount === 1 ? "" : "s"}`,
           tone: "bg-mist text-sky-700"
+        }
+      : null,
+    guardianCount > 0
+      ? {
+          href: "/guardian",
+          icon: "shield" as const,
+          title: "Guardian",
+          detail: `${guardianCount} to check`,
+          tone: "bg-[#e8efe5] text-[#52705a]"
         }
       : null
   ].filter(Boolean);
@@ -153,7 +175,7 @@ export function DashboardHome() {
           ) : null}
           <EstateDashboard />
         </section>
-        <DesktopDashboard greeting={greeting} />
+        <DesktopDashboard greeting={greeting} guardianCount={guardianCount} />
       </div>
       <BottomNav />
     </>

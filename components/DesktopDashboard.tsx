@@ -28,7 +28,7 @@ const portalLabels: Record<string, { title: string; eyebrow: string }> = {
   driveway: { title: "Plans", eyebrow: "Trips & preparation" }
 };
 
-export function DesktopDashboard({ greeting }: { greeting: string }) {
+export function DesktopDashboard({ greeting, guardianCount }: { greeting: string; guardianCount: number }) {
   const { state, hydrated } = useDiaryDockData();
   const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] || "there";
   const visibleAreas = estateAreas.filter((area) => isDashboardAreaVisible(area.id, state.onboarding));
@@ -128,10 +128,11 @@ export function DesktopDashboard({ greeting }: { greeting: string }) {
             </div>
           ) : null}
 
-          <section aria-label="DiaryDock activity" className="mx-auto mt-6 grid max-w-[1100px] grid-cols-3 divide-x divide-[#345143]/10 overflow-hidden rounded-[24px] border border-[#b89a5c]/30 bg-[#fffdf8]/90 shadow-[0_24px_55px_-42px_rgba(32,53,42,0.65)] backdrop-blur-lg">
+          <section aria-label="DiaryDock activity" className="mx-auto mt-6 grid max-w-[1430px] grid-cols-4 divide-x divide-[#345143]/10 overflow-hidden rounded-[24px] border border-[#b89a5c]/30 bg-[#fffdf8]/90 shadow-[0_24px_55px_-42px_rgba(32,53,42,0.65)] backdrop-blur-lg">
             <ActivityItem icon="file" title="Recent file" href="/files" primary={latestDocument?.title || "No files yet"} secondary={latestDocument ? [latestDocument.kind, latestDocument.updated].filter(Boolean).join(" · ") : "Your saved documents will appear here."} />
             <ActivityItem icon="calendar" title="Next reminder" href="/reminders" primary={nextReminder?.title || "Nothing coming up"} secondary={nextReminder ? [nextReminder.timeLabel, nextReminder.roomName].filter(Boolean).join(" · ") : "Your reminder list is clear."} />
             <ActivityItem icon="alert" title="Review items" href="/review-inbox" primary={reviewDocuments.length ? `${reviewDocuments.length} ${reviewDocuments.length === 1 ? "item" : "items"} to check` : "Nothing waiting"} secondary="Check captured details before filing." />
+            <ActivityItem icon="shield" title="Guardian" href="/guardian" primary={guardianCount ? `${guardianCount} ${guardianCount === 1 ? "thing needs" : "things need"} attention` : "Everything looks settled"} secondary="A calm check of your saved dates." />
           </section>
 
           {remainingAreas.length ? (
@@ -166,7 +167,7 @@ function SpaceChip({ area }: { area: (typeof estateAreas)[number] }) {
   );
 }
 
-function ActivityItem({ icon, title, href, primary, secondary }: { icon: "file" | "calendar" | "alert"; title: string; href: string; primary: string; secondary: string }) {
+function ActivityItem({ icon, title, href, primary, secondary }: { icon: "file" | "calendar" | "alert" | "shield"; title: string; href: string; primary: string; secondary: string }) {
   return (
     <Link href={href} className="group flex min-h-[118px] items-center gap-4 px-5 py-4 transition hover:bg-[#f7f5ed] xl:px-7">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e5ecdf] text-[#54705e]"><UiIcon name={icon} className="h-[19px] w-[19px]" /></span>
