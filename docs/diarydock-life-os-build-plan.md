@@ -220,6 +220,8 @@ Unknown, tampered, expired, revoked, replaced, and unauthorized links reveal nei
 
 Phases covered: 13 and part of 14/20.
 
+Status: implemented. Search now runs through an authenticated, rate-limited server endpoint whose Supabase session applies document, reminder, asset and owner-state RLS before deterministic ranking. Minimal results cover documents, Home, vehicles, pets, travel, insurance, contacts, assets and reminders with category and date filters. Raw OCR, private notes, phone numbers, email and addresses are deliberately excluded from retrieval and results.
+
 ### Work
 
 - Define a server-side search projection/result schema with category, title, expiry, resource link, and authorization scope.
