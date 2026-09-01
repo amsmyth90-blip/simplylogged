@@ -422,6 +422,12 @@ export const initialSettingGroups: SettingGroup[] = [
         hint: "Manage private QR and NFC tags",
         href: "/physical-links",
       },
+      {
+        kind: "link",
+        label: "Home Handover",
+        hint: "Prepare a private property handover draft",
+        href: "/home-handover",
+      },
     ],
   },
   {

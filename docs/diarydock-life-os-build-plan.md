@@ -296,6 +296,8 @@ DiaryDock makes an E2EE claim only for content whose plaintext is encrypted on t
 
 Phases covered: 15 and part of 10/14/16.
 
+Status: implemented as an owner-only selection and preview foundation. Eligible appliances, boilers, equipment and narrowly classified linked property documents can be explicitly added after recent authentication. The database derives minimal previews and provenance, records redacted audit events and structurally excludes sensitive categories, emergency data and Vault. No recipient access, publishing or export exists yet.
+
 ### Work
 
 - Add explicit transferable classification to eligible property/assets facts and documents.
