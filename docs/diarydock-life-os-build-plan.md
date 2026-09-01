@@ -202,6 +202,8 @@ No pet/vehicle means exclusion, not a penalty; score changes are explainable and
 
 Phases covered: 9, completion of 10, and part of 17/20.
 
+Status: implemented for the appliance/boiler pilot. Smart items now have progressive owner/permission-aware records and Physical Links use random public lookups plus one-time secrets whose hashes alone are stored. The authenticated resolver is non-disclosing and enforces the normal resource permission function. Owners can create, rename, reassign, disable/re-enable, revoke and atomically replace QR/Web-NFC tags, with last-used metadata and successful-open audit events.
+
 ### Work
 
 - Add `physical_links` with a public lookup identifier, hashed secret/verifier, resource reference, owner/household, status, replacement chain, and last-used metadata.

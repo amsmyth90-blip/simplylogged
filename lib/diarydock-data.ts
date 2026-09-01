@@ -416,6 +416,12 @@ export const initialSettingGroups: SettingGroup[] = [
         hint: "Keep important contacts ready",
         href: "/emergency",
       },
+      {
+        kind: "link",
+        label: "Physical Links",
+        hint: "Manage private QR and NFC tags",
+        href: "/physical-links",
+      },
     ],
   },
   {
