@@ -15,6 +15,18 @@ export type Reminder = {
   assignedTo?: string;
   dueDate?: string;
   sourceNoticeId?: string;
+  dueAt?: string;
+  sourceDueAt?: string;
+  origin?: "USER_CREATED" | "SYSTEM_GENERATED";
+  reminderType?: string;
+  sourceResourceType?: string;
+  sourceResourceId?: string;
+  sourceDateKey?: string;
+  ruleId?: string;
+  ruleVersion?: number;
+  dedupeKey?: string;
+  scheduleOffsetDays?: number;
+  timeZone?: string;
 };
 
 export const remindersList: Reminder[] = [];

@@ -214,7 +214,19 @@ export async function upsertStructuredReminder(reminder: Reminder) {
       priority: reminder.priority,
       repeat: reminder.repeat ?? null,
       document_id: reminder.documentId ?? null,
-      document_title: reminder.documentTitle ?? null
+      document_title: reminder.documentTitle ?? null,
+      due_at: reminder.dueAt ?? null,
+      source_due_at: reminder.sourceDueAt ?? null,
+      origin: reminder.origin ?? "USER_CREATED",
+      reminder_type: reminder.reminderType ?? "custom",
+      source_resource_type: reminder.sourceResourceType ?? null,
+      source_resource_id: reminder.sourceResourceId ?? null,
+      source_date_key: reminder.sourceDateKey ?? null,
+      rule_id: reminder.ruleId ?? null,
+      rule_version: reminder.ruleVersion ?? null,
+      dedupe_key: reminder.dedupeKey ?? null,
+      schedule_offset_days: reminder.scheduleOffsetDays ?? null,
+      time_zone: reminder.timeZone ?? "Europe/London"
     },
     { onConflict: "id" }
   );
@@ -436,7 +448,19 @@ export async function loadStructuredDocumentsAndReminders() {
     priority: asReminderPriority(row.priority),
     repeat: row.repeat ?? undefined,
     documentId: row.document_id ?? undefined,
-    documentTitle: row.document_title ?? undefined
+    documentTitle: row.document_title ?? undefined,
+    dueAt: row.due_at ?? undefined,
+    sourceDueAt: row.source_due_at ?? undefined,
+    origin: row.origin === "SYSTEM_GENERATED" ? "SYSTEM_GENERATED" : "USER_CREATED",
+    reminderType: row.reminder_type ?? undefined,
+    sourceResourceType: row.source_resource_type ?? undefined,
+    sourceResourceId: row.source_resource_id ?? undefined,
+    sourceDateKey: row.source_date_key ?? undefined,
+    ruleId: row.rule_id ?? undefined,
+    ruleVersion: typeof row.rule_version === "number" ? row.rule_version : undefined,
+    dedupeKey: row.dedupe_key ?? undefined,
+    scheduleOffsetDays: typeof row.schedule_offset_days === "number" ? row.schedule_offset_days : undefined,
+    timeZone: row.time_zone ?? undefined
   }));
 
   const householdMembers: HouseholdMember[] = membersResult.error

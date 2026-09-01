@@ -44,10 +44,13 @@ export function CaptureProposalsWorkspace() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ proposalId, decision })
       });
-      const payload = await response.json() as { error?: string };
+      const payload = await response.json() as { error?: string; proposal?: { status?: string } };
       if (!response.ok) throw new Error(payload.error || "That suggestion could not be updated.");
       if (decision === "dismiss") {
         setProposals((current) => current.filter((proposal) => proposal.id !== proposalId));
+      } else if (payload.proposal?.status === "completed") {
+        setProposals((current) => current.filter((proposal) => proposal.id !== proposalId));
+        setMessage("The reminder schedule was created and will stay linked to its source date.");
       } else {
         setProposals((current) => current.map((proposal) => proposal.id === proposalId ? { ...proposal, status: "approved" } : proposal));
       }

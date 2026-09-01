@@ -229,6 +229,18 @@ export async function GET() {
     repeat: row.repeat ? String(row.repeat) : undefined,
     documentId: row.document_id ? String(row.document_id) : undefined,
     documentTitle: row.document_title ? String(row.document_title) : undefined,
+    dueAt: row.due_at ? String(row.due_at) : undefined,
+    sourceDueAt: row.source_due_at ? String(row.source_due_at) : undefined,
+    origin: row.origin === "SYSTEM_GENERATED" ? "SYSTEM_GENERATED" : "USER_CREATED",
+    reminderType: row.reminder_type ? String(row.reminder_type) : undefined,
+    sourceResourceType: row.source_resource_type ? String(row.source_resource_type) : undefined,
+    sourceResourceId: row.source_resource_id ? String(row.source_resource_id) : undefined,
+    sourceDateKey: row.source_date_key ? String(row.source_date_key) : undefined,
+    ruleId: row.rule_id ? String(row.rule_id) : undefined,
+    ruleVersion: typeof row.rule_version === "number" ? row.rule_version : undefined,
+    dedupeKey: row.dedupe_key ? String(row.dedupe_key) : undefined,
+    scheduleOffsetDays: typeof row.schedule_offset_days === "number" ? row.schedule_offset_days : undefined,
+    timeZone: row.time_zone ? String(row.time_zone) : undefined,
   }));
 
   const payload: DiaryDockBootstrapPayload = {

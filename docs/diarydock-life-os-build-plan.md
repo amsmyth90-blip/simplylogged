@@ -148,6 +148,8 @@ Each pilot scan can propose multiple linked actions; users can accept/reject the
 
 Phases covered: 5, part of 4 and 20.
 
+Status: in progress. Reminders now support authoritative timestamps, user/system origin, source resource/date, rule version, bounded schedule offsets and stable dedupe keys. The authenticated synchronization function safely updates date changes, removes obsolete generated offsets and preserves manual/completed reminders. Approved capture reminder proposals execute through this engine. Remaining work includes migrating legacy manual due-date labels, module update adapters, notification delivery and Guardian-generated schedules.
+
 ### Work
 
 - Add authoritative due timestamp/time zone, origin (`USER_CREATED`/`SYSTEM_GENERATED`), rule ID/version, source resource/date, and dedupe key.
