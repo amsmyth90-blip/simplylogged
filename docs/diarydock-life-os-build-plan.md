@@ -40,7 +40,7 @@ Production database migration state remains an explicit pre-deployment check bec
 
 Phases covered: 16, 17, and prerequisites for 1, 6, 9, 11, 12, 13.
 
-Status: in progress. Truthful Vault/Settings/Emergency wording and the typed deny-by-default resource contract are complete. The first persistent vertical slice now supports private, household, and selected-member document visibility using stable user IDs, an atomic sharing RPC, matching document/storage RLS, redacted share/unshare audit events, owner-only mutations, and recipient-cache isolation. The fail-closed live document/storage gate passed all 46 checks against the user-confirmed empty linked project. The migrations are applied to the linked project and the slice is deployed to production. Recent-auth, the broader audit service, and additional resource types remain.
+Status: in progress. Truthful Vault/Settings/Emergency wording and the typed deny-by-default resource contract are complete. The first persistent vertical slice now supports private, household, and selected-member document visibility using stable user IDs, an atomic sharing RPC, matching document/storage RLS, redacted share/unshare audit events, owner-only mutations, recipient-cache isolation, and a 15-minute recent-sign-in gate for household access changes. The fail-closed live document/storage gate passed all 46 checks against the user-confirmed empty linked project. The migrations are applied to the linked project and the slice is deployed to production. The broader audit service and additional resource types remain.
 
 ### Work
 
@@ -63,7 +63,7 @@ Status: in progress. Truthful Vault/Settings/Emergency wording and the typed den
 
 Phases covered: 1 and part of 17/20.
 
-Status: in progress. Ordinary documents are the first migrated resource. The reusable tables and authorization helper exist, Vault remains excluded, and document interfaces use stable household user IDs. People & Sharing now distinguishes accounts from local profiles and supports explicit Adult/Member invitations, link copy/renew/cancel, role changes, removal, safe non-owner leave into a new empty private household, rename, per-person document visibility summaries, and redacted append-only access history. The live RLS gate passed for document rows and stored files, including removal and cross-household denial. The production deployment is live and protected routes fail closed when signed out. Ownership transfer, recent-auth, invitation delivery, and migration of broad household JSON are not complete.
+Status: in progress. Ordinary documents are the first migrated resource. The reusable tables and authorization helper exist, Vault remains excluded, and document interfaces use stable household user IDs. People & Sharing now distinguishes accounts from local profiles and supports explicit Adult/Member invitations, link copy/renew/cancel, role changes, removal, safe non-owner leave into a new empty private household, rename, per-person document visibility summaries, recent-sign-in protection for access changes, and redacted append-only access history. The live RLS gate passed for document rows and stored files, including removal and cross-household denial. The production deployment is live and protected routes fail closed when signed out. Ownership transfer, invitation delivery, and migration of broad household JSON are not complete.
 
 ### Data design
 

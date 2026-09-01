@@ -5,6 +5,8 @@ Initial supported resource: non-Vault documents
 
 ## Security contract
 
+- Creating or changing invitations, roles, membership and household identity requires a sign-in within the previous 15 minutes. The API derives that timestamp from the authenticated Supabase user; the browser cannot assert it.
+
 Every document is private unless its owner explicitly changes its visibility. Authorization is decided in Postgres from the authenticated user, the document owner, active household memberships, and—when needed—a stable selected-user grant. Display names are never authorization subjects.
 
 | Visibility | Owner | Active member in same household | Selected active member | Removed or other-household user |

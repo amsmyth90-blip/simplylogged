@@ -8,6 +8,7 @@ import type {
   HouseholdInvitePreview,
   HouseholdRole,
 } from "@/lib/household-sharing";
+import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 const auditEventTypes = [
@@ -22,6 +23,17 @@ const auditEventTypes = [
   "RESOURCE_SHARED",
   "RESOURCE_UNSHARED",
 ];
+
+const recentAuthenticationActions = new Set([
+  "create-invite",
+  "create-role-invite",
+  "cancel-invite",
+  "renew-invite",
+  "update-role",
+  "remove-member",
+  "rename",
+  "leave",
+]);
 
 function textValue(value: unknown, maximumLength = 160) {
   return typeof value === "string" ? value.trim().slice(0, maximumLength) : "";
@@ -123,7 +135,6 @@ export async function GET(request: Request) {
   if (authError || !authData.user) {
     return NextResponse.json({ error: "Please sign in again to manage household access." }, { status: 401 });
   }
-
   if (view === "events") {
     const householdId = textValue(url.searchParams.get("householdId"), 80);
     const { data: currentHouseholdId, error: householdError } = await supabase.rpc("ensure_user_household");
@@ -166,6 +177,18 @@ export async function POST(request: Request) {
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
     return NextResponse.json({ error: "Please sign in again to manage household access." }, { status: 401 });
+  }
+  if (
+    recentAuthenticationActions.has(action) &&
+    !hasRecentAuthentication(authData.user.last_sign_in_at)
+  ) {
+    return NextResponse.json(
+      {
+        error: "For your security, sign out and sign in again before changing household access.",
+        code: "RECENT_AUTH_REQUIRED",
+      },
+      { status: 403 }
+    );
   }
 
   if (action === "create-invite" || action === "create-role-invite") {
