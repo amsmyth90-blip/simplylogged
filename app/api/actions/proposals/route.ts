@@ -1,0 +1,53 @@
+import { NextResponse } from "next/server";
+
+import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+async function authenticatedClient() {
+  if (!isSupabaseConfiguredServer()) return null;
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase.auth.getUser();
+  return error || !data.user ? null : { supabase, user: data.user };
+}
+
+export async function GET() {
+  const auth = await authenticatedClient();
+  if (!auth) return NextResponse.json({ error: "Please sign in again to review suggestions." }, { status: 401 });
+
+  const { data, error } = await auth.supabase
+    .from("action_requests")
+    .select("id, action_type, risk_level, status, title, summary, reason, proposed_payload, source_document_id, created_at")
+    .eq("user_id", auth.user.id)
+    .in("status", ["proposed", "approved"])
+    .order("created_at", { ascending: false })
+    .limit(30);
+  if (error) return NextResponse.json({ error: "Suggestions could not be loaded." }, { status: 500 });
+  return NextResponse.json({ proposals: data ?? [] });
+}
+
+export async function POST(request: Request) {
+  const auth = await authenticatedClient();
+  if (!auth) return NextResponse.json({ error: "Please sign in again to review suggestions." }, { status: 401 });
+  const body = await request.json().catch((): Record<string, unknown> => ({}));
+  const proposalId = typeof body.proposalId === "string" ? body.proposalId : "";
+  const decision = body.decision === "approve" || body.decision === "dismiss" ? body.decision : null;
+  if (!uuidPattern.test(proposalId) || !decision) {
+    return NextResponse.json({ error: "That suggestion decision was not valid." }, { status: 400 });
+  }
+
+  const now = new Date().toISOString();
+  const { data, error } = await auth.supabase
+    .from("action_requests")
+    .update(decision === "approve"
+      ? { status: "approved", confirmed_at: now, cancelled_at: null }
+      : { status: "dismissed", cancelled_at: now })
+    .eq("id", proposalId)
+    .eq("user_id", auth.user.id)
+    .eq("status", "proposed")
+    .select("id, status")
+    .maybeSingle();
+  if (error) return NextResponse.json({ error: "That suggestion could not be updated." }, { status: 500 });
+  if (!data) return NextResponse.json({ error: "That suggestion is no longer waiting for a decision." }, { status: 409 });
+  return NextResponse.json({ proposal: data });
+}

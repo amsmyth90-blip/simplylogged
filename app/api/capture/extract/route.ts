@@ -141,7 +141,8 @@ export async function POST(request: Request) {
     "If a date is useful for follow-up, set dueDate and make reminderTitle/timeLabel practical for a household user.",
     "Keep reminderTimeLabel human friendly, for example: Today, This week, In 14 days, Next month.",
     "Keep dueDate empty if no date is visible.",
-    "Keep extractedText concise but useful. Include key lines, not every visual detail."
+    "Keep extractedText concise but useful. Include key lines, not every visual detail.",
+    "Return extractedFields for useful structured values visible in the document. Use stable snake_case keys. For MOT documents prefer registration, test_date, mot_expiry, mileage and result. For appliance receipts or warranties prefer product, manufacturer, model, serial_number, purchase_date, retailer, price, warranty_duration and warranty_expiry. For pet vaccination records prefer pet_name, vaccine, vaccination_date, next_due_date, vet and batch_number. Each field must retain its own confidence, source uploaded_document and userConfirmed false. Do not include a field when its value is absent."
   ].join(" ");
 
   const willPrompt = [
@@ -230,7 +231,8 @@ export async function POST(request: Request) {
         dueDate: typeof result.dueDate === "string" ? result.dueDate : undefined,
         confidence: typeof result.confidence === "number" ? result.confidence : undefined,
         source: "uploaded_document",
-        userConfirmed: false
+        userConfirmed: false,
+        extractedFields: Array.isArray(result.extractedFields) ? result.extractedFields : []
       };
       await supabase
         .from("capture_jobs")

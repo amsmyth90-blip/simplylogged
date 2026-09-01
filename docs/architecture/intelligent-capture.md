@@ -20,6 +20,7 @@ The current general capture path is:
 8. show the editable review screen;
 9. save the private original and confirmed DiaryDock record;
 10. mark the capture job confirmed against the saved document.
+11. create idempotent, still-unexecuted next-step proposals from user-confirmed pilot fields.
 
 The original file bytes and OCR text are not stored in `capture_jobs`. Originals use the existing private document bucket. Provider errors are recorded using a generic failure code rather than document contents.
 
@@ -42,4 +43,4 @@ The original file bytes and OCR text are not stored in `capture_jobs`. Originals
 - The built-in scanner is signature validation only and is not described as malware protection.
 - The general capture UI prepares photographed pages as JPEG. PDF ingestion remains available to specialist document workflows and can be added to general capture after page rendering and ordering are verified.
 - Specialist bill, policy, will and vehicle-receipt screens receive capture job identifiers but still need to record their final confirmation against their own structured records.
-- Automatic appliance, MOT and pet-record proposals belong to the next Life Graph integration milestone.
+- MOT, appliance/warranty and pet-vaccination proposals are now generated and reviewed separately. Authoritative execution adapters remain deliberately pending.

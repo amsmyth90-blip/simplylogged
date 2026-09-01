@@ -129,6 +129,8 @@ No AI-extracted field, module record, or system reminder becomes authoritative w
 
 Phases covered: 3, 10, 14, and prerequisites for 4/6/7/9/13/15.
 
+Status: in progress. The existing Life Graph schema is now protected with same-owner relationship/fact/link triggers and confidence bounds. Confirmed capture fields can create idempotent, owner-only action proposals for MOT, appliance/warranty and pet-vaccination pilots. Users can keep or dismiss these suggestions, and nothing mutates an authoritative module record silently. Execution adapters, durable module repositories and relationship backfills remain.
+
 ### Work
 
 - Build repositories/services for existing `life_entities`, `life_relationships`, `life_facts`, provenance, events, and document links.

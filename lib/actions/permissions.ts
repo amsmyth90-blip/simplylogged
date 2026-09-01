@@ -15,7 +15,7 @@ const veryHighRiskActions: ActionType[] = ["cancel_subscription", "make_purchase
 export function riskForAction(actionType: ActionType): ActionRiskLevel {
   if (veryHighRiskActions.includes(actionType)) return "very_high";
   if (highRiskActions.includes(actionType)) return "high";
-  if (actionType === "update_record" || actionType === "link_document") return "medium";
+  if (actionType === "create_record" || actionType === "update_record" || actionType === "link_document") return "medium";
   return "low";
 }
 
@@ -71,4 +71,3 @@ export function defaultPermissionDecision(input: {
       : "Low risk action is safe, but confirmation is required until autopilot is enabled."
   };
 }
-

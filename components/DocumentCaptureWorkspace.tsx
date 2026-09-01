@@ -185,6 +185,7 @@ export function DocumentCaptureWorkspace() {
   const [draft, setDraft] = useState<DocumentExtractionResult | null>(null);
   const [savedDocumentId, setSavedDocumentId] = useState<string | null>(null);
   const [captureJobId, setCaptureJobId] = useState<string | null>(null);
+  const [proposalCount, setProposalCount] = useState(0);
   const [processingStage, setProcessingStage] = useState<
     "idle" | "preparing" | "reading" | "organising" | "review" | "saving" | "complete" | "error"
   >("idle");
@@ -204,6 +205,7 @@ export function DocumentCaptureWorkspace() {
     setDraft(null);
     setSavedDocumentId(null);
     setCaptureJobId(null);
+    setProposalCount(0);
     setErrorMessage(null);
     setCreateReminder(false);
     setReminderTimeLabel("This week");
@@ -353,11 +355,17 @@ export function DocumentCaptureWorkspace() {
         await upsertStructuredDocument(nextDocument);
         if (nextReminder) await upsertStructuredReminder(nextReminder);
         if (captureJobId) {
-          await fetch("/api/capture/jobs/confirm", {
+          const confirmationResponse = await fetch("/api/capture/jobs/confirm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ captureJobId, documentId })
+            body: JSON.stringify({
+              captureJobId,
+              documentId,
+              confirmedFields: (extraction.extractedFields ?? []).map((field) => ({ ...field, userConfirmed: true }))
+            })
           });
+          const confirmation = await confirmationResponse.json().catch(() => ({})) as { proposalCount?: number };
+          setProposalCount(typeof confirmation.proposalCount === "number" ? confirmation.proposalCount : 0);
         }
       }
 
@@ -649,6 +657,31 @@ export function DocumentCaptureWorkspace() {
                   <span className="text-xs font-semibold text-slate-700">Document name</span>
                   <input value={draft.title} onChange={(event) => setDraft((current) => current ? { ...current, title: event.target.value } : current)} className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
                 </label>
+                {draft.extractedFields?.length ? (
+                  <fieldset className="rounded-[20px] border border-slate-200 bg-slate-50/80 p-4">
+                    <legend className="px-1 text-xs font-semibold text-slate-700">Details found in the document</legend>
+                    <div className="mt-2 space-y-3">
+                      {draft.extractedFields.map((field, index) => (
+                        <label key={`${field.key}-${index}`} className="block">
+                          <span className="flex items-center justify-between gap-3 text-xs font-semibold text-slate-700">
+                            {field.label}
+                            <span className="text-[10px] font-medium text-slate-400">{Math.round(field.confidence * 100)}% match</span>
+                          </span>
+                          <input
+                            value={field.value}
+                            onChange={(event) => setDraft((current) => current ? {
+                              ...current,
+                              extractedFields: (current.extractedFields ?? []).map((item, itemIndex) =>
+                                itemIndex === index ? { ...item, value: event.target.value } : item
+                              )
+                            } : current)}
+                            className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                ) : null}
                 <label className="block">
                   <span className="text-xs font-semibold text-slate-700">Who issued it</span>
                   <input value={draft.issuer} onChange={(event) => setDraft((current) => current ? { ...current, issuer: event.target.value } : current)} placeholder="Leave blank if it is not shown" className="mt-1.5 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none focus:border-[#86a774]" />
@@ -751,6 +784,12 @@ export function DocumentCaptureWorkspace() {
                   </span>
                 </div>
               </div>
+
+              {proposalCount ? (
+                <Link href="/review-actions" className="mt-4 block rounded-[18px] bg-[#eef4ea] px-4 py-3 text-xs font-semibold leading-5 text-[#4f6f47]">
+                  Review {proposalCount} optional next step{proposalCount === 1 ? "" : "s"}. Nothing else has been changed without your approval.
+                </Link>
+              ) : null}
 
               <Link href={savedDocumentId ? `/document/${savedDocumentId}` : "/files"} className="mt-4 flex w-full items-center justify-center gap-2 rounded-[19px] bg-[#86a774] px-4 py-3.5 text-sm font-semibold text-white shadow-[0_18px_30px_-20px_rgba(67,102,63,0.7)]">
                 <UiIcon name="file" className="h-4 w-4" />
