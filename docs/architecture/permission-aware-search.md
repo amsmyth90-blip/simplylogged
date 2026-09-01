@@ -16,8 +16,8 @@ The current adapters cover:
 
 - documents, with title/category/kind/room/issuer but not OCR text;
 - reminders, without private notes;
-- smart assets;
-- vehicles, trips, insurance, bills and professional contacts from the caller's private state;
+- smart assets, with separate warranty and service-date results;
+- vehicles, with distinct MOT, tax and insurance dates, plus trips, insurance, bills and professional contacts from the caller's private state;
 - direct room navigation.
 
 Contact search uses name, role, company and category only. It does not search or return phone, email, address or notes.

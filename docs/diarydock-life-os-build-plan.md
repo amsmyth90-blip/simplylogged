@@ -238,6 +238,8 @@ Private household records cannot affect result titles, counts, snippets, suggest
 
 Phases covered: 6, part of 13/14/16/17/20.
 
+Status: implemented. Ask DiaryDock authenticates first, reuses the RLS-backed search loader, locally selects no more than eight minimal records, and returns structured answers with verified links to the records used. The model receives no full account payload, raw OCR, notes, contact details, database IDs, routes or action tools. Provider failure falls back to a deterministic cited answer; no-match questions do not invoke AI.
+
 ### Work
 
 - Parse question intent, resolve authenticated scope, retrieve the minimum authorized records, and generate a structured answer with citations.

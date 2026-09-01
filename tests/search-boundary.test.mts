@@ -3,18 +3,21 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const routePath = new URL("../app/api/search/route.ts", import.meta.url);
+const authorizedPath = new URL("../lib/search/authorized.ts", import.meta.url);
 
 test("search retrieves through RLS-backed user tables before ranking", async () => {
   const source = await readFile(routePath, "utf8");
-  assert.match(source, /supabase\.from\("documents"\)/);
-  assert.match(source, /supabase\.from\("reminders"\)/);
-  assert.match(source, /supabase\.from\("assets"\)/);
-  assert.match(source, /supabase\.from\("app_state"\).*\.eq\("id", authData\.user\.id\)/s);
-  assert.match(source, /filterAndRankSearchResults\(candidates/);
+  const authorized = await readFile(authorizedPath, "utf8");
+  assert.match(source, /loadAuthorizedSearchCandidates\(supabase, authData\.user\.id\)/);
+  assert.match(authorized, /supabase\.from\("documents"\)/);
+  assert.match(authorized, /supabase\.from\("reminders"\)/);
+  assert.match(authorized, /supabase\.from\("assets"\)/);
+  assert.match(authorized, /supabase\.from\("app_state"\).*\.eq\("id", userId\)/s);
+  assert.match(source, /filterAndRankSearchResults\(authorized\.candidates/);
 });
 
 test("search does not retrieve high-sensitivity OCR, notes, phone or email fields", async () => {
-  const source = await readFile(routePath, "utf8");
+  const source = await readFile(authorizedPath, "utf8");
   assert.doesNotMatch(source, /extracted_text|extraction_summary|emergency_notes|contact\.phone|contact\.email|contact\.notes/);
   assert.doesNotMatch(source, /select\([^\n]*\bnote\b/);
 });

@@ -57,7 +57,7 @@ export function SearchWorkspace() {
 
   return (
     <div className="space-y-4">
-      <PageHeader eyebrow="Private search" title="Find anything" subtitle="Search only records your signed-in account is allowed to open. Full OCR, private notes and phone numbers are not searched." backHref="/dashboard" backLabel="Home" meta={<><span className="estate-chip">Permission checked first</span><span className="estate-chip">No AI required</span></>} />
+      <PageHeader eyebrow="Private search" title="Find anything" subtitle="Search only records your signed-in account is allowed to open. Full OCR, private notes and phone numbers are not searched." backHref="/dashboard" backLabel="Home" action={<Link href="/ask" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#315443] px-3.5 text-xs font-semibold text-white"><UiIcon name="star" className="h-4 w-4" /><span className="hidden sm:inline">Ask DiaryDock</span></Link>} meta={<><span className="estate-chip">Permission checked first</span><span className="estate-chip">No AI required</span></>} />
 
       <section className="estate-sheet sticky top-3 z-20 p-3">
         <label className="flex items-center gap-3 rounded-[22px] bg-white/80 px-4 py-3 shadow-[0_18px_34px_-28px_rgba(15,23,42,0.35)]">

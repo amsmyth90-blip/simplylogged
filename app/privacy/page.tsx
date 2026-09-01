@@ -40,7 +40,7 @@ export default function PrivacyPage() {
           title: "How we use your information",
           body: [
             "To store and organise your documents, show reminders, and route items to the correct room in your digital home.",
-            "When you choose to use AI document, photo, recipe, noticeboard, bill, receipt, will, insurance, or kitchen reading, the file, photo, audio, or extracted text you provide is sent to our AI provider, OpenAI, solely to read it and suggest useful details. Under OpenAI's API terms, content submitted through the API is not used to train their models. AI results can be incomplete or wrong, so DiaryDock asks you to review important details before relying on them.",
+            "When you choose to use AI document, photo, recipe, noticeboard, bill, receipt, will, insurance, kitchen reading, or Ask DiaryDock, the content you submit is sent to our AI provider, OpenAI, solely to provide that feature. Ask DiaryDock sends your question with no more than eight relevant, stripped-down record summaries; it does not send your full account, raw documents, private notes, or contact details. Under OpenAI's API terms, content submitted through the API is not used to train their models. AI results can be incomplete or wrong, so DiaryDock asks you to check linked records before relying on important details.",
             "To operate family sharing and Emergency Access Mode exactly as you configure them, and to respond to support requests.",
             "We do not sell your personal data, and we do not use your documents or photos for advertising."
           ]
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           title: "Who we share data with",
           body: [
             "Supabase, for authentication, database, and file storage.",
-            "OpenAI, for AI-based extraction and summarisation from files, photos, audio, and text that you explicitly submit for smart reading, as described above.",
+            "OpenAI, for AI-based extraction, summarisation, and cited answers from files, photos, audio, text, and questions that you explicitly submit, as described above.",
             "Family members you explicitly invite, limited to the documents and access level you assign them.",
             "We do not share your data with any other third party except where required by law."
           ]

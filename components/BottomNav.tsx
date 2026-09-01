@@ -47,6 +47,7 @@ export function BottomNav() {
   };
 
   const desktopUtilities: NavItem[] = [
+    { id: "ask", href: "/ask", label: "Ask DiaryDock", icon: "star" },
     { id: "search", href: "/search", label: "Search", icon: "search" },
     { id: "settings", href: "/settings", label: "Settings", icon: "gear" }
   ];
