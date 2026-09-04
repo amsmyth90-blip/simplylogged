@@ -32,4 +32,6 @@ jobs:
       - name: Run the complete repository gate
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+          NEXT_PUBLIC_SUPABASE_URL: "https://ci.invalid"
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_ci_verification_only"
         run: npm run check
