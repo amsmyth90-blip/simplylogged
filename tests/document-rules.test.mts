@@ -17,6 +17,8 @@ test("sanitises document names before storage", () => {
   assert.equal(sanitizeDocumentFileName("  Home Insurance (2026).PDF  "), "home-insurance-2026.pdf");
   assert.equal(sanitizeDocumentFileName("../../Passport Copy.png"), "passport-copy.png");
   assert.equal(sanitizeDocumentFileName("Council___Tax###Bill.pdf"), "council-tax-bill.pdf");
+  assert.equal(sanitizeDocumentFileName("draft----.PDF"), "draft.pdf");
+  assert.equal(sanitizeDocumentFileName(`${"-".repeat(20_000)}notes.pdf`), "notes.pdf");
   assert.equal(sanitizeDocumentFileName("..."), "document");
   assert.ok(sanitizeDocumentFileName("a".repeat(140)).length <= 96);
 });
@@ -43,7 +45,7 @@ test("rejects empty, oversized and unsupported uploads", () => {
   );
   assert.equal(
     validateDocumentUpload({ type: "application/pdf", size: MAX_DOCUMENT_BYTES + 1 }),
-    "Please choose a file smaller than 10 MB.",
+    "Please choose a file no larger than 4 MB.",
   );
   assert.equal(
     validateDocumentUpload({ type: "application/pdf", size: 0 }),

@@ -7,61 +7,17 @@ import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon, type IconName } from "@/components/UiIcon";
+import { IntakeItemCard } from "@/components/intake/IntakeItemCard";
+import {
+  intakeCategory as categoryForRoom,
+  intakeDocumentKind as kindForMail,
+  intakeRoomId as roomIdFromName,
+  intakeSourceCards as sourceCards,
+  type IntakeAction,
+} from "@/components/intake/intake-rules";
 import type { MailItem } from "@/lib/diarydock-data";
 import { roomDetails, type Reminder, type RoomDocument, type VaultDocument } from "@/lib/mock-data";
 import { upsertStructuredDocument, upsertStructuredReminder } from "@/lib/structured-data";
-
-type IntakeAction = "vault" | "reminder" | "room" | "ignored";
-
-const statusCopy: Record<MailItem["routeStatus"], { label: string; tone: string }> = {
-  new: { label: "Needs filing", tone: "bg-amber-100/80 text-amber-700" },
-  vault: { label: "Saved to Vault", tone: "bg-sky-100/80 text-sky-700" },
-  reminder: { label: "Reminder made", tone: "bg-orange-100/80 text-orange-700" },
-  room: { label: "Sent to room", tone: "bg-emerald-100/80 text-emerald-700" },
-  ignored: { label: "Ignored", tone: "bg-stone-100/90 text-stone-500" }
-};
-
-const sourceCards: { title: string; detail: string; icon: IconName; badge: string }[] = [
-  {
-    title: "Scan",
-    detail: "Photograph letters, bills and forms with AI read-through.",
-    icon: "plus",
-    badge: "Live"
-  },
-  {
-    title: "Share to DiaryDock",
-    detail: "Native app share-sheet target for email attachments and PDFs.",
-    icon: "share",
-    badge: "Next"
-  },
-  {
-    title: "Email forwarding",
-    detail: "Forward bills or appointments into a private DiaryDock inbox.",
-    icon: "mail",
-    badge: "Planned"
-  }
-];
-
-function roomIdFromName(name?: string) {
-  if (!name) {
-    return "office";
-  }
-
-  const match = Object.values(roomDetails).find((room) => room.name.toLowerCase() === name.toLowerCase());
-  return match?.id ?? name.toLowerCase().replaceAll(" ", "-");
-}
-
-function categoryForRoom(roomId: string) {
-  if (roomId === "bedroom") return "Health & Medical";
-  if (roomId === "attic" || roomId === "family-room" || roomId === "garden") return "Memories";
-  if (roomId === "office" || roomId === "safe-room") return "Legal & Estate";
-  if (roomId === "garage" || roomId === "driveway") return "Home & Property";
-  return "Home & Property";
-}
-
-function kindForMail(item: MailItem): VaultDocument["kind"] {
-  return item.kind === "Form" || item.kind === "Statement" ? "PDF" : "Scan";
-}
 
 export function IntakeWorkspace() {
   const { state, updateState, repositoryMode } = useDiaryDockData();
@@ -283,76 +239,9 @@ export function IntakeWorkspace() {
         </div>
 
         <div className="space-y-3">
-          {visibleItems.map((item) => {
-            const roomId = roomIdFromName(item.suggestedRoom);
-            const room = roomDetails[roomId] ?? roomDetails.office;
-            const status = statusCopy[item.routeStatus];
-            const isNew = item.routeStatus === "new";
-
-            return (
-              <article key={item.id} className="estate-sheet overflow-hidden p-4">
-                <div className="flex items-start gap-3">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[22px] bg-white/76 text-ink shadow-soft">
-                    <UiIcon name={room.icon as IconName} className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-base font-semibold leading-tight text-ink">{item.title}</h2>
-                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${status.tone}`}>
-                        {status.label}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-ink/55">
-                      {item.source} - {item.kind}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink/52">
-                      <span className="rounded-full border border-white/80 bg-white/68 px-3 py-1.5">
-                        Suggested: {room.name}
-                      </span>
-                      <Link href={`/room/${room.id}`} className="rounded-full border border-white/80 bg-white/68 px-3 py-1.5 font-semibold text-ink/62">
-                        Open room
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <button
-                    type="button"
-                    disabled={!isNew}
-                    onClick={() => routeItem(item, "vault")}
-                    className="rounded-2xl bg-ink px-3 py-2.5 text-xs font-semibold text-white shadow-soft transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-ink/25"
-                  >
-                    Save to All Files
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!isNew}
-                    onClick={() => routeItem(item, "reminder")}
-                    className="rounded-2xl border border-white/80 bg-white/72 px-3 py-2.5 text-xs font-semibold text-ink/70 shadow-soft transition hover:bg-white disabled:cursor-not-allowed disabled:text-ink/30"
-                  >
-                    Make reminder
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!isNew}
-                    onClick={() => routeItem(item, "room")}
-                    className="rounded-2xl border border-white/80 bg-white/72 px-3 py-2.5 text-xs font-semibold text-ink/70 shadow-soft transition hover:bg-white disabled:cursor-not-allowed disabled:text-ink/30"
-                  >
-                    Send to room
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!isNew}
-                    onClick={() => routeItem(item, "ignored")}
-                    className="rounded-2xl border border-white/70 bg-white/40 px-3 py-2.5 text-xs font-semibold text-ink/45 transition hover:bg-white/70 disabled:cursor-not-allowed disabled:text-ink/25"
-                  >
-                    Ignore
-                  </button>
-                </div>
-              </article>
-            );
-          })}
+          {visibleItems.map((item) => (
+            <IntakeItemCard key={item.id} item={item} onRoute={routeItem} />
+          ))}
 
           {!visibleItems.length ? (
             <div className="estate-sheet p-6 text-center">

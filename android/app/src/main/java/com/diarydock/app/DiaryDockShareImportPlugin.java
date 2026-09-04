@@ -1,14 +1,10 @@
 package com.diarydock.app;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.OpenableColumns;
 import android.util.Base64;
-import android.webkit.MimeTypeMap;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -18,11 +14,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +23,6 @@ import org.json.JSONObject;
 public class DiaryDockShareImportPlugin extends Plugin {
     private static final String PREFS_NAME = "diarydock_share_import";
     private static final String PREF_PENDING_FILES = "pending_files";
-    private static final int MAX_FILES = 12;
-    private static final long MAX_FILE_BYTES = 10L * 1024L * 1024L;
 
     @Override
     public void load() {
@@ -47,34 +37,40 @@ public class DiaryDockShareImportPlugin extends Plugin {
     @PluginMethod
     public void getPendingImport(PluginCall call) {
         JSObject result = new JSObject();
-        JSArray files = new JSArray();
-
+        JSArray items = new JSArray();
         try {
-            JSONArray pendingFiles = new JSONArray(getPrefs().getString(PREF_PENDING_FILES, "[]"));
-
-            for (int index = 0; index < pendingFiles.length(); index += 1) {
-                JSONObject pendingFile = pendingFiles.getJSONObject(index);
-                File file = new File(pendingFile.getString("path"));
-
-                if (!file.exists() || file.length() <= 0 || file.length() > MAX_FILE_BYTES) {
-                    continue;
-                }
+            JSONArray pending = pendingFiles();
+            if (!isValidPendingSet(pending)) throw new IllegalStateException("Invalid pending import.");
+            for (int index = 0; index < pending.length(); index += 1) {
+                JSONObject metadata = pending.getJSONObject(index);
+                File file = new File(metadata.getString("path"));
 
                 JSObject item = new JSObject();
-                item.put("id", pendingFile.getString("id"));
-                item.put("name", pendingFile.getString("name"));
-                item.put("mimeType", pendingFile.getString("mimeType"));
+                item.put("id", metadata.getString("id"));
+                item.put("name", metadata.getString("name"));
+                item.put("mimeType", metadata.getString("mimeType"));
                 item.put("size", file.length());
                 item.put("base64", encodeFile(file));
-                files.put(item);
+                items.put(item);
             }
-
-            result.put("files", files);
+            result.put("files", items);
             result.put("source", "android-share-sheet");
             result.put("receivedAt", String.valueOf(System.currentTimeMillis()));
             call.resolve(result);
         } catch (Exception exception) {
+            clearPendingFiles();
             call.reject("Unable to read the shared files.");
+        }
+    }
+
+    @PluginMethod
+    public void hasPendingImport(PluginCall call) {
+        try {
+            JSONArray pending = pendingFiles();
+            call.resolve(new JSObject().put("count", isValidPendingSet(pending) ? pending.length() : 0));
+        } catch (Exception exception) {
+            clearPendingFiles();
+            call.resolve(new JSObject().put("count", 0));
         }
     }
 
@@ -85,231 +81,91 @@ public class DiaryDockShareImportPlugin extends Plugin {
     }
 
     private void handleShareIntent(Intent intent) {
-        if (intent == null || intent.getAction() == null) {
-            return;
-        }
-
-        String action = intent.getAction();
-        if (!Intent.ACTION_SEND.equals(action) && !Intent.ACTION_SEND_MULTIPLE.equals(action) && !Intent.ACTION_VIEW.equals(action)) {
-            return;
-        }
-
-        List<Uri> uris = collectUris(intent);
-        if (uris.isEmpty()) {
+        if (!isShareIntent(intent)) return;
+        List<Uri> uris = new ShareImportFiles(getContext()).collectUris(intent);
+        if (uris.isEmpty()) return;
+        if (uris.size() > ShareImportFiles.MAX_FILES) {
+            clearPendingFiles();
+            clearIncomingIntent(intent);
             return;
         }
 
         try {
-            JSONArray pendingFiles = copyUrisToPrivateStorage(uris);
-            if (pendingFiles.length() == 0) {
-                return;
-            }
-
-            getPrefs().edit().putString(PREF_PENDING_FILES, pendingFiles.toString()).apply();
-
+            clearPendingFiles();
+            JSONArray pending = new ShareImportFiles(getContext()).copyToPrivateStorage(uris);
+            if (pending.length() == 0) return;
+            getPrefs().edit().putString(PREF_PENDING_FILES, pending.toString()).apply();
             JSObject result = new JSObject();
-            result.put("count", pendingFiles.length());
+            result.put("count", pending.length());
             notifyListeners("shareImportReceived", result, true);
-            openImportReviewPage();
         } catch (Exception ignored) {
-            // Keep native sharing quiet; the web review screen shows a friendly fallback if nothing is available.
+            clearPendingFiles();
         } finally {
-            intent.setAction(null);
-            intent.removeExtra(Intent.EXTRA_STREAM);
+            clearIncomingIntent(intent);
         }
     }
 
-    private List<Uri> collectUris(Intent intent) {
-        List<Uri> uris = new ArrayList<>();
-
-        if (intent.getData() != null) {
-            uris.add(intent.getData());
-        }
-
-        Uri stream = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (stream != null) {
-            uris.add(stream);
-        }
-
-        ArrayList<Uri> streams = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-        if (streams != null) {
-            uris.addAll(streams);
-        }
-
-        ClipData clipData = intent.getClipData();
-        if (clipData != null) {
-            for (int index = 0; index < clipData.getItemCount(); index += 1) {
-                Uri uri = clipData.getItemAt(index).getUri();
-                if (uri != null) {
-                    uris.add(uri);
-                }
-            }
-        }
-
-        return uris.size() > MAX_FILES ? uris.subList(0, MAX_FILES) : uris;
+    private boolean isShareIntent(Intent intent) {
+        if (intent == null || intent.getAction() == null) return false;
+        String action = intent.getAction();
+        if (Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action)) return true;
+        Uri data = intent.getData();
+        return Intent.ACTION_VIEW.equals(action)
+            && data != null
+            && "content".equalsIgnoreCase(data.getScheme());
     }
 
-    private JSONArray copyUrisToPrivateStorage(List<Uri> uris) throws Exception {
-        clearPendingFiles();
-        File directory = new File(getContext().getCacheDir(), "diarydock-share-imports");
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw new IllegalStateException("Unable to prepare share import storage.");
-        }
-
-        JSONArray pendingFiles = new JSONArray();
-
-        for (Uri uri : uris) {
-            String mimeType = getMimeType(uri);
-            if (!isSupportedMimeType(mimeType)) {
-                continue;
-            }
-
-            String displayName = sanitizeFileName(getDisplayName(uri));
-            String id = String.valueOf(System.currentTimeMillis()) + "-" + pendingFiles.length();
-            File destination = new File(directory, id + "-" + displayName);
-            long copiedBytes = copyUri(uri, destination);
-
-            if (copiedBytes <= 0 || copiedBytes > MAX_FILE_BYTES) {
-                if (destination.exists()) {
-                    destination.delete();
-                }
-                continue;
-            }
-
-            JSONObject item = new JSONObject();
-            item.put("id", id);
-            item.put("name", displayName);
-            item.put("mimeType", mimeType);
-            item.put("path", destination.getAbsolutePath());
-            pendingFiles.put(item);
-        }
-
-        return pendingFiles;
-    }
-
-    private long copyUri(Uri uri, File destination) throws Exception {
-        long totalBytes = 0;
-
-        try (InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-             FileOutputStream outputStream = new FileOutputStream(destination)) {
-            if (inputStream == null) {
-                return 0;
-            }
-
-            byte[] buffer = new byte[8192];
-            int read;
-
-            while ((read = inputStream.read(buffer)) != -1) {
-                totalBytes += read;
-                if (totalBytes > MAX_FILE_BYTES) {
-                    break;
-                }
-                outputStream.write(buffer, 0, read);
-            }
-        }
-
-        return totalBytes;
+    private void clearIncomingIntent(Intent intent) {
+        intent.setAction(null);
+        intent.setData(null);
+        intent.setClipData(null);
+        intent.removeExtra(Intent.EXTRA_STREAM);
     }
 
     private String encodeFile(File file) throws Exception {
-        try (FileInputStream inputStream = new FileInputStream(file);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        try (FileInputStream input = new FileInputStream(file);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
             int read;
-
-            while ((read = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-
-            return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP);
-        }
-    }
-
-    private String getMimeType(Uri uri) {
-        String resolverType = getContext().getContentResolver().getType(uri);
-        if (resolverType != null && !resolverType.trim().isEmpty()) {
-            return resolverType.toLowerCase(Locale.ROOT);
-        }
-
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
-        if (extension == null || extension.trim().isEmpty()) {
-            return "application/octet-stream";
-        }
-
-        String mappedType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase(Locale.ROOT));
-        return mappedType == null ? "application/octet-stream" : mappedType.toLowerCase(Locale.ROOT);
-    }
-
-    private boolean isSupportedMimeType(String mimeType) {
-        return "application/pdf".equals(mimeType)
-            || "image/jpeg".equals(mimeType)
-            || "image/png".equals(mimeType)
-            || "image/webp".equals(mimeType)
-            || "image/heic".equals(mimeType);
-    }
-
-    private String getDisplayName(Uri uri) {
-        try (Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (index >= 0) {
-                    String name = cursor.getString(index);
-                    if (name != null && !name.trim().isEmpty()) {
-                        return name;
-                    }
+            int totalBytes = 0;
+            while ((read = input.read(buffer)) != -1) {
+                totalBytes += read;
+                if (totalBytes > ShareImportFiles.MAX_FILE_BYTES) {
+                    throw new IllegalStateException("Shared file exceeds the safe limit.");
                 }
+                output.write(buffer, 0, read);
             }
-        } catch (Exception ignored) {
-            // Fall back to URI path below.
+            return Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP);
         }
-
-        String path = uri.getLastPathSegment();
-        return path == null || path.trim().isEmpty() ? "shared-document" : path;
-    }
-
-    private String sanitizeFileName(String name) {
-        String safeName = name
-            .trim()
-            .toLowerCase(Locale.ROOT)
-            .replaceAll("[^a-z0-9.]+", "-")
-            .replaceAll("-+", "-")
-            .replaceAll("(^-|-$)", "");
-
-        if (safeName.isEmpty()) {
-            return "shared-document";
-        }
-
-        return safeName.length() > 96 ? safeName.substring(0, 96) : safeName;
     }
 
     private void clearPendingFiles() {
         try {
-            JSONArray pendingFiles = new JSONArray(getPrefs().getString(PREF_PENDING_FILES, "[]"));
-
-            for (int index = 0; index < pendingFiles.length(); index += 1) {
-                File file = new File(pendingFiles.getJSONObject(index).getString("path"));
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
+            ShareImportFiles.clear(pendingFiles());
         } catch (JSONException ignored) {
-            // Nothing to clear.
+            // A malformed private preference has no trusted files to retain.
         }
-
         getPrefs().edit().remove(PREF_PENDING_FILES).apply();
+    }
+
+    private JSONArray pendingFiles() throws JSONException {
+        return new JSONArray(getPrefs().getString(PREF_PENDING_FILES, "[]"));
+    }
+
+    private boolean isValidPendingSet(JSONArray pending) throws JSONException {
+        if (pending.length() == 0 || pending.length() > ShareImportFiles.MAX_FILES) return false;
+        long totalBytes = 0;
+        for (int index = 0; index < pending.length(); index += 1) {
+            File file = new File(pending.getJSONObject(index).getString("path"));
+            if (!ShareImportFiles.isPrivatePendingFile(getContext(), file)) return false;
+            totalBytes += file.length();
+            if (totalBytes > ShareImportFiles.MAX_TOTAL_BYTES) return false;
+        }
+        return true;
     }
 
     private SharedPreferences getPrefs() {
         return getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    private void openImportReviewPage() {
-        if (bridge == null || bridge.getWebView() == null) {
-            return;
-        }
-
-        bridge.getWebView().post(() ->
-            bridge.getWebView().evaluateJavascript("window.location.assign('/import/share?source=share')", null)
-        );
-    }
 }

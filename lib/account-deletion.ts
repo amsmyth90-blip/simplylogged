@@ -111,6 +111,15 @@ export async function processAccountDeletion(
     throw new Error("Deletion request does not include a user id.");
   }
 
+  // Lock, re-check, and remove only sole-owner households in one database
+  // transaction before any personal file or row is changed.
+  const { error: householdPreparationError } = await client.rpc("prepare_account_deletion", {
+    input_user_id: userId,
+  });
+  if (householdPreparationError) {
+    throw new Error(householdPreparationError.message);
+  }
+
   const { error: processingError } = await client
     .from("account_deletion_requests")
     .update({ status: "processing" })

@@ -1,0 +1,54 @@
+.settings-screen { width: min(100%, 58rem); min-height: 100dvh; margin: 0 auto; padding-bottom: 7rem; }
+.settings-hero { position: relative; min-height: 22rem; color: white; background-position: center; background-size: cover; }
+.settings-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(20 28 23 / 18%), rgb(18 28 23 / 82%)); }
+.settings-back,
+.settings-hero .sync-pill { position: absolute; z-index: 1; top: max(1rem, env(safe-area-inset-top)); }
+.settings-back { left: 1rem; width: 2.7rem; height: 2.7rem; color: white; font: inherit; font-size: 2rem; border: 1px solid rgb(255 255 255 / 38%); border-radius: 50%; background: rgb(255 255 255 / 18%); backdrop-filter: blur(12px); }
+.settings-hero .sync-pill { right: 1rem; margin: 0; }
+.settings-hero > div:last-child { position: absolute; z-index: 1; right: 1.25rem; bottom: 2rem; left: 1.25rem; }
+.settings-hero p { margin: 0; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.65rem; font-weight: 850; }
+.settings-hero h1 { margin: 0.35rem 0; font-size: clamp(2.5rem, 11vw, 4.4rem); line-height: 0.95; }
+.settings-hero strong { font-size: 0.9rem; }
+
+.settings-profile,
+.settings-card { margin: 1rem; padding: 1.2rem; border: 1px solid rgb(255 255 255 / 80%); border-radius: 1.6rem; background: rgb(255 253 248 / 92%); box-shadow: 0 1.75rem 4rem -2.8rem rgb(32 53 42 / 38%); }
+.settings-profile { position: relative; display: flex; align-items: center; gap: 0.8rem; margin-top: -1rem; }
+.settings-profile > span { display: grid; width: 3.3rem; height: 3.3rem; flex: 0 0 auto; place-items: center; color: white; font-size: 0.8rem; font-weight: 850; border-radius: 50%; background: var(--dd-green-deep); }
+.settings-profile h2,
+.settings-card h2 { margin: 0; font-size: 1.15rem; }
+.settings-profile p { margin: 0.15rem 0; color: var(--dd-muted); font-size: 0.72rem; }
+.settings-profile small,
+.settings-card > small { color: var(--dd-muted); font-size: 0.62rem; }
+.settings-card .eyebrow { margin: 0 0 0.25rem; }
+.settings-row { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.7rem; padding-top: 0.7rem; color: var(--dd-muted); font-size: 0.72rem; border-top: 1px solid rgb(32 53 42 / 8%); }
+.settings-row strong { color: var(--dd-green); font-size: 0.65rem; text-transform: capitalize; }
+.settings-secondary { width: 100%; min-height: 3rem; margin-top: 0.9rem; color: var(--dd-ink); font: inherit; font-size: 0.75rem; font-weight: 800; border: 1px solid rgb(32 53 42 / 15%); border-radius: 0.9rem; background: white; }
+.settings-storage { height: 0.55rem; margin: 1rem 0 0.5rem; overflow: hidden; border-radius: 999px; background: #e7e5dc; }
+.settings-storage span { display: block; height: 100%; border-radius: inherit; background: var(--dd-green); }
+.settings-switch,
+.settings-link-row { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.7rem; padding: 0.8rem 0; color: var(--dd-ink); text-align: left; font: inherit; border: 0; border-top: 1px solid rgb(32 53 42 / 8%); background: transparent; }
+.settings-switch > span,
+.settings-link-row > span { display: grid; min-width: 0; gap: 0.25rem; }
+.settings-switch strong,
+.settings-link-row strong { font-size: 0.74rem; }
+.settings-switch small,
+.settings-link-row small { color: var(--dd-muted); font-size: 0.62rem; line-height: 1.45; }
+.settings-switch input { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; accent-color: var(--dd-green); }
+.settings-link-row b { color: var(--dd-green); font-size: 0.68rem; }
+.settings-danger-link { width: 100%; margin-top: 1rem; padding: 0.75rem; color: #9f3131; font: inherit; font-size: 0.7rem; font-weight: 800; border: 0; background: transparent; }
+.settings-delete { margin-top: 1rem; padding: 1rem; border-radius: 1rem; background: #fff1f1; }
+.settings-delete p { margin: 0 0 0.75rem; color: #7f1d1d; font-size: 0.68rem; line-height: 1.5; }
+.settings-delete input { width: 100%; min-height: 3rem; padding: 0.7rem; font: inherit; border: 1px solid #fecaca; border-radius: 0.8rem; background: white; }
+.settings-delete > div { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
+.settings-delete button { min-height: 2.8rem; font: inherit; font-size: 0.7rem; font-weight: 800; border: 0; border-radius: 0.8rem; background: white; }
+.settings-delete button:last-child { color: white; background: #9f3131; }
+
+@media (min-width: 760px) {
+  .settings-screen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 1rem; padding: 1rem 1rem 7rem; }
+  .settings-hero { grid-row: span 3; min-height: 40rem; border-radius: 2rem; }
+  .settings-profile,
+  .settings-card { margin: 0; }
+  .settings-profile { margin-top: 0; }
+  .settings-account-actions { grid-column: 2; }
+  .settings-screen > .form-message { grid-column: 1 / -1; }
+}

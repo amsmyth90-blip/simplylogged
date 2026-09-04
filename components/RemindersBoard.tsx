@@ -123,10 +123,11 @@ export function RemindersBoard({ reminders, onOpenReminder, onToggleDone, onSnoo
                 >
                   <button
                     type="button"
+                    disabled={!onToggleDone}
                     onClick={() => onToggleDone?.(item)}
                     aria-label={done ? `Reopen ${item.title}` : `Complete ${item.title}`}
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition ${
-                      done ? "border-moss bg-moss text-white" : "border-slate-300 bg-white text-transparent hover:border-moss"
+                      done ? "border-moss bg-moss text-white" : "border-slate-300 bg-white text-transparent enabled:hover:border-moss"
                     }`}
                   >
                     <svg
@@ -142,7 +143,8 @@ export function RemindersBoard({ reminders, onOpenReminder, onToggleDone, onSnoo
                     </svg>
                   </button>
                   <div className="min-w-0 flex-1">
-                    <button type="button" onClick={() => onOpenReminder?.(item)} className="w-full text-left">
+                    <button type="button" disabled={!onOpenReminder}
+                      onClick={() => onOpenReminder?.(item)} className="w-full text-left disabled:cursor-default">
                     <div className="flex items-center gap-2">
                       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${priorityDot[item.priority]}`} />
                       <p className={`truncate text-sm font-semibold ${done ? "text-ink/45 line-through" : "text-ink"}`}>
@@ -189,11 +191,12 @@ export function RemindersBoard({ reminders, onOpenReminder, onToggleDone, onSnoo
                       <div className="mt-3 flex flex-wrap gap-2">
                         <button
                           type="button"
+                          disabled={!onSnooze}
                           onClick={(event) => {
                             event.stopPropagation();
                             onSnooze?.(item);
                           }}
-                          className="rounded-full border border-white/70 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-ink/55 transition hover:bg-white hover:text-ink"
+                          className="rounded-full border border-white/70 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-ink/55 transition enabled:hover:bg-white enabled:hover:text-ink disabled:cursor-default disabled:opacity-50"
                         >
                           Snooze 7 days
                         </button>

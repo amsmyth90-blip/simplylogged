@@ -1,0 +1,54 @@
+.wills-screen { min-height: 100dvh; padding: max(.8rem,env(safe-area-inset-top)) 0 7rem; color: #20352a; background: radial-gradient(circle at 8% 0,#fff 0,transparent 32%),linear-gradient(155deg,#f2f1ea,#fbfaf7 50%,#e9ece3); }
+.wills-header,.wills-hero,.wills-sheet { width: min(100% - 1.5rem,70rem); margin-inline: auto; }
+.wills-header { display: flex; min-height: 3rem; align-items: center; gap: .7rem; }
+.wills-header > button { width: 2.75rem; height: 2.75rem; color: #315443; font-size: 1.6rem; border: 1px solid #e3e3d8; border-radius: 50%; background: rgb(255 255 255 / 82%); }
+.wills-header > div { min-width: 0; flex: 1; }
+.wills-header strong,.wills-header small { display: block; }
+.wills-header strong { font-family: Georgia,serif; font-size: 1.05rem; }
+.wills-header small { margin-top: .1rem; color: #6f786f; font-size: .64rem; }
+.wills-header > span { max-width: 7rem; overflow: hidden; padding: .45rem .65rem; font-size: .55rem; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; border-radius: 999px; }
+.wills-hero { position: relative; height: 13rem; margin-top: .8rem; overflow: hidden; border-radius: 1.5rem; background-position: center 58%; background-size: cover; box-shadow: 0 1.4rem 3rem -2rem rgb(35 61 51 / 72%); }
+.wills-hero > div { position: absolute; inset: 0; background: linear-gradient(90deg,rgb(27 50 40 / 88%),rgb(49 78 64 / 40%) 72%,transparent); }
+.wills-hero article { position: absolute; left: 1.2rem; bottom: 1.2rem; max-width: 27rem; color: white; }
+.wills-hero p { margin: 0; color: rgb(255 255 255 / 70%); font-size: .56rem; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
+.wills-hero h1 { margin: .35rem 0 0; font-family: Georgia,serif; font-size: 1.8rem; line-height: 1; }
+.wills-hero article span { display: block; margin-top: .55rem; color: rgb(255 255 255 / 82%); font-size: .68rem; line-height: 1.5; }
+.wills-sheet { margin-top: .8rem; }
+.wills-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; padding: .7rem; border: 1px solid rgb(255 255 255 / 92%); border-radius: 1.1rem; background: rgb(255 255 255 / 72%); box-shadow: 0 .8rem 2rem -1.7rem #263b35; }
+.wills-summary article { min-width: 0; padding: .55rem .25rem; text-align: center; border-radius: .8rem; background: #eef0e8; }
+.wills-summary strong,.wills-summary small { display: block; }
+.wills-summary strong { font-family: Georgia,serif; font-size: 1.25rem; }
+.wills-summary small { margin-top: .2rem; color: #758077; font-size: .5rem; line-height: 1.3; }
+.wills-summary > button { min-height: 2.7rem; grid-column: 1 / -1; color: white; font-size: .66rem; font-weight: 800; border: 0; border-radius: .78rem; background: #315443; }
+.wills-tabs { display: grid; grid-template-columns: repeat(5,minmax(4rem,1fr)); gap: .4rem; margin-top: .7rem; overflow-x: auto; }
+.wills-tabs button { min-height: 4rem; padding: .45rem .2rem; color: #687369; border: 1px solid white; border-radius: .9rem; background: rgb(255 255 255 / 66%); }
+.wills-tabs span,.wills-tabs strong { display: block; }
+.wills-tabs span { font-size: .82rem; }
+.wills-tabs strong { margin-top: .28rem; font-size: .5rem; }
+.wills-tabs button.is-active { color: white; border-color: #52705a; background: #52705a; box-shadow: 0 .7rem 1.4rem -1rem #315443; }
+.wills-privacy-note,.wills-status,.wills-disclaimer { margin: .7rem 0 0; padding: .7rem .8rem; color: #5f7163; font-size: .58rem; line-height: 1.5; border: 1px solid #e2e5da; border-radius: .85rem; background: rgb(255 255 255 / 68%); }
+.wills-overview-grid { display: grid; gap: .7rem; margin-top: .7rem; }
+.wills-card { min-width: 0; margin-top: .7rem; padding: .9rem; border: 1px solid rgb(255 255 255 / 94%); border-radius: 1.15rem; background: rgb(255 255 255 / 76%); box-shadow: 0 1rem 2.5rem -2rem #263b35; }
+.wills-overview-grid .wills-card { margin-top: 0; }
+.wills-card > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.wills-card > header p { margin: 0; color: #71846f; font-size: .54rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.wills-card > header h2 { margin: .18rem 0 0; font-family: Georgia,serif; font-size: 1.1rem; }
+.wills-card > header button,.wills-secondary-action { min-height: 2.4rem; padding-inline: .7rem; color: #52705a; font-size: .58rem; font-weight: 850; border: 1px solid #dfe3d7; border-radius: .7rem; background: white; }
+.wills-facts { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; margin-top: .7rem; }
+.wills-facts article { padding: .65rem; border-radius: .8rem; background: #f0f2eb; }
+.wills-facts small,.wills-facts strong { display: block; }
+.wills-facts small,.wills-detail-list small { color: #738077; font-size: .5rem; }
+.wills-facts strong,.wills-detail-list strong { margin-top: .2rem; font-size: .68rem; }
+.wills-detail-list { display: grid; gap: .45rem; margin-top: .7rem; }
+.wills-detail-list article { padding: .65rem; border-radius: .8rem; background: #f0f2eb; }
+.wills-detail-list small,.wills-detail-list strong,.wills-detail-list span { display: block; }
+.wills-detail-list span { margin-top: .15rem; color: #718078; font-size: .52rem; }
+.wills-action-card { padding: .45rem; }
+.wills-action-card > button { display: flex; width: 100%; min-height: 3.8rem; align-items: center; gap: .65rem; padding: .65rem; text-align: left; border: 0; border-radius: .8rem; background: transparent; }
+.wills-action-card > button + button { border-top: 1px solid #e2e5dc; }
+.wills-action-card span { display: grid; width: 2.1rem; height: 2.1rem; flex: 0 0 auto; place-items: center; color: white; border-radius: .65rem; background: #6f8e72; }
+.wills-action-card div { min-width: 0; flex: 1; }
+.wills-action-card strong,.wills-action-card small { display: block; }
+.wills-action-card strong { font-size: .68rem; }
+.wills-action-card small { margin-top: .15rem; color: #718078; font-size: .54rem; }
+@media (min-width:720px) { .wills-hero { height: 17rem; } .wills-summary { grid-template-columns: repeat(3,1fr) auto; } .wills-summary > button { min-width: 11rem; grid-column: auto; } .wills-overview-grid { grid-template-columns: 1.2fr .8fr; } .wills-action-card { grid-column: 1 / -1; } }

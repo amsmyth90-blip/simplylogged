@@ -1,0 +1,111 @@
+.file-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  align-items: end;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  background: rgb(20 31 27 / 52%);
+  backdrop-filter: blur(0.3rem);
+}
+
+.file-editor {
+  width: min(100%, 42rem);
+  max-height: calc(100dvh - env(safe-area-inset-top));
+  margin: 0 auto;
+  overflow-y: auto;
+  border-radius: 1.75rem 1.75rem 0 0;
+  background: #fffdf8;
+  box-shadow: 0 -1.5rem 4rem -2rem rgb(15 23 42 / 60%);
+}
+
+.file-editor > header,
+.file-editor footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.file-editor .eyebrow,
+.file-editor h2 {
+  margin: 0;
+}
+
+.file-editor h2 {
+  margin-top: 0.25rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.file-editor form {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0 1.15rem max(1.15rem, env(safe-area-inset-bottom));
+}
+
+.file-editor label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--dd-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.file-editor input:not([type="checkbox"]) {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.85rem;
+  color: var(--dd-ink);
+  font: inherit;
+  border: 1px solid rgb(32 53 42 / 15%);
+  border-radius: 0.85rem;
+  background: #fff;
+}
+
+.file-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.file-editor .file-check {
+  display: flex;
+  min-height: 3rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  color: var(--dd-ink);
+  border-radius: 0.85rem;
+  background: #f4f6f0;
+}
+
+.file-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--dd-green);
+}
+
+.file-editor footer {
+  padding: 0.35rem 0 0;
+}
+
+.file-editor footer button {
+  width: 100%;
+  min-height: 3.1rem;
+  color: white;
+  font: inherit;
+  font-weight: 800;
+  border: 0;
+  border-radius: 0.9rem;
+  background: var(--dd-green);
+}
+
+@media (max-width: 480px) {
+  .file-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}

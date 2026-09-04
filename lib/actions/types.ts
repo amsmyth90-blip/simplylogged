@@ -18,6 +18,7 @@ export type ActionStatus = (typeof actionStatuses)[number];
 export const actionTypes = [
   "classify_document",
   "link_document",
+  "create_record",
   "create_reminder",
   "create_task",
   "update_record",
@@ -50,4 +51,3 @@ export type ActionRequest = {
   createdAt: string;
   expiresAt?: string;
 };
-

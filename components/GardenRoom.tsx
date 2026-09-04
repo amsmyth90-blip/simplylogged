@@ -104,7 +104,7 @@ export function GardenRoom() {
         if (distance > 72) router.push("/dashboard");
       }}
     >
-      <div className="absolute left-1/2 top-1/2 h-[max(100svh,150vw)] w-[max(100vw,66.67svh)] -translate-x-1/2 -translate-y-1/2">
+      <div className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2">
         <Image
           src="/images/pages/garden-command-centre-v2.webp"
           alt="Interactive DiaryDock Garden with a cat, dog, potting bench, tools, outdoor boxes and planning notebook"

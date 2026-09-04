@@ -183,6 +183,12 @@ export function InviteAcceptanceWorkspace({ inviteId }: InviteAcceptanceWorkspac
           {accepting ? "Joining household..." : "Accept invite"}
           <UiIcon name="chevron-right" className="h-4 w-4" />
         </button>
+        <a
+          href={`diarydock://family/invite/${encodeURIComponent(invite.id)}`}
+          className="mt-2 inline-flex w-full items-center justify-center rounded-2xl border border-ink/10 bg-white px-4 py-3 text-sm font-semibold text-ink"
+        >
+          Open in the DiaryDock app
+        </a>
         {error ? (
           <p className="mt-3 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>
         ) : null}

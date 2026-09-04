@@ -1,0 +1,38 @@
+.attic-document-list > .progressive-list-more,
+.attic-reminder-list > .progressive-list-more,
+.garden-document-list > .progressive-list-more,
+.garden-reminder-list > .progressive-list-more,
+.health-files-card > div > .progressive-list-more,
+.wills-files-card > div > .progressive-list-more {
+  display: block;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: .65rem .8rem;
+  color: #52675b;
+  font-size: .58rem;
+  font-weight: 850;
+  text-align: center;
+  border: 1px solid #dce3dc;
+  border-radius: .78rem;
+  background: #f8faf7;
+}
+
+.progressive-list-more:focus-visible {
+  outline: 3px solid rgb(73 112 89 / 35%);
+  outline-offset: 2px;
+}
+
+.attic-image-choice > div > .progressive-list-more,
+.trusted-notices > .progressive-list-more {
+  display: block;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: .65rem .8rem;
+  color: #52675b;
+  font-size: .58rem;
+  font-weight: 850;
+  text-align: center;
+  border: 1px solid #dce3dc;
+  border-radius: .78rem;
+  background: #f8faf7;
+}

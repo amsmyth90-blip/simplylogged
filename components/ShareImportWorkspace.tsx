@@ -5,101 +5,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
-import { uploadPrivateDocument, validateDocumentFile } from "@/lib/document-storage";
-import type { MailItem } from "@/lib/diarydock-data";
-import {
-  roomDetails,
-  vaultCategories,
-  type RoomActivity,
-  type RoomDetail,
-  type RoomDocument,
-  type VaultDocument
-} from "@/lib/mock-data";
+import { prepareShareImport } from "@/components/share-import/prepare-share-import";
+import { formatImportBytes, sharedFileToFile, shareImportRoomOptions, titleFromSharedName, type ImportFile } from "@/components/share-import/share-import-model";
+import { validateDocumentFile } from "@/lib/document-storage";
+import { roomDetails, vaultCategories, type RoomDetail } from "@/lib/mock-data";
 import { upsertStructuredDocument } from "@/lib/structured-data";
-
-type NativeSharedFile = {
-  id: string;
-  name: string;
-  mimeType: string;
-  size: number;
-  base64: string;
-};
-
-type NativeShareImportPayload = {
-  files?: NativeSharedFile[];
-  receivedAt?: string;
-  source?: string;
-};
-
-type NativeShareImportPlugin = {
-  getPendingImport?: () => Promise<NativeShareImportPayload>;
-  clearPendingImport?: () => Promise<void>;
-};
-
-declare global {
-  interface Window {
-    Capacitor?: {
-      Plugins?: {
-        DiaryDockShareImport?: NativeShareImportPlugin;
-      };
-    };
-  }
-}
-
-type ImportFile = {
-  id: string;
-  file: File;
-};
-
-const roomOptions = Object.values(roomDetails).map((room) => ({
-  id: room.id,
-  name: room.name
-}));
-
-function base64ToFile(sharedFile: NativeSharedFile) {
-  const cleanBase64 = sharedFile.base64.includes(",") ? sharedFile.base64.split(",").pop() ?? "" : sharedFile.base64;
-  const binary = window.atob(cleanBase64);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-
-  return new File([bytes], sharedFile.name || "shared-document", {
-    type: sharedFile.mimeType || "application/octet-stream",
-    lastModified: Date.now()
-  });
-}
-
-function formatBytes(bytes: number) {
-  if (bytes >= 1024 * 1024) {
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
-
-  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-
-function titleFromName(name: string) {
-  return name
-    .replace(/\.[^.]+$/, "")
-    .replace(/[-_]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function documentKindFor(file: File): VaultDocument["kind"] {
-  if (file.type === "application/pdf") return "PDF";
-  if (file.type.startsWith("image/")) return "Image";
-  return "Scan";
-}
-
-function mailKindFor(title: string): MailItem["kind"] {
-  const text = title.toLowerCase();
-  if (text.includes("bill") || text.includes("invoice")) return "Bill";
-  if (text.includes("statement")) return "Statement";
-  if (text.includes("form")) return "Form";
-  return "Letter";
-}
 
 export function ShareImportWorkspace() {
   const { repositoryMode, updateState } = useDiaryDockData();
@@ -133,13 +43,13 @@ export function ShareImportWorkspace() {
         const files = (payload.files ?? [])
           .map((sharedFile) => ({
             id: sharedFile.id,
-            file: base64ToFile(sharedFile)
+            file: sharedFileToFile(sharedFile)
           }))
           .filter((item) => !validateDocumentFile(item.file));
 
         if (!cancelled && files.length) {
           setImportFiles(files);
-          setTitle(titleFromName(files[0].file.name));
+          setTitle(titleFromSharedName(files[0].file.name));
         }
       } catch {
         if (!cancelled) {
@@ -174,75 +84,24 @@ export function ShareImportWorkspace() {
     setMessage(null);
 
     if (mapped[0]) {
-      setTitle(titleFromName(mapped[0].file.name));
+      setTitle(titleFromSharedName(mapped[0].file.name));
     }
   };
 
   const saveImport = async () => {
     if (!importFiles.length || saving) return;
 
-    const cleanTitle = title.trim() || titleFromName(importFiles[0].file.name) || "Shared document";
     setSaving(true);
     setMessage(null);
 
     try {
-      const documents: VaultDocument[] = [];
-      const roomDocuments: RoomDocument[] = [];
-      const roomActivity: RoomActivity[] = [];
-      const mailboxItems: MailItem[] = [];
-
-      for (const [index, item] of importFiles.entries()) {
-        const validationError = validateDocumentFile(item.file);
-        if (validationError) throw new Error(validationError);
-
-        const documentId = crypto.randomUUID();
-        const titleSuffix = importFiles.length > 1 ? ` ${index + 1}` : "";
-        const documentTitle = `${cleanTitle}${titleSuffix}`;
-        const storedFile = repositoryMode === "supabase" ? await uploadPrivateDocument(item.file, documentId) : null;
-        const sizeLabel = formatBytes(item.file.size);
-        const document: VaultDocument = {
-          id: documentId,
-          title: documentTitle,
-          category,
-          kind: documentKindFor(item.file),
-          size: sizeLabel,
-          updated: "Just now",
-          storageBucket: storedFile?.bucket,
-          storagePath: storedFile?.path,
-          originalFileName: item.file.name,
-          mimeType: item.file.type || "application/octet-stream",
-          roomId: selectedRoom.id,
-          roomName: selectedRoom.name,
-          issuer: "Shared to DiaryDock",
-          extractionSummary: "Imported from your phone share sheet. Please review and add any missing details.",
-          actionItems: ["Check the title, category, room and any important dates."],
-          reviewStatus: "needs-review",
-          reviewReasons: ["Shared into DiaryDock — please check details before relying on it."]
-        };
-
-        documents.push(document);
-        roomDocuments.push({
-          id: `${selectedRoom.id}-${documentId}`,
-          title: documentTitle,
-          kind: document.kind,
-          size: sizeLabel,
-          updated: "Just now"
-        });
-        roomActivity.push({
-          id: `share-import-${documentId}`,
-          text: `Imported ${documentTitle} from the phone share sheet`,
-          when: "Just now",
-          by: "DiaryDock"
-        });
-        mailboxItems.push({
-          id: `share-mail-${documentId}`,
-          title: documentTitle,
-          source: "Phone share sheet",
-          kind: mailKindFor(documentTitle),
-          suggestedRoom: selectedRoom.name,
-          routeStatus: selectedRoom.id === "mailbox" ? "new" : "room"
-        });
-      }
+      const { documents, mailboxItems, roomActivity, roomDocuments } = await prepareShareImport({
+        category,
+        files: importFiles,
+        repositoryMode,
+        room: selectedRoom,
+        title
+      });
 
       updateState((current) => ({
         ...current,
@@ -330,7 +189,7 @@ export function ShareImportWorkspace() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-[#20352a]">{item.file.name}</p>
-                  <p className="mt-0.5 text-xs text-[#667068]">{formatBytes(item.file.size)}</p>
+                  <p className="mt-0.5 text-xs text-[#667068]">{formatImportBytes(item.file.size)}</p>
                 </div>
               </div>
             ))
@@ -354,7 +213,7 @@ export function ShareImportWorkspace() {
             <input
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder={firstFile ? titleFromName(firstFile.name) : "Shared document"}
+              placeholder={firstFile ? titleFromSharedName(firstFile.name) : "Shared document"}
               className="min-h-12 w-full rounded-2xl border border-[#20352a]/[0.10] bg-[#fffdf8] px-4 text-sm font-semibold text-[#20352a] outline-none transition focus:border-[#6f8e72] focus:ring-2 focus:ring-[#6f8e72]/20"
             />
           </label>
@@ -367,7 +226,7 @@ export function ShareImportWorkspace() {
                 onChange={(event) => setRoomId(event.target.value)}
                 className="min-h-12 w-full rounded-2xl border border-[#20352a]/[0.10] bg-[#fffdf8] px-4 text-sm font-semibold text-[#20352a] outline-none transition focus:border-[#6f8e72] focus:ring-2 focus:ring-[#6f8e72]/20"
               >
-                {roomOptions.map((room) => (
+                {shareImportRoomOptions.map((room) => (
                   <option key={room.id} value={room.id}>
                     {room.name}
                   </option>

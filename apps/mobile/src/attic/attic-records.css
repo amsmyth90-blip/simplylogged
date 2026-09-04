@@ -1,0 +1,43 @@
+.attic-record-columns { display: grid; gap: .7rem; margin-top: .7rem; }
+.attic-card { min-width: 0; padding: .9rem; border: 1px solid rgb(255 255 255 / 92%); border-radius: 1.15rem; background: rgb(255 255 255 / 72%); box-shadow: 0 1rem 2.5rem -2rem #493b3e; }
+.attic-card > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.attic-card > header p { margin: 0; color: #897076; font-size: .54rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.attic-card > header h2 { margin: .18rem 0 0; font-family: Georgia,serif; font-size: 1.1rem; }
+.attic-card > header button,.attic-empty button { min-height: 2.45rem; padding-inline: .75rem; color: #76575d; font-size: .6rem; font-weight: 800; border: 1px solid #eadde0; border-radius: .72rem; background: white; }
+.attic-document-list,.attic-reminder-list,.attic-story-list { display: grid; gap: .42rem; margin-top: .7rem; }
+.attic-document-list > button { display: grid; width: 100%; min-height: 3.35rem; grid-template-columns: 2.6rem minmax(0,1fr) 2rem; align-items: center; gap: .45rem; padding: .35rem; color: #362c2d; text-align: left; border: 1px solid #eee5e6; border-radius: .88rem; background: white; }
+.attic-document-list > button > span { display: grid; width: 2.6rem; height: 2.6rem; place-items: center; color: #76575d; font-size: .52rem; font-weight: 900; border-radius: .7rem; background: #f1e7e8; }
+.attic-document-list strong,.attic-document-list small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attic-document-list strong { font-size: .68rem; }
+.attic-document-list small { margin-top: .15rem; color: #827679; font-size: .53rem; }
+.attic-document-list b { color: #806c70; font-size: 1rem; text-align: center; }
+.attic-reminder-list > label { display: grid; min-height: 3.3rem; grid-template-columns: 2.5rem minmax(0,1fr); align-items: center; gap: .45rem; padding: .35rem; border: 1px solid #eee5e6; border-radius: .88rem; background: white; }
+.attic-reminder-list input { width: 2.35rem; height: 2.35rem; margin: 0; appearance: none; border: 1px solid #decfd2; border-radius: .68rem; background: #f8f3f3; }
+.attic-reminder-list input:checked { background: #76575d; box-shadow: inset 0 0 0 .65rem #76575d; }
+.attic-reminder-list input:checked::after { display: grid; height: 100%; place-items: center; color: white; content: "✓"; font-size: .8rem; font-weight: 900; }
+.attic-reminder-list strong,.attic-reminder-list small { display: block; }
+.attic-reminder-list strong { font-size: .69rem; }
+.attic-reminder-list small { margin-top: .15rem; overflow: hidden; color: #827679; font-size: .54rem; text-overflow: ellipsis; white-space: nowrap; }
+.attic-story-list details { border: 1px solid #eee5e6; border-radius: .9rem; background: white; }
+.attic-story-list summary { display: grid; min-height: 3.7rem; grid-template-columns: 2.5rem minmax(0,1fr) auto; align-items: center; gap: .5rem; padding: .45rem; cursor: pointer; list-style: none; }
+.attic-story-list summary::-webkit-details-marker { display: none; }
+.attic-story-list summary > span { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; color: #76575d; border-radius: .7rem; background: #f1e7e8; }
+.attic-story-list summary strong,.attic-story-list summary small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attic-story-list summary strong { font-size: .7rem; }
+.attic-story-list summary small { margin-top: .15rem; color: #827679; font-size: .53rem; }
+.attic-story-list summary b { color: #876f74; font-size: .5rem; }
+.attic-story-list details > p { margin: 0; padding: .2rem .8rem .8rem; color: #625558; font-size: .62rem; line-height: 1.6; white-space: pre-wrap; }
+.attic-story-list details > footer { display: flex; flex-wrap: wrap; gap: .3rem; padding: 0 .8rem .8rem; }
+.attic-story-list details > footer span { padding: .3rem .45rem; color: #76575d; font-size: .48rem; font-weight: 750; border-radius: 999px; background: #f3e9ea; }
+.attic-empty { padding: 1.1rem .8rem; text-align: center; border: 1px dashed #dfd0d3; border-radius: .95rem; background: #fcf8f7; }
+.attic-empty > span { display: grid; width: 2.7rem; height: 2.7rem; margin: 0 auto; place-items: center; color: #76575d; border-radius: .8rem; background: #f1e5e7; }
+.attic-empty > strong { display: block; margin-top: .5rem; font-family: Georgia,serif; font-size: .82rem; }
+.attic-empty > p { max-width: 25rem; margin: .35rem auto 0; color: #7d6e71; font-size: .58rem; line-height: 1.55; }
+.attic-empty > button { margin-top: .65rem; }
+.attic-load-more { width: 100%; min-height: 2.8rem; margin-top: .75rem; color: #76575d; font-size: .64rem; font-weight: 850; border: 1px solid #dfd0d3; border-radius: .9rem; background: rgb(255 255 255 / 82%); }
+.attic-load-more:disabled { cursor: wait; opacity: .6; }
+@media (min-width:720px) {
+  .attic-record-columns { grid-template-columns: 1fr 1fr; }
+  .attic-story-card { grid-row: span 2; }
+  .attic-document-list,.attic-reminder-list,.attic-story-list { max-height: 32rem; overflow-y: auto; }
+}

@@ -1,0 +1,143 @@
+.auth-card {
+  width: min(100%, 28rem);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 2rem;
+  background: rgb(255 253 248 / 90%);
+  box-shadow: 0 1.875rem 5rem -2.5rem rgb(32 53 42 / 45%);
+  backdrop-filter: blur(1.25rem);
+}
+
+.auth-card-header {
+  padding: 2rem 1.5rem 1.75rem;
+  border-bottom: 1px solid rgb(32 53 42 / 10%);
+  background: radial-gradient(circle at top, #fffdf8fa, #f5f4edeb 58%, #dde6d8b3);
+}
+
+.auth-card-header .brand-mark {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+}
+
+.auth-card-header .brand-mark svg {
+  width: 1.5rem;
+}
+
+.auth-card-header .eyebrow {
+  margin-top: 1.25rem;
+}
+
+.auth-card-header h1 {
+  margin-top: 0.55rem;
+  font-family: inherit;
+  font-size: 1.875rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.auth-card-header > p:last-child {
+  margin: 0.75rem 0 0;
+  color: var(--dd-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.auth-form label span {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.auth-form input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  color: var(--dd-ink);
+  font: inherit;
+  border: 1px solid rgb(32 53 42 / 12%);
+  border-radius: 1rem;
+  outline: none;
+  background: white;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.auth-form input:focus-visible {
+  border-color: var(--dd-sage);
+  box-shadow: 0 0 0 0.25rem var(--dd-green-soft);
+}
+
+.auth-form button,
+.sign-out-button {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--dd-green);
+}
+
+.auth-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.auth-form .auth-text-button {
+  min-height: 2.5rem;
+  padding: 0.5rem;
+  color: var(--dd-green);
+  background: transparent;
+}
+
+.auth-card-footer {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-top: 1px solid rgb(32 53 42 / 10%);
+  background: rgb(232 239 227 / 45%);
+}
+
+.auth-card-footer p,
+.auth-card-footer small {
+  margin: 0;
+  color: var(--dd-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.auth-card-footer button {
+  min-height: 2.75rem;
+  color: var(--dd-green);
+  font: inherit;
+  font-weight: 750;
+  border: 1px solid rgb(49 84 67 / 20%);
+  border-radius: 1rem;
+  background: var(--dd-paper);
+}
+
+.form-message {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  border-radius: 1rem;
+}
+
+.form-error {
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+  background: #fff1f2;
+}

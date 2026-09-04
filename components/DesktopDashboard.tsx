@@ -7,6 +7,7 @@ import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { isDashboardAreaVisible } from "@/lib/dashboard-areas";
 import { estateAreas } from "@/lib/mock-data";
+import { calculateOrganisationScore } from "@/lib/organisation-score";
 
 const areaImages: Record<string, string> = {
   attic: "/images/pages/attic-memory-room-v1.webp",
@@ -28,7 +29,7 @@ const portalLabels: Record<string, { title: string; eyebrow: string }> = {
   driveway: { title: "Plans", eyebrow: "Trips & preparation" }
 };
 
-export function DesktopDashboard({ greeting }: { greeting: string }) {
+export function DesktopDashboard({ greeting, guardianCount }: { greeting: string; guardianCount: number }) {
   const { state, hydrated } = useDiaryDockData();
   const firstName = state.settingsProfile.name.trim().split(/\s+/)[0] || "there";
   const visibleAreas = estateAreas.filter((area) => isDashboardAreaVisible(area.id, state.onboarding));
@@ -50,6 +51,7 @@ export function DesktopDashboard({ greeting }: { greeting: string }) {
   const activeReminders = state.reminders.filter((reminder) => reminder.group !== "done");
   const latestDocument = state.vaultDocuments.at(-1);
   const nextReminder = activeReminders[0];
+  const organisationScore = calculateOrganisationScore(state);
   const dateLabel = new Intl.DateTimeFormat("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -95,6 +97,7 @@ export function DesktopDashboard({ greeting }: { greeting: string }) {
             <div className="mx-auto mt-3 flex w-36 items-center gap-3 text-[#b89a5c]" aria-hidden="true">
               <span className="h-px flex-1 bg-current/60" /><span className="text-sm">◆</span><span className="h-px flex-1 bg-current/60" />
             </div>
+            <Link href="/life-check" className="mx-auto mt-3 inline-flex min-h-9 items-center gap-2 rounded-full border border-[#345143]/10 bg-white/65 px-4 text-[11px] font-semibold text-[#54705e] shadow-sm transition hover:bg-white"><UiIcon name="chart" className="h-3.5 w-3.5" />{organisationScore.score}% organised · Life Check</Link>
           </section>
 
           <section aria-label="Your main DiaryDock spaces" className="mx-auto mt-5 grid max-w-[1430px] grid-cols-4 items-center gap-4 xl:grid-cols-[150px_repeat(4,minmax(0,1fr))_150px] xl:gap-5">
@@ -128,10 +131,11 @@ export function DesktopDashboard({ greeting }: { greeting: string }) {
             </div>
           ) : null}
 
-          <section aria-label="DiaryDock activity" className="mx-auto mt-6 grid max-w-[1100px] grid-cols-3 divide-x divide-[#345143]/10 overflow-hidden rounded-[24px] border border-[#b89a5c]/30 bg-[#fffdf8]/90 shadow-[0_24px_55px_-42px_rgba(32,53,42,0.65)] backdrop-blur-lg">
+          <section aria-label="DiaryDock activity" className="mx-auto mt-6 grid max-w-[1430px] grid-cols-4 divide-x divide-[#345143]/10 overflow-hidden rounded-[24px] border border-[#b89a5c]/30 bg-[#fffdf8]/90 shadow-[0_24px_55px_-42px_rgba(32,53,42,0.65)] backdrop-blur-lg">
             <ActivityItem icon="file" title="Recent file" href="/files" primary={latestDocument?.title || "No files yet"} secondary={latestDocument ? [latestDocument.kind, latestDocument.updated].filter(Boolean).join(" · ") : "Your saved documents will appear here."} />
             <ActivityItem icon="calendar" title="Next reminder" href="/reminders" primary={nextReminder?.title || "Nothing coming up"} secondary={nextReminder ? [nextReminder.timeLabel, nextReminder.roomName].filter(Boolean).join(" · ") : "Your reminder list is clear."} />
             <ActivityItem icon="alert" title="Review items" href="/review-inbox" primary={reviewDocuments.length ? `${reviewDocuments.length} ${reviewDocuments.length === 1 ? "item" : "items"} to check` : "Nothing waiting"} secondary="Check captured details before filing." />
+            <ActivityItem icon="shield" title="Guardian" href="/guardian" primary={guardianCount ? `${guardianCount} ${guardianCount === 1 ? "thing needs" : "things need"} attention` : "Everything looks settled"} secondary="A calm check of your saved dates." />
           </section>
 
           {remainingAreas.length ? (
@@ -166,7 +170,7 @@ function SpaceChip({ area }: { area: (typeof estateAreas)[number] }) {
   );
 }
 
-function ActivityItem({ icon, title, href, primary, secondary }: { icon: "file" | "calendar" | "alert"; title: string; href: string; primary: string; secondary: string }) {
+function ActivityItem({ icon, title, href, primary, secondary }: { icon: "file" | "calendar" | "alert" | "shield"; title: string; href: string; primary: string; secondary: string }) {
   return (
     <Link href={href} className="group flex min-h-[118px] items-center gap-4 px-5 py-4 transition hover:bg-[#f7f5ed] xl:px-7">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e5ecdf] text-[#54705e]"><UiIcon name={icon} className="h-[19px] w-[19px]" /></span>

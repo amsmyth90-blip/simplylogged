@@ -367,9 +367,9 @@ This is a solid start for Universal Life Inbox. It should become one ingestion s
 - Android project exists.
 - Android share import plugin exists: `android/app/src/main/java/com/diarydock/app/DiaryDockShareImportPlugin.java`.
 - Codemagic workflow builds a developer APK.
-- The app uses hosted web content via `server.url: https://diarydock.com`.
+- The app packages local mobile assets from `apps/mobile/dist`; no production `server.url` overrides the installed interface.
 
-This means many web production changes can appear in the installed APK without rebuilding, but native plugin or manifest changes require a new APK.
+Mobile interface, native plugin, Capacitor configuration and manifest changes require a new signed build. Backwards-compatible server API and database changes can deploy independently through the versioned mobile contract.
 
 ## Current security controls
 
@@ -395,7 +395,7 @@ Concerns:
 - Uploaded documents can influence downstream AI extraction; prompt-injection handling is not yet explicit.
 - No general audit log for viewed/exported/shared/AI-processed records.
 - `app_state.payload` makes database-level permissioning and selective export/deletion difficult for many feature objects.
-- CSP currently allows `unsafe-inline` and `unsafe-eval`, likely for Next compatibility, but should be revisited before high-risk agentic functionality.
+- Production web CSP retains `unsafe-inline` for the current Next.js rendering mode but limits `unsafe-eval` to development. The packaged mobile CSP permits neither. A nonce/hash migration should still be reconsidered before high-risk agentic functionality.
 
 ## Current privacy posture
 

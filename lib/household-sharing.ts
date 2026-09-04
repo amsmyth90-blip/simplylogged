@@ -1,53 +1,46 @@
 "use client";
 
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import type {
+  HouseholdAccessEvent,
+  HouseholdDirectory,
+  HouseholdInvitePreview,
+  HouseholdRole,
+} from "@diarydock/household";
 
-export type HouseholdInvitePreview = {
-  token: string;
-  householdName: string;
-  name: string;
-  relation: string;
-  access: string;
-  expiresAt: string;
-};
+export type {
+  HouseholdAccessEvent,
+  HouseholdDirectory,
+  HouseholdDirectoryInvite,
+  HouseholdDirectoryMember,
+  HouseholdInvitePreview,
+  HouseholdOwnershipTransfer,
+  HouseholdRole,
+} from "@diarydock/household";
 
-export type HouseholdRole = "owner" | "member" | "viewer";
+type ApiError = { error?: string };
 
-export type HouseholdDirectoryMember = {
-  userId: string;
-  name: string;
-  relation: string;
-  role: HouseholdRole;
-  joinedAt: string;
-};
+async function householdRequest<T>(path = "", init?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/household${path}`, {
+    ...init,
+    cache: "no-store",
+    headers: init?.body
+      ? { "Content-Type": "application/json", ...init.headers }
+      : init?.headers,
+  });
+  const payload = await response.json().catch((): ApiError => ({}));
 
-export type HouseholdDirectoryInvite = {
-  token: string;
-  email: string;
-  name: string;
-  relation: string;
-  access: string;
-  createdAt: string;
-  expiresAt: string;
-};
-
-export type HouseholdDirectory = {
-  householdId: string;
-  householdName: string;
-  currentUserId: string;
-  role: HouseholdRole;
-  members: HouseholdDirectoryMember[];
-  invites: HouseholdDirectoryInvite[];
-};
-
-function requireClient() {
-  const client = getSupabaseBrowserClient();
-
-  if (!client) {
-    throw new Error("Household sharing is not configured.");
+  if (!response.ok) {
+    throw new Error((payload as ApiError).error ?? "Household access could not be updated.");
   }
 
-  return client;
+  return payload as T;
+}
+
+async function householdMutation<T>(action: string, values: Record<string, unknown> = {}) {
+  return householdRequest<T>("", {
+    method: "POST",
+    body: JSON.stringify({ action, ...values }),
+  });
 }
 
 export async function createHouseholdInvite(input: {
@@ -56,169 +49,79 @@ export async function createHouseholdInvite(input: {
   relation: string;
   access: string;
 }) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("create_household_invite", {
-    invite_email: input.email,
-    invite_name: input.name,
-    invite_relation: input.relation,
-    invite_access: input.access
-  });
+  const payload = await householdMutation<{ token: string }>("create-invite", input);
+  return payload.token;
+}
 
-  if (error || !data) {
-    throw new Error(error?.message ?? "The invite could not be created.");
-  }
-
-  return String(data);
+export async function createHouseholdRoleInvite(input: {
+  email: string;
+  name: string;
+  relation: string;
+  role: Exclude<HouseholdRole, "owner">;
+}) {
+  const payload = await householdMutation<{ token: string }>("create-role-invite", input);
+  return payload.token;
 }
 
 export async function getHouseholdInvite(token: string): Promise<HouseholdInvitePreview | null> {
-  const client = requireClient();
-  const { data, error } = await client.rpc("get_household_invite", {
-    invite_token: token
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const row = Array.isArray(data) ? data[0] : data;
-  if (!row) {
-    return null;
-  }
-
-  return {
-    token: String(row.token),
-    householdName: String(row.household_name),
-    name: String(row.invite_name),
-    relation: String(row.relation),
-    access: String(row.access),
-    expiresAt: String(row.expires_at)
-  };
+  const payload = await householdRequest<{ invite: HouseholdInvitePreview | null }>(
+    `?view=invite&token=${encodeURIComponent(token)}`,
+  );
+  return payload.invite;
 }
 
 export async function acceptHouseholdInvite(token: string) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("accept_household_invite", {
-    invite_token: token
-  });
-
-  if (error || !data) {
-    throw new Error(error?.message ?? "The invite could not be accepted.");
-  }
-
-  return String(data);
+  const payload = await householdMutation<{ householdId: string }>("accept-invite", { token });
+  return payload.householdId;
 }
 
 export async function cancelHouseholdInvite(token: string) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("cancel_household_invite", {
-    invite_token: token
-  });
-
-  if (error || !data) {
-    throw new Error(error?.message ?? "The invite could not be cancelled.");
-  }
+  await householdMutation("cancel-invite", { token });
 }
 
 export async function renewHouseholdInvite(token: string) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("renew_household_invite", {
-    invite_token: token
-  });
-
-  if (error || !data) {
-    throw new Error(error?.message ?? "The invite could not be renewed.");
-  }
+  await householdMutation("renew-invite", { token });
 }
 
 export async function loadHouseholdDirectory(): Promise<HouseholdDirectory | null> {
-  const client = requireClient();
-  const { data: authData, error: authError } = await client.auth.getUser();
-
-  if (authError || !authData.user) {
-    return null;
-  }
-
-  const { data: householdId, error: householdError } = await client.rpc("ensure_user_household");
-  if (householdError || !householdId) {
-    return null;
-  }
-
-  const [householdResult, membersResult, invitesResult] = await Promise.all([
-    client.from("households").select("name").eq("id", householdId).maybeSingle(),
-    client
-      .from("household_memberships")
-      .select("user_id, role, display_name, relation, joined_at")
-      .eq("household_id", householdId)
-      .eq("status", "active")
-      .order("joined_at", { ascending: true }),
-    client
-      .from("household_invites")
-      .select("token, email, name, relation, access, created_at, expires_at")
-      .eq("household_id", householdId)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true })
-  ]);
-
-  if (householdResult.error || membersResult.error) {
-    return null;
-  }
-
-  const members: HouseholdDirectoryMember[] = (membersResult.data ?? []).map((row) => ({
-    userId: String(row.user_id),
-    name: String(row.display_name || "Household member"),
-    relation: String(row.relation || "Household member"),
-    role: row.role as HouseholdRole,
-    joinedAt: String(row.joined_at)
-  }));
-  const currentMembership = members.find((member) => member.userId === authData.user.id);
-
-  if (!currentMembership) {
-    return null;
-  }
-
-  return {
-    householdId: String(householdId),
-    householdName: String(householdResult.data?.name ?? "My household"),
-    currentUserId: authData.user.id,
-    role: currentMembership.role,
-    members,
-    invites: invitesResult.error
-      ? []
-      : (invitesResult.data ?? []).map((row) => ({
-          token: String(row.token),
-          email: String(row.email),
-          name: String(row.name),
-          relation: String(row.relation),
-          access: String(row.access),
-          createdAt: String(row.created_at),
-          expiresAt: String(row.expires_at)
-        }))
-  };
+  const payload = await householdRequest<{ household: HouseholdDirectory | null }>();
+  return payload.household;
 }
 
 export async function updateHouseholdMemberRole(
   userId: string,
-  role: Exclude<HouseholdRole, "owner">
+  role: Exclude<HouseholdRole, "owner">,
 ) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("update_household_member_role", {
-    member_user_id: userId,
-    new_role: role
-  });
-
-  if (error || !data) {
-    throw new Error(error?.message ?? "The member's access could not be changed.");
-  }
+  await householdMutation("update-role", { userId, role });
 }
 
 export async function removeHouseholdMember(userId: string) {
-  const client = requireClient();
-  const { data, error } = await client.rpc("remove_household_member", {
-    member_user_id: userId
-  });
+  await householdMutation("remove-member", { userId });
+}
 
-  if (error || !data) {
-    throw new Error(error?.message ?? "The household member could not be removed.");
-  }
+export async function renameHousehold(name: string) {
+  await householdMutation("rename", { name: name.trim() });
+}
+
+export async function leaveHousehold() {
+  const payload = await householdMutation<{ householdId: string }>("leave");
+  return payload.householdId;
+}
+
+export async function initiateHouseholdOwnershipTransfer(userId: string) {
+  await householdMutation("initiate-ownership-transfer", { userId });
+}
+
+export async function resolveHouseholdOwnershipTransfer(
+  transferId: string,
+  decision: "accept" | "decline" | "cancel",
+) {
+  await householdMutation("resolve-ownership-transfer", { transferId, decision });
+}
+
+export async function loadHouseholdAccessEvents(householdId: string): Promise<HouseholdAccessEvent[]> {
+  const payload = await householdRequest<{ events: HouseholdAccessEvent[] }>(
+    `?view=events&householdId=${encodeURIComponent(householdId)}`,
+  );
+  return payload.events;
 }

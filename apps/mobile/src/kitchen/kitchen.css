@@ -1,0 +1,82 @@
+.kitchen-screen {
+  min-height: 100dvh;
+  padding: max(0.8rem, env(safe-area-inset-top)) 0 7rem;
+  color: #26382f;
+  background: radial-gradient(circle at 10% 0%, #fff 0, transparent 35%), linear-gradient(160deg, #eef5ea, #fbfcf9 52%, #e8f1e7);
+}
+
+.kitchen-header,
+.kitchen-hero,
+.kitchen-sheet { width: min(100% - 1.5rem, 70rem); margin-inline: auto; }
+
+.kitchen-header { display: flex; min-height: 3rem; align-items: center; gap: 0.7rem; }
+.kitchen-header > button { width: 2.75rem; height: 2.75rem; color: #29483d; font-size: 1.6rem; border: 1px solid #dce7d7; border-radius: 50%; background: rgb(255 255 255 / 80%); }
+.kitchen-header > div { min-width: 0; flex: 1; }
+.kitchen-header strong,
+.kitchen-header small { display: block; }
+.kitchen-header strong { font-family: Georgia, serif; font-size: 1.05rem; }
+.kitchen-header small { margin-top: 0.1rem; color: #6f786f; font-size: 0.64rem; }
+.kitchen-header > span { padding: 0.45rem 0.65rem; font-size: 0.58rem; font-weight: 850; border-radius: 999px; }
+.kitchen-header .is-live { color: #315443; background: #dfead9; }
+.kitchen-header .is-cached { color: #705f43; background: #efe8d8; }
+
+.kitchen-hero { position: relative; height: 12rem; margin-top: 0.8rem; overflow: hidden; border-radius: 1.5rem; background-position: center; background-size: cover; box-shadow: 0 1.4rem 3rem -2rem rgb(35 61 51 / 70%); }
+.kitchen-hero > div { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(24 54 43 / 88%), rgb(33 65 51 / 48%) 68%, transparent); }
+.kitchen-hero article { position: absolute; left: 1.2rem; bottom: 1.2rem; max-width: 20rem; color: white; }
+.kitchen-hero p { margin: 0; color: rgb(255 255 255 / 70%); font-size: 0.58rem; font-weight: 850; letter-spacing: 0.16em; text-transform: uppercase; }
+.kitchen-hero h1 { margin: 0.35rem 0 0; font-family: Georgia, serif; font-size: 1.8rem; line-height: 1; }
+.kitchen-hero article span { display: block; margin-top: 0.55rem; color: rgb(255 255 255 / 78%); font-size: 0.7rem; line-height: 1.5; }
+
+.kitchen-sheet { margin-top: 0.85rem; }
+.kitchen-feature-links { display: grid; gap: .5rem; margin-bottom: .65rem; }
+.kitchen-noticeboard-link { display: grid; width: 100%; min-height: 4.4rem; grid-template-columns: 2.75rem minmax(0,1fr) 2.75rem; align-items: center; gap: .55rem; padding: .5rem; color: #315443; text-align: left; border: 1px solid rgb(255 255 255 / 90%); border-radius: 1.15rem; background: linear-gradient(110deg, rgb(235 243 229 / 92%), rgb(255 255 255 / 82%)); box-shadow: 0 .8rem 2rem -1.7rem #243d35; }
+.kitchen-noticeboard-link > span { display: grid; width: 2.75rem; height: 2.75rem; place-items: center; color: white; font-size: 1rem; border-radius: .85rem; background: #607b55; }
+.kitchen-noticeboard-link strong,.kitchen-noticeboard-link small { display: block; }.kitchen-noticeboard-link strong { font-family: Georgia,serif; font-size: .82rem; }.kitchen-noticeboard-link small { margin-top: .2rem; color: #768078; font-size: .56rem; }.kitchen-noticeboard-link b { font-size: 1.25rem; text-align: center; }
+.kitchen-add { padding: 0.85rem; border: 1px solid rgb(255 255 255 / 88%); border-radius: 1.15rem; background: rgb(255 255 255 / 72%); box-shadow: 0 0.8rem 2rem -1.8rem #243d35; }
+.kitchen-add label { display: block; color: #617958; font-size: 0.58rem; font-weight: 850; letter-spacing: 0.11em; text-transform: uppercase; }
+.kitchen-add > div { display: flex; gap: 0.55rem; margin-top: 0.45rem; }
+.kitchen-add input { min-width: 0; min-height: 2.75rem; flex: 1; padding: 0 0.8rem; color: #26382f; font: inherit; font-size: 0.78rem; border: 1px solid #d9e4d5; border-radius: 0.85rem; outline: none; background: white; }
+.kitchen-add input:focus { border-color: #78936c; box-shadow: 0 0 0 3px rgb(120 147 108 / 15%); }
+.kitchen-add button { min-width: 4rem; min-height: 2.75rem; padding-inline: 1rem; color: white; font-size: 0.7rem; font-weight: 800; border: 0; border-radius: 0.85rem; background: #263b35; }
+.kitchen-add :disabled { opacity: 0.52; }
+
+.kitchen-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: 0.75rem; padding: 0.25rem; border-radius: 0.95rem; background: rgb(255 255 255 / 58%); }
+.kitchen-tabs button { display: flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: 0.45rem; color: #687369; font-size: 0.7rem; font-weight: 800; border: 0; border-radius: 0.75rem; background: transparent; }
+.kitchen-tabs button span { display: grid; min-width: 1.35rem; height: 1.35rem; padding-inline: 0.25rem; place-items: center; font-size: 0.56rem; border-radius: 999px; background: #e7eee3; }
+.kitchen-tabs .is-active { color: #315443; background: white; box-shadow: 0 0.5rem 1rem -0.9rem #263b35; }
+
+.kitchen-message,
+.kitchen-loading { margin: 0.7rem 0 0; padding: 0.7rem 0.85rem; color: #5f6d61; font-size: 0.68rem; line-height: 1.5; border: 1px solid #dce7d7; border-radius: 0.85rem; background: rgb(255 255 255 / 70%); }
+.kitchen-list-grid { display: grid; gap: 0.8rem; margin-top: 0.75rem; }
+.kitchen-list-grid .kitchen-list:nth-child(2) { display: none; }
+.kitchen-list { min-width: 0; padding: 0.9rem; border: 1px solid rgb(255 255 255 / 92%); border-radius: 1.2rem; background: rgb(255 255 255 / 72%); box-shadow: 0 1rem 2.5rem -2rem #263b35; }
+.kitchen-list > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.kitchen-list > header p { margin: 0; color: #71806f; font-size: 0.55rem; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase; }
+.kitchen-list > header h2 { margin: 0.2rem 0 0; font-family: Georgia, serif; font-size: 1.25rem; }
+.kitchen-list > header > span { display: grid; min-width: 2rem; height: 2rem; padding-inline: 0.4rem; place-items: center; color: #5d7753; font-size: 0.68rem; font-weight: 850; border-radius: 999px; background: #e7f0e2; }
+.kitchen-items { display: grid; gap: 0.45rem; margin-top: 0.75rem; }
+.kitchen-items article { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem 2.75rem; align-items: center; gap: 0.35rem; min-height: 3.25rem; padding: 0.25rem; border: 1px solid #e6ece2; border-radius: 0.95rem; background: white; }
+.kitchen-items article.is-checked > div strong { color: #829083; text-decoration: line-through; }
+.kitchen-check,
+.kitchen-item-action { width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; }
+.kitchen-check { color: white; font-size: 0.9rem; font-weight: 900; border: 1px solid #b9c8b3; background: #f6f8f4; }
+.is-checked .kitchen-check { border-color: #718c65; background: #718c65; }
+.kitchen-items article > div { min-width: 0; }
+.kitchen-items strong,
+.kitchen-items small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kitchen-items strong { font-size: 0.72rem; }
+.kitchen-items small { margin-top: 0.18rem; color: #899088; font-size: 0.56rem; }
+.kitchen-item-action { color: #607b55; font-size: 1rem; border: 0; background: #edf4e9; }
+.kitchen-item-action.is-delete { color: #9b5148; background: #fff0ee; }
+.kitchen-items button:disabled { opacity: 0.45; }
+.kitchen-empty { margin: 0; padding: 1.3rem; color: #7b857c; font-size: 0.7rem; text-align: center; border: 1px dashed #d6e0d2; border-radius: 0.9rem; }
+
+@media (min-width: 760px) {
+  .kitchen-screen { padding-inline: 1rem; }
+  .kitchen-hero { height: 14rem; }
+  .kitchen-hero h1 { font-size: 2.4rem; }
+  .kitchen-tabs { display: none; }
+  .kitchen-list-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kitchen-list-grid .kitchen-list:nth-child(2) { display: block; }
+  .kitchen-feature-links { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}

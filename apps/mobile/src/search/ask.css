@@ -1,0 +1,149 @@
+.ask-panel {
+  width: min(100%, 46rem);
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 1.2rem;
+}
+
+.ask-intro {
+  display: flex;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 1.2rem;
+  background: #eaf0e7;
+}
+
+.ask-intro > span {
+  color: #52715e;
+  font-size: 1.4rem;
+}
+
+.ask-intro h2,
+.ask-intro p {
+  margin: 0;
+}
+
+.ask-intro h2 {
+  font-family: Georgia, serif;
+}
+
+.ask-intro p {
+  margin-top: 0.25rem;
+  color: #65736b;
+  font-size: 0.75rem;
+}
+
+.ask-panel form {
+  margin-top: 1rem;
+}
+
+.ask-panel label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #65736b;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.ask-panel textarea {
+  width: 100%;
+  min-height: 7rem;
+  padding: 0.9rem;
+  color: #20352a;
+  border: 1px solid #dcd6ca;
+  border-radius: 1rem;
+  outline: none;
+  background: rgb(255 255 255 / 86%);
+  box-shadow: 0 0.8rem 2rem -1.7rem #20352a;
+  resize: vertical;
+}
+
+.ask-panel textarea:focus {
+  border-color: #6e8b78;
+  box-shadow: 0 0 0 3px rgb(110 139 120 / 18%);
+}
+
+.ask-panel form button {
+  width: 100%;
+  min-height: 3rem;
+  margin-top: 0.6rem;
+  color: white;
+  font-weight: 800;
+  border: 0;
+  border-radius: 0.9rem;
+  background: #315443;
+}
+
+.ask-examples {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.55rem 0 0.15rem;
+  scrollbar-width: none;
+}
+
+.ask-examples button {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.7rem;
+  color: #526259;
+  font-size: 0.68rem;
+  border: 1px solid #ded8cc;
+  border-radius: 999px;
+  background: #fffdf8;
+}
+
+.ask-answer {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe3d8;
+  border-radius: 1.2rem;
+  background: #fbfdf8;
+}
+
+.ask-answer > span {
+  color: #52715e;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ask-answer > p {
+  line-height: 1.6;
+}
+
+.ask-answer h3 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.78rem;
+}
+
+.ask-answer > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.7rem;
+  margin-top: 0.45rem;
+  padding: 0.7rem;
+  color: #20352a;
+  text-align: left;
+  border: 1px solid #e2ddd3;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 82%);
+}
+
+.ask-answer button strong,
+.ask-answer button small {
+  display: block;
+}
+
+.ask-answer button small {
+  margin-top: 0.15rem;
+  overflow: hidden;
+  color: #788079;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

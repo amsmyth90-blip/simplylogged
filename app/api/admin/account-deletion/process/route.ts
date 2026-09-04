@@ -3,6 +3,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { processAccountDeletion } from "@/lib/account-deletion";
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 
 type ProcessDeletionBody = {
@@ -36,7 +37,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const body = await request.json().catch((): ProcessDeletionBody => ({}));
+  let body: ProcessDeletionBody;
+  try {
+    const parsed = await readBoundedJson(request, 4 * 1024);
+    body = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as ProcessDeletionBody
+      : {};
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "The deletion request is invalid." }, { status });
+  }
   const requestId = String(body.requestId ?? "").trim();
   if (!requestId) {
     return NextResponse.json({ error: "requestId is required." }, { status: 400 });

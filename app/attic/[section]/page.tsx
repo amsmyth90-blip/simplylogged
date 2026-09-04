@@ -4,12 +4,17 @@ import { notFound, redirect } from "next/navigation";
 import { BottomNav } from "@/components/BottomNav";
 import { AtticSectionWorkspace } from "@/components/attic/AtticSectionWorkspace";
 import { requireUser } from "@/lib/auth";
-import { atticSections, getAtticSection, isAtticSection } from "@/lib/attic-sections";
+import {
+  atticSections,
+  getAtticSection,
+  isAtticSection,
+  type AtticSection,
+} from "@/lib/attic-sections";
 
 type AtticSectionPageProps = { params: Promise<{ section: string }> };
 
 export function generateStaticParams() {
-  return atticSections.map((section) => ({ section: section.id }));
+  return atticSections.map((section: AtticSection) => ({ section: section.id }));
 }
 
 export async function generateMetadata({ params }: AtticSectionPageProps): Promise<Metadata> {

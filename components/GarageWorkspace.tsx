@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
+import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { DesktopSpaceLanding } from "@/components/DesktopSpaceLanding";
 import { RoomSceneHeader, roomHotspotClass, roomImageLabelClass } from "@/components/RoomSceneChrome";
 import type { IconName } from "@/components/UiIcon";
-import { DEFAULT_VEHICLE_ID } from "@/lib/vehicle-records";
 
 type GarageSectionId =
   | "vehicle"
@@ -72,7 +72,27 @@ const garageSections: GarageSection[] = [
 
 export function GarageWorkspace() {
   const router = useRouter();
+  const { state, hydrated } = useDiaryDockData();
   const touchStartX = useRef<number | null>(null);
+  const primaryVehicleId = state.vehicles.vehicles[0]?.id;
+  const visibleSections = !hydrated
+    ? []
+    : primaryVehicleId
+      ? garageSections
+      : [
+          {
+            id: "vehicle" as const,
+            label: "Add your first vehicle",
+            shortDescription: "Create a secure vehicle profile",
+            modalDescription: "Start your Garage with the vehicle you use.",
+            icon: "car" as const,
+            href: "",
+          },
+        ];
+  const sectionHref = (section: GarageSection) =>
+    primaryVehicleId
+      ? `/garage/vehicles/${primaryVehicleId}${section.href}`
+      : "/garage/vehicles/new";
 
   useEffect(() => {
     const previousHtmlOverflow = document.documentElement.style.overflow;
@@ -94,12 +114,17 @@ export function GarageWorkspace() {
         image="/images/pages/garage-folio-hero-v5.webp"
         imageAlt="A warm organised garage with a car and workbench"
         imagePosition="center 46%"
-        items={garageSections.map((section) => ({
+        items={visibleSections.map((section) => ({
           label: section.label,
           description: section.shortDescription,
           icon: section.icon,
-          href: `/garage/vehicles/${DEFAULT_VEHICLE_ID}${section.href}`,
-        }))}
+          href: sectionHref(section),
+        })).concat(primaryVehicleId ? [{
+          label: "Add vehicle",
+          description: "Create another vehicle profile",
+          icon: "plus" as const,
+          href: "/garage/vehicles/new",
+        }] : [])}
       />
       <main
         className="fixed inset-0 z-30 overflow-hidden bg-[#4b4033] overscroll-none lg:hidden"
@@ -127,7 +152,7 @@ export function GarageWorkspace() {
 
         <section
           aria-label="Interactive Garage"
-          className="relative mx-auto h-full w-[min(100vw,56.5svh,34rem)] overflow-hidden bg-[#514536] shadow-[0_0_70px_rgba(28,23,17,0.5)]"
+          className="absolute left-1/2 top-1/2 h-[max(100svh,177.71vw)] w-[max(100vw,56.27svh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#514536] shadow-[0_0_70px_rgba(28,23,17,0.5)]"
         >
           <Image
             src="/images/pages/garage-folio-hero-v5.webp"
@@ -142,7 +167,7 @@ export function GarageWorkspace() {
           <div className="absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-[#211b15]/30 to-transparent" />
 
           <nav aria-label="Garage sections" className="absolute inset-0 z-20">
-            {garageSections.map((section, index) => {
+            {visibleSections.map((section, index) => {
               const sharedProps = {
                 "aria-label": `Open ${section.label}: ${section.shortDescription}`,
                 className: `${roomHotspotClass} group left-[51%] right-[10%] min-h-11 active:scale-[0.98] motion-reduce:transform-none`,
@@ -150,7 +175,7 @@ export function GarageWorkspace() {
               };
 
               return (
-                <Link key={section.id} href={`/garage/vehicles/${DEFAULT_VEHICLE_ID}${section.href}`} {...sharedProps}>
+                <Link key={section.id} href={sectionHref(section)} {...sharedProps}>
                   <span className="sr-only">{section.label}: {section.shortDescription}</span>
                   <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
                     {section.label}
@@ -158,6 +183,18 @@ export function GarageWorkspace() {
                 </Link>
               );
             })}
+            {primaryVehicleId ? (
+              <Link
+                href="/garage/vehicles/new"
+                aria-label="Add another vehicle"
+                className={`${roomHotspotClass} group left-[51%] right-[10%] min-h-11 active:scale-[0.98] motion-reduce:transform-none`}
+                style={{ top: "82.5%", height: "5.4%" }}
+              >
+                <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${roomImageLabelClass}`}>
+                  Add vehicle
+                </span>
+              </Link>
+            ) : null}
           </nav>
 
         </section>

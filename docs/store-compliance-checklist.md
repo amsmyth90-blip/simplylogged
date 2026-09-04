@@ -23,6 +23,7 @@ Use these URLs in App Store Connect and Google Play Console:
 - Essential auth cookies/local storage: yes.
 - User-generated content: documents, notes, reminders, household data, family stories, travel records, garden/garage/office records.
 - Sensitive data may be stored by user choice: health, identity, wills, insurance, bills, emergency information.
+- User-directed sharing: household resources, trusted emergency records and a minimal read-only Home Handover can be shared with a specifically chosen person; received Home Handover copies are online-only and expire within 30 days.
 
 ## Apple App Store / TestFlight
 
@@ -46,8 +47,8 @@ Use these URLs in App Store Connect and Google Play Console:
 ## Required operational follow-up before public launch
 
 - Confirm `hello@diarydock.com` remains monitored. DNS currently routes DiaryDock email through Zoho Mail (`mx.zoho.eu`, SPF and Zoho verification present). A test message sent to `hello@diarydock.com` on 17 August 2026 arrived in Amy's monitored Outlook inbox.
-- Add `SUPABASE_SERVICE_ROLE_KEY`, `ACCOUNT_DELETION_ADMIN_TOKEN` and `ACCOUNT_DELETION_ADMIN_EMAILS` to Vercel production environment variables.
-- Apply the Supabase migration `20260817103000_account_deletion_requests.sql`.
+- Run `npm run release:preflight` in the protected production environment and retain its result without exporting secret values.
+- Confirm the full reviewed Supabase migration chain is applied in order; the account-deletion migration alone is not a sufficient schema release.
 - Review pending deletion requests in `public.account_deletion_requests` or the protected internal page at `/admin/account-deletion`.
 - Process a verified request through the server-only endpoint:
 

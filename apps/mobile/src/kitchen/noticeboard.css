@@ -1,0 +1,40 @@
+.noticeboard-screen { min-height: 100dvh; padding-bottom: 6.5rem; color: #26382f; background: linear-gradient(145deg, #eef4eb, #fbfcf8 48%, #e7efe4); }
+.noticeboard-shell { width: min(100% - 1.5rem, 70rem); margin-inline: auto; padding-top: max(.8rem, env(safe-area-inset-top)); }
+.noticeboard-header { display: flex; min-height: 3rem; align-items: center; gap: .55rem; }
+.notice-round-button,
+.notice-add-button { display: grid; width: 2.75rem; height: 2.75rem; flex: 0 0 2.75rem; place-items: center; border-radius: 50%; }
+.notice-round-button { color: #52635a; font-size: 1.4rem; border: 1px solid rgb(255 255 255 / 90%); background: rgb(255 255 255 / 74%); box-shadow: 0 .4rem 1rem -.8rem #263b35; }
+.notice-add-button { color: white; font-size: 1.5rem; border: 0; background: #263b35; box-shadow: 0 .8rem 1.4rem -.8rem rgb(38 59 53 / 75%); }
+.notice-add-button:disabled { opacity: .45; }
+.noticeboard-heading { min-width: 0; flex: 1; }
+.noticeboard-heading small { display: block; color: #66805c; font-size: .55rem; font-weight: 850; letter-spacing: .18em; text-transform: uppercase; }
+.noticeboard-heading h1 { overflow: hidden; margin: .12rem 0 0; font-family: Georgia, serif; font-size: 1.35rem; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
+.notice-archive-button { position: relative; font-size: 1rem; }
+.notice-archive-button span { position: absolute; top: -.18rem; right: -.18rem; display: grid; min-width: 1rem; height: 1rem; padding-inline: .2rem; place-items: center; color: white; font-size: .48rem; font-weight: 850; border-radius: 999px; background: #718b62; }
+.notice-status-line { display: flex; justify-content: flex-end; margin-top: .25rem; }
+.notice-status-line span { padding: .3rem .55rem; color: #315443; font-size: .52rem; font-weight: 800; border-radius: 999px; background: #dfead9; }
+.notice-status-line .is-cached { color: #705f43; background: #efe8d8; }
+.notice-filters { display: flex; gap: .4rem; margin-top: .45rem; padding-bottom: .2rem; overflow-x: auto; scrollbar-width: none; }
+.notice-filters::-webkit-scrollbar { display: none; }
+.notice-filters button { min-height: 2.75rem; padding: 0 .85rem; color: #657168; font-size: .64rem; font-weight: 800; border: 1px solid rgb(255 255 255 / 92%); border-radius: 999px; background: rgb(255 255 255 / 72%); }
+.notice-filters button.is-active { color: white; border-color: #263b35; background: #263b35; }
+.notice-corkboard { position: relative; min-height: calc(100dvh - 12rem); margin-top: .45rem; overflow: hidden; border: .42rem solid #9b7453; border-radius: 1.75rem; background: #b9885f; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 16%), 0 1.25rem 2.8rem -1.6rem rgb(53 39 25 / 70%); }
+.notice-cork-texture { position: absolute; inset: 0; opacity: .3; background-image: radial-gradient(circle at 20% 30%, #6c4328 0 1px, transparent 1.5px), radial-gradient(circle at 75% 60%, #f2d2aa 0 1px, transparent 1.5px); background-size: 13px 15px,17px 19px; }
+.notice-card-grid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-height: calc(100dvh - 12.8rem); padding: 1rem; overflow-y: auto; }
+.notice-card { position: relative; display: flex; min-height: 9rem; flex-direction: column; padding: 1.2rem .75rem .7rem; overflow: hidden; color: #344038; text-align: left; border: 1px solid rgb(117 94 60 / 18%); border-radius: .22rem; box-shadow: 0 .65rem 1.1rem -.6rem rgb(48 31 18 / 72%); transform: rotate(-1deg); }
+.notice-card:nth-child(2n) { transform: rotate(1.2deg); }
+.notice-card:nth-child(3n) { transform: rotate(-.35deg); }
+.notice-card.is-cream { background: #fff5c9; }.notice-card.is-sage { background: #dce8c9; }.notice-card.is-blue { background: #d9e8f0; }.notice-card.is-clay { background: #efd6c2; }
+.notice-pin { position: absolute; top: .38rem; left: 50%; width: .82rem; height: .82rem; border: 2px solid rgb(255 255 255 / 68%); border-radius: 50%; background: #718b62; box-shadow: 0 .18rem .22rem rgb(31 24 18 / 35%); transform: translateX(-50%); }
+.notice-card small { color: #6e756f; font-size: .48rem; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
+.notice-card strong { display: -webkit-box; margin-top: .32rem; overflow: hidden; font-family: Georgia, serif; font-size: .82rem; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.notice-card p { display: -webkit-box; margin: .32rem 0 0; overflow: hidden; color: #637069; font-size: .55rem; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.notice-card footer { display: flex; align-items: end; justify-content: space-between; gap: .3rem; margin-top: auto; padding-top: .4rem; color: #6c746f; font-size: .5rem; font-weight: 800; }
+.notice-card footer span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notice-card b { position: absolute; right: .5rem; bottom: .5rem; display: grid; width: 1.3rem; height: 1.3rem; place-items: center; color: white; font-size: .62rem; border-radius: 50%; background: #607b55; }
+.notice-card.is-complete { box-shadow: inset 0 0 0 2px rgb(96 123 85 / 22%), 0 .65rem 1.1rem -.6rem rgb(48 31 18 / 72%); }.notice-card.is-complete strong { color: #667269; text-decoration: line-through; }
+.notice-empty-card { grid-column: 1 / -1; display: flex; width: min(14rem, 90%); min-height: 10rem; align-self: center; justify-self: center; flex-direction: column; align-items: center; justify-content: center; margin-top: 4rem; padding: 1rem; color: #56655c; text-align: center; border: 0; border-radius: 1.35rem; background: rgb(255 255 255 / 82%); box-shadow: 0 .8rem 1.5rem -.8rem #5b3d28; }
+.notice-empty-card > span { display: grid; width: 2.75rem; height: 2.75rem; place-items: center; color: white; font-size: 1.2rem; border-radius: 50%; background: #263b35; }
+.notice-empty-card strong { margin-top: .65rem; font-size: .75rem; }.notice-empty-card small { margin-top: .3rem; color: #7a847d; font-size: .58rem; }
+.noticeboard-message { position: fixed; z-index: 30; right: 1rem; bottom: 6.2rem; left: 1rem; max-width: 30rem; margin: auto; padding: .65rem .8rem; color: #56655c; font-size: .62rem; text-align: center; border: 1px solid #dce7d7; border-radius: .8rem; background: rgb(255 255 255 / 94%); box-shadow: 0 .8rem 2rem -1.2rem #263b35; }
+@media (min-width: 760px) { .noticeboard-shell { padding-inline: 1rem; }.notice-card-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }.notice-card { min-height: 11rem; }.noticeboard-heading h1 { font-size: 1.65rem; } }

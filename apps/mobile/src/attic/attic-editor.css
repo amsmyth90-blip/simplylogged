@@ -1,0 +1,30 @@
+.attic-editor-backdrop { position: fixed; z-index: 80; inset: 0; display: grid; align-items: end; padding-top: max(1rem,env(safe-area-inset-top)); background: rgb(33 24 27 / 55%); backdrop-filter: blur(6px); }
+.attic-editor { width: min(100%,48rem); max-height: calc(100dvh - 1rem); margin-inline: auto; overflow-y: auto; padding: 1rem max(1rem,env(safe-area-inset-right)) max(1rem,env(safe-area-inset-bottom)) max(1rem,env(safe-area-inset-left)); color: #362c2d; border-radius: 1.4rem 1.4rem 0 0; background: #fbf8f5; box-shadow: 0 -1rem 4rem rgb(24 15 18 / 25%); }
+.attic-editor > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.attic-editor > header p { margin: 0; color: #8a7075; font-size: .55rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+.attic-editor > header h2 { margin: .2rem 0 0; font-family: Georgia,serif; font-size: 1.3rem; }
+.attic-editor > header button { width: 2.5rem; height: 2.5rem; color: #76575d; font-size: 1.3rem; border: 1px solid #e7dadd; border-radius: 50%; background: white; }
+.attic-editor-fields { display: grid; gap: .65rem; margin-top: .9rem; }
+.attic-editor-fields label > span { display: block; margin: 0 0 .3rem .15rem; color: #75666a; font-size: .55rem; font-weight: 800; }
+.attic-editor-fields input,.attic-editor-fields textarea { width: 100%; padding: .75rem; color: #362c2d; font: inherit; font-size: .68rem; border: 1px solid #e3d7d9; border-radius: .8rem; outline: none; background: white; }
+.attic-editor-fields textarea { resize: vertical; line-height: 1.55; }
+.attic-editor-fields input:focus,.attic-editor-fields textarea:focus { border-color: #8a686e; box-shadow: 0 0 0 3px rgb(118 87 93 / 12%); }
+.attic-image-choice { margin-top: .8rem; padding: .75rem; border: 1px solid #eadfe0; border-radius: .9rem; background: #f4ecec; }
+.attic-image-choice > header { display: flex; justify-content: space-between; gap: .6rem; }
+.attic-image-choice > header strong { font-size: .65rem; }
+.attic-image-choice > header small { color: #806f72; font-size: .52rem; }
+.attic-image-choice > div { display: grid; gap: .35rem; margin-top: .55rem; }
+.attic-image-choice label { display: flex; min-height: 2.4rem; align-items: center; gap: .55rem; padding: .35rem .5rem; font-size: .58rem; border-radius: .65rem; background: white; }
+.attic-image-choice input { width: 1.1rem; height: 1.1rem; accent-color: #76575d; }
+.attic-image-choice > p { margin: .55rem 0 0; color: #77686b; font-size: .56rem; line-height: 1.5; }
+.attic-editor > footer { display: grid; grid-template-columns: 1fr 1.4fr; gap: .55rem; margin-top: .9rem; }
+.attic-editor > footer button { min-height: 2.8rem; color: #684d52; font-size: .65rem; font-weight: 850; border: 1px solid #e1d4d6; border-radius: .8rem; background: white; }
+.attic-editor > footer button:last-child { color: white; border-color: #684d52; background: #684d52; }
+.attic-editor > footer button:disabled { opacity: .5; }
+@media (min-width:720px) {
+  .attic-editor-backdrop { align-items: center; padding: 2rem; }
+  .attic-editor { max-height: calc(100dvh - 4rem); border-radius: 1.4rem; }
+  .attic-editor-fields { grid-template-columns: 1fr 1fr; }
+  .attic-wide-field { grid-column: 1 / -1; }
+  .attic-image-choice > div { grid-template-columns: 1fr 1fr; }
+}

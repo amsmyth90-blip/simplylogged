@@ -139,7 +139,14 @@ export function BillsAction({
   return (
     <Link
       href={href}
-      className="group flex min-h-[80px] items-center gap-3 rounded-[18px] border border-[#20352a]/[0.07] bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-24px_rgba(32,53,42,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
+      className={[
+        "group flex min-h-[80px] items-center gap-3 rounded-[18px] border",
+        "border-[#20352a]/[0.07] bg-white px-4 py-3 transition hover:-translate-y-0.5",
+        "hover:shadow-[0_14px_28px_-24px_rgba(32,53,42,0.55)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]",
+        "focus-visible:ring-offset-2 motion-reduce:transform-none",
+        "motion-reduce:transition-none",
+      ].join(" ")}
     >
       <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[#eef2e9] text-[#52705a]">
         <UiIcon name={icon} className="h-5 w-5" />

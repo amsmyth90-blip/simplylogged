@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { checkSharedRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit";
+import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 function getRequestOrigin(requestHeaders: Headers) {
@@ -26,7 +26,7 @@ export async function signInAction(formData: FormData) {
   const requestHeaders = await headers();
   const clientIp = getForwardedClientIp(requestHeaders);
   const supabase = await getSupabaseServerClient();
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("auth:signin", clientIp, email.toLowerCase()), {
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("auth:signin", clientIp, email.toLowerCase()), {
     limit: 8,
     windowMs: 10 * 60 * 1000
   });
@@ -64,7 +64,7 @@ export async function signUpAction(formData: FormData) {
   const requestHeaders = await headers();
   const clientIp = getForwardedClientIp(requestHeaders);
   const supabase = await getSupabaseServerClient();
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("auth:signup", clientIp, email.toLowerCase()), {
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("auth:signup", clientIp, email.toLowerCase()), {
     limit: 5,
     windowMs: 30 * 60 * 1000
   });
@@ -103,7 +103,7 @@ export async function requestPasswordResetAction(formData: FormData) {
   const requestHeaders = await headers();
   const clientIp = getForwardedClientIp(requestHeaders);
   const supabase = await getSupabaseServerClient();
-  const rateLimit = await checkSharedRateLimit(supabase, createRateLimitKey("auth:reset", clientIp, email.toLowerCase()), {
+  const rateLimit = await checkServerRateLimit(createRateLimitKey("auth:reset", clientIp, email.toLowerCase()), {
     limit: 5,
     windowMs: 30 * 60 * 1000
   });

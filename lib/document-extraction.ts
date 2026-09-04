@@ -23,6 +23,15 @@ export const suggestedRoomOptions = [
 export type DocumentCategory = (typeof documentCategoryOptions)[number];
 export type SuggestedRoom = (typeof suggestedRoomOptions)[number];
 
+export type DocumentExtractedField = {
+  key: string;
+  label: string;
+  value: string;
+  confidence: number;
+  source: "uploaded_document";
+  userConfirmed: false;
+};
+
 export type DocumentExtractionResult = {
   title: string;
   issuer: string;
@@ -36,6 +45,7 @@ export type DocumentExtractionResult = {
   actionItems: string[];
   extractedText: string;
   confidence: number;
+  extractedFields?: DocumentExtractedField[];
 };
 
 export const documentExtractionSchema = {
@@ -66,6 +76,23 @@ export const documentExtractionSchema = {
       type: "number",
       minimum: 0,
       maximum: 1
+    },
+    extractedFields: {
+      type: "array",
+      maxItems: 24,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          key: { type: "string" },
+          label: { type: "string" },
+          value: { type: "string" },
+          confidence: { type: "number", minimum: 0, maximum: 1 },
+          source: { type: "string", enum: ["uploaded_document"] },
+          userConfirmed: { type: "boolean", enum: [false] }
+        },
+        required: ["key", "label", "value", "confidence", "source", "userConfirmed"]
+      }
     }
   },
   required: [
@@ -80,6 +107,7 @@ export const documentExtractionSchema = {
     "dueDate",
     "actionItems",
     "extractedText",
-    "confidence"
+    "confidence",
+    "extractedFields"
   ]
 } as const;
