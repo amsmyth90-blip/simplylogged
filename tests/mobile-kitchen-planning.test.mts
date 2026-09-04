@@ -9,6 +9,7 @@ import {
   parseKitchenPlanningMutation,
   parseKitchenPlanningSnapshot,
   parseKitchenRecipeDetail,
+  scaleKitchenRecipeIngredient,
   type KitchenRecipe,
 } from "../packages/kitchen/src/index.ts";
 import {
@@ -37,6 +38,13 @@ function recipe(overrides: Partial<KitchenRecipe> = {}): KitchenRecipe {
     ...overrides,
   };
 }
+
+test("recipe quantities scale without backtracking on numeric input", () => {
+  assert.equal(scaleKitchenRecipeIngredient("1.5kg flour", 2, 4), "3kg flour");
+  assert.equal(scaleKitchenRecipeIngredient("1. cups flour", 2, 4), "2. cups flour");
+  assert.equal(scaleKitchenRecipeIngredient("salt", 2, 4), "salt");
+  assert.equal(scaleKitchenRecipeIngredient(`${"0".repeat(20_000)}x`, 2, 4), "0x");
+});
 
 test("Kitchen planning contracts are exact, bounded and owner-free", () => {
   const snapshot = parseKitchenPlanningSnapshot({

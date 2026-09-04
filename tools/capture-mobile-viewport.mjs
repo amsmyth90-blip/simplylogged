@@ -39,9 +39,10 @@ socket.addEventListener("message", (event) => {
     else request.resolve(message.result);
     return;
   }
-  const listener = listeners.get(message.method);
+  if (message.method !== "Page.loadEventFired") return;
+  const listener = listeners.get("Page.loadEventFired");
   if (listener) {
-    listeners.delete(message.method);
+    listeners.delete("Page.loadEventFired");
     listener(message.params);
   }
 });
@@ -55,6 +56,7 @@ function send(method, params = {}) {
 }
 
 function waitFor(method, timeoutMs = 15_000) {
+  if (method !== "Page.loadEventFired") throw new Error(`Unsupported browser event: ${method}`);
   return new Promise((resolveEvent, rejectEvent) => {
     const timeout = setTimeout(() => {
       listeners.delete(method);

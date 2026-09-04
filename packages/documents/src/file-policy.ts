@@ -24,7 +24,7 @@ export function sanitizeDocumentFileName(name: string) {
     .toLowerCase()
     .replace(/[^a-z0-9.]+/g, "-")
     .replace(/-+/g, "-")
-    .replace(/-+\./g, ".")
+    .replace(/-\./g, ".")
     .replace(/\.{2,}/g, ".")
     .replace(/^[.-]+|[.-]+$/g, "")
     .slice(0, 96)

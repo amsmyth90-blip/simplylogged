@@ -31,15 +31,26 @@ function scaledQuantity(value: number) {
   return whole > 0 ? `${whole}${label}` : label || String(rounded);
 }
 
+function leadingDecimal(value: string) {
+  let end = 0;
+  while (end < value.length && value.charCodeAt(end) >= 48 && value.charCodeAt(end) <= 57) end += 1;
+  if (end === 0) return null;
+  if (value[end] === "." && value.charCodeAt(end + 1) >= 48 && value.charCodeAt(end + 1) <= 57) {
+    end += 2;
+    while (end < value.length && value.charCodeAt(end) >= 48 && value.charCodeAt(end) <= 57) end += 1;
+  }
+  return value.slice(0, end);
+}
+
 export function scaleKitchenRecipeIngredient(
   ingredient: string,
   originalServings: number,
   servings: number,
 ) {
   if (servings === originalServings || originalServings < 1) return ingredient;
-  const match = ingredient.match(/^(\d+(?:\.\d+)?)(.*)$/);
-  if (!match) return ingredient;
-  return `${scaledQuantity(Number(match[1]) * (servings / originalServings))}${match[2]}`;
+  const quantity = leadingDecimal(ingredient);
+  if (!quantity) return ingredient;
+  return `${scaledQuantity(Number(quantity) * (servings / originalServings))}${ingredient.slice(quantity.length)}`;
 }
 
 export function normaliseKitchenRecipeIngredient(ingredient: string) {

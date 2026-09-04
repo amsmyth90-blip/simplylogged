@@ -95,9 +95,9 @@ test("Android and iOS share receivers feed the bounded packaged capture flow", a
   assert.match(extension, /copyBounded/);
   assert.match(extension, /providers\.count <= maximumFiles/);
   assert.doesNotMatch(extension, /\.prefix\(maximumFiles\)/);
-  assert.match(extension, /diarydock:\/\/import\/share/);
+  assert.ok(extension.includes('URL(string: "diarydock://import/share")'));
   assert.doesNotMatch(extension, /Data\(contentsOf: source/);
-  assert.match(appEntitlements, /group\.com\.diarydock\.shared/);
-  assert.match(extensionEntitlements, /group\.com\.diarydock\.shared/);
+  assert.ok(appEntitlements.includes("<string>group.com.diarydock.shared</string>"));
+  assert.ok(extensionEntitlements.includes("<string>group.com.diarydock.shared</string>"));
   assert.match(extensionPlist, /NSExtensionActivationSupportsFileWithMaxCount/);
 });
