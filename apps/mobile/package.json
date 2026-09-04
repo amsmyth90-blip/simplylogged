@@ -46,11 +46,11 @@
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@types/react": "19.1.6",
-    "@types/react-dom": "19.1.5",
+    "@types/react-dom": "19.2.5",
     "@vitejs/plugin-react": "latest",
     "typescript": "5.8.3",
     "vite": "latest"
