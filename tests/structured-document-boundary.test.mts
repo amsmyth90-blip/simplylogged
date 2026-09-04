@@ -69,12 +69,13 @@ test("document deletion is owner-scoped and leaves a durable storage cleanup job
 });
 
 test("desktop document helpers use the authenticated service route", async () => {
-  const [route, client, migration, cleanupRoute, cleanupWorker] = await Promise.all([
+  const [route, client, migration, cleanupRoute, cleanupWorker, vercelSource] = await Promise.all([
     readFile(new URL("../app/api/diarydock/documents/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/structured-documents.ts", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/20260904208000_document_service_boundary.sql", import.meta.url), "utf8"),
     readFile(new URL("../app/api/internal/document-cleanup/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/document-cleanup.ts", import.meta.url), "utf8"),
+    readFile(new URL("../vercel.json", import.meta.url), "utf8"),
   ]);
   assert.match(route, /sameOrigin/);
   assert.match(route, /checkServerRateLimit/);
@@ -87,6 +88,13 @@ test("desktop document helpers use the authenticated service route", async () =>
   assert.match(migration, /revoke insert, update, delete on table public\.documents/);
   assert.match(cleanupRoute, /timingSafeEqual/);
   assert.match(cleanupRoute, /CRON_SECRET/);
+  assert.match(cleanupRoute, /export async function GET/);
+  assert.match(cleanupRoute, /export async function POST/);
   assert.match(cleanupWorker, /isOwnedDocumentStoragePath/);
   assert.match(cleanupWorker, /nextAttempt/);
+  const vercel = JSON.parse(vercelSource) as { crons?: unknown };
+  assert.deepEqual(vercel.crons, [{
+    path: "/api/internal/document-cleanup",
+    schedule: "17 3 * * *",
+  }]);
 });
