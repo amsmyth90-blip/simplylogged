@@ -33,7 +33,7 @@ function response(
   return NextResponse.json(body, { headers, status });
 }
 
-export async function POST(request: Request) {
+async function handleCleanup(request: Request) {
   const observation = new RequestObservation({
     operation: "document-storage-cleanup",
     request,
@@ -51,4 +51,12 @@ export async function POST(request: Request) {
   } catch {
     return response(observation, { error: "Cleanup could not run." }, 503, "failed");
   }
+}
+
+export async function GET(request: Request) {
+  return handleCleanup(request);
+}
+
+export async function POST(request: Request) {
+  return handleCleanup(request);
 }
