@@ -1,0 +1,22 @@
+.health-record-card > header > strong { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; color: #52705a; font-family: Georgia,serif; border-radius: .7rem; background: #e8f0ea; }
+.health-record-list { display: grid; gap: .42rem; margin-top: .7rem; }
+.health-record-list > article { display: grid; min-height: 3.6rem; grid-template-columns: 2.6rem minmax(0,1fr); align-items: start; gap: .55rem; padding: .45rem; border: 1px solid #e4ebe5; border-radius: .88rem; background: white; }
+.health-record-list > article > span { display: grid; width: 2.6rem; height: 2.6rem; place-items: center; color: #52705a; font-size: .58rem; font-weight: 900; border-radius: .7rem; background: #e8f0ea; }
+.health-record-list > article strong,.health-record-list > article small { display: block; }
+.health-record-list > article strong { font-size: .69rem; }
+.health-record-list > article small { margin-top: .15rem; color: #7a837b; font-size: .53rem; line-height: 1.4; }
+.health-record-list > article p { margin: .3rem 0 0; color: #68756b; font-size: .56rem; line-height: 1.5; }
+.health-empty { padding: 1.1rem .8rem; text-align: center; border: 1px dashed #ccd9cf; border-radius: .95rem; background: #f8faf8; }
+.health-empty > span { display: grid; width: 2.7rem; height: 2.7rem; margin: 0 auto; place-items: center; color: #52705a; border-radius: .8rem; background: #e6eee8; }
+.health-empty > strong { display: block; margin-top: .5rem; font-family: Georgia,serif; font-size: .82rem; }
+.health-empty > p { margin: .35rem auto 0; color: #727d73; font-size: .58rem; line-height: 1.55; }
+.health-files-card > header button { min-height: 2.4rem; padding-inline: .75rem; color: #52705a; font-size: .6rem; font-weight: 800; border: 1px solid #dbe6dd; border-radius: .72rem; background: white; }
+.health-files-card > div { display: grid; gap: .42rem; margin-top: .7rem; }
+.health-files-card > div > button { display: grid; width: 100%; min-height: 3.35rem; grid-template-columns: 2.6rem minmax(0,1fr) 2rem; align-items: center; gap: .45rem; padding: .35rem; color: #20352a; text-align: left; border: 1px solid #e4ebe5; border-radius: .88rem; background: white; }
+.health-files-card > div > button > span { display: grid; width: 2.6rem; height: 2.6rem; place-items: center; color: #52705a; font-size: .52rem; font-weight: 900; border-radius: .7rem; background: #e8f0ea; }
+.health-files-card > div > button strong,.health-files-card > div > button small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.health-files-card > div > button strong { font-size: .68rem; }
+.health-files-card > div > button small { margin-top: .15rem; color: #7a837b; font-size: .53rem; }
+.health-files-card > div > button b { color: #718072; text-align: center; }
+.health-files-card > div > p { margin: 0; padding: .8rem; color: #718076; font-size: .6rem; text-align: center; }
+@media (min-width:720px) { .health-record-list { grid-template-columns: 1fr 1fr; } }

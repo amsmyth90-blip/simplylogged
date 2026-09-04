@@ -4,10 +4,18 @@ import {
   DOCUMENT_QUARANTINE_BUCKET,
   validatePreparedUpload,
 } from "@/lib/document-upload";
+import { authenticateDocumentUploadRequest } from "@/lib/document-upload-auth";
 import { sanitizeDocumentFileName } from "@/lib/document-rules";
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
+import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
-import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
+
+export const runtime = "nodejs";
+
+export function OPTIONS(request: Request) {
+  return mobilePreflight(request);
+}
 
 type PrepareBody = {
   documentId?: unknown;
@@ -26,28 +34,38 @@ type ReservationRow = {
 };
 
 export async function POST(request: Request) {
-  if (!isSupabaseConfiguredServer() || !isSupabaseAdminConfigured()) {
-    return NextResponse.json({ error: "Secure document upload is not configured." }, { status: 503 });
+  const headers = mobileCorsHeaders(request);
+  if (!isSupabaseAdminConfigured()) {
+    return NextResponse.json({ error: "Secure document upload is not configured." }, { status: 503, headers });
   }
 
-  const supabase = await getSupabaseServerClient();
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    return NextResponse.json({ error: "Please sign in again before uploading a document." }, { status: 401 });
+  const auth = await authenticateDocumentUploadRequest(request);
+  if (auth.error === "UNAVAILABLE") {
+    return NextResponse.json({ error: "Secure document upload is unavailable." }, { status: 503, headers });
+  }
+  if (auth.error || !auth.user) {
+    return NextResponse.json({ error: "Please sign in again before uploading a document." }, { status: 401, headers });
   }
 
   const rateLimit = await checkServerRateLimit(
-    createRateLimitKey("document-upload-prepare", authData.user.id),
+    createRateLimitKey("document-upload-prepare", auth.user.id),
     { limit: 30, windowMs: 10 * 60 * 1000 },
   );
   if (!rateLimit.allowed) {
+    headers.set("Retry-After", String(rateLimit.retryAfterSeconds));
     return NextResponse.json(
       { error: "Too many document uploads. Please wait and try again." },
-      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+      { status: 429, headers },
     );
   }
 
-  const body = (await request.json().catch(() => null)) as PrepareBody | null;
+  let body: PrepareBody | null;
+  try {
+    body = await readBoundedJson(request, 16 * 1024) as PrepareBody;
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "The upload request is invalid." }, { status, headers });
+  }
   const input = {
     documentId: typeof body?.documentId === "string" ? body.documentId : "",
     fileName: typeof body?.fileName === "string" ? body.fileName : "",
@@ -56,13 +74,13 @@ export async function POST(request: Request) {
   };
   const validationError = validatePreparedUpload(input);
   if (validationError) {
-    return NextResponse.json({ error: validationError }, { status: 400 });
+    return NextResponse.json({ error: validationError }, { status: 400, headers });
   }
 
   const admin = getSupabaseAdminClient();
   const safeName = sanitizeDocumentFileName(input.fileName);
   const { data: reservationData, error: reservationError } = await admin.rpc("reserve_document_upload", {
-    input_user_id: authData.user.id,
+    input_user_id: auth.user.id,
     input_document_id: input.documentId,
     input_safe_name: safeName,
     input_mime_type: input.mimeType,
@@ -78,13 +96,13 @@ export async function POST(request: Request) {
           : "DiaryDock could not reserve secure storage for this document.",
         code: storageLimitExceeded ? "STORAGE_LIMIT_EXCEEDED" : "RESERVATION_FAILED",
       },
-      { status: storageLimitExceeded ? 413 : 503 },
+      { status: storageLimitExceeded ? 413 : 503, headers },
     );
   }
 
   const reservation = (Array.isArray(reservationData) ? reservationData[0] : reservationData) as ReservationRow | null;
   if (!reservation?.reservation_id || !reservation.quarantine_path) {
-    return NextResponse.json({ error: "DiaryDock could not reserve secure storage for this document." }, { status: 503 });
+    return NextResponse.json({ error: "DiaryDock could not reserve secure storage for this document." }, { status: 503, headers });
   }
 
   const { data: signedUpload, error: signedUploadError } = await admin.storage
@@ -93,11 +111,11 @@ export async function POST(request: Request) {
 
   if (signedUploadError || !signedUpload?.token) {
     await admin.rpc("finish_document_upload", {
-      input_user_id: authData.user.id,
+      input_user_id: auth.user.id,
       input_reservation_id: reservation.reservation_id,
       input_commit: false,
     });
-    return NextResponse.json({ error: "DiaryDock could not open a secure upload channel." }, { status: 503 });
+    return NextResponse.json({ error: "DiaryDock could not open a secure upload channel." }, { status: 503, headers });
   }
 
   return NextResponse.json({
@@ -110,5 +128,5 @@ export async function POST(request: Request) {
       reservedBytes: Number(reservation.reserved_bytes),
       limitBytes: Number(reservation.storage_limit_bytes),
     },
-  });
+  }, { headers });
 }

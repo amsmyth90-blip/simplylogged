@@ -36,7 +36,7 @@ The first risk-reduction slice was implemented immediately after the baseline au
 - leaving or removal explicitly revokes selected grants, and leave creates an empty private household without copying broad shared JSON state;
 - capture, authorization, household-role/summary, migration-invariant, RLS-target safety, and cache-isolation tests raise the current suite to 52 passing tests. The user-confirmed empty linked Supabase project now has the household migrations and UUID-compatibility forward fix applied. The live five-actor database and storage gate passes all 46 checks with clean test-data removal.
 
-The classifications below describe the audited baseline unless the row explicitly references this post-audit slice. The persistent document-sharing slice is implemented and live RLS behaviour is verified, but broader resource coverage, recent authentication, ownership transfer, and the remaining Household experience remain outstanding.
+The classifications below describe the audited baseline unless the row explicitly references a later slice. Persistent document sharing and live RLS verification were delivered first; recent authentication and two-person ownership transfer are now implemented, while broader resource coverage and the remaining incremental Household experience continue beyond that baseline.
 
 ## Classification legend
 
@@ -55,7 +55,7 @@ The classifications below describe the audited baseline unless the row explicitl
 
 - Next.js App Router `16.3.0`, React `19.1.0`, TypeScript `5.8.3`, Tailwind `3.4.17`.
 - Supabase SSR/browser clients provide authentication, Postgres access, RLS, and private object storage.
-- Capacitor `8.4.2` packages the hosted web application for Android/iOS; Android includes a native share-import plugin.
+- Capacitor `8.4.2` packages the local React mobile bundle for Android/iOS; Android includes a native share-import plugin.
 - Vercel/Codemagic configuration exists. Remotion is used for promotional media, not the product runtime.
 - `app/*` contains thin authenticated route wrappers; large client workspaces in `components/*` contain most UI and mutation logic.
 
@@ -162,7 +162,7 @@ Current concerns:
 - some domain mutations happen entirely in client state and rely on later persistence rather than a server-authorised operation;
 - the general capture endpoint trusts a file's declared MIME type and sends its content directly to the AI provider;
 - uploaded content has no explicit prompt-injection/hostile-document boundary;
-- the current CSP permits `'unsafe-inline'` and `'unsafe-eval'` scripts;
+- the production web CSP permits `'unsafe-inline'` for the current Next.js rendering mode but no longer permits `'unsafe-eval'`; the packaged mobile CSP permits neither;
 - no recent-auth check protects sensitive security/share changes;
 - no application service writes meaningful `audit_events`;
 - no cross-user/household negative integration tests exist;

@@ -1,0 +1,30 @@
+.garden-record-columns { display: grid; gap: .7rem; margin-top: .7rem; }
+.garden-card { min-width: 0; padding: .9rem; border: 1px solid rgb(255 255 255 / 92%); border-radius: 1.15rem; background: rgb(255 255 255 / 72%); box-shadow: 0 1rem 2.5rem -2rem #263b35; }
+.garden-card > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.garden-card > header p { margin: 0; color: #71846f; font-size: .54rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.garden-card > header h2 { margin: .18rem 0 0; font-family: Georgia,serif; font-size: 1.1rem; }
+.garden-card > header button,.garden-empty button { min-height: 2.45rem; padding-inline: .75rem; color: #52705a; font-size: .6rem; font-weight: 800; border: 1px solid #dbe6d7; border-radius: .72rem; background: white; }
+.garden-reminder-list,.garden-document-list { display: grid; gap: .42rem; margin-top: .7rem; }
+.garden-reminder-list > label { display: grid; min-height: 3.3rem; grid-template-columns: 2.5rem minmax(0,1fr); align-items: center; gap: .45rem; padding: .35rem; border: 1px solid #e7ece2; border-radius: .88rem; background: white; }
+.garden-reminder-list input { width: 2.35rem; height: 2.35rem; margin: 0; appearance: none; border: 1px solid #cfdacb; border-radius: .68rem; background: #f4f7f1; }
+.garden-reminder-list input:checked { background: #617b65; box-shadow: inset 0 0 0 .65rem #617b65; }
+.garden-reminder-list input:checked::after { display: grid; height: 100%; place-items: center; color: white; content: "✓"; font-size: .8rem; font-weight: 900; }
+.garden-reminder-list strong,.garden-reminder-list small { display: block; }
+.garden-reminder-list strong { font-size: .69rem; }
+.garden-reminder-list small { margin-top: .15rem; overflow: hidden; color: #7a837b; font-size: .54rem; text-overflow: ellipsis; white-space: nowrap; }
+.garden-document-list > button { display: grid; width: 100%; min-height: 3.35rem; grid-template-columns: 2.6rem minmax(0,1fr) 2rem; align-items: center; gap: .45rem; padding: .35rem; color: #20352a; text-align: left; border: 1px solid #e7ece2; border-radius: .88rem; background: white; }
+.garden-document-list > button > span { display: grid; width: 2.6rem; height: 2.6rem; place-items: center; color: #52705a; font-size: .52rem; font-weight: 900; border-radius: .7rem; background: #e8eee3; }
+.garden-document-list > button > span.needs-review { color: #946b2d; background: #f4ead6; }
+.garden-document-list strong,.garden-document-list small { display: block; }
+.garden-document-list strong { overflow: hidden; font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+.garden-document-list small { margin-top: .15rem; overflow: hidden; color: #7a837b; font-size: .53rem; text-overflow: ellipsis; white-space: nowrap; }
+.garden-document-list b { color: #718072; font-size: 1rem; text-align: center; }
+.garden-empty { padding: 1.1rem .8rem; text-align: center; border: 1px dashed #ccd9c7; border-radius: .95rem; background: #f8faf5; }
+.garden-empty > span { display: grid; width: 2.7rem; height: 2.7rem; margin: 0 auto; place-items: center; color: #52705a; border-radius: .8rem; background: #e6eee1; }
+.garden-empty > strong { display: block; margin-top: .5rem; font-family: Georgia,serif; font-size: .82rem; }
+.garden-empty > p { max-width: 25rem; margin: .35rem auto 0; color: #727d73; font-size: .58rem; line-height: 1.55; }
+.garden-empty > button { margin-top: .65rem; }
+@media (min-width:720px) {
+  .garden-record-columns { grid-template-columns: 1fr 1fr; }
+  .garden-reminder-list,.garden-document-list { max-height: 30rem; overflow-y: auto; }
+}

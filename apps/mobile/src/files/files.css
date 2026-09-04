@@ -1,0 +1,259 @@
+.files-screen {
+  width: min(100%, 68rem);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem 7rem;
+}
+
+.files-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.files-header .sync-pill {
+  margin: 0;
+}
+
+.files-hero {
+  margin-top: 1.5rem;
+  padding: clamp(1.5rem, 6vw, 2.75rem);
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 2rem;
+  background: linear-gradient(135deg, #fffdf8f2, #edf2e9e8);
+  box-shadow: 0 1.75rem 4rem -2.5rem rgb(32 53 42 / 45%);
+}
+
+.files-hero .eyebrow {
+  margin: 0;
+}
+
+.files-hero h1 {
+  max-width: 35rem;
+  margin-top: 0.55rem;
+  font-size: clamp(2.2rem, 9vw, 3.5rem);
+}
+
+.files-hero > p:not(.eyebrow) {
+  margin: 0.8rem 0 0;
+  color: var(--dd-muted);
+  line-height: 1.55;
+}
+
+.file-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.file-summary span {
+  padding: 0.55rem 0.75rem;
+  color: var(--dd-muted);
+  font-size: 0.72rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 75%);
+}
+
+.file-summary strong {
+  color: var(--dd-green);
+}
+
+.file-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.file-controls label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--dd-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.file-controls input,
+.file-controls select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--dd-ink);
+  font: inherit;
+  border: 1px solid rgb(32 53 42 / 14%);
+  border-radius: 0.9rem;
+  background: rgb(255 253 248 / 92%);
+}
+
+.file-filter-tabs {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.file-filter-tabs button {
+  min-height: 2.65rem;
+  padding: 0.55rem 0.8rem;
+  color: var(--dd-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  white-space: nowrap;
+  border: 1px solid rgb(32 53 42 / 10%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 78%);
+}
+
+.file-filter-tabs .is-active {
+  color: var(--dd-green);
+  border-color: rgb(79 112 70 / 25%);
+  background: var(--dd-green-soft);
+}
+
+.file-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.file-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgb(32 53 42 / 9%);
+  border-radius: 1.25rem;
+  background: rgb(255 253 248 / 90%);
+}
+
+.file-kind {
+  display: grid;
+  width: 2.8rem;
+  height: 3.2rem;
+  place-items: center;
+  color: #315443;
+  font-size: 0.65rem;
+  font-weight: 850;
+  border-radius: 0.7rem;
+  background: #e7eee3;
+}
+
+.file-kind-pdf {
+  color: #9f1239;
+  background: #fff1f2;
+}
+
+.file-copy {
+  min-width: 0;
+}
+
+.file-copy h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-copy p,
+.file-copy small {
+  display: block;
+  margin: 0.25rem 0 0;
+  color: var(--dd-muted);
+  font-size: 0.72rem;
+}
+
+.file-badges {
+  display: flex;
+  max-width: 9rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.file-badges span,
+.file-badges button {
+  padding: 0.3rem 0.45rem;
+  color: #315443;
+  font-size: 0.6rem;
+  font-weight: 750;
+  border-radius: 999px;
+  background: #edf4e9;
+}
+
+.file-badges button {
+  font: inherit;
+  border: 1px solid rgb(79 112 70 / 20%);
+}
+
+.file-badges .review-badge {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.file-conflict {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  color: #78350f;
+  border: 1px solid #f2c879;
+  border-radius: 0.85rem;
+  background: #fffbeb;
+}
+
+.file-conflict p {
+  flex: 1 1 15rem;
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.file-conflict button {
+  min-height: 2.4rem;
+  padding: 0.5rem 0.65rem;
+  color: #78350f;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  border: 1px solid #e5b85d;
+  border-radius: 0.7rem;
+  background: #fffdf8;
+}
+
+.empty-files {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  border: 1px dashed rgb(32 53 42 / 18%);
+  border-radius: 1.25rem;
+}
+
+.empty-files h2,
+.empty-files p {
+  margin: 0;
+}
+
+.empty-files p {
+  margin-top: 0.35rem;
+  color: var(--dd-muted);
+}
+
+@media (max-width: 560px) {
+  .file-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .file-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .file-badges {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+}

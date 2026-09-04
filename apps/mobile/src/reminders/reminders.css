@@ -1,0 +1,213 @@
+.app-screen {
+  width: min(100%, 58rem);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem 7rem;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-brand .brand-mark {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.9rem;
+}
+
+.app-brand .brand-mark svg {
+  width: 1.4rem;
+}
+
+.app-brand div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.app-brand strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.app-brand span {
+  color: var(--dd-muted);
+  font-size: 0.7rem;
+}
+
+.quiet-button,
+.delete-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  color: var(--dd-green);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgb(32 53 42 / 12%);
+  border-radius: 0.85rem;
+  background: rgb(255 253 248 / 78%);
+}
+
+.reminder-hero {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: clamp(1.5rem, 6vw, 2.5rem);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 2rem;
+  background: linear-gradient(135deg, #fffdf8f2, #edf2e9e8);
+  box-shadow: 0 1.75rem 4rem -2.5rem rgb(32 53 42 / 45%);
+}
+
+.reminder-hero .eyebrow {
+  margin: 0;
+}
+
+.reminder-hero h1 {
+  margin-top: 0.55rem;
+  font-size: clamp(2.3rem, 10vw, 3.5rem);
+}
+
+.reminder-hero > p:not(.eyebrow) {
+  max-width: 30rem;
+  margin: 0.8rem 0 0;
+  color: var(--dd-muted);
+  line-height: 1.55;
+}
+
+.sync-pill {
+  display: inline-flex;
+  margin-top: 1rem;
+  padding: 0.4rem 0.65rem;
+  color: var(--dd-green);
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-transform: capitalize;
+  border-radius: 999px;
+  background: var(--dd-green-soft);
+}
+
+.sync-offline {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.reminder-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.reminder-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid rgb(32 53 42 / 9%);
+  border-radius: 1.25rem;
+  background: rgb(255 253 248 / 88%);
+}
+
+.completion-button {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+  font-weight: 800;
+  border: 2px solid var(--dd-sage);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.is-done .completion-button {
+  background: var(--dd-sage);
+}
+
+.completion-button:disabled {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.reminder-copy {
+  min-width: 0;
+}
+
+.reminder-copy h2,
+.empty-reminders h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.reminder-copy p,
+.empty-reminders p {
+  margin: 0.25rem 0 0;
+  color: var(--dd-muted);
+  font-size: 0.75rem;
+}
+
+.is-done .reminder-copy h2 {
+  color: var(--dd-muted);
+  text-decoration: line-through;
+}
+
+.delete-button {
+  color: #9f1239;
+}
+
+.conflict-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.8rem;
+  color: #78350f;
+  border: 1px solid #f2c879;
+  border-radius: 0.9rem;
+  background: #fffbeb;
+}
+
+.conflict-actions p {
+  flex: 1 1 15rem;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.conflict-actions button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  color: #78350f;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  border: 1px solid #e5b85d;
+  border-radius: 0.75rem;
+  background: #fffdf8;
+}
+
+.empty-reminders {
+  padding: 2rem 1rem;
+  text-align: center;
+  border: 1px dashed rgb(32 53 42 / 18%);
+  border-radius: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .reminder-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .delete-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

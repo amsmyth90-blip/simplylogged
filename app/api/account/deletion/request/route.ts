@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
+import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
 type DeletionRequestBody = {
@@ -17,11 +18,6 @@ type AccountDeletionRequestRow = {
 export async function POST(request: Request) {
   if (!isSupabaseConfiguredServer()) {
     return NextResponse.json({ error: "Account deletion requests are not configured yet." }, { status: 503 });
-  }
-
-  const body = await request.json().catch((): DeletionRequestBody => ({}));
-  if (String(body.confirmation ?? "").trim().toUpperCase() !== "DELETE") {
-    return NextResponse.json({ error: "Type DELETE to confirm the account deletion request." }, { status: 400 });
   }
 
   const supabase = await getSupabaseServerClient();
@@ -53,6 +49,20 @@ export async function POST(request: Request) {
       { error: "Too many deletion requests. Please wait before trying again." },
       { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
     );
+  }
+
+  let body: DeletionRequestBody;
+  try {
+    const parsed = await readBoundedJson(request, 1024);
+    body = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as DeletionRequestBody
+      : {};
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "The deletion request is invalid." }, { status });
+  }
+  if (String(body.confirmation ?? "").trim().toUpperCase() !== "DELETE") {
+    return NextResponse.json({ error: "Type DELETE to confirm the account deletion request." }, { status: 400 });
   }
 
   const userAgent = requestHeaders.get("user-agent") ?? "";

@@ -88,23 +88,29 @@ test("routes browser and email uploads through byte inspection and the scanner b
 
   const emailRoute = await source("../app/api/import/email/route.ts");
   assert.match(emailRoute, /hasCompleteResendSignature/);
-  assert.match(emailRoute, /MAX_WEBHOOK_BYTES/);
-  assert.match(emailRoute, /readBoundedStream\(response\.body, MAX_DOCUMENT_BYTES\)/);
-  assert.doesNotMatch(emailRoute, /response\.arrayBuffer\(\)/);
-  assert.match(emailRoute, /inspectCaptureFile\(\{ declaredMimeType: attachment\.mimeType, bytes \}\)/);
-  assert.match(emailRoute, /getCaptureSecurityScanner\(\)\.scan/);
+  const emailPayload = await source("../lib/email-import/payload.ts");
+  assert.match(emailPayload, /MAX_WEBHOOK_BYTES/);
+  assert.match(emailPayload, /parseBoundedInboundMultipart\(request/);
+  assert.match(emailPayload, /readBoundedStream\(response\.body, remainingBytes\)/);
+  assert.match(emailPayload, /MAX_INBOUND_ATTACHMENT_BYTES - totalBytes/);
+  assert.doesNotMatch(emailPayload, /response\.arrayBuffer\(\)/);
+  assert.match(emailRoute, /checkServerRateLimit\(createRateLimitKey\("inbound-email", verifiedUserId\)/);
+  const emailAttachment = await source("../lib/email-import/import-attachment.ts");
+  assert.match(emailAttachment, /inspectCaptureFile\(\{ declaredMimeType: attachment\.mimeType, bytes \}\)/);
+  assert.match(emailAttachment, /getCaptureSecurityScanner\(\)\.scan/);
 });
 
-test("records completed actions through a narrow checked RPC", async () => {
+test("records completed actions through one atomic service-only RPC", async () => {
   const migration = await readFile(migrationPath, "utf8");
-  const followup = await source("../supabase/migrations/20260901221000_close_security_hardening_races.sql");
+  const followup = await source("../supabase/migrations/20260904212000_action_proposal_service_boundary.sql");
   assert.match(migration, /audit_events_action_completed_unique_idx/i);
-  assert.match(followup, /create or replace function public\.finalize_action_request/i);
-  assert.match(followup, /request\.user_id = auth\.uid\(\)[\s\S]*request\.status = 'proposed'[\s\S]*for update/i);
-  assert.match(followup, /update public\.action_requests[\s\S]*insert into public\.audit_events/i);
+  assert.match(followup, /create or replace function public\.decide_action_request_server/i);
+  assert.match(followup, /request\.user_id = input_user_id[\s\S]*request\.status = 'proposed'[\s\S]*for update/i);
+  assert.match(followup, /sync_system_reminders_server[\s\S]*update public\.action_requests[\s\S]*insert into public\.audit_events/i);
+  assert.match(followup, /finalize_action_request\(uuid,text,boolean\)[\s\S]*from public, anon, authenticated, service_role/i);
 
   const route = await source("../app/api/actions/proposals/route.ts");
-  assert.match(route, /rpc\("finalize_action_request"/);
+  assert.match(route, /rpc\("decide_action_request_server"/);
   assert.doesNotMatch(route, /from\("audit_events"\)\.insert/);
 });
 

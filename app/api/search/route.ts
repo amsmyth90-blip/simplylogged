@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { SEARCH_SCHEMA_VERSION } from "@diarydock/search";
+
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { loadAuthorizedSearchCandidates } from "@/lib/search/authorized";
 import { filterAndRankSearchResults, searchCategories, searchDateFilters, type SearchCategory, type SearchDateFilter } from "@/lib/search/results";
@@ -21,5 +23,5 @@ export async function GET(request: Request) {
   const authorized = await loadAuthorizedSearchCandidates(supabase, authData.user.id);
   if (authorized.error) return NextResponse.json({ error: "Search could not safely load your records." }, { status: 500 });
   const results = filterAndRankSearchResults(authorized.candidates, query, requestedCategory as SearchCategory, requestedDate as SearchDateFilter).slice(0, 50);
-  return NextResponse.json({ results, query, filters: { category: requestedCategory, date: requestedDate } }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
+  return NextResponse.json({ schemaVersion: SEARCH_SCHEMA_VERSION, results, query, filters: { category: requestedCategory, date: requestedDate } }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

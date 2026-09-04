@@ -1,50 +1,21 @@
 "use client";
 
-export type HouseholdInvitePreview = {
-  token: string;
-  householdName: string;
-  name: string;
-  relation: string;
-  access: string;
-  expiresAt: string;
-};
+import type {
+  HouseholdAccessEvent,
+  HouseholdDirectory,
+  HouseholdInvitePreview,
+  HouseholdRole,
+} from "@diarydock/household";
 
-export type HouseholdRole = "owner" | "member" | "viewer";
-
-export type HouseholdDirectoryMember = {
-  userId: string;
-  name: string;
-  relation: string;
-  role: HouseholdRole;
-  joinedAt: string;
-};
-
-export type HouseholdDirectoryInvite = {
-  token: string;
-  email: string;
-  name: string;
-  relation: string;
-  access: string;
-  createdAt: string;
-  expiresAt: string;
-};
-
-export type HouseholdDirectory = {
-  householdId: string;
-  householdName: string;
-  currentUserId: string;
-  role: HouseholdRole;
-  members: HouseholdDirectoryMember[];
-  invites: HouseholdDirectoryInvite[];
-};
-
-export type HouseholdAccessEvent = {
-  id: string;
-  actorUserId: string;
-  eventType: string;
-  createdAt: string;
-  metadata: Record<string, unknown>;
-};
+export type {
+  HouseholdAccessEvent,
+  HouseholdDirectory,
+  HouseholdDirectoryInvite,
+  HouseholdDirectoryMember,
+  HouseholdInvitePreview,
+  HouseholdOwnershipTransfer,
+  HouseholdRole,
+} from "@diarydock/household";
 
 type ApiError = { error?: string };
 
@@ -135,6 +106,17 @@ export async function renameHousehold(name: string) {
 export async function leaveHousehold() {
   const payload = await householdMutation<{ householdId: string }>("leave");
   return payload.householdId;
+}
+
+export async function initiateHouseholdOwnershipTransfer(userId: string) {
+  await householdMutation("initiate-ownership-transfer", { userId });
+}
+
+export async function resolveHouseholdOwnershipTransfer(
+  transferId: string,
+  decision: "accept" | "decline" | "cancel",
+) {
+  await householdMutation("resolve-ownership-transfer", { transferId, decision });
 }
 
 export async function loadHouseholdAccessEvents(householdId: string): Promise<HouseholdAccessEvent[]> {

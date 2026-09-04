@@ -1,15 +1,13 @@
 "use client";
 
+import {
+  parseDocumentSharingResponse,
+  type DocumentSharing,
+} from "@/lib/document-sharing-contract";
+import { readBoundedJsonResponse } from "@/lib/http/bounded-json-response";
 import type { ResourceVisibility } from "@/lib/resource-access";
 
-export type DocumentSharing = {
-  visibility: ResourceVisibility;
-  selectedUserIds: string[];
-};
-
-type SharingResponse = DocumentSharing & { error?: string };
-
-async function sharingRequest(path: string, init?: RequestInit): Promise<SharingResponse> {
+async function sharingRequest(path: string, init?: RequestInit): Promise<DocumentSharing> {
   const response = await fetch(`/api/documents/sharing${path}`, {
     ...init,
     cache: "no-store",
@@ -17,11 +15,14 @@ async function sharingRequest(path: string, init?: RequestInit): Promise<Sharing
       ? { "Content-Type": "application/json", ...init.headers }
       : init?.headers,
   });
-  const payload = await response.json().catch((): { error?: string } => ({}));
+  const payload = await readBoundedJsonResponse(response, 16 * 1024)
+    .catch((): { error?: string } => ({}));
   if (!response.ok) {
-    throw new Error(payload.error ?? "The document sharing choice could not be saved.");
+    const error = payload && typeof payload === "object" && "error" in payload
+      && typeof payload.error === "string" ? payload.error : null;
+    throw new Error(error ?? "The document sharing choice could not be saved.");
   }
-  return payload as SharingResponse;
+  return parseDocumentSharingResponse(payload);
 }
 
 export async function getDocumentSharing(documentId: string): Promise<DocumentSharing> {
@@ -39,6 +40,6 @@ export async function setDocumentSharing(input: {
 }) {
   await sharingRequest("", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify({ ...input, selectedUserIds: input.selectedUserIds ?? [] }),
   });
 }

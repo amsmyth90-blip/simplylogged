@@ -3,13 +3,16 @@
 Date: 1 September 2026
 Release branch: `codex/android-java21-main`
 
+> Historical implementation snapshot. This records the first Life OS release slice, not the current working tree or current production readiness. The authoritative current evidence and launch blockers are maintained in `docs/engineering/release-readiness.md`.
+
 ## Outcome
 
-The planned Life OS foundation is implemented, database migrations are applied to the user-approved empty linked project, and the production application is deployed at `https://diarydock.com`. The work turns DiaryDock from a collection of household screens into a permission-aware organisation system with deterministic intelligence, deliberate sharing and documented security limits.
+At the date above, the first planned Life OS foundation had been implemented and its baseline was deployed at `https://diarydock.com`. Later web, packaged-mobile, synchronisation and security work is not represented by this snapshot. The current working implementation must not be described as deployed or release-ready without the evidence required by the release-readiness record.
 
 ## Implemented capabilities
 
 - Stable household membership, private/household/selected-member document sharing, redacted access history and database-enforced recent authentication.
+- Two-person, 24-hour household ownership transfer with atomic role exchange and preserved household data.
 - Review-before-save intelligent capture, durable capture jobs, byte-signature validation, scanner boundary, inbox deduplication, filing suggestions and confirmed-field action proposals.
 - Owner-consistent Life Graph records and proposal execution through the central reminder engine.
 - Versioned reminders and deterministic Guardian findings with resolve, dismiss and snooze controls.
@@ -18,7 +21,8 @@ The planned Life OS foundation is implemented, database migrations are applied t
 - Permission-aware universal search and cited, retrieval-limited Ask DiaryDock answers.
 - Email-bound, grant-by-grant Trusted Emergency Access with short-lived file links.
 - Truthful Vault E2EE threat model, target architecture and recovery design gate.
-- Owner-only Home Handover selection/preview foundation that structurally excludes sensitive categories.
+- Home Handover on web, phone and tablet, with an encrypted owner-only offline draft, recent-login protected selection, structural exclusion of sensitive categories, and explicit revocable 30-day read-only access for one confirmed recipient email.
+- Native six-stage onboarding on phone and tablet with the same household, Life Check and dashboard rules as the web app, encrypted offline state and one revision-checked save.
 - First-party, opt-in, content-free product analytics with immediate opt-out deletion and 90-day logical expiry.
 
 ## Main schema, APIs and services
@@ -33,6 +37,8 @@ The final scan reported eight issues. The release fixes bind file paths to owner
 
 ## Verification evidence
 
+The figures below belong only to the historical release slice. They must not be used as verification of the current working tree.
+
 - TypeScript: pass.
 - ESLint: pass.
 - Automated tests: 125/125 pass.
@@ -45,12 +51,12 @@ The final scan reported eight issues. The release fixes bind file paths to owner
 
 - Vault content is server-readable plaintext protected by Auth/RLS/Storage. Native E2EE is not implemented and must pass the documented signed-client, key-storage, recovery and cryptographic test gates before any E2EE claim.
 - The scanner interface and fail-closed deployment switch exist, but an approved production malware-scanner adapter is not bundled.
-- Household ownership transfer is not implemented. Account deletion is blocked while an owner has other active members.
-- Home Handover does not yet create recipient access, export or publication.
+- Household owners must complete the two-person transfer before leaving or deleting an account that still has active members.
+- Home Handover does not send email, create a public link, expose source files or produce a downloadable export; recipient access is in-app, read-only, email-bound and time-limited.
 - Trusted Emergency Access does not automatically release data after inactivity or death.
 - Some specialist module adapters and notification delivery remain incremental product work; the implemented Life OS does not silently infer or execute those future actions.
 - Analytics rows are hidden after 90 days and pruned on analytics activity. A separate scheduled physical-cleanup job remains an operational enhancement.
 
 ## Android release impact
 
-The current Android shell loads `https://diarydock.com`, so these web and database changes do not require rebuilding the APK. An APK rebuild is required only when native Java, Capacitor configuration, permissions, icons/splash assets or packaged native plugins change.
+The Android application contains a locally built mobile bundle and communicates with authenticated HTTPS APIs. Changes to mobile code, native Java, Capacitor configuration, permissions, icons/splash assets or packaged plugins require a new signed APK/App Bundle. Server-only API and database changes remain independently deployable when they preserve the versioned mobile contract.

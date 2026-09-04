@@ -6,12 +6,55 @@
 // Run: node tools/generate-app-icons.mjs
 
 import sharp from "sharp";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SOURCE_ICON = path.join(ROOT, "public/brand/diarydock-app-icon.png");
 const BACKGROUND = "#f8f4ec"; // matches tailwind.config.ts `cream`
+
+async function generateIosAssets(icon, splash) {
+  const assets = path.join(ROOT, "ios", "App", "App", "Assets.xcassets");
+  const iconDirectory = path.join(assets, "AppIcon.appiconset");
+  const splashDirectory = path.join(assets, "Splash.imageset");
+  await Promise.all([mkdir(iconDirectory, { recursive: true }), mkdir(splashDirectory, { recursive: true })]);
+  await writeFile(path.join(iconDirectory, "AppIcon-512@2x.png"), icon);
+  await Promise.all([
+    "splash-2732x2732.png",
+    "splash-2732x2732-1.png",
+    "splash-2732x2732-2.png",
+  ].map((name) => writeFile(path.join(splashDirectory, name), splash)));
+}
+
+async function generateAndroidIcons(icon) {
+  const sizes = { ldpi: 36, mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
+  const androidResources = path.join(ROOT, "android", "app", "src", "main", "res");
+  for (const [density, size] of Object.entries(sizes)) {
+    const directory = path.join(androidResources, `mipmap-${density}`);
+    await mkdir(directory, { recursive: true });
+    const adaptiveSize = Math.round(size * 2.25);
+    await Promise.all([
+      sharp(icon).resize(size, size).png().toFile(path.join(directory, "ic_launcher.png")),
+      sharp(icon).resize(size, size).png().toFile(path.join(directory, "ic_launcher_round.png")),
+      sharp(icon).resize(adaptiveSize, adaptiveSize).png().toFile(path.join(directory, "ic_launcher_foreground.png")),
+      sharp(icon).resize(adaptiveSize, adaptiveSize).png().toFile(path.join(directory, "ic_launcher_background.png")),
+    ]);
+  }
+}
+
+async function generateAndroidSplashes(splash) {
+  const resources = path.join(ROOT, "android", "app", "src", "main", "res");
+  const directories = await readdir(resources, { withFileTypes: true });
+  for (const directory of directories) {
+    if (!directory.isDirectory() || !directory.name.startsWith("drawable")) continue;
+    const directoryPath = path.join(resources, directory.name);
+    if (!(await readdir(directoryPath)).includes("splash.png")) continue;
+    const target = path.join(directoryPath, "splash.png");
+    const metadata = await sharp(target).metadata();
+    if (!metadata.width || !metadata.height) continue;
+    await sharp(splash).resize(metadata.width, metadata.height, { fit: "cover" }).png().toFile(target);
+  }
+}
 
 async function main() {
   await mkdir(path.join(ROOT, "resources"), { recursive: true });
@@ -30,7 +73,7 @@ async function main() {
   // Splash source: brand-colored canvas with the mark centered at ~40% width.
   const markSize = 1100;
   const mark = await sharp(flattened).resize(markSize, markSize).toBuffer();
-  await sharp({
+  const splash = await sharp({
     create: {
       width: 2732,
       height: 2732,
@@ -42,7 +85,8 @@ async function main() {
     .flatten({ background: BACKGROUND })
     .removeAlpha()
     .png()
-    .toFile(path.join(ROOT, "resources/splash.png"));
+    .toBuffer();
+  await writeFile(path.join(ROOT, "resources/splash.png"), splash);
 
   const webSizes = [
     { name: "apple-touch-icon.png", size: 180 },
@@ -58,7 +102,13 @@ async function main() {
       .toFile(path.join(ROOT, "public/icons", name));
   }
 
-  console.log("Generated resources/icon.png, resources/splash.png, and public/icons/*.png");
+  await Promise.all([
+    generateIosAssets(flattened, splash),
+    generateAndroidIcons(flattened),
+    generateAndroidSplashes(splash),
+  ]);
+
+  console.log("Generated DiaryDock web, iOS, and Android application assets.");
 }
 
 main().catch((err) => {

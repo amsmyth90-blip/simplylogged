@@ -1,0 +1,215 @@
+.garage-add-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+}
+.garage-add-tabs button {
+  min-height: 2.35rem;
+  padding: 0.25rem;
+  color: #786e61;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  border: 1px solid #e2dbd0;
+  border-radius: 0.65rem;
+  background: white;
+}
+.garage-add-tabs .is-active {
+  color: white;
+  border-color: #665642;
+  background: #665642;
+}
+.garage-quick-add form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+.garage-quick-add textarea {
+  min-height: 5rem;
+  padding-block: 0.65rem;
+  resize: vertical;
+}
+.garage-quick-add :disabled {
+  opacity: 0.52;
+}
+.garage-wide-field,
+.garage-offline-notice,
+.garage-save {
+  grid-column: 1 / -1;
+}
+.garage-offline-notice,
+.garage-empty {
+  margin: 0;
+  padding: 0.7rem;
+  color: #71685d;
+  font-size: 0.62rem;
+  line-height: 1.5;
+  border-radius: 0.75rem;
+  background: #f2ede6;
+}
+.garage-save {
+  min-height: 2.85rem;
+}
+.garage-no-vehicles {
+  text-align: center;
+}
+.garage-no-vehicles > span {
+  font-size: 2rem;
+}
+.garage-no-vehicles h2 {
+  margin: 0.4rem 0 0;
+  font-family: Georgia, serif;
+}
+.garage-no-vehicles p {
+  color: #756d63;
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+.garage-editor-backdrop {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  padding: 1rem;
+  background: rgb(31 27 22 / 58%);
+  backdrop-filter: blur(0.35rem);
+}
+.garage-vehicle-editor {
+  width: min(100%, 38rem);
+  max-height: calc(100dvh - 2rem);
+  margin-inline: auto;
+  padding: 1rem;
+  overflow-y: auto;
+  border-radius: 1.25rem;
+  background: #fbfaf7;
+  box-shadow: 0 1.5rem 4rem rgb(31 25 19 / 35%);
+}
+.garage-vehicle-editor > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.garage-vehicle-editor header p,
+.garage-vehicle-editor header h2 {
+  margin: 0;
+}
+.garage-vehicle-editor header p {
+  color: #786b58;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.garage-vehicle-editor header h2 {
+  margin-top: 0.25rem;
+  font: 1.35rem Georgia, serif;
+}
+.garage-vehicle-editor header button {
+  width: 2.6rem;
+  height: 2.6rem;
+  color: #554a3d;
+  font-size: 1.35rem;
+  border: 1px solid #ded6cb;
+  border-radius: 50%;
+  background: white;
+}
+.garage-vehicle-editor form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.garage-vehicle-editor label span {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #786b58;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+.garage-vehicle-editor input {
+  width: 100%;
+  min-height: 2.85rem;
+  padding-inline: 0.75rem;
+  color: #332f2a;
+  font: inherit;
+  border: 1px solid #ddd4c7;
+  border-radius: 0.75rem;
+  background: white;
+}
+.garage-editor-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.65rem;
+  color: #8c493f;
+  border-radius: 0.7rem;
+  background: #f7e4df;
+}
+.garage-vehicle-editor footer {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.garage-vehicle-editor footer button {
+  min-height: 2.85rem;
+  color: #4d4439;
+  font-weight: 800;
+  border: 1px solid #d9d1c5;
+  border-radius: 0.75rem;
+  background: white;
+}
+.garage-vehicle-editor footer button:last-child {
+  color: white;
+  border-color: #42382d;
+  background: #42382d;
+}
+.garage-vehicle-editor :disabled {
+  opacity: 0.52;
+}
+@media (min-width: 720px) {
+  .garage-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .garage-date-list {
+    grid-template-columns: 1fr 1fr;
+  }
+  .garage-record-list,
+  .garage-note-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .garage-hero {
+    height: 17rem;
+  }
+  .garage-sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
+    gap: 0.8rem;
+  }
+  .garage-toolbar,
+  .garage-tabs,
+  .garage-summary-grid,
+  .garage-message {
+    grid-column: 1 / -1;
+  }
+  .garage-panel {
+    margin-top: 0;
+  }
+  .garage-file-link {
+    grid-column: 1;
+  }
+  .garage-quick-add {
+    grid-column: 2;
+    grid-row: 4 / span 3;
+  }
+  .garage-panel:not(.garage-quick-add),
+  .garage-summary-grid {
+    align-self: start;
+  }
+  .garage-editor-backdrop {
+    align-items: center;
+  }
+}

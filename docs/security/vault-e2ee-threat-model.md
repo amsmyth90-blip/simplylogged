@@ -12,15 +12,15 @@ The server bootstrap returns authorised document rows, including storage locatio
 
 | Component | Current role | Security-relevant source |
 |---|---|---|
-| Web/Capacitor client | Authenticates, uploads plaintext, renders plaintext metadata and requests file links | `lib/supabase/client.ts:1-28`, `lib/document-storage.ts:17-64` |
-| Next.js server | Loads authorised plaintext metadata/state and serves remote application code | `app/api/diarydock/bootstrap/route.ts:45-105`, `next.config.ts:11-20` |
+| Web client | Authenticates, uploads plaintext, renders plaintext metadata and requests file links | `lib/supabase/client.ts:1-28`, `lib/document-storage.ts:17-64` |
+| Next.js server | Loads authorised plaintext metadata/state, serves web application code and exposes authorised mobile APIs | `app/api/diarydock/bootstrap/route.ts:45-105`, `next.config.ts:11-20` |
 | Supabase Auth/Postgres/Storage | Holds sessions, plaintext metadata and server-decryptable files; enforces RLS/private bucket policy | `supabase/schema.sql:1-34`, `supabase/schema.sql:37-123` |
 | OpenAI integrations | May receive user-submitted plaintext for explicitly chosen AI reading; not part of an E2EE path | `app/privacy/page.tsx:40-53`, `lib/ask/openai.ts:19-34` |
-| Capacitor shell | Loads the production web origin; it is not presently an independently bundled trusted cryptographic client | `capacitor.config.ts:3-14` |
+| Packaged Capacitor client | Runs a signed local application bundle, protects its offline database with platform-backed SQLCipher keys, and exchanges currently server-readable content through HTTPS APIs; Vault E2EE is not implemented | `capacitor.config.ts`, `apps/mobile/src/data/offline/database.ts`, `apps/mobile/src/data/offline/database-key.ts` |
 
 ```mermaid
 flowchart LR
-  U[User] --> C[Browser or current Capacitor shell]
+  U[User] --> C[Browser or packaged Capacitor client]
   C -->|session + plaintext| N[DiaryDock web/server origin]
   C -->|plaintext upload| S[Supabase Storage]
   N -->|authorised plaintext metadata| D[Supabase Postgres]
@@ -38,8 +38,8 @@ flowchart LR
 | Document upload | File bytes | Private bucket, owner path, 4 MB/type allow-list | `diarydock-documents/<user>/<document>/<name>` | User browser, Supabase Storage, authorised signed-link readers | Storage RLS and bucket constraints | `lib/document-storage.ts:17-40`, `supabase/schema.sql:37-91` |
 | Metadata/bootstrap | Titles, extraction, OCR, routes | Authorised `documents` query and private/no-store response | Postgres `documents`; client memory | Authorised user browser and server | Database RLS | `app/api/diarydock/bootstrap/route.ts:75-100`, `app/api/diarydock/bootstrap/route.ts:184-240` |
 | Unconfigured/local fallback | Complete app state | Used only when Supabase is not configured | Browser `sessionStorage` | Same-origin scripts and user session | Browser origin/process isolation | `lib/diarydock-data.ts:896-925`, `lib/diarydock-data.ts:1033-1035` |
-| Current Android/iOS shell | Executable web client | Remote production URL wins | `https://diarydock.com` | App webview receives server-delivered JavaScript | TLS; no native key-store boundary is implemented | `capacitor.config.ts:3-14` |
-| Android share import | Temporary incoming file | Android app-private cache and bridge | Plaintext cache file until successful import/cleanup | DiaryDock Android process and hosted WebView | OS application sandbox, type/size limits and explicit cleanup | `android/app/src/main/java/com/diarydock/app/DiaryDockShareImportPlugin.java:152-170`, `components/ShareImportWorkspace.tsx:194-265` |
+| Current Android/iOS application | Executable mobile client and encrypted offline cache | Local assets from `apps/mobile/dist`; authenticated API origin supplied at build time | Signed app bundle plus account-scoped SQLCipher database | DiaryDock app process; authorised HTTPS services receive current server-managed plaintext | Store signing, OS sandbox, secure storage, SQLCipher, TLS and runtime hardening; no Vault E2EE yet | `capacitor.config.ts`, `apps/mobile/src/auth/supabase-config.ts`, `apps/mobile/src/data/offline/database.ts` |
+| Android share import | Temporary incoming file | Android app-private cache and bridge | Plaintext cache file until successful import/cleanup | DiaryDock Android process and local Capacitor WebView | OS application sandbox, type/size limits and explicit cleanup | `android/app/src/main/java/com/diarydock/app/DiaryDockShareImportPlugin.java`, `apps/mobile/src/capture` |
 | Future E2EE pilot | Master key, device keys, recovery material | Not implemented; design below required | Trusted device memory/key store; server receives only wrapped keys | Enrolled devices and holder of offline recovery material | Reviewed AEAD/KDF and signed-client controls | Library, native secure storage and device enrolment require approval |
 
 ## Threat model, boundaries and assumptions
@@ -57,7 +57,7 @@ flowchart LR
 - An unauthenticated internet attacker can send requests and supply uploaded content but does not begin with a valid session.
 - A malicious or removed household member or trusted contact may retain their own account and previously received plaintext, but does not begin with the owner's Vault keys.
 - A database/storage attacker may read or alter server-held rows/objects but does not begin with device-held key material in the target model.
-- A compromised DiaryDock server or deployment account can alter remote web JavaScript. In the current web and remote-URL Capacitor model this actor can potentially capture keys when a user next decrypts; therefore the strongest “DiaryDock server cannot decrypt” claim is not supportable without an independently signed client.
+- A compromised DiaryDock server or deployment account can alter web application JavaScript and API responses. It cannot silently replace an already installed, store-signed mobile bundle, but the current mobile APIs and storage model remain server-readable. The strongest “DiaryDock server cannot decrypt” claim is therefore still unsupported until the signed client contains and verifies the complete E2EE protocol.
 - A device attacker with an unlocked device or same-origin script execution may read in-memory plaintext and keys. E2EE does not protect an already compromised trusted endpoint.
 - A local attacker who controls the DiaryDock Android process or an unlocked/compromised device may reach temporary plaintext share-import cache files. A normal sandboxed app does not begin with this access.
 - DiaryDock support is not assumed to possess recovery keys and must not promise recovery when all enrolled devices and offline recovery material are lost.
@@ -78,8 +78,8 @@ flowchart LR
 ### Assumptions and unresolved gates
 
 - TLS, Supabase operational controls and OS secure storage are dependencies, not substitutes for E2EE.
-- Browser Web Crypto can support an encrypted-at-rest pilot against database/storage compromise, but remote server-delivered JavaScript cannot protect keys from a malicious server build.
-- A strong E2EE claim therefore requires an independently distributed/signed native client, reviewed secure-key-store integration, release integrity and a defined policy for the web client.
+- Browser Web Crypto can support an encrypted-at-rest pilot against database/storage compromise, but server-delivered web JavaScript cannot protect keys from a malicious server build.
+- The packaged mobile application provides an independently distributed and signed code boundary. A strong E2EE claim additionally requires reviewed Vault cryptography and secure-key-store integration, release provenance, recovery and multi-device tests, migration evidence and a defined policy for the web client.
 - Cryptographic library, chunked-file construction, KDF parameters, WebAuthn/secure-enclave portability, accessibility of recovery material and multi-device UX remain approval gates.
 - Existing plaintext objects, metadata, OCR and backups remain server-readable until a verified migration completes.
 
@@ -89,9 +89,9 @@ These are threat hypotheses for design coverage, not validated vulnerabilities.
 
 | Priority | Scenario and capability gain | Prerequisites | Impact | Existing controls | Required mitigation | Evidence |
 |---|---|---|---|---|---|---|
-| Critical | Compromised server ships JavaScript that captures an unlocked Vault key | Deployment/server compromise and user opens Vault | Full future Vault plaintext/key compromise | TLS and account auth do not stop authorised malicious code | Independently signed native crypto client; release provenance; keep keys out of remote web client for strongest mode | `capacitor.config.ts:7-13`, `next.config.ts:16-18` |
+| Critical | Compromised server ships web JavaScript that captures an unlocked Vault key | Deployment/server compromise and user opens Vault in a future crypto-enabled web client | Full future Vault plaintext/key compromise | TLS and account auth do not stop authorised malicious web code; the mobile bundle is independently signed | Keep strong-mode keys in reviewed signed clients; enforce release provenance and a restricted or independently trusted web policy | `capacitor.config.ts`, `apps/mobile/package.json`, `next.config.ts:16-18` |
 | High | Database/storage disclosure reveals current files, OCR and metadata | Provider/admin compromise or policy bypass | Current Vault confidentiality loss | Private bucket, RLS, signed links | Client-side AEAD and encrypted metadata; server stores ciphertext only | `supabase/schema.sql:37-123`, `app/api/diarydock/bootstrap/route.ts:184-213` |
-| High | XSS/supply-chain code reads in-memory keys/plaintext | Script execution in trusted origin while Vault unlocked | Decrypt/export owner content | CSP exists, but currently permits inline/eval scripts | Nonce/hash CSP, remove unsafe directives, dependency integrity, short unlock window, native isolation | `next.config.ts:11-20` |
+| High | XSS/supply-chain code reads in-memory keys/plaintext | Script execution in trusted origin while Vault unlocked | Decrypt/export owner content | Production CSP blocks `unsafe-eval`, but Next.js web rendering still requires inline script and style allowances; the packaged mobile CSP permits neither | Nonce/hash CSP where platform-compatible, dependency integrity, short unlock window and native isolation | `next.config.ts:7-18`, `apps/mobile/index.html` |
 | High | Nonce reuse or unauthenticated chunk ordering breaks confidentiality/integrity | Incorrect custom file-encryption construction | Plaintext recovery or undetected corruption | No E2EE implementation yet | Reviewed library/protocol, versioned manifest, per-chunk nonce derivation and associated-data binding, known-answer tests | Design gate |
 | High | Weak/reused recovery secret permits offline key guessing | Low-entropy passphrase or leaked wrapper database | Master-key recovery | No current recovery model | Random high-entropy recovery key; memory-hard KDF only for user passphrases; attempt-independent AEAD verification | Design gate |
 | Medium | Removed device/contact retains old content | Prior authorised decrypt or copied key envelope | Continued access to past plaintext | Normal access revocation exists outside E2EE | Rewrap/rotate for future versions; explain that already viewed plaintext cannot be revoked | `lib/resource-access.ts:1-115`, design gate |

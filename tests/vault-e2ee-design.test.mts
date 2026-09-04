@@ -5,7 +5,7 @@ import test from "node:test";
 const threatModelPath = new URL("../docs/security/vault-e2ee-threat-model.md", import.meta.url);
 const architecturePath = new URL("../docs/security/vault-e2ee-architecture.md", import.meta.url);
 const recoveryPath = new URL("../docs/security/vault-recovery-model.md", import.meta.url);
-const settingsPath = new URL("../lib/diarydock-data.ts", import.meta.url);
+const settingsPath = new URL("../lib/diarydock-initial-state.ts", import.meta.url);
 
 test("Vault documentation does not misrepresent the current storage model as E2EE", async () => {
   const [threatModel, architecture, settings] = await Promise.all([
@@ -20,11 +20,12 @@ test("Vault documentation does not misrepresent the current storage model as E2E
   assert.match(settings, /Not currently enabled for Vault documents/);
 });
 
-test("the proposed design keeps the strong server-confidentiality claim behind a signed-client gate", async () => {
+test("the proposed design keeps the strong server-confidentiality claim behind a reviewed signed-client gate", async () => {
   const architecture = await readFile(architecturePath, "utf8");
 
-  assert.match(architecture, /signed native build/i);
-  assert.match(architecture, /not a malicious DiaryDock server/i);
+  assert.match(architecture, /signed local mobile bundle/i);
+  assert.match(architecture, /does not itself provide Vault E2EE/i);
+  assert.match(architecture, /reviewed cryptographic implementation/i);
   assert.match(architecture, /Home-grown chunk nonce\/counter logic is prohibited/i);
   assert.match(architecture, /synthetic data only/i);
 });

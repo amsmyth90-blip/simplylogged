@@ -1,0 +1,145 @@
+.editor-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  background: rgb(21 40 35 / 52%);
+  backdrop-filter: blur(0.5rem);
+}
+
+.reminder-editor {
+  width: min(100%, 42rem);
+  max-height: calc(100dvh - 2rem);
+  margin: 0 auto;
+  padding: 1.25rem;
+  overflow-y: auto;
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 1.75rem;
+  background: var(--dd-paper);
+  box-shadow: 0 2rem 5rem rgb(21 40 35 / 35%);
+}
+
+.reminder-editor > header,
+.reminder-editor footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reminder-editor .eyebrow {
+  margin: 0;
+}
+
+.reminder-editor h2 {
+  margin: 0.35rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+.editor-close {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--dd-muted);
+  font: inherit;
+  font-size: 1.5rem;
+  border: 1px solid rgb(32 53 42 / 10%);
+  border-radius: 50%;
+  background: white;
+}
+
+.reminder-editor form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.reminder-editor label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--dd-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.reminder-editor input,
+.reminder-editor textarea,
+.reminder-editor select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--dd-ink);
+  font: inherit;
+  font-weight: 500;
+  border: 1px solid rgb(32 53 42 / 12%);
+  border-radius: 0.9rem;
+  background: white;
+  outline: none;
+}
+
+.reminder-editor textarea {
+  resize: vertical;
+}
+
+.reminder-editor input:focus-visible,
+.reminder-editor textarea:focus-visible,
+.reminder-editor select:focus-visible {
+  border-color: var(--dd-sage);
+  box-shadow: 0 0 0 0.25rem var(--dd-green-soft);
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.reminder-editor footer {
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.editor-cancel,
+.editor-save {
+  min-height: 2.9rem;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  border-radius: 999px;
+}
+
+.editor-cancel {
+  color: var(--dd-green);
+  border: 1px solid rgb(32 53 42 / 12%);
+  background: white;
+}
+
+.editor-save {
+  color: white;
+  border: 0;
+  background: var(--dd-green);
+}
+
+.editor-save:disabled {
+  opacity: 0.55;
+}
+
+@media (min-width: 700px) {
+  .editor-backdrop {
+    align-items: center;
+  }
+
+  .editor-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+}

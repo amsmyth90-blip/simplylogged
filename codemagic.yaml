@@ -4,6 +4,8 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
+      groups:
+        - mobile_runtime
       vars:
         PACKAGE_NAME: "com.diarydock.app"
       node: 22
@@ -20,6 +22,9 @@ workflows:
       - name: Install npm dependencies
         script: |
           npm ci
+      - name: Run repository verification
+        script: |
+          npm run check
       - name: Add Android platform if missing
         script: |
           if [ ! -d "android" ]; then
@@ -28,6 +33,9 @@ workflows:
       - name: Generate app icons and splash screens
         script: |
           npm run assets:generate
+      - name: Build packaged mobile application
+        script: |
+          npm run mobile:build
       - name: Sync Capacitor
         script: |
           npx cap sync android
@@ -40,6 +48,119 @@ workflows:
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug
+          ./gradlew testDebugUnitTest lintDebug assembleDebug
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/reports/lint-results-debug.html
+      - android/app/build/test-results/**/*.xml
+
+  android-play-internal:
+    name: DiaryDock Android - Play Internal Testing
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      android_signing:
+        - diarydock_upload
+      groups:
+        - mobile_runtime
+        - google_play_credentials
+      vars:
+        PACKAGE_NAME: "com.diarydock.app"
+      node: 22
+      java: 21
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "android-release-*"
+          include: true
+        - pattern: "*"
+          include: false
+    scripts:
+      - name: Install locked dependencies
+        script: npm ci
+      - name: Run repository verification
+        script: npm run check
+      - name: Generate app icons and splash screens
+        script: npm run assets:generate
+      - name: Build packaged mobile application
+        script: npm run mobile:build
+      - name: Sync Capacitor Android project
+        script: npx cap sync android
+      - name: Test and build signed App Bundle
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          APP_VERSION=$(node -p "require('./package.json').version")
+          cd android
+          chmod +x ./gradlew
+          ./gradlew testDebugUnitTest lintRelease bundleRelease \
+            -PversionCode="$BUILD_NUMBER" \
+            -PversionName="$APP_VERSION"
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/mapping/release/mapping.txt
+      - android/app/build/reports/lint-results-release.html
+      - android/app/build/test-results/**/*.xml
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: true
+
+  ios-testflight:
+    name: DiaryDock iOS - TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      groups:
+        - mobile_runtime
+        - appstore_credentials
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.diarydock.app
+      vars:
+        XCODE_PROJECT: "$CM_BUILD_DIR/ios/App/App.xcodeproj"
+        XCODE_SCHEME: "App"
+      node: 22
+      xcode: latest
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "ios-*"
+          include: true
+        - pattern: "*"
+          include: false
+    scripts:
+      - name: Install locked dependencies
+        script: npm ci
+      - name: Run repository verification
+        script: npm run check
+      - name: Generate app icons and splash screens
+        script: npm run assets:generate
+      - name: Build packaged mobile application
+        script: npm run mobile:build
+      - name: Sync Capacitor iOS project
+        script: npx cap sync ios
+      - name: Apply App Store signing profile
+        script: xcode-project use-profiles
+      - name: Set immutable build number
+        script: |
+          cd "$CM_BUILD_DIR/ios/App"
+          agvtool new-version -all "$BUILD_NUMBER"
+      - name: Build signed IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        submit_to_app_store: false

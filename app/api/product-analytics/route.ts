@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
 import { validateProductAnalyticsEvent } from "@/lib/product-analytics";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
@@ -24,11 +25,17 @@ export async function GET() {
 export async function POST(request: Request) {
   const auth = await authenticatedClient();
   if (!auth) return NextResponse.json({ error: "Please sign in again to use analytics privacy." }, { status: 401, headers: privateHeaders });
-  const length = Number(request.headers.get("content-length") ?? "0");
-  if (length > 2048) return NextResponse.json({ error: "That analytics request is too large." }, { status: 413, headers: privateHeaders });
   const rateLimit = await checkServerRateLimit(createRateLimitKey("product-analytics", auth.user.id), { limit: 60, windowMs: 60_000 });
   if (!rateLimit.allowed) return NextResponse.json({ error: "Please wait before trying again." }, { status: 429, headers: { ...privateHeaders, "Retry-After": String(rateLimit.retryAfterSeconds) } });
-  const body = await request.json().catch((): Record<string, unknown> => ({}));
+  let body: Record<string, unknown>;
+  try {
+    const parsed = await readBoundedJson(request, 2_048);
+    body = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown> : {};
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "That analytics request is not valid." }, { status, headers: privateHeaders });
+  }
 
   if (body.operation === "SET_CONSENT") {
     if (typeof body.enabled !== "boolean") return NextResponse.json({ error: "Choose whether to share product usage." }, { status: 400, headers: privateHeaders });

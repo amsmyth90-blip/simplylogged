@@ -1,0 +1,202 @@
+.garage-panel {
+  margin-top: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid rgb(255 255 255 / 92%);
+  border-radius: 1.15rem;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 1rem 2.5rem -2rem #40372d;
+}
+.garage-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+.garage-panel > header p {
+  margin: 0;
+  color: #8a785e;
+  font-size: 0.54rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.garage-panel > header h2 {
+  margin: 0.18rem 0 0;
+  font-family: Georgia, serif;
+  font-size: 1.1rem;
+}
+.garage-panel > header > span {
+  color: #74644f;
+  font-size: 0.64rem;
+  font-weight: 850;
+}
+.garage-date-list,
+.garage-record-list {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.7rem;
+}
+.garage-date-list article {
+  display: grid;
+  min-height: 3.25rem;
+  grid-template-columns: 0.65rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid #ebe5dc;
+  border-radius: 0.85rem;
+  background: white;
+}
+.garage-date-mark {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #b6afa3;
+}
+.garage-date-mark.is-current {
+  background: #66815f;
+}
+.garage-date-mark.is-soon {
+  background: #c18c3d;
+}
+.garage-date-mark.is-overdue {
+  background: #b2594c;
+}
+.garage-date-list strong,
+.garage-date-list small {
+  display: block;
+}
+.garage-date-list strong {
+  font-size: 0.69rem;
+}
+.garage-date-list small {
+  margin-top: 0.15rem;
+  color: #81786d;
+  font-size: 0.57rem;
+}
+.garage-date-list b {
+  color: #81786d;
+  font-size: 0.5rem;
+  text-transform: capitalize;
+}
+.garage-date-list b.is-overdue {
+  color: #a4463c;
+}
+.garage-date-list b.is-soon {
+  color: #9a681e;
+}
+.garage-record-list > article {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.55rem;
+  border: 1px solid #e9e2d8;
+  border-radius: 0.9rem;
+  background: white;
+}
+.garage-record-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 0.75rem;
+  border-radius: 0.72rem;
+  background: #7c6951;
+}
+.garage-record-list strong,
+.garage-record-list small {
+  display: block;
+}
+.garage-record-list strong {
+  font-size: 0.69rem;
+}
+.garage-record-list small {
+  margin-top: 0.15rem;
+  color: #83796d;
+  font-size: 0.54rem;
+  line-height: 1.45;
+}
+.garage-record-list p {
+  margin: 0.35rem 0 0;
+  color: #6f675e;
+  font-size: 0.58rem;
+  line-height: 1.45;
+}
+.garage-record-list aside {
+  min-width: 4.5rem;
+  text-align: right;
+}
+.garage-record-list aside b {
+  display: block;
+  font-size: 0.63rem;
+}
+.garage-record-list aside small {
+  font-size: 0.5rem;
+}
+.garage-note-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+.garage-note-grid article {
+  padding: 0.75rem;
+  border: 1px solid #e7dfd4;
+  border-radius: 0.9rem;
+  background: white;
+}
+.garage-note-grid small,
+.garage-note-grid strong {
+  display: block;
+}
+.garage-note-grid small {
+  color: #948875;
+  font-size: 0.52rem;
+}
+.garage-note-grid strong {
+  margin-top: 0.25rem;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+}
+.garage-note-grid p {
+  margin: 0.4rem 0 0;
+  color: #676057;
+  font-size: 0.62rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.garage-file-link {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+  padding: 0.55rem;
+  border: 1px solid rgb(255 255 255 / 92%);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 70%);
+}
+.garage-file-link > span {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  color: white;
+  border-radius: 0.75rem;
+  background: #76644f;
+}
+.garage-file-link strong,
+.garage-file-link small {
+  display: block;
+}
+.garage-file-link strong {
+  font-family: Georgia, serif;
+  font-size: 0.72rem;
+}
+.garage-file-link small {
+  margin-top: 0.18rem;
+  color: #82786b;
+  font-size: 0.52rem;
+}

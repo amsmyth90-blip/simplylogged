@@ -26,7 +26,7 @@ The original file bytes and OCR text are not stored in `capture_jobs`. Originals
 
 ## File security
 
-`lib/capture/file-security.ts` identifies PDF, JPEG, PNG, WebP and HEIC signatures and rejects disguised or unknown files before provider processing. `CaptureSecurityScanner` is a replaceable interface. The default implementation reports `UNAVAILABLE` because binary signature validation is not malware scanning. Set `DIARYDOCK_CAPTURE_SCANNER_REQUIRED=true` only after a real scanner adapter is configured; in that mode capture fails closed unless the scanner returns `PASSED`.
+`lib/capture/file-security.ts` identifies PDF, JPEG, PNG, WebP and HEIC signatures and rejects disguised or unknown files before provider processing. `CaptureSecurityScanner` is a replaceable interface. When `DIARYDOCK_MALWARE_SCANNER_URL` and its credential are configured, the HTTPS adapter sends only bounded files to the private service in `services/malware-scanner`, which streams them through ClamAV without disk persistence. Production fails closed unless the scanner returns `PASSED`; signature validation alone never counts as a malware scan.
 
 ## Provider boundary
 

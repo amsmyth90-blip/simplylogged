@@ -1,6 +1,9 @@
 .next
 node_modules
 out
+apps/*/dist/
+services/*/dist/
+ios/App/App/public/
 *.log
 *.tsbuildinfo
 next-env.d.ts
@@ -17,10 +20,7 @@ tools/diarydock-photo-ad/
 .qa-*/
 tmp-diarydock-dummy-bill.png
 
-# Generated iOS project lives on the CI runner, not in the repo
-ios/
-
-# Android native project is committed so mobile builds are reproducible
+# Native projects are committed so mobile builds are reproducible
 
 # Supabase local link/cache metadata
 supabase/.temp/

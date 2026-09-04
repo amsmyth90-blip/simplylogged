@@ -13,8 +13,9 @@ import {
 import {
   createInitialDiaryDockState,
   createDiaryDockRepository,
+  DiaryDockRepositoryConflictError,
   hydrateDiaryDockBootstrap,
-  type DiaryDockBootstrapPayload,
+  mergeDiaryDockRecordPage,
   type DiaryDockAppState,
   type RepositoryMode,
   familyInvitesFromDirectory,
@@ -26,6 +27,8 @@ import {
 } from "@/lib/household-sharing";
 import { PRODUCT_ANALYTICS_EVENTS, trackProductAnalytics } from "@/lib/product-analytics";
 import { createCoalescedSaver } from "@/lib/coalesced-save";
+import { loadDiaryDockBootstrap } from "@/lib/diarydock-bootstrap-client";
+import { loadRemainingDiaryDockRecords } from "@/lib/diarydock-record-page-client";
 
 type DiaryDockDataContextValue = {
   repositoryMode: RepositoryMode;
@@ -40,22 +43,21 @@ type DiaryDockDataContextValue = {
 
 const DiaryDockDataContext = createContext<DiaryDockDataContextValue | null>(null);
 
-async function loadServerBootstrap() {
-  const response = await fetch("/api/diarydock/bootstrap", {
-    cache: "no-store",
-    credentials: "same-origin"
-  });
-  const payload = await response.json().catch((): { error?: string } => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error ?? "DiaryDock could not load your secure data.");
-  }
-  return payload as DiaryDockBootstrapPayload;
-}
-
 export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
   const repository = useMemo(() => createDiaryDockRepository(), []);
+  const [persistenceError, setPersistenceError] = useState("");
   const stateSaver = useMemo(
-    () => createCoalescedSaver<DiaryDockAppState>((next) => repository.save(next)),
+    () => createCoalescedSaver<DiaryDockAppState>(async (next) => {
+      try {
+        await repository.save(next);
+        setPersistenceError("");
+      } catch (error) {
+        setPersistenceError(error instanceof DiaryDockRepositoryConflictError
+          ? "DiaryDock changed on another device. Reload the secure copy before making more changes."
+          : "DiaryDock could not save these changes. Check your connection and reload before continuing.");
+        throw error;
+      }
+    }),
     [repository],
   );
   const [state, setState] = useState<DiaryDockAppState>(createInitialDiaryDockState);
@@ -64,14 +66,31 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
 
     const load = async () => {
       if (repository.mode === "supabase") {
-        const bootstrap = await loadServerBootstrap();
+        const bootstrap = await loadDiaryDockBootstrap();
         if (!cancelled) {
+          repository.adoptRevisions(
+            bootstrap.privateRevision,
+            bootstrap.householdRevision,
+          );
           setState(hydrateDiaryDockBootstrap(bootstrap));
           setHousehold(bootstrap.household);
           setHydrated(true);
+          void loadRemainingDiaryDockRecords({
+            documentCursor: bootstrap.documentCursor,
+            reminderCursor: bootstrap.reminderCursor,
+            signal: controller.signal,
+            apply: (page) => {
+              if (!cancelled) setState((current) => mergeDiaryDockRecordPage(current, page));
+            },
+          }).catch(() => {
+            if (!cancelled && !controller.signal.aborted) {
+              setPersistenceError("DiaryDock could not finish loading every record. Reload to try again safely.");
+            }
+          });
         }
         return;
       }
@@ -90,6 +109,7 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [repository]);
 
@@ -124,9 +144,20 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     }
 
     if (reloadState) {
-      const bootstrap = await loadServerBootstrap();
+      const bootstrap = await loadDiaryDockBootstrap();
+      repository.adoptRevisions(
+        bootstrap.privateRevision,
+        bootstrap.householdRevision,
+      );
       setHousehold(bootstrap.household);
       setState(hydrateDiaryDockBootstrap(bootstrap));
+      void loadRemainingDiaryDockRecords({
+        documentCursor: bootstrap.documentCursor,
+        reminderCursor: bootstrap.reminderCursor,
+        apply: (page) => setState((current) => mergeDiaryDockRecordPage(current, page)),
+      }).catch(() => setPersistenceError(
+        "DiaryDock could not finish loading every record. Reload to try again safely.",
+      ));
       return bootstrap.household;
     }
 
@@ -166,6 +197,14 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
         updateState
       }}
     >
+      {persistenceError ? <div role="alert"
+        className="sticky top-0 z-[100] flex flex-col gap-2 bg-[#7b2d2d] px-4 py-3 text-sm text-white shadow-lg sm:flex-row sm:items-center sm:justify-center">
+        <span>{persistenceError}</span>
+        <button type="button" onClick={() => window.location.reload()}
+          className="min-h-10 rounded-full bg-white px-4 font-semibold text-[#7b2d2d]">
+          Reload secure copy
+        </button>
+      </div> : null}
       {children}
     </DiaryDockDataContext.Provider>
   );

@@ -60,16 +60,31 @@ export function DesktopSpaceLanding({
         </header>
 
         <div className="mt-8 grid gap-7 xl:grid-cols-[minmax(25rem,0.86fr)_minmax(32rem,1.14fr)] xl:items-stretch">
-          <section aria-labelledby={`${title}-sections`} className="order-2 xl:order-1">
+          <section
+            aria-labelledby={`${title}-sections`}
+            className="order-2 xl:order-1"
+          >
             <div className="rounded-[2rem] border border-[#284536]/10 bg-[#fbfaf5] p-5 shadow-[0_24px_60px_rgba(45,58,48,0.08)] xl:h-full xl:p-6">
               <div className="flex items-end justify-between gap-4 px-1 pb-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#849486]">Inside this space</p>
-                  <h2 id={`${title}-sections`} className="mt-1 font-serif text-3xl text-[#263e32]">Choose an area</h2>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#849486]">
+                    Inside this space
+                  </p>
+                  <h2
+                    id={`${title}-sections`}
+                    className="mt-1 font-serif text-3xl text-[#263e32]"
+                  >
+                    Choose an area
+                  </h2>
                 </div>
-                <span className="text-sm text-[#758279]">{items.length} sections</span>
+                <span className="text-sm text-[#758279]">
+                  {items.length} sections
+                </span>
               </div>
-              <nav className="grid gap-3 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2" aria-label={`${title} sections`}>
+              <nav
+                className="grid gap-3 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2"
+                aria-label={`${title} sections`}
+              >
                 {items.map((item) => {
                   const content = (
                     <>
@@ -77,18 +92,46 @@ export function DesktopSpaceLanding({
                         <UiIcon name={item.icon} className="h-5 w-5" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-base font-bold text-[#24382f]">{item.label}</span>
-                        <span className="mt-0.5 block text-sm leading-5 text-[#6b7770]">{item.description}</span>
+                        <span className="block text-base font-bold text-[#24382f]">
+                          {item.label}
+                        </span>
+                        <span className="mt-0.5 block text-sm leading-5 text-[#6b7770]">
+                          {item.description}
+                        </span>
                       </span>
-                      <UiIcon name="chevron-right" className="h-4 w-4 shrink-0 text-[#87938b]" />
+                      <UiIcon
+                        name="chevron-right"
+                        className="h-4 w-4 shrink-0 text-[#87938b]"
+                      />
                     </>
                   );
-                  const className = "group flex min-h-[86px] w-full items-center gap-4 rounded-[1.35rem] border border-[#284536]/9 bg-white px-4 py-3.5 text-left shadow-[0_10px_28px_rgba(53,65,56,0.055)] transition hover:-translate-y-0.5 hover:border-[#6f8e72]/35 hover:shadow-[0_16px_34px_rgba(53,65,56,0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] motion-reduce:transform-none";
+                  const className = [
+                    "group flex min-h-[86px] w-full items-center gap-4 rounded-[1.35rem] border",
+                    "border-[#284536]/9 bg-white px-4 py-3.5 text-left",
+                    "shadow-[0_10px_28px_rgba(53,65,56,0.055)] transition",
+                    "hover:-translate-y-0.5 hover:border-[#6f8e72]/35",
+                    "hover:shadow-[0_16px_34px_rgba(53,65,56,0.1)]",
+                    "focus-visible:outline-none focus-visible:ring-2",
+                    "focus-visible:ring-[#6f8e72] motion-reduce:transform-none",
+                  ].join(" ");
 
                   return item.href ? (
-                    <Link key={item.label} href={item.href} className={className}>{content}</Link>
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={className}
+                    >
+                      {content}
+                    </Link>
                   ) : (
-                    <button key={item.label} type="button" onClick={item.onClick} className={className}>{content}</button>
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={item.onClick}
+                      className={className}
+                    >
+                      {content}
+                    </button>
                   );
                 })}
               </nav>
@@ -107,8 +150,12 @@ export function DesktopSpaceLanding({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#14251d]/58 via-transparent to-white/5" />
             <figcaption className="absolute inset-x-0 bottom-0 p-7 text-white xl:p-9">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">DiaryDock</p>
-              <p className="mt-2 max-w-xl font-serif text-3xl leading-tight xl:text-4xl">Everything in {title.toLowerCase()}, calmly organised.</p>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">
+                DiaryDock
+              </p>
+              <p className="mt-2 max-w-xl font-serif text-3xl leading-tight xl:text-4xl">
+                Everything in {title.toLowerCase()}, calmly organised.
+              </p>
             </figcaption>
           </figure>
         </div>

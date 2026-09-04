@@ -34,7 +34,7 @@ test("analytics is consent-gated, separately stored and automatically expires", 
 test("the API is authenticated, bounded and never accepts arbitrary event fields", async () => {
   const route = await readFile(routePath, "utf8");
   assert.match(route, /auth\.getUser\(\)/);
-  assert.match(route, /content-length/);
+  assert.match(route, /readBoundedJson\(request, 2_048\)/);
   assert.match(route, /checkServerRateLimit/);
   assert.match(route, /validateProductAnalyticsEvent/);
   assert.doesNotMatch(route, /body\.(question|title|filename|email|phone|notes|content)/);

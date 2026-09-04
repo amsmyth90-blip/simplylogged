@@ -29,6 +29,7 @@ export async function checkServerRateLimit(
     await Promise.all([
       admin.rpc("cleanup_rate_limit_buckets"),
       admin.rpc("cleanup_document_upload_reservations"),
+      admin.rpc("cleanup_sync_idempotency"),
     ]).catch(() => undefined);
   }
 

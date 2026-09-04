@@ -1,83 +1,122 @@
 import { NextResponse } from "next/server";
 
+import { parseHomeHandoverDetailRequest,
+  parseHomeHandoverMutation } from "@diarydock/home-handover";
+
 import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
-import { isHandoverAssetCategory, isHandoverDocumentCategory } from "@/lib/home-handover";
-import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
+import { applyHomeHandoverMutation, loadHomeHandoverDetail,
+  loadHomeHandoverSnapshot } from "@/lib/home-handover-server";
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
+import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
+import { RequestObservation } from "@/lib/observability/request-observation";
+import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
+import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
+import { authenticateHybridRequest } from "@/lib/supabase/hybrid-request";
 
-const privateHeaders = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export const runtime = "nodejs";
 
-async function authenticatedClient() {
-  if (!isSupabaseConfiguredServer()) return null;
-  const supabase = await getSupabaseServerClient();
-  const { data, error } = await supabase.auth.getUser();
-  return error || !data.user ? null : { supabase, user: data.user };
+function verifiedEmail(user: { email?: string; email_confirmed_at?: string }) {
+  return user.email && user.email_confirmed_at ? user.email.trim().toLowerCase() : null;
 }
 
-function shortText(value: unknown, maximum: number) {
-  return typeof value === "string" ? value.trim().slice(0, maximum) : "";
+function requestedDetail(request: Request) {
+  const entries = [...new URL(request.url).searchParams.entries()];
+  if (!entries.length) return null;
+  if (new Set(entries.map(([key]) => key)).size !== entries.length) {
+    throw new Error("Duplicate Home Handover detail parameter.");
+  }
+  return parseHomeHandoverDetailRequest(Object.fromEntries(entries));
 }
 
-export async function GET() {
-  const auth = await authenticatedClient();
-  if (!auth) return NextResponse.json({ error: "Please sign in again to open Home Handover." }, { status: 401, headers: privateHeaders });
+function respond(request: Request, observation: RequestObservation, body: unknown,
+  status: number, outcome: string, records = 0) {
+  const headers = mobileCorsHeaders(request);
+  headers.set("Cache-Control", "private, no-store, max-age=0");
+  headers.set("X-Content-Type-Options", "nosniff");
+  observation.finish(headers, { outcome, records, status });
+  return NextResponse.json(body, { status, headers });
+}
 
-  const [{ data: packs, error: packError }, { data: assets, error: assetError }] = await Promise.all([
-    auth.supabase.from("home_handover_packs").select("id, name, status, created_at, updated_at").eq("owner_id", auth.user.id).eq("status", "DRAFT").order("updated_at", { ascending: false }),
-    auth.supabase.from("assets").select("id, name, category, location, manufacturer, model, warranty_due_at, next_service_at, document_ids, handover_eligible").eq("owner_id", auth.user.id).order("created_at", { ascending: false }),
-  ]);
-  if (packError || assetError) return NextResponse.json({ error: "Home Handover could not be loaded." }, { status: 500, headers: privateHeaders });
+export function OPTIONS(request: Request) { return mobilePreflight(request); }
 
-  const eligibleAssets = (assets ?? []).filter((asset) => isHandoverAssetCategory(String(asset.category)));
-  const linkedDocumentIds = [...new Set(eligibleAssets.flatMap((asset) => Array.isArray(asset.document_ids) ? asset.document_ids.map(String) : []))];
-  const documentResult = linkedDocumentIds.length
-    ? await auth.supabase.from("documents").select("id, title, category, kind, issuer, handover_eligible").eq("user_id", auth.user.id).in("id", linkedDocumentIds)
-    : { data: [], error: null };
-  if (documentResult.error) return NextResponse.json({ error: "Eligible property documents could not be loaded." }, { status: 500, headers: privateHeaders });
-
-  const draft = packs?.[0] ?? null;
-  const itemResult = draft
-    ? await auth.supabase.from("home_handover_items").select("id, pack_id, resource_type, resource_id, preview_snapshot, provenance, added_at").eq("pack_id", draft.id).order("added_at")
-    : { data: [], error: null };
-  if (itemResult.error) return NextResponse.json({ error: "The handover preview could not be loaded." }, { status: 500, headers: privateHeaders });
-
-  return NextResponse.json({
-    draft,
-    items: itemResult.data ?? [],
-    candidates: [
-      ...eligibleAssets.map((asset) => ({ type: "ASSET", id: String(asset.id), label: String(asset.name), detail: [asset.category, asset.location, asset.manufacturer, asset.model].filter(Boolean).join(" · "), eligible: Boolean(asset.handover_eligible) })),
-      ...(documentResult.data ?? []).filter((document) => isHandoverDocumentCategory(String(document.category))).map((document) => ({ type: "DOCUMENT", id: String(document.id), label: String(document.title), detail: `${document.category} · Linked to an eligible home item`, eligible: Boolean(document.handover_eligible) })),
-    ],
-    exclusions: ["Private and unselected files", "Financial records and receipts", "Identity, legal and correspondence records", "Health, travel, pet and insurance records", "Emergency information", "Vault or future encrypted Vault content"],
-  }, { headers: privateHeaders });
+export async function GET(request: Request) {
+  const observation = new RequestObservation({ operation: "home-handover-read", request,
+    route: "/api/home-handover" });
+  const auth = await authenticateHybridRequest(request);
+  if (auth.error === "UNAVAILABLE") return respond(request, observation,
+    { error: "Home Handover is unavailable." }, 503, "auth-unavailable");
+  if (auth.error || !auth.user) return respond(request, observation,
+    { error: "Please sign in again to open Home Handover." }, 401, "unauthenticated");
+  const rate = await checkServerRateLimit(createRateLimitKey("home-handover:read", auth.user.id),
+    { limit: 90, windowMs: 5 * 60_000 });
+  if (!rate.allowed) return respond(request, observation,
+    { error: "Home Handover is busy. Try again shortly." }, 429, "rate-limited");
+  let detailRequest;
+  try { detailRequest = requestedDetail(request); }
+  catch { return respond(request, observation,
+    { error: "That Home Handover detail request was not valid." }, 400, "invalid-query"); }
+  if (!isSupabaseAdminConfigured()) return respond(request, observation,
+    { error: "Home Handover could not be refreshed." }, 503, "database-unavailable");
+  if (detailRequest) {
+    const result = await loadHomeHandoverDetail(getSupabaseAdminClient(), auth.user.id,
+      verifiedEmail(auth.user), detailRequest);
+    if (result.error === "UNAVAILABLE") return respond(request, observation,
+      { error: "Home Handover details could not be refreshed." }, 503, "database-unavailable");
+    if (!result.detail) return respond(request, observation,
+      { error: "That Home Handover item is no longer available." }, 404, "not-found");
+    return respond(request, observation, result.detail, 200, "detail-ok", 1);
+  }
+  const result = await loadHomeHandoverSnapshot(getSupabaseAdminClient(), auth.user.id,
+    verifiedEmail(auth.user));
+  if (!result.snapshot) return respond(request, observation,
+    { error: "Home Handover could not be refreshed." }, 503, "database-unavailable");
+  return respond(request, observation, result.snapshot, 200, "ok",
+    result.snapshot.candidates.length + result.snapshot.items.length);
 }
 
 export async function POST(request: Request) {
-  const auth = await authenticatedClient();
-  if (!auth) return NextResponse.json({ error: "Please sign in again to change Home Handover." }, { status: 401, headers: privateHeaders });
-  const length = Number(request.headers.get("content-length") ?? "0");
-  if (length > 4096) return NextResponse.json({ error: "That request is too large." }, { status: 413, headers: privateHeaders });
-  if (!hasRecentAuthentication(auth.user.last_sign_in_at)) return NextResponse.json({ error: "For your security, please sign in again before changing a handover draft.", code: "RECENT_AUTH_REQUIRED" }, { status: 403, headers: privateHeaders });
-
-  const body = await request.json().catch((): Record<string, unknown> => ({}));
-  const operation = shortText(body.operation, 40);
-  if (operation === "CREATE_PACK") {
-    const name = shortText(body.name, 120);
-    if (!name) return NextResponse.json({ error: "Give this handover draft a name." }, { status: 400, headers: privateHeaders });
-    const { data, error } = await auth.supabase.rpc("create_home_handover_pack", { input_name: name });
-    if (error || !data) return NextResponse.json({ error: "That handover draft could not be created." }, { status: 400, headers: privateHeaders });
-    return NextResponse.json({ packId: data }, { status: 201, headers: privateHeaders });
+  const observation = new RequestObservation({ operation: "home-handover-write", request,
+    route: "/api/home-handover" });
+  const auth = await authenticateHybridRequest(request);
+  if (auth.error === "UNAVAILABLE") return respond(request, observation,
+    { error: "Home Handover is unavailable." }, 503, "auth-unavailable");
+  if (auth.error || !auth.user) return respond(request, observation,
+    { error: "Please sign in again to change Home Handover." }, 401, "unauthenticated");
+  const rate = await checkServerRateLimit(createRateLimitKey("home-handover:write", auth.user.id),
+    { limit: 40, windowMs: 5 * 60_000 });
+  if (!rate.allowed) return respond(request, observation,
+    { error: "Please wait before changing Home Handover again." }, 429, "rate-limited");
+  if (!hasRecentAuthentication(auth.user.last_sign_in_at)) return respond(request, observation,
+    { error: "For your security, please sign in again before changing a handover draft.",
+      code: "RECENT_AUTH_REQUIRED" }, 403, "recent-auth-required");
+  let mutation;
+  try { mutation = parseHomeHandoverMutation(await readBoundedJson(request, 4 * 1024)); }
+  catch (error) { return respond(request, observation,
+    { error: "That Home Handover change was not valid." },
+    error instanceof RequestBodyError ? error.status : 400, "invalid-body"); }
+  if (!isSupabaseAdminConfigured()) return respond(request, observation,
+    { error: "Home Handover could not be updated." }, 503, "database-unavailable");
+  const result = await applyHomeHandoverMutation(getSupabaseAdminClient(), auth.user.id,
+    verifiedEmail(auth.user), mutation);
+  if (result.status === "ERROR" || !result.snapshot) return respond(request, observation,
+    { error: "Home Handover could not be updated." }, 503, "database-unavailable");
+  if (result.status === "RECENT_AUTH_REQUIRED") return respond(request, observation,
+    { error: "For your security, please sign in again before changing a handover draft.",
+      code: "RECENT_AUTH_REQUIRED" }, 403, "recent-auth-required");
+  if (result.status === "INVALID_RECIPIENT") return respond(request, observation,
+    { error: "Enter another person's valid email address." }, 400, "invalid-recipient");
+  if (result.status === "TOO_LARGE") return respond(request, observation,
+    { error: "This handover is too large to share safely." }, 413, "too-large");
+  if (result.status !== "OK" && result.status !== "EXISTS") {
+    const messages = { CONFLICT: "Home Handover changed on another device. Review the latest copy.",
+      CAPACITY: "This handover draft has reached its 200-item safety limit.",
+      NOT_FOUND: "That handover draft is no longer available.",
+      INVALID_REFERENCE: "That item is no longer eligible for Home Handover.",
+      EMPTY: "Select at least one item before sharing Home Handover." } as const;
+    return respond(request, observation, { error: messages[result.status], snapshot: result.snapshot },
+      409, result.status.toLowerCase());
   }
-
-  if (operation === "SET_ITEM") {
-    const packId = shortText(body.packId, 50);
-    const resourceType = body.resourceType === "ASSET" || body.resourceType === "DOCUMENT" ? body.resourceType : "";
-    const resourceId = shortText(body.resourceId, 160);
-    if (!uuidPattern.test(packId) || !resourceType || !resourceId) return NextResponse.json({ error: "Choose a valid handover item." }, { status: 400, headers: privateHeaders });
-    const { data, error } = await auth.supabase.rpc("set_home_handover_item", { input_pack_id: packId, input_resource_type: resourceType, input_resource_id: resourceId, input_selected: body.selected === true });
-    if (error || !data) return NextResponse.json({ error: "That item is not eligible for this handover draft." }, { status: 400, headers: privateHeaders });
-    return NextResponse.json({ updated: true }, { headers: privateHeaders });
-  }
-
-  return NextResponse.json({ error: "That Home Handover request was not valid." }, { status: 400, headers: privateHeaders });
+  return respond(request, observation, result.snapshot,
+    mutation.operation === "CREATE_PACK" && result.status === "OK" ? 201 : 200,
+    result.status.toLowerCase(), 1);
 }

@@ -1,0 +1,69 @@
+.life-screen { width: min(100%, 70rem); min-height: 100dvh; margin: 0 auto; padding: max(1rem, env(safe-area-inset-top)) 1rem 7rem; color: var(--dd-ink); background: radial-gradient(circle at top right, #e8efe5, transparent 25rem), var(--dd-paper); }
+.life-header { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1rem; }
+.life-header > button { width: 2.75rem; height: 2.75rem; flex: 0 0 auto; color: var(--dd-green-deep); font: inherit; font-size: 2rem; border: 1px solid rgb(32 53 42 / 12%); border-radius: 50%; background: rgb(255 255 255 / 76%); }
+.life-header > div { min-width: 0; flex: 1; }
+.life-header small,
+.life-score > small,
+.life-answer-card header small,
+.life-categories > header small,
+.life-recommendations header small { color: var(--dd-green); font-size: 0.6rem; font-weight: 850; letter-spacing: 0.15em; text-transform: uppercase; }
+.life-header h1 { margin: 0.1rem 0; font-size: clamp(1.9rem, 8vw, 3rem); line-height: 1; }
+.life-header p,
+.life-answer-card header p,
+.life-categories > header p { margin: 0.25rem 0 0; color: var(--dd-muted); font-size: 0.68rem; line-height: 1.5; }
+.life-header > span { padding: 0.45rem 0.65rem; font-size: 0.58rem; font-weight: 800; border-radius: 999px; }
+.life-header .is-live { color: #246c4a; background: #dff4e7; }
+.life-header .is-cached { color: #725d28; background: #f4ecd2; }
+.life-message { margin: 0 0 1rem; padding: 0.8rem 1rem; font-size: 0.68rem; border-radius: 0.9rem; background: #f4ecd2; }
+
+.life-score { padding: 1.3rem; color: white; border-radius: 1.5rem; background: var(--dd-green-deep); box-shadow: 0 1.8rem 3.5rem -2.6rem rgb(32 53 42 / 85%); }
+.life-score > small { color: rgb(255 255 255 / 65%); }
+.life-score > div { display: flex; align-items: end; gap: 0.25rem; margin-top: 0.5rem; }
+.life-score strong { font-family: Georgia, serif; font-size: 3.8rem; font-weight: 500; line-height: 0.9; }
+.life-score > div > span { color: rgb(255 255 255 / 55%); font-size: 1.15rem; }
+.life-score p { margin: 0.8rem 0; color: rgb(255 255 255 / 72%); font-size: 0.7rem; }
+.life-score .life-score-bar { height: 0.48rem; margin: 0; overflow: hidden; border-radius: 999px; background: rgb(255 255 255 / 14%); }
+.life-score-bar span { display: block; height: 100%; border-radius: inherit; background: #d8c38f; }
+
+.life-answer-card,
+.life-categories,
+.life-recommendations { margin-top: 1rem; padding: 1rem; border: 1px solid rgb(32 53 42 / 9%); border-radius: 1.4rem; background: rgb(255 253 248 / 94%); box-shadow: 0 1.5rem 3rem -2.5rem rgb(32 53 42 / 38%); }
+.life-answer-card h2,
+.life-categories h2,
+.life-recommendations h2 { margin: 0.15rem 0 0; font-size: 1.25rem; }
+.life-answer-card > article { display: grid; gap: 0.65rem; padding: 0.85rem 0; border-top: 1px solid rgb(32 53 42 / 8%); }
+.life-answer-card > article:first-of-type { margin-top: 0.7rem; }
+.life-answer-card article > div:first-child { display: grid; gap: 0.15rem; }
+.life-answer-card article strong { font-size: 0.74rem; }
+.life-answer-card article span { color: var(--dd-muted); font-size: 0.61rem; }
+.life-choices { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.life-choices button { min-height: 2.4rem; padding: 0.45rem 0.7rem; color: var(--dd-muted); font: inherit; font-size: 0.62rem; font-weight: 800; border: 1px solid rgb(32 53 42 / 12%); border-radius: 0.7rem; background: white; }
+.life-choices button.is-selected { color: white; border-color: var(--dd-green-deep); background: var(--dd-green-deep); }
+.life-choices button:disabled { opacity: 0.55; }
+
+.life-categories > div { display: grid; gap: 0.6rem; margin-top: 0.8rem; }
+.life-categories article { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 1rem; padding: 0.8rem; border-radius: 0.9rem; background: #f5f4ed; }
+.life-categories article > span,
+.life-categories article > strong { font-size: 0.68rem; }
+.life-categories article > div { grid-column: 1 / -1; height: 0.35rem; overflow: hidden; border-radius: 999px; background: rgb(49 84 67 / 10%); }
+.life-categories article i { display: block; height: 100%; border-radius: inherit; background: #6f8e72; }
+.life-categories article > small { grid-column: 1 / -1; color: var(--dd-muted); font-size: 0.56rem; }
+
+.life-recommendations > button { display: flex; width: 100%; align-items: center; gap: 0.7rem; margin-top: 0.65rem; padding: 0.8rem; color: var(--dd-ink); text-align: left; font: inherit; border: 1px solid rgb(32 53 42 / 8%); border-radius: 1rem; background: #f8f6ef; }
+.life-recommendations > button > span { display: grid; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; place-items: center; color: var(--dd-green); border-radius: 0.7rem; background: #e8efe5; }
+.life-recommendations button div { display: grid; min-width: 0; flex: 1; gap: 0.2rem; }
+.life-recommendations button strong { font-size: 0.7rem; }
+.life-recommendations button small { color: var(--dd-muted); font-size: 0.58rem; line-height: 1.4; }
+.life-recommendations button b { color: var(--dd-green); }
+.life-recommendations > p { padding: 1rem; color: var(--dd-green); font-size: 0.72rem; border-radius: 0.9rem; background: #e8efe5; }
+
+@media (min-width: 760px) {
+  .life-screen { display: grid; grid-template-columns: minmax(15rem, 0.68fr) minmax(0, 1.32fr); align-content: start; gap: 1rem; padding: 1.5rem 1.5rem 7rem; }
+  .life-header,
+  .life-message { grid-column: 1 / -1; margin: 0; }
+  .life-score { grid-column: 1; grid-row: 2; }
+  .life-answer-card { grid-column: 2; grid-row: 2 / span 3; margin: 0; }
+  .life-categories { grid-column: 1; grid-row: 3; margin: 0; }
+  .life-recommendations { grid-column: 1; grid-row: 4; margin: 0; }
+  .life-categories > div { grid-template-columns: 1fr 1fr; }
+}

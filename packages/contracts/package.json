@@ -1,0 +1,11 @@
+{
+  "name": "@diarydock/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sync": "./src/sync.ts",
+    "./sync-push": "./src/sync-push.ts"
+  }
+}

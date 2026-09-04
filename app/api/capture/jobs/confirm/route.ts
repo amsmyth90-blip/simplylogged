@@ -1,35 +1,40 @@
 import { NextResponse } from "next/server";
 
 import { buildCaptureActionProposals, type ConfirmedCaptureField } from "@/lib/capture/proposals";
-import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
+import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
+import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
+import { authenticateHybridRequest } from "@/lib/supabase/hybrid-request";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function POST(request: Request) {
-  if (!isSupabaseConfiguredServer()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
-  }
+export const runtime = "nodejs";
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-    error: authError
-  } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: "Please sign in again to confirm this capture." }, { status: 401 });
+export function OPTIONS(request: Request) {
+  return mobilePreflight(request);
+}
+
+export async function POST(request: Request) {
+  const headers = mobileCorsHeaders(request);
+  const respond = (body: Record<string, unknown>, status = 200) => NextResponse.json(body, { status, headers });
+  const auth = await authenticateHybridRequest(request);
+  if (auth.error === "UNAVAILABLE") return respond({ error: "Secure capture confirmation is unavailable." }, 503);
+  if (auth.error || !auth.user || !auth.supabase) {
+    return respond({ error: "Please sign in again to confirm this capture." }, 401);
   }
+  const { user, supabase } = auth;
 
   let payload: { captureJobId?: unknown; documentId?: unknown; confirmedFields?: unknown };
   try {
-    payload = (await request.json()) as typeof payload;
-  } catch {
-    return NextResponse.json({ error: "The confirmation request was not valid." }, { status: 400 });
+    payload = await readBoundedJson(request, 64 * 1024) as typeof payload;
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return respond({ error: "The confirmation request was not valid." }, status);
   }
 
-  const captureJobId = typeof payload.captureJobId === "string" ? payload.captureJobId : "";
-  const documentId = typeof payload.documentId === "string" ? payload.documentId : "";
+  const captureJobId = typeof payload?.captureJobId === "string" ? payload.captureJobId : "";
+  const documentId = typeof payload?.documentId === "string" ? payload.documentId : "";
   if (!uuidPattern.test(captureJobId) || !uuidPattern.test(documentId)) {
-    return NextResponse.json({ error: "The confirmation request was not valid." }, { status: 400 });
+    return respond({ error: "The confirmation request was not valid." }, 400);
   }
 
   const { data: document, error: documentError } = await supabase
@@ -39,10 +44,10 @@ export async function POST(request: Request) {
     .eq("user_id", user.id)
     .maybeSingle();
   if (documentError || !document) {
-    return NextResponse.json({ error: "The saved document could not be verified." }, { status: 404 });
+    return respond({ error: "The saved document could not be verified." }, 404);
   }
 
-  const confirmedFields: ConfirmedCaptureField[] = Array.isArray(payload.confirmedFields)
+  const confirmedFields: ConfirmedCaptureField[] = Array.isArray(payload?.confirmedFields)
     ? payload.confirmedFields.slice(0, 24).flatMap((entry) => {
         if (!entry || typeof entry !== "object") return [];
         const field = entry as Record<string, unknown>;
@@ -60,13 +65,18 @@ export async function POST(request: Request) {
 
   const { data: captureJob, error: captureJobError } = await supabase
     .from("capture_jobs")
-    .select("id, proposed_fields")
+    .select("id,status,confirmed_document_id,proposed_fields")
     .eq("id", captureJobId)
     .eq("user_id", user.id)
-    .eq("status", "NEEDS_REVIEW")
     .maybeSingle();
   if (captureJobError || !captureJob) {
-    return NextResponse.json({ error: "This capture is no longer waiting for review." }, { status: 409 });
+    return respond({ error: "This capture is no longer waiting for review." }, 409);
+  }
+  if (captureJob.status === "CONFIRMED" && captureJob.confirmed_document_id === documentId) {
+    return respond({ confirmed: true, proposalCount: 0 });
+  }
+  if (captureJob.status !== "NEEDS_REVIEW") {
+    return respond({ error: "This capture is no longer waiting for review." }, 409);
   }
   const proposedFields = captureJob.proposed_fields && typeof captureJob.proposed_fields === "object"
     ? captureJob.proposed_fields as Record<string, unknown>
@@ -87,10 +97,10 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: "DiaryDock could not record this confirmation." }, { status: 500 });
+    return respond({ error: "DiaryDock could not record this confirmation." }, 500);
   }
   if (!data) {
-    return NextResponse.json({ error: "This capture is no longer waiting for review." }, { status: 409 });
+    return respond({ error: "This capture is no longer waiting for review." }, 409);
   }
 
   const proposals = buildCaptureActionProposals({
@@ -122,9 +132,9 @@ export async function POST(request: Request) {
       { onConflict: "user_id,dedupe_key", ignoreDuplicates: true }
     );
     if (proposalError) {
-      return NextResponse.json({ error: "The document was saved, but its optional suggestions could not be prepared." }, { status: 500 });
+      return respond({ error: "The document was saved, but its optional suggestions could not be prepared." }, 500);
     }
   }
 
-  return NextResponse.json({ confirmed: true, proposalCount: proposals.length });
+  return respond({ confirmed: true, proposalCount: proposals.length });
 }

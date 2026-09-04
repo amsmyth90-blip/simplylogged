@@ -1,0 +1,34 @@
+.wills-record-card { margin-top: .7rem; }
+.wills-version-list,.wills-letter-list,.wills-preparation-list { display: grid; gap: .5rem; margin-top: .75rem; }
+.wills-version-list > article { display: grid; grid-template-columns: auto 1fr; gap: .65rem; padding: .75rem; border: 1px solid #e2e5dc; border-radius: .9rem; background: #fff; }
+.wills-version-list > article.is-current { border-color: #9bb19d; background: #edf3ee; }
+.wills-version-list > article > span { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; color: white; font-size: .65rem; font-weight: 850; border-radius: .7rem; background: #6f8e72; }
+.wills-version-list strong,.wills-version-list small,.wills-version-list p { display: block; }
+.wills-version-list strong { font-size: .7rem; }
+.wills-version-list small { margin-top: .15rem; color: #718078; font-size: .53rem; text-transform: capitalize; }
+.wills-version-list p { margin: .3rem 0 0; color: #606d64; font-size: .57rem; line-height: 1.5; }
+.wills-version-list footer { display: flex; grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; }
+.wills-version-list footer button,.wills-version-list footer b { min-height: 2rem; padding: .45rem .6rem; color: #52705a; font-size: .52rem; font-weight: 850; border: 1px solid #dfe3d7; border-radius: .6rem; background: white; }
+.wills-secondary-action { width: 100%; margin-top: .7rem; }
+.wills-secondary-actions { display: grid; gap: .45rem; }
+@media (min-width:720px) { .wills-secondary-actions { grid-template-columns: 1fr 1fr; } }
+.wills-boundary-note { margin: .65rem 0 0; padding: .65rem; color: #5f7163; font-size: .57rem; line-height: 1.5; border-radius: .75rem; background: #eef0e8; }
+.wills-letter-list > button,.wills-preparation-list > button,.wills-files-card > div > button { display: flex; width: 100%; min-width: 0; align-items: center; gap: .65rem; padding: .7rem; text-align: left; border: 1px solid #e2e5dc; border-radius: .85rem; background: white; }
+.wills-letter-list > button > span,.wills-preparation-list > button > span,.wills-files-card > div > button > span { display: grid; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; place-items: center; color: white; font-size: .58rem; font-weight: 850; border-radius: .65rem; background: #6f8e72; }
+.wills-letter-list div,.wills-preparation-list div,.wills-files-card > div > button div { min-width: 0; flex: 1; }
+.wills-letter-list strong,.wills-letter-list small,.wills-letter-list p,.wills-preparation-list strong,.wills-preparation-list small,.wills-preparation-list p,.wills-files-card strong,.wills-files-card small { display: block; }
+.wills-letter-list strong,.wills-preparation-list strong,.wills-files-card strong { overflow: hidden; font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+.wills-letter-list small,.wills-preparation-list small,.wills-files-card small { margin-top: .15rem; color: #718078; font-size: .52rem; }
+.wills-letter-list p,.wills-preparation-list p { display: -webkit-box; margin: .3rem 0 0; overflow: hidden; color: #606d64; font-size: .56rem; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.wills-preparation-list > button > span.is-not-started { color: #718078; background: #eef0e8; }
+.wills-preparation-list > button > span.is-in-progress { background: #b4955d; }
+.wills-empty { display: grid; min-height: 9rem; place-items: center; align-content: center; padding: 1rem; text-align: center; border: 1px dashed #cfd6cc; border-radius: .9rem; }
+.wills-empty > span { font-size: 1.4rem; }
+.wills-empty strong { margin-top: .4rem; font-size: .7rem; }
+.wills-empty p,.wills-files-card > div > p { max-width: 22rem; margin: .3rem 0 0; color: #718078; font-size: .56rem; line-height: 1.5; }
+.wills-files-card > div { display: grid; gap: .45rem; margin-top: .7rem; }
+.wills-analysis-summary { display: grid; gap: .5rem; padding: .7rem; border-radius: .8rem; background: #eef0e8; }
+.wills-analysis-summary h3,.wills-analysis-summary p { margin: 0; }
+.wills-analysis-summary h3,.wills-analysis-summary strong { font-size: .65rem; }
+.wills-analysis-summary p,.wills-analysis-summary li { color: #5f6b63; font-size: .57rem; line-height: 1.5; }
+.wills-analysis-summary ul { margin: .25rem 0 0; padding-left: 1rem; }
