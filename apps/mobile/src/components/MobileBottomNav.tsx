@@ -1,3 +1,5 @@
+import { MobileIcon, type MobileIconName } from "./MobileIcon";
+
 export type MobileDestination = "EMERGENCY" | "FAMILY" | "FILES" | "GUARDIAN" | "HOME"
   | "KITCHEN" | "KITCHEN_MEALS" | "KITCHEN_NOTICES" | "KITCHEN_RECIPES"
   | "HOME_HANDOVER" | "LIFE_CHECK" | "PHYSICAL_LINKS" | "REMINDERS" | "SCAN" | "SEARCH"
@@ -10,9 +12,16 @@ type MobileBottomNavProps = {
   onNavigate: (destination: MobileDestination) => void;
 };
 
-const destinations = [
-  { id: "HOME" as const, icon: "⌂", label: "Home" },
-  { id: "FILES" as const, icon: "▱", label: "All Files" },
+const destinations: ReadonlyArray<{
+  id: MobileDestination;
+  icon: MobileIconName;
+  label: string;
+}> = [
+  { id: "HOME", icon: "home", label: "Home" },
+  { id: "FILES", icon: "folder", label: "All Files" },
+  { id: "SCAN", icon: "plus", label: "Scan" },
+  { id: "REMINDERS", icon: "calendar", label: "Reminders" },
+  { id: "FAMILY", icon: "users", label: "Family Room" },
 ];
 
 export function MobileBottomNav(props: MobileBottomNavProps) {
@@ -21,39 +30,21 @@ export function MobileBottomNav(props: MobileBottomNavProps) {
       className={`mobile-bottom-nav ${props.floating ? "is-floating" : ""}`}
       aria-label="Mobile navigation"
     >
-      {destinations.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          className={props.active === item.id ? "is-active" : ""}
-          aria-current={props.active === item.id ? "page" : undefined}
-          onClick={() => props.onNavigate(item.id)}
-        >
-          <span>{item.icon}</span>{item.label}
-        </button>
-      ))}
-      <button
-        type="button"
-        className={`scan-button ${props.active === "SCAN" ? "is-active" : ""}`}
-        aria-current={props.active === "SCAN" ? "page" : undefined}
-        onClick={() => props.onNavigate("SCAN")}
-      >
-        <span>＋</span>Scan
-      </button>
-      <button
-        type="button"
-        className={props.active === "REMINDERS" ? "is-active" : ""}
-        aria-current={props.active === "REMINDERS" ? "page" : undefined}
-        onClick={() => props.onNavigate("REMINDERS")}
-      >
-        <span>◷</span>Reminders
-      </button>
-      <button
-        type="button"
-        className={props.active === "FAMILY" ? "is-active" : ""}
-        aria-current={props.active === "FAMILY" ? "page" : undefined}
-        onClick={() => props.onNavigate("FAMILY")}
-      ><span>♙</span>Family</button>
+      {destinations.map((item) => {
+        const central = item.id === "SCAN";
+        return (
+          <button
+            key={item.id}
+            type="button"
+            className={`${central ? "scan-button " : ""}${props.active === item.id ? "is-active" : ""}`}
+            aria-current={props.active === item.id ? "page" : undefined}
+            onClick={() => props.onNavigate(item.id)}
+          >
+            <span className="mobile-nav-icon"><MobileIcon name={item.icon} /></span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

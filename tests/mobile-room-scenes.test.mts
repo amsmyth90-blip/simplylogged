@@ -50,6 +50,8 @@ test("native room scenes fill the viewport and render accessible image labels", 
   assert.match(styles, /\.native-room-scene\s*{[\s\S]*?position: fixed;[\s\S]*?inset: 0;/);
   assert.match(styles, /\.native-room-image\s*{[\s\S]*?width: 100%;[\s\S]*?height: 100%;/);
   assert.match(styles, /\.native-room-label\s*{[\s\S]*?position: absolute;/);
+  assert.match(styles, /background: rgb\(229 236 222 \/ 94%\)/);
+  assert.match(styles, /color: #284334/);
 });
 
 test("room labels open the matching secure native workspace", async () => {

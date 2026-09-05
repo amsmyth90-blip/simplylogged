@@ -44,3 +44,20 @@ test("every declared mobile destination has a signed-in rendering path", async (
     assert.match(app, new RegExp(`destination === ["']${destination}["']`));
   }
 });
+
+test("native navigation reproduces the wrapper labels and drawn icons", async () => {
+  const [navigation, icons, styles] = await Promise.all([
+    read("apps/mobile/src/components/MobileBottomNav.tsx"),
+    read("apps/mobile/src/components/MobileIcon.tsx"),
+    read("apps/mobile/src/components/mobile-navigation.css"),
+  ]);
+  for (const label of ["Home", "All Files", "Scan", "Reminders", "Family Room"]) {
+    assert.ok(navigation.includes(`label: "${label}"`));
+  }
+  for (const icon of ["home", "folder", "plus", "calendar", "users"]) {
+    assert.ok(navigation.includes(`icon: "${icon}"`));
+  }
+  assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
+  assert.match(icons, /viewBox="0 0 24 24"/);
+  assert.match(styles, /background: #edf4e9/);
+});
