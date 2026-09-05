@@ -106,10 +106,12 @@ test("native capture declares permissions, restoration, and encrypted offline qu
 });
 
 test("mobile authentication persists tokens only in native secure storage", async () => {
-  const [storage, session, registry, mobilePackage, rootPackage] = await Promise.all([
+  const [storage, session, registry, database, app, mobilePackage, rootPackage] = await Promise.all([
     read("apps/mobile/src/auth/secure-auth-storage.ts"),
     read("apps/mobile/src/auth/use-mobile-session.ts"),
     read("apps/mobile/src/auth/native-offline-account-registry.ts"),
+    read("apps/mobile/src/data/offline/database.ts"),
+    read("apps/mobile/src/MobileApp.tsx"),
     read("apps/mobile/package.json"),
     read("package.json"),
   ]);
@@ -124,6 +126,10 @@ test("mobile authentication persists tokens only in native secure storage", asyn
   assert.match(session, /import\("\.\/native-offline-account-registry"\)/);
   assert.doesNotMatch(session, /^import .*native-offline-account-registry/m);
   assert.match(registry, /offline-account-state/);
+  assert.match(database, /closeConnection\(databaseName, false\)\.catch/);
+  assert.match(session, /retryOfflineStorage/);
+  assert.match(session, /returnToSignIn/);
+  assert.match(app, /OfflineStorageErrorScreen/);
 });
 
 test("mobile account creation and password recovery are native", async () => {

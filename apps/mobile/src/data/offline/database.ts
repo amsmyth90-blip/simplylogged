@@ -71,17 +71,25 @@ export async function openEncryptedOfflineDatabase(accountId: string): Promise<O
   const connection = new SQLiteConnection(CapacitorSQLite);
   await ensureEncryptionSecret(connection);
 
-  const database = await acquireConnection(connection, databaseName);
-  await database.open();
+  let registered = false;
+  try {
+    const database = await acquireConnection(connection, databaseName);
+    registered = true;
+    await database.open();
 
-  const encrypted = await connection.isDatabaseEncrypted(databaseName);
-  if (!encrypted.result) {
-    await database.close();
-    throw new Error("DiaryDock refused to open an unencrypted offline database.");
+    const encrypted = await connection.isDatabaseEncrypted(databaseName);
+    if (!encrypted.result) {
+      throw new Error("DiaryDock refused to open an unencrypted offline database.");
+    }
+    await assertDatabasePolicy(database);
+
+    return { connection, database, databaseName };
+  } catch (error) {
+    if (registered) {
+      await connection.closeConnection(databaseName, false).catch(() => undefined);
+    }
+    throw error;
   }
-  await assertDatabasePolicy(database);
-
-  return { connection, database, databaseName };
 }
 
 export async function deleteEncryptedOfflineDatabase(databaseName: string) {

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { ResetPasswordScreen } from "@mobile/auth/ResetPasswordScreen";
+import { OfflineStorageErrorScreen } from "@mobile/auth/OfflineStorageErrorScreen";
 import { SignedOutApp } from "@mobile/auth/SignedOutApp";
 import { useMobileSession } from "@mobile/auth/use-mobile-session";
 import { SignedInApp } from "@mobile/SignedInApp";
@@ -26,6 +27,10 @@ export function MobileApp() {
         </p>
       </main>
     );
+  }
+  if (state.status === "OFFLINE_STORAGE_ERROR") {
+    return <OfflineStorageErrorScreen message={state.message}
+      onRetry={session.retryOfflineStorage} onReturnToSignIn={session.returnToSignIn} />;
   }
   if (state.status === "SIGNED_OUT") {
     return <SignedOutApp passwordResetError={session.passwordResetError}

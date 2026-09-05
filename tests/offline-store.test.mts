@@ -74,6 +74,15 @@ test("the offline schema is versioned and uses durable outbox state", () => {
     OFFLINE_UPGRADES.map((upgrade) => upgrade.toVersion),
     [1, 2, 3, 4, 5, 6, 7, 8],
   );
+  for (const upgrade of OFFLINE_UPGRADES) {
+    for (const statement of upgrade.statements) {
+      assert.equal(
+        statement.trim().replace(/;$/, "").includes(";"),
+        false,
+        `version ${upgrade.toVersion} contains a multi-statement upgrade`,
+      );
+    }
+  }
 });
 
 test("a fresh offline database creates the complete current schema", () => {
