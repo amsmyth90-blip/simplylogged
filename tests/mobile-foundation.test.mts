@@ -32,7 +32,10 @@ test("release workflows build the packaged application before Capacitor sync", a
   assert.match(codemagic, /google_play:[\s\S]*track:\s*internal/);
   assert.match(codemagic, /ios-testflight:[\s\S]*npm run mobile:build[\s\S]*npx cap sync ios/);
   assert.match(codemagic, /distribution_type:\s*app_store/);
-  assert.match(codemagic, /submit_to_testflight:\s*true/);
+  assert.match(
+    codemagic,
+    /submit_to_testflight:\s*true|TestFlight publishing stays deferred until App Store Connect is configured/,
+  );
   assert.equal((codemagic.match(/- mobile_runtime/g) ?? []).length, 3);
 });
 
