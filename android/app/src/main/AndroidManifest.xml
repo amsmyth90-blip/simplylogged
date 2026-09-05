@@ -45,6 +45,18 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="diarydock" android:host="family" android:pathPrefix="/invite/" />
             </intent-filter>
+            <intent-filter android:label="DiaryDock account confirmation">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="diarydock" android:host="auth" android:path="/confirm" />
+            </intent-filter>
+            <intent-filter android:label="DiaryDock password recovery">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="diarydock" android:host="auth" android:path="/reset" />
+            </intent-filter>
         </activity>
 
         <provider

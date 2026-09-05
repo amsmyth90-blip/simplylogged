@@ -1,16 +1,17 @@
 import { useState, type FormEvent } from "react";
 
 import { BrandMark } from "@mobile/components/BrandMark";
-import { openMobileAuthPage, type MobileAuthPage } from "./auth-browser";
 
 type LoginScreenProps = {
   error: string | null;
+  message: string | null;
+  onCreateAccount: () => void;
+  onForgotPassword: () => void;
   onSignIn: (email: string, password: string) => Promise<{ ok: boolean }>;
 };
 
-export function LoginScreen({ error, onSignIn }: LoginScreenProps) {
+export function LoginScreen({ error, message, onCreateAccount, onForgotPassword, onSignIn }: LoginScreenProps) {
   const [busy, setBusy] = useState(false);
-  const [navigationError, setNavigationError] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,12 +24,6 @@ export function LoginScreen({ error, onSignIn }: LoginScreenProps) {
     }
   }
 
-  async function open(page: MobileAuthPage) {
-    setNavigationError(null);
-    try { await openMobileAuthPage(page); }
-    catch { setNavigationError("The secure DiaryDock account page could not be opened."); }
-  }
-
   return (
     <main className="mobile-shell">
       <section className="auth-card" aria-labelledby="login-title">
@@ -39,8 +34,8 @@ export function LoginScreen({ error, onSignIn }: LoginScreenProps) {
           <p>Sign in to your digital home for everyday life.</p>
         </header>
         <form className="auth-form" onSubmit={submit}>
-          {error || navigationError ? <p className="form-message form-error" role="alert">
-            {error ?? navigationError}</p> : null}
+          {error ? <p className="form-message form-error" role="alert">{error}</p> : null}
+          {message ? <p className="form-message form-success" role="status">{message}</p> : null}
           <label>
             <span>Email</span>
             <input type="email" name="email" autoComplete="email" required />
@@ -53,13 +48,13 @@ export function LoginScreen({ error, onSignIn }: LoginScreenProps) {
             {busy ? "Signing in…" : "Sign in"}
           </button>
           <button type="button" className="auth-text-button"
-            onClick={() => void open("/forgot-password")}>Forgot password?</button>
+            onClick={onForgotPassword}>Forgot password?</button>
         </form>
         <footer className="auth-card-footer">
           <strong>New to DiaryDock?</strong>
           <p>Create your account and complete the same private setup used by the web app.</p>
-          <button type="button" onClick={() => void open("/signup")}>Create account</button>
-          <small>Account setup opens in a secure DiaryDock window. Return here to sign in.</small>
+          <button type="button" onClick={onCreateAccount}>Create account</button>
+          <small>Create your account and complete private setup without leaving the app.</small>
         </footer>
       </section>
     </main>

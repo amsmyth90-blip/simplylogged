@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { Browser } from "@capacitor/browser";
 import { DocumentService, type DocumentSummary } from "@diarydock/documents";
 import type { OfflineStore } from "@diarydock/offline-store";
 import {
@@ -14,9 +13,9 @@ import {
 import { BrandMark } from "@mobile/components/BrandMark";
 import type { MobileDestination } from "@mobile/components/MobileBottomNav";
 import { DocumentViewer } from "@mobile/files/DocumentViewer";
-import { getSecureRuntime } from "@mobile/platform/runtime-security";
 
 import { AskPanel } from "./AskPanel";
+import { nativeTargetForSearchResult } from "./native-search-target";
 import { loadRecentSearches, rememberSearch } from "./recent-searches";
 import { SearchResults } from "./SearchResults";
 import { useSearchResults } from "./use-search-results";
@@ -28,6 +27,7 @@ type SearchScreenProps = {
   syncStatus: string;
   onBack: () => void;
   onNavigate: (destination: MobileDestination) => void;
+  onOpenArea: (roomId: string) => void;
 };
 
 const categoryLabels: Record<SearchCategory, string> = {
@@ -63,16 +63,10 @@ export function SearchScreen(props: SearchScreenProps) {
       const document = documents.find((item) => item.id === documentId);
       if (document) { setViewer(document); return; }
     }
-    if (result.category === "reminders") {
-      props.onNavigate("REMINDERS");
-      return;
-    }
-    if (!navigator.onLine || props.disableOnline) {
-      setOpenError("Connect to open this record. Your offline files and reminders remain available.");
-      return;
-    }
-    const url = new URL(result.href, getSecureRuntime().apiOrigin);
-    await Browser.open({ url: url.toString(), presentationStyle: "popover" });
+    const target = nativeTargetForSearchResult(result);
+    if (target?.kind === "ROOM") props.onOpenArea(target.roomId);
+    else if (target?.kind === "DESTINATION") props.onNavigate(target.destination);
+    else setOpenError("This result is not available in the installed app yet.");
   }
 
   return (

@@ -128,7 +128,7 @@ The application includes:
 
 - Identity provider: Supabase Auth.
 - Implemented sign-in method: email and password.
-- Email confirmation and password-reset links return through the server-side `/auth/callback` route.
+- Web email confirmation and password-reset links return through the server-side `/auth/callback` route. Installed-app links use exact `diarydock://auth/confirm` and `diarydock://auth/reset` callbacks, exchange single-use PKCE codes in the app, and retain the recovery state only in device-protected secure storage.
 - Passwords must contain at least eight characters at the application layer. Any additional Supabase password-strength settings must be confirmed in the Supabase dashboard.
 - Supabase SSR session cookies are refreshed by the Next.js proxy layer.
 - Protected server pages call Supabase to validate the current user before rendering.

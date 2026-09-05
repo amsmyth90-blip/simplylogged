@@ -8,6 +8,8 @@ Secrets and signing material must be configured in Codemagic and must never be c
 
 Create the protected `mobile_runtime` environment group used by every workflow. It must provide `NEXT_PUBLIC_SUPABASE_URL`, one Supabase publishable/anonymous client key, and `VITE_API_ORIGIN=https://diarydock.com`. The production build validates that the Supabase credential is public, both origins use HTTPS and the API host is allowlisted. Never place a service-role or secret-format Supabase key in this group.
 
+Add `diarydock://auth/confirm` and `diarydock://auth/reset` to the Supabase Authentication redirect allowlist. Native account email links use these exact callbacks so the installed app can exchange each single-use PKCE code and continue into native onboarding or password reset.
+
 ### Android
 
 1. Upload the long-lived Google Play upload keystore under the Codemagic signing reference `diarydock_upload`.

@@ -12,7 +12,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.diarydock.app.household-invite</string>
+			<string>com.diarydock.app.deep-links</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>diarydock</string>
