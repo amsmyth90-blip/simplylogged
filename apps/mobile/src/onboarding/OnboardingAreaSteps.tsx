@@ -1,14 +1,14 @@
 import { estateAreas } from "@diarydock/home";
-import { OPTIONAL_DASHBOARD_AREAS } from "@diarydock/onboarding";
+import { ADDITIONAL_DASHBOARD_AREAS } from "@diarydock/onboarding";
 
 import type { OnboardingDraft } from "./onboarding-model";
 
 export function AreasStep({ draft, toggle }: { draft: OnboardingDraft;
   toggle: (areaId: string) => void }) {
   return <section className="setup-stage">
-    <p className="setup-eyebrow">Personalise your home</p><h2>What belongs in your DiaryDock?</h2>
-    <p>Choose what is useful now. You can change this later in Settings.</p>
-    <div className="setup-areas">{OPTIONAL_DASHBOARD_AREAS.map((question) => {
+    <p className="setup-eyebrow">Optional spaces</p><h2>Would you like anything else?</h2>
+    <p>Your earlier answers selected the relevant areas. Add either of these if useful.</p>
+    <div className="setup-areas">{ADDITIONAL_DASHBOARD_AREAS.map((question) => {
       const area = estateAreas.find(({ id }) => id === question.roomId);
       const selected = draft.selectedAreaIds.includes(question.roomId);
       return <button type="button" role="switch" aria-checked={selected} key={question.roomId}

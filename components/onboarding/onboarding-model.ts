@@ -4,8 +4,7 @@ export const onboardingStepTitles = [
   "Your profile",
   "Your household",
   "Your life",
-  "Your preferences",
-  "Choose your areas",
+  "Extra areas",
   "Your dashboard",
 ] as const;
 

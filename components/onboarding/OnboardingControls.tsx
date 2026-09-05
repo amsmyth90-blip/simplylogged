@@ -45,11 +45,11 @@ export function OnboardingNavigation({ view }: { view: OnboardingViewModel }) {
       ) : null}
       <button
         type="button"
-        disabled={!view.canContinue}
+        disabled={!view.canContinue || view.saving}
         onClick={view.continueSetup}
         className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-5 text-sm font-semibold text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {finalStep ? "Open my DiaryDock" : "Continue"}
+        {view.saving ? "Saving securely…" : finalStep ? "Open my DiaryDock" : "Continue"}
         <UiIcon
           name={finalStep ? "check" : "chevron-right"}
           className="h-4 w-4"

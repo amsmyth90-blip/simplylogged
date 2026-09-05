@@ -1,5 +1,5 @@
 import { UiIcon, type IconName } from "@/components/UiIcon";
-import { OPTIONAL_DASHBOARD_AREAS } from "@/lib/dashboard-areas";
+import { ADDITIONAL_DASHBOARD_AREAS } from "@/lib/dashboard-areas";
 import { estateAreas } from "@/lib/mock-data";
 
 import type { OnboardingViewModel } from "./useOnboarding";
@@ -9,18 +9,18 @@ export function AreasStep({ view }: { view: OnboardingViewModel }) {
     <section className="space-y-4">
       <div className="px-1">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-          Personalise your home
+          Optional spaces
         </p>
         <h1 className="mt-2 font-serif text-3xl text-ink">
-          What belongs in your DiaryDock?
+          Would you like anything else?
         </h1>
         <p className="mt-2 text-sm leading-6 text-ink/55">
-          Switch on only what is useful now. You can add anything later in
-          Settings.
+          Your earlier answers selected the relevant areas. Add either of
+          these if useful.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        {OPTIONAL_DASHBOARD_AREAS.map((question) => {
+        {ADDITIONAL_DASHBOARD_AREAS.map((question) => {
           const area = estateAreas.find((item) => item.id === question.roomId);
           const selected = view.selectedAreaIds.includes(question.roomId);
           if (!area) return null;

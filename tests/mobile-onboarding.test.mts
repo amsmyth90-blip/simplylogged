@@ -5,14 +5,25 @@ import test from "node:test";
 import { PGlite } from "@electric-sql/pglite";
 
 import {
+  ADDITIONAL_DASHBOARD_AREAS,
   CORE_DASHBOARD_AREA_IDS,
+  finaliseOnboardingAnswers,
   normaliseDashboardAreaIds,
   ONBOARDING_SCHEMA_VERSION,
   parseOnboardingMutation,
   parseOnboardingSnapshot,
 } from "../packages/onboarding/src/index.ts";
 import { projectOnboardingSnapshot } from "../lib/onboarding/mobile-onboarding-payload.ts";
-import { shouldShowSetup } from "../apps/mobile/src/onboarding/onboarding-model.ts";
+import { completeDesktopOnboarding } from "../lib/onboarding/desktop-onboarding-completion.ts";
+import {
+  answerDraft,
+  draftFromSnapshot,
+  finaliseOnboardingDraft,
+  householdDraft,
+  onboardingStepTitles,
+  shouldShowSetup,
+  stepIsComplete,
+} from "../apps/mobile/src/onboarding/onboarding-model.ts";
 
 const read = (path: string) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const userId = "11111111-1111-4111-8111-111111111111";
@@ -59,18 +70,75 @@ test("an app upgrade never blocks encrypted offline access before setup is cache
     snapshot: incomplete }), true);
 });
 
+test("onboarding derives repeated choices and asks only for additional areas", () => {
+  assert.deepEqual(ADDITIONAL_DASHBOARD_AREAS.map(({ roomId }) => roomId),
+    ["bedroom", "attic"]);
+  assert.deepEqual(onboardingStepTitles,
+    ["Your profile", "Your household", "Your life", "Extra areas", "Your dashboard"]);
+  let draft = draftFromSnapshot(projectOnboardingSnapshot({}, null));
+  draft = householdDraft(draft, "Me and my partner");
+  draft = answerDraft(draft, "homeTenure", "own");
+  draft = answerDraft(draft, "vehicles", "yes");
+  draft = answerDraft(draft, "pets", "no");
+  draft = answerDraft(draft, "internationalTravel", "yes");
+  assert.equal(stepIsComplete(2, draft), true);
+  assert.equal(draft.answers.householdCollaboration, "yes");
+  assert.equal(draft.selectedAreaIds.includes("family-room"), true);
+  assert.equal(draft.selectedAreaIds.includes("garage"), true);
+  assert.equal(draft.selectedAreaIds.includes("garden"), false);
+  assert.equal(draft.selectedAreaIds.includes("driveway"), true);
+  const completed = finaliseOnboardingDraft(draft);
+  assert.equal(completed.answers.documentStorage, "yes");
+  assert.equal(completed.answers.reminders, "yes");
+  assert.equal(finaliseOnboardingAnswers(answers, "Just me").householdCollaboration, "no");
+});
+
+test("desktop onboarding waits for persistence before navigating", async () => {
+  const [provider, hook, controls] = await Promise.all([
+    read("components/DiaryDockDataProvider.tsx"),
+    read("components/onboarding/useOnboarding.ts"),
+    read("components/onboarding/OnboardingControls.tsx"),
+  ]);
+  assert.match(provider, /persistState: \(state: DiaryDockAppState\) => Promise<void>/);
+  assert.match(hook, /await persistState\(next\)/);
+  assert.match(hook, /catch \{\s*setSaving\(false\)/);
+  assert.match(controls, /disabled=\{!view\.canContinue \|\| view\.saving\}/);
+  assert.match(controls, /Saving securely/);
+});
+
+test("desktop onboarding derives core choices before its awaited save", () => {
+  const state = ({ onboarding: { completed: false, dashboardAreasConfigured: false,
+    householdMembers: "Me and my partner", selectedRooms: ["garage", "driveway"],
+    lifeCheck: { homeTenure: "own", vehicles: "yes", pets: "no", internationalTravel: "yes",
+      householdCollaboration: "not-set", documentStorage: "not-set", reminders: "not-set" } } }) as Parameters<typeof completeDesktopOnboarding>[0];
+  const completed = completeDesktopOnboarding(state, "2026-09-05T16:00:00.000Z");
+  assert.ok(completed);
+  assert.equal(completed.onboarding.completed, true);
+  assert.equal(completed.onboarding.dashboardAreasConfigured, true);
+  assert.equal(completed.onboarding.lifeCheck.householdCollaboration, "yes");
+  assert.equal(completed.onboarding.lifeCheck.documentStorage, "yes");
+  assert.equal(completed.onboarding.lifeCheck.reminders, "yes");
+  assert.equal(completed.onboarding.lifeCheck.completedAt, "2026-09-05T16:00:00.000Z");
+  assert.deepEqual(completed.onboarding.selectedRooms,
+    [...CORE_DASHBOARD_AREA_IDS, "garage", "driveway"]);
+});
+
 test("mobile onboarding is authenticated, bounded, encrypted offline and specialist-routed", async () => {
-  const [route, server, client, hook, screen, home, signedIn, settings, dashboard] = await Promise.all([
+  const [route, server, client, hook, screen, home, signedIn, settings, dashboard,
+    provisioner] = await Promise.all([
     read("app/api/mobile/onboarding/route.ts"), read("lib/onboarding/mobile-onboarding-server.ts"),
     read("apps/mobile/src/onboarding/onboarding-client.ts"),
     read("apps/mobile/src/onboarding/use-mobile-onboarding.ts"),
     read("apps/mobile/src/onboarding/OnboardingScreen.tsx"), read("apps/mobile/src/home/HomeScreen.tsx"),
     read("apps/mobile/src/SignedInApp.tsx"), read("apps/mobile/src/settings/SettingsScreen.tsx"),
     read("lib/dashboard-areas.ts"),
+    read("lib/household/ensure-service-household.ts"),
   ]);
   assert.match(route, /authenticateHybridRequest/); assert.match(route, /readBoundedJson\(request, 8 \* 1024\)/);
   assert.match(route, /checkServerRateLimit/); assert.match(route, /RequestObservation/);
-  assert.match(server, /apply_mobile_onboarding/); assert.match(client, /readBoundedJsonResponse\(response, 32 \* 1024\)/);
+  assert.match(server, /ensureServiceHousehold[\s\S]+apply_mobile_onboarding/);
+  assert.match(provisioner, /ensure_service_user_household/);
+  assert.match(client, /readBoundedJsonResponse\(response, 32 \* 1024\)/);
   assert.match(client, /could not reach its secure service/);
   assert.match(hook, /tryPutReadModel\(store, CACHE_KEY/);
   assert.match(hook, /tryRemoveReadModel\(store, CACHE_KEY/);

@@ -3,6 +3,8 @@ import "server-only";
 import type { OnboardingMutation } from "@diarydock/onboarding";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { ensureServiceHousehold } from "@/lib/household/ensure-service-household";
+
 import { projectOnboardingSnapshot } from "./mobile-onboarding-payload.ts";
 
 type AppStateRow = { payload: unknown; updated_at: string };
@@ -32,6 +34,9 @@ export async function applyOnboardingMutation(supabase: SupabaseClient, admin: S
   const setup = { profileName: mutation.profileName, householdName: mutation.householdName,
     householdMembers: mutation.householdMembers, selectedAreaIds: mutation.selectedAreaIds,
     answers: mutation.answers };
+  const householdReady = await ensureServiceHousehold(admin, userId,
+    mutation.householdName, mutation.profileName);
+  if (!householdReady) return { status: "ERROR" as const, snapshot: null };
   const result = await admin.rpc("apply_mobile_onboarding", { input_user_id: userId,
     input_expected_revision: mutation.revision, input_setup: setup }).maybeSingle<MutationRow>();
   if (result.error || !result.data) return { status: "ERROR" as const, snapshot: null };

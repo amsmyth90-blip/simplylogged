@@ -39,6 +39,7 @@ type DiaryDockDataContextValue = {
   canEditShared: boolean;
   refreshHousehold: (reloadState?: boolean) => Promise<HouseholdDirectory | null>;
   updateState: (updater: (current: DiaryDockAppState) => DiaryDockAppState) => void;
+  persistState: (state: DiaryDockAppState) => Promise<void>;
 };
 
 const DiaryDockDataContext = createContext<DiaryDockDataContextValue | null>(null);
@@ -181,6 +182,11 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     });
   }, [stateSaver]);
 
+  const persistState = useCallback(async (next: DiaryDockAppState) => {
+    stateSaver.schedule(next);
+    await stateSaver.flush();
+  }, [stateSaver]);
+
   return (
     <DiaryDockDataContext.Provider
       value={{
@@ -194,7 +200,8 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
           household?.role === "member" ||
           repository.mode === "session",
         refreshHousehold,
-        updateState
+        updateState,
+        persistState,
       }}
     >
       {persistenceError ? <div role="alert"
