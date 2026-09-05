@@ -143,6 +143,22 @@ canvas {
   @apply rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,251,246,0.94),rgba(255,249,241,0.82))] shadow-[0_22px_50px_-34px_rgba(54,44,24,0.28)] backdrop-blur-xl;
 }
 
+body:has(.onboarding-shell) {
+  background-color: #edf8f4;
+  background-image: none;
+}
+
+.onboarding-shell {
+  color: #153f35;
+}
+
+.onboarding-shell .estate-sheet {
+  border-color: #c5ded5;
+  background: rgb(250 255 253 / 96%);
+  box-shadow: 0 22px 50px -38px rgb(5 72 54 / 42%);
+  backdrop-filter: none;
+}
+
 .estate-chip {
   @apply inline-flex items-center gap-1.5 rounded-full border border-white/75 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-ink/60 backdrop-blur-md;
 }

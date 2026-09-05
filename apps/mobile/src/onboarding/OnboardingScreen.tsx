@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import type { HouseholdChoice, OnboardingAnswers } from "@diarydock/onboarding";
 
-import estateImage from "../../../../public/images/estate-dashboard-country.webp";
 import { AreasStep, ReviewStep } from "./OnboardingAreaSteps";
 import { SetupNavigation, SetupProgress } from "./OnboardingControls";
 import { LifeStep } from "./OnboardingLifeSteps";
@@ -21,7 +20,7 @@ import type { MobileOnboardingModel } from "./use-mobile-onboarding";
 function SetupUnavailable({ model, onSignOut }: { model: MobileOnboardingModel;
   onSignOut: () => void }) {
   return <main className="setup-screen setup-unavailable">
-    <div className="setup-unavailable-image" style={{ backgroundImage: `url(${estateImage})` }} />
+    <span aria-hidden="true" className="setup-unavailable-image" />
     <section className="setup-card"><p className="setup-eyebrow">Private setup</p>
       <h1>{model.loading ? "Preparing your DiaryDock…" : "Connect to continue"}</h1>
       <p>{model.message ?? "Your setup could not be opened safely."}</p>
@@ -52,10 +51,11 @@ function SetupForm({ model, onBack, onComplete }: { model: MobileOnboardingModel
   }
 
   return <main className="setup-screen">
-    <header className="setup-hero" style={{ backgroundImage: `url(${estateImage})` }}>
+    <header className="setup-hero">
+      <span aria-hidden="true" className="setup-botanical" />
       {onBack ? <button type="button" onClick={onBack} aria-label="Back to Settings">‹</button> : null}
-      <div><p>Welcome to DiaryDock</p><h1>Let’s make it yours</h1>
-        <span>A few simple questions create a calmer dashboard. Nothing is permanent.</span></div>
+      <strong className="setup-wordmark">DiaryDock</strong>
+      <div><p>Welcome to DiaryDock</p><h1>Let’s make it yours</h1></div>
       <b>🔒 Private setup</b>
     </header>
     <div className="setup-content"><SetupProgress step={step} />
