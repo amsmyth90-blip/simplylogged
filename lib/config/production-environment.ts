@@ -83,6 +83,7 @@ export function inspectProductionRuntimeEnvironment(environment: EnvironmentSour
     || value(environment, "NEXT_PUBLIC_SUPABASE_ANON_KEY");
   const serviceKey = value(environment, "SUPABASE_SERVICE_ROLE_KEY");
   const cursorSecret = value(environment, "DIARYDOCK_SYNC_CURSOR_SECRET");
+  const scannerRequired = value(environment, "DIARYDOCK_CAPTURE_SCANNER_REQUIRED");
   const scannerUrl = value(environment, "DIARYDOCK_MALWARE_SCANNER_URL");
   const scannerToken = value(environment, "DIARYDOCK_MALWARE_SCANNER_TOKEN");
 
@@ -98,14 +99,16 @@ export function inspectProductionRuntimeEnvironment(environment: EnvironmentSour
   if (!secretIsValid(cursorSecret)) {
     issues.push(issue("DIARYDOCK_SYNC_CURSOR_SECRET", "must contain 32 to 512 characters"));
   }
-  if (value(environment, "DIARYDOCK_CAPTURE_SCANNER_REQUIRED") !== "true") {
-    issues.push(issue("DIARYDOCK_CAPTURE_SCANNER_REQUIRED", "must be explicitly true"));
+  if (scannerRequired !== "true" && scannerRequired !== "false") {
+    issues.push(issue("DIARYDOCK_CAPTURE_SCANNER_REQUIRED", "must be explicitly true or false"));
   }
-  if (!httpsEndpointIsValid(scannerUrl)) {
-    issues.push(issue("DIARYDOCK_MALWARE_SCANNER_URL", "must be a credential-free HTTPS endpoint"));
-  }
-  if (!secretIsValid(scannerToken)) {
-    issues.push(issue("DIARYDOCK_MALWARE_SCANNER_TOKEN", "must contain 32 to 512 characters"));
+  if (scannerRequired === "true") {
+    if (!httpsEndpointIsValid(scannerUrl)) {
+      issues.push(issue("DIARYDOCK_MALWARE_SCANNER_URL", "must be a credential-free HTTPS endpoint"));
+    }
+    if (!secretIsValid(scannerToken)) {
+      issues.push(issue("DIARYDOCK_MALWARE_SCANNER_TOKEN", "must contain 32 to 512 characters"));
+    }
   }
   if ([serviceKey, cursorSecret, scannerToken].filter(Boolean).length
     !== new Set([serviceKey, cursorSecret, scannerToken].filter(Boolean)).size) {
