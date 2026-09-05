@@ -82,4 +82,10 @@ grant execute on function public.delete_diarydock_document(uuid, text)
 to service_role;
 
 revoke insert, update, delete on table public.documents from authenticated;
-revoke insert, update, delete on table public.document_permissions from authenticated;
+do $$
+begin
+  if to_regclass('public.document_permissions') is not null then
+    revoke insert, update, delete on table public.document_permissions from authenticated;
+  end if;
+end;
+$$;

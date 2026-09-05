@@ -55,7 +55,7 @@ as $$
             and coalesce(reminder.room_id, '') = coalesce(candidate.value ->> 'roomId', '')
             and coalesce(reminder.room_name, '') = coalesce(candidate.value ->> 'roomName', '')
             and coalesce(reminder.repeat, '') = coalesce(candidate.value ->> 'repeat', '')
-            and coalesce(reminder.document_id, '') = coalesce(candidate.value ->> 'documentId', '')
+            and coalesce(reminder.document_id::text, '') = coalesce(candidate.value ->> 'documentId', '')
             and coalesce(reminder.document_title, '') = coalesce(candidate.value ->> 'documentTitle', '')
             and coalesce(reminder.assigned_to, '') = coalesce(candidate.value ->> 'assignedTo', '')
             and reminder.origin = coalesce(candidate.value ->> 'origin', 'USER_CREATED')

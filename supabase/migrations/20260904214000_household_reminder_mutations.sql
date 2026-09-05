@@ -132,11 +132,11 @@ begin
     document_id := nullif(payload ->> 'documentId', '');
     if document_id is not null and not (
       exists (select 1 from public.documents
-        where documents.id = document_id and documents.user_id = current_user_id)
+        where documents.id::text = document_id and documents.user_id = current_user_id)
       or (current_record.record_id is not null
         and document_id = current_record.payload ->> 'documentId'
         and exists (select 1 from public.documents
-          where documents.id = document_id
+          where documents.id::text = document_id
             and documents.user_id = current_record.owner_id))
     ) then
       return jsonb_build_object('status','REJECTED','record',null,'errorCode','FORBIDDEN');
@@ -154,7 +154,7 @@ begin
     ) values (
       source_id,target_owner_id,target_scope_kind,target_scope_id,trim(payload ->> 'title'),
       payload ->> 'note',payload ->> 'roomId',payload ->> 'roomName',payload ->> 'group',
-      payload ->> 'timeLabel',payload ->> 'priority',payload ->> 'repeat',document_id,
+      payload ->> 'timeLabel',payload ->> 'priority',payload ->> 'repeat',document_id::uuid,
       payload ->> 'documentTitle',payload ->> 'assignedTo',
       case when payload ? 'dueAt' then (payload ->> 'dueAt')::timestamptz else null end,
       'USER_CREATED','custom',coalesce(payload ->> 'timeZone','Europe/London')

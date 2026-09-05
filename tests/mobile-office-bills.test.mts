@@ -165,7 +165,7 @@ test("mobile Office API is owner-derived, revisioned, bounded and atomic", async
   assert.match(server, /apply_mobile_office_state/);
   assert.match(server, /input_document_kind: "bill"/);
   assert.match(migration, /auth\.role\(\) is distinct from 'service_role'/);
-  assert.match(migration, /where id = document_id and user_id = input_user_id/);
+  assert.match(migration, /where id::text = document_id and user_id = input_user_id/);
   assert.match(migration, /apply_mobile_bill_state[\s\S]*authenticated, service_role/);
 });
 

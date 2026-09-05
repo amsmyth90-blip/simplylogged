@@ -64,7 +64,7 @@ begin
       or length(coalesce(source_document_id, '')) not between 1 and 180
       or not exists (
         select 1 from public.documents
-        where documents.id = source_document_id
+        where documents.id::text = source_document_id
           and documents.user_id = input_user_id
       ) then
       raise exception 'Invalid reminder proposal';
