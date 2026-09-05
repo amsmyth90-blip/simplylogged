@@ -20,8 +20,8 @@ export function ProfileStep({ draft, setDraft }: { draft: OnboardingDraft;
 export function HouseholdStep({ draft, choose }: { draft: OnboardingDraft;
   choose: (value: HouseholdChoice) => void }) {
   return <section className="setup-stage">
-    <p className="setup-eyebrow">Your household</p><h2>Who is DiaryDock for?</h2>
-    <p>This recommends useful areas. It does not give anyone access.</p>
+    <p className="setup-eyebrow">Your household</p><h2>Who shares your home?</h2>
+    <p>We’ll tailor shared spaces to the people you organise life with. This does not give anyone access.</p>
     <div className="setup-households">{householdChoices.map((choice) =>
       <SetupChoice key={choice.value} selected={draft.householdMembers === choice.value}
         onClick={() => choose(choice.value)}><span className="setup-choice-icon">⌂</span>

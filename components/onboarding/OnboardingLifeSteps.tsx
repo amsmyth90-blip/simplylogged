@@ -12,13 +12,13 @@ export function LifeDetailsStep({ view }: { view: OnboardingViewModel }) {
   return (
     <section className="space-y-4">
       <div className="px-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8c67a5]">
           Your life
         </p>
-        <h1 className="mt-2 font-serif text-3xl text-ink">
+        <h1 className="mt-2 font-serif text-3xl text-[#123f34]">
           What applies to you?
         </h1>
-        <p className="mt-2 text-sm leading-6 text-ink/55">
+        <p className="mt-2 text-sm leading-6 text-[#55756c]">
           This keeps your organisation score fair. Choosing “No” excludes that
           area rather than counting it as missing.
         </p>
