@@ -14,6 +14,7 @@ import { useMobileAuthLinks } from "./use-mobile-auth-links";
 export type MobileSessionState =
   | { status: "CONFIGURATION_ERROR"; message: string }
   | { status: "LOADING" }
+  | { status: "OFFLINE_STORAGE_ERROR"; message: string }
   | { status: "PASSWORD_RECOVERY"; session: Session }
   | { status: "SIGNED_IN"; session: Session; store: SqliteOfflineStore }
   | { status: "SIGNED_OUT" };
@@ -89,7 +90,7 @@ export function useMobileSession() {
       setState({ status: "SIGNED_IN", session, store: storeRef.current! });
     }).catch(() => {
       setState({
-        status: "CONFIGURATION_ERROR",
+        status: "OFFLINE_STORAGE_ERROR",
         message: "Encrypted offline storage could not be opened.",
       });
     });
@@ -242,7 +243,35 @@ export function useMobileSession() {
     if (error) throw new Error("DiaryDock could not complete sign out safely.");
   }, [applySession]);
 
+  const retryOfflineStorage = useCallback(async () => {
+    setState({ status: "LOADING" });
+    try {
+      const current = await getMobileSupabase().auth.getSession();
+      await applySession(current.data.session);
+    } catch {
+      setState({
+        status: "OFFLINE_STORAGE_ERROR",
+        message: "Encrypted offline storage could not be opened.",
+      });
+    }
+  }, [applySession]);
+
+  const returnToSignIn = useCallback(async () => {
+    recoveryIntent.current = false;
+    await setPasswordRecoveryPending(false).catch(() => undefined);
+    try {
+      await getMobileSupabase().auth.signOut({ scope: "local" });
+    } catch {
+      // The local UI must remain recoverable even if native auth storage is unavailable.
+    }
+    await storeRef.current?.close().catch(() => undefined);
+    purgeOnSignOutRef.current = false;
+    storeRef.current = null;
+    accountRef.current = null;
+    setState({ status: "SIGNED_OUT" });
+  }, []);
+
   return { cancelPasswordRecovery, finishPasswordRecovery, passwordResetError,
     recoveredPasswordError, requestPasswordReset, state, signIn, signInError,
-    signInMessage, signOut, signUp, signUpError };
+    signInMessage, signOut, signUp, signUpError, retryOfflineStorage, returnToSignIn };
 }

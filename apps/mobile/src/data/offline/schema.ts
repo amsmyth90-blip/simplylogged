@@ -168,6 +168,13 @@ const READ_MODEL_TABLE = `CREATE TABLE IF NOT EXISTS cached_read_models (
 
 const VERSION_1_SCHEMA = `${CORE_SCHEMA}${CONFLICT_SCHEMA_V1}${FINAL_SCHEMA}`;
 
+function splitSchema(schema: string) {
+  return schema
+    .split(";")
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+}
+
 export const OFFLINE_SCHEMA = `${CURRENT_CORE_SCHEMA}${CONFLICT_SCHEMA_V2}${FINAL_SCHEMA}${FILE_CACHE_SCHEMA}${PENDING_UPLOAD_SCHEMA}${READ_MODEL_TABLE};`;
 
 export const OFFLINE_MIGRATIONS = [
@@ -227,7 +234,7 @@ export const OFFLINE_MIGRATIONS = [
 ] as const;
 
 export const OFFLINE_UPGRADES: capSQLiteVersionUpgrade[] = [
-  { toVersion: 1, statements: [VERSION_1_SCHEMA] },
+  { toVersion: 1, statements: splitSchema(VERSION_1_SCHEMA) },
   ...OFFLINE_MIGRATIONS.map((migration) => ({
     toVersion: migration.toVersion,
     statements: [...migration.statements],
