@@ -15,6 +15,12 @@ export const OPTIONAL_DASHBOARD_AREAS = [
     detail: "Stories, photographs, keepsakes and heirlooms." },
 ] as const;
 
+const inferredAreaIds = new Set(["family-room", "garage", "garden", "driveway"]);
+
+export const ADDITIONAL_DASHBOARD_AREAS = OPTIONAL_DASHBOARD_AREAS.filter(
+  ({ roomId }) => !inferredAreaIds.has(roomId),
+);
+
 export const DASHBOARD_AREA_IDS = [
   ...CORE_DASHBOARD_AREA_IDS,
   ...OPTIONAL_DASHBOARD_AREAS.map(({ roomId }) => roomId),

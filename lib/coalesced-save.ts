@@ -54,7 +54,9 @@ export function createCoalescedSaver<T>(
     },
     async flush() {
       if (disposed) return;
-      await drain();
+      do {
+        await drain();
+      } while (hasPendingValue && !disposed);
     },
     dispose() {
       disposed = true;

@@ -82,66 +82,15 @@ export function LifeDetailsStep({ view }: { view: OnboardingViewModel }) {
             onChange={(value) => view.updateLifeCheck("pets", value)}
           />
         </LifeCheckQuestion>
-      </div>
-    </section>
-  );
-}
-
-export function PreferencesStep({ view }: { view: OnboardingViewModel }) {
-  const lifeCheck = view.onboarding.lifeCheck;
-  return (
-    <section className="space-y-4">
-      <div className="px-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-          Your preferences
-        </p>
-        <h1 className="mt-2 font-serif text-3xl text-ink">
-          How can DiaryDock help?
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-ink/55">
-          These choices only personalise your checklist. They do not share
-          anything or turn on notifications.
-        </p>
-      </div>
-      <div className="estate-sheet space-y-5 p-5">
         <LifeCheckQuestion
           title="International travel"
-          detail="Would you like to organise passports, cover or overseas trips?"
+          detail="Do you organise passports, cover or overseas trips?"
         >
           <YesNoChoices
             value={lifeCheck.internationalTravel}
             onChange={(value) =>
               view.updateLifeCheck("internationalTravel", value)
             }
-          />
-        </LifeCheckQuestion>
-        <LifeCheckQuestion
-          title="Household collaboration"
-          detail="Would you like to organise some things with another person?"
-        >
-          <YesNoChoices
-            value={lifeCheck.householdCollaboration}
-            onChange={(value) =>
-              view.updateLifeCheck("householdCollaboration", value)
-            }
-          />
-        </LifeCheckQuestion>
-        <LifeCheckQuestion
-          title="Private document storage"
-          detail="Would you like DiaryDock to hold important files?"
-        >
-          <YesNoChoices
-            value={lifeCheck.documentStorage}
-            onChange={(value) => view.updateLifeCheck("documentStorage", value)}
-          />
-        </LifeCheckQuestion>
-        <LifeCheckQuestion
-          title="Reminders"
-          detail="Would you like DiaryDock to keep useful dates in view?"
-        >
-          <YesNoChoices
-            value={lifeCheck.reminders}
-            onChange={(value) => view.updateLifeCheck("reminders", value)}
           />
         </LifeCheckQuestion>
       </div>

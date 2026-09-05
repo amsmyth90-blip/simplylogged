@@ -1,4 +1,5 @@
 import {
+  finaliseOnboardingAnswers,
   normaliseDashboardAreaIds,
   type HouseholdChoice,
   type OnboardingAnswers,
@@ -14,8 +15,7 @@ export type OnboardingDraft = {
 };
 
 export const onboardingStepTitles = [
-  "Your profile", "Your household", "Your life", "Your preferences",
-  "Choose your areas", "Your dashboard",
+  "Your profile", "Your household", "Your life", "Extra areas", "Your dashboard",
 ] as const;
 
 export function draftFromSnapshot(snapshot: OnboardingSnapshot): OnboardingDraft {
@@ -31,16 +31,13 @@ export function stepIsComplete(step: number, draft: OnboardingDraft) {
   if (step === 0) return Boolean(draft.profileName.trim() && draft.householdName.trim());
   if (step === 1) return Boolean(draft.householdMembers);
   if (step === 2) return draft.answers.homeTenure !== "not-set"
-    && draft.answers.vehicles !== "not-set" && draft.answers.pets !== "not-set";
-  if (step === 3) return draft.answers.internationalTravel !== "not-set"
-    && draft.answers.householdCollaboration !== "not-set"
-    && draft.answers.documentStorage !== "not-set" && draft.answers.reminders !== "not-set";
+    && draft.answers.vehicles !== "not-set" && draft.answers.pets !== "not-set"
+    && draft.answers.internationalTravel !== "not-set";
   return true;
 }
 
 const areaForAnswer: Partial<Record<keyof OnboardingAnswers, string>> = {
   vehicles: "garage", pets: "garden", internationalTravel: "driveway",
-  householdCollaboration: "family-room",
 };
 
 export function answerDraft(draft: OnboardingDraft, field: keyof OnboardingAnswers, value: string) {
@@ -51,11 +48,22 @@ export function answerDraft(draft: OnboardingDraft, field: keyof OnboardingAnswe
     selectedAreaIds: normaliseDashboardAreaIds(selected) } as OnboardingDraft;
 }
 
-export function householdDraft(draft: OnboardingDraft, householdMembers: HouseholdChoice) {
+export function householdDraft(
+  draft: OnboardingDraft,
+  householdMembers: HouseholdChoice,
+): OnboardingDraft {
   const selected = householdMembers === "Just me"
     ? draft.selectedAreaIds.filter((id) => id !== "family-room")
     : [...draft.selectedAreaIds, "family-room"];
-  return { ...draft, householdMembers, selectedAreaIds: normaliseDashboardAreaIds(selected) };
+  return { ...draft, householdMembers, selectedAreaIds: normaliseDashboardAreaIds(selected),
+    answers: { ...draft.answers,
+      householdCollaboration: householdMembers === "Just me" ? "no" as const : "yes" as const } };
+}
+
+export function finaliseOnboardingDraft(draft: OnboardingDraft): OnboardingDraft {
+  if (!draft.householdMembers) return draft;
+  return { ...draft,
+    answers: finaliseOnboardingAnswers(draft.answers, draft.householdMembers) };
 }
 
 export function toggleDraftArea(draft: OnboardingDraft, areaId: string) {

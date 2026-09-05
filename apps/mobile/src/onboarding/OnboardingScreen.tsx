@@ -5,10 +5,11 @@ import type { HouseholdChoice, OnboardingAnswers } from "@diarydock/onboarding";
 import estateImage from "../../../../public/images/estate-dashboard-country.webp";
 import { AreasStep, ReviewStep } from "./OnboardingAreaSteps";
 import { SetupNavigation, SetupProgress } from "./OnboardingControls";
-import { LifeStep, PreferencesStep } from "./OnboardingLifeSteps";
+import { LifeStep } from "./OnboardingLifeSteps";
 import {
   answerDraft,
   draftFromSnapshot,
+  finaliseOnboardingDraft,
   householdDraft,
   onboardingStepTitles,
   stepIsComplete,
@@ -43,8 +44,10 @@ function SetupForm({ model, onBack, onComplete }: { model: MobileOnboardingModel
   async function continueSetup() {
     if (!finalStep) { setStep((current) => current + 1); return; }
     if (!draft.householdMembers) return;
-    const saved = await model.save({ ...draft, profileName: draft.profileName.trim(),
-      householdName: draft.householdName.trim(), householdMembers: draft.householdMembers });
+    const householdMembers = draft.householdMembers;
+    const completed = finaliseOnboardingDraft(draft);
+    const saved = await model.save({ ...completed, profileName: completed.profileName.trim(),
+      householdName: completed.householdName.trim(), householdMembers });
     if (saved) onComplete();
   }
 
@@ -59,9 +62,8 @@ function SetupForm({ model, onBack, onComplete }: { model: MobileOnboardingModel
       {step === 0 ? <ProfileStep draft={draft} setDraft={setDraft} /> : null}
       {step === 1 ? <HouseholdStep draft={draft} choose={choose} /> : null}
       {step === 2 ? <LifeStep draft={draft} answer={answer} /> : null}
-      {step === 3 ? <PreferencesStep draft={draft} answer={answer} /> : null}
-      {step === 4 ? <AreasStep draft={draft} toggle={toggle} /> : null}
-      {step === 5 ? <ReviewStep draft={draft} /> : null}
+      {step === 3 ? <AreasStep draft={draft} toggle={toggle} /> : null}
+      {step === 4 ? <ReviewStep draft={draft} /> : null}
       {model.message ? <p className="setup-message" role="status">{model.message}</p> : null}
       {!model.online ? <p className="setup-message">You can review your choices offline. Connect to save them.</p> : null}
       <SetupNavigation busy={model.busy} canContinue={stepIsComplete(step, draft)}

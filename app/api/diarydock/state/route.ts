@@ -5,6 +5,7 @@ import {
   parseDiaryDockStateSaveRequest,
 } from "@/lib/diarydock-state-save";
 import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
+import { ensureServiceHousehold } from "@/lib/household/ensure-service-household";
 import { RequestObservation } from "@/lib/observability/request-observation";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
@@ -73,7 +74,18 @@ export async function POST(request: Request) {
   if (!isSupabaseAdminConfigured()) {
     return respond(observation, { error: "Secure sync is unavailable." }, 503, "admin-unavailable");
   }
-  const write = await getSupabaseAdminClient().rpc("apply_diarydock_state", {
+  const admin = getSupabaseAdminClient();
+  const householdReady = await ensureServiceHousehold(
+    admin,
+    authData.user.id,
+    input.privateState.onboarding.householdName,
+    input.privateState.settingsProfile.name,
+  );
+  if (!householdReady) {
+    return respond(observation, { error: "DiaryDock could not prepare your household." },
+      503, "household-unavailable");
+  }
+  const write = await admin.rpc("apply_diarydock_state", {
     input_expected_household_revision: input.householdRevision,
     input_expected_private_revision: input.privateRevision,
     input_household_payload: input.householdState,

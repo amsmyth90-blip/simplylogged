@@ -34,6 +34,7 @@ test("desktop persistence uses bootstrap revisions and refuses lost updates", as
   assert.match(bootstrap, /privateRevision:/);
   assert.match(bootstrap, /householdRevision:/);
   assert.match(route, /apply_diarydock_state/);
+  assert.match(route, /ensureServiceHousehold[\s\S]+apply_diarydock_state/);
   assert.match(route, /isSameOrigin/);
   assert.match(route, /checkServerRateLimit/);
   assert.match(repository, /\/api\/diarydock\/state/);

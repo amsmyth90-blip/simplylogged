@@ -13,7 +13,9 @@ const initial: OnboardingSnapshot = {
   profileName: "Amy Smyth",
   householdName: "The Smyth household",
   householdMembers: "Me and my partner",
-  selectedAreaIds: ["office", "kitchen", "mailbox", "front-gate", "family-room", "garage"],
+  selectedAreaIds: [
+    "office", "kitchen", "mailbox", "front-gate", "family-room", "garage", "driveway",
+  ],
   answers: { homeTenure: "own", vehicles: "yes", pets: "no", internationalTravel: "yes",
     householdCollaboration: "yes", documentStorage: "yes", reminders: "yes", completedAt: null },
 };

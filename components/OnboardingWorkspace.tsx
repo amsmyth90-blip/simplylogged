@@ -12,7 +12,6 @@ import {
 } from "./onboarding/OnboardingControls";
 import {
   LifeDetailsStep,
-  PreferencesStep,
 } from "./onboarding/OnboardingLifeSteps";
 import {
   HouseholdStep,
@@ -39,9 +38,8 @@ export function OnboardingWorkspace() {
       {view.step === 0 ? <ProfileStep view={view} /> : null}
       {view.step === 1 ? <HouseholdStep view={view} /> : null}
       {view.step === 2 ? <LifeDetailsStep view={view} /> : null}
-      {view.step === 3 ? <PreferencesStep view={view} /> : null}
-      {view.step === 4 ? <AreasStep view={view} /> : null}
-      {view.step === 5 ? <DashboardPreviewStep view={view} /> : null}
+      {view.step === 3 ? <AreasStep view={view} /> : null}
+      {view.step === 4 ? <DashboardPreviewStep view={view} /> : null}
       <OnboardingNavigation view={view} />
     </div>
   );

@@ -7,10 +7,8 @@ import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { normaliseDashboardAreaIds } from "@/lib/dashboard-areas";
 import type { LifeCheckState } from "@/lib/diarydock-data";
 import { estateAreas } from "@/lib/mock-data";
-import {
-  calculateOrganisationScore,
-  isLifeCheckComplete,
-} from "@/lib/organisation-score";
+import { completeDesktopOnboarding } from "@/lib/onboarding/desktop-onboarding-completion";
+import { calculateOrganisationScore } from "@/lib/organisation-score";
 import {
   PRODUCT_ANALYTICS_EVENTS,
   trackProductAnalytics,
@@ -20,8 +18,9 @@ import { initialsForName, onboardingStepTitles } from "./onboarding-model";
 
 export function useOnboarding() {
   const router = useRouter();
-  const { state, repositoryMode, updateState } = useDiaryDockData();
+  const { state, repositoryMode, updateState, persistState } = useDiaryDockData();
   const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
   const onboarding = state.onboarding;
   const selectedAreaIds = useMemo(
     () => normaliseDashboardAreaIds(onboarding.selectedRooms),
@@ -66,6 +65,10 @@ export function useOnboarding() {
           ...current.onboarding,
           completed: false,
           householdMembers: value,
+          lifeCheck: {
+            ...current.onboarding.lifeCheck,
+            householdCollaboration: value === "Just me" ? "no" : "yes",
+          },
           selectedRooms: normaliseDashboardAreaIds(selectedRooms),
         },
       };
@@ -134,46 +137,30 @@ export function useOnboarding() {
         : step === 2
           ? onboarding.lifeCheck.homeTenure !== "not-set" &&
             onboarding.lifeCheck.vehicles !== "not-set" &&
-            onboarding.lifeCheck.pets !== "not-set"
-          : step === 3
-            ? [
-                onboarding.lifeCheck.internationalTravel,
-                onboarding.lifeCheck.householdCollaboration,
-                onboarding.lifeCheck.documentStorage,
-                onboarding.lifeCheck.reminders,
-              ].every((answer) => answer !== "not-set")
-            : true;
+            onboarding.lifeCheck.pets !== "not-set" &&
+            onboarding.lifeCheck.internationalTravel !== "not-set"
+          : true;
 
-  const finishSetup = () => {
-    updateState((current) => {
-      const lifeCheck = current.onboarding.lifeCheck;
-      return {
-        ...current,
-        onboarding: {
-          ...current.onboarding,
-          completed: true,
-          dashboardAreasConfigured: true,
-          selectedRooms: normaliseDashboardAreaIds(
-            current.onboarding.selectedRooms,
-          ),
-          lifeCheck: {
-            ...lifeCheck,
-            completedAt: isLifeCheckComplete(lifeCheck)
-              ? new Date().toISOString()
-              : undefined,
-          },
-        },
-      };
-    });
-    void trackProductAnalytics(
-      PRODUCT_ANALYTICS_EVENTS.ONBOARDING_COMPLETED,
-      {},
-    );
-    router.push("/dashboard");
+  const finishSetup = async () => {
+    if (saving) return;
+    const next = completeDesktopOnboarding(state, new Date().toISOString());
+    if (!next) return;
+    setSaving(true);
+    updateState(() => next);
+    try {
+      await persistState(next);
+      void trackProductAnalytics(
+        PRODUCT_ANALYTICS_EVENTS.ONBOARDING_COMPLETED,
+        {},
+      );
+      router.push("/dashboard");
+    } catch {
+      setSaving(false);
+    }
   };
 
   const continueSetup = () => {
-    if (step === onboardingStepTitles.length - 1) finishSetup();
+    if (step === onboardingStepTitles.length - 1) void finishSetup();
     else setStep((current) => current + 1);
   };
 
@@ -186,6 +173,7 @@ export function useOnboarding() {
     selectedAreaIds,
     selectedAreas,
     score,
+    saving,
     updateProfile,
     chooseHousehold,
     toggleArea,

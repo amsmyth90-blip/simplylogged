@@ -26,24 +26,10 @@ export function LifeStep({ draft, answer }: { draft: OnboardingDraft;
       <Question title="Pets" detail="Do you have pet records or care to organise?">
         <YesNoChoice value={draft.answers.pets} onChange={(value) => answer("pets", value)} />
       </Question>
+      <Question title="International travel" detail="Do you organise passports, cover or overseas trips?">
+        <YesNoChoice value={draft.answers.internationalTravel}
+          onChange={(value) => answer("internationalTravel", value)} />
+      </Question>
     </div>
-  </section>;
-}
-
-const preferenceQuestions = [
-  ["internationalTravel", "International travel", "Organise passports, cover or overseas trips?"],
-  ["householdCollaboration", "Household collaboration", "Organise some things with another person?"],
-  ["documentStorage", "Private document storage", "Keep important files securely in DiaryDock?"],
-  ["reminders", "Reminders", "Keep useful dates and actions in view?"],
-] as const;
-
-export function PreferencesStep({ draft, answer }: { draft: OnboardingDraft;
-  answer: (field: keyof OnboardingAnswers, value: string) => void }) {
-  return <section className="setup-stage">
-    <p className="setup-eyebrow">Your preferences</p><h2>How can DiaryDock help?</h2>
-    <p>These choices personalise your checklist. They do not share anything or enable notifications.</p>
-    <div className="setup-card setup-questions">{preferenceQuestions.map(([field, title, detail]) =>
-      <Question key={field} title={title} detail={detail}><YesNoChoice value={draft.answers[field]}
-        onChange={(value) => answer(field, value)} /></Question>)}</div>
   </section>;
 }
