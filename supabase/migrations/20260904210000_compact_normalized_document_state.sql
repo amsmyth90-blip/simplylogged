@@ -21,7 +21,7 @@ begin
     or jsonb_typeof(entry.value -> 'id') is distinct from 'string'
     or not exists (
       select 1 from public.documents as document
-      where document.id = entry.value ->> 'id'
+      where document.id::text = entry.value ->> 'id'
         and document.user_id = new.id::uuid
     );
 
@@ -47,7 +47,7 @@ insert into public.documents (
   review_status, review_reasons, reviewed_at, emergency_visible, shared_with
 )
 select
-  entry.value ->> 'id', state.id::uuid, trim(entry.value ->> 'title'),
+  (entry.value ->> 'id')::uuid, state.id::uuid, trim(entry.value ->> 'title'),
   trim(entry.value ->> 'category'), entry.value ->> 'kind',
   entry.value ->> 'size', nullif(entry.value ->> 'roomId', ''),
   nullif(entry.value ->> 'roomName', ''), nullif(entry.value ->> 'issuer', ''),
@@ -77,6 +77,7 @@ where state.id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[
   and exists (select 1 from auth.users where id = state.id::uuid)
   and jsonb_typeof(entry.value) = 'object'
   and jsonb_typeof(entry.value -> 'id') = 'string'
+  and (entry.value ->> 'id') ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
   and length(entry.value ->> 'id') between 1 and 128
   and jsonb_typeof(entry.value -> 'title') = 'string'
   and length(trim(entry.value ->> 'title')) between 1 and 240
@@ -123,6 +124,6 @@ where state.id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[
   )
   and not exists (
     select 1 from public.documents as existing
-    where existing.id = entry.value ->> 'id'
+    where existing.id::text = entry.value ->> 'id'
   )
 on conflict (id) do nothing;

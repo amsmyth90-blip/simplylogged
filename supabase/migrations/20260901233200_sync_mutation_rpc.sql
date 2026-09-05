@@ -87,7 +87,7 @@ begin
     document_id := nullif(payload ->> 'documentId', '');
     if document_id is not null and not exists (
       select 1 from public.documents
-      where documents.id = document_id and documents.user_id = current_user_id
+      where documents.id::text = document_id and documents.user_id = current_user_id
     ) then
       return jsonb_build_object('status', 'REJECTED', 'record', null, 'errorCode', 'FORBIDDEN');
     end if;
@@ -115,7 +115,7 @@ begin
       payload ->> 'timeLabel',
       payload ->> 'priority',
       payload ->> 'repeat',
-      document_id,
+      document_id::uuid,
       payload ->> 'documentTitle',
       payload ->> 'assignedTo',
       case when payload ? 'dueAt' then (payload ->> 'dueAt')::timestamptz else null end,

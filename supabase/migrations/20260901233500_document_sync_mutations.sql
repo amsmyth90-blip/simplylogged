@@ -116,7 +116,7 @@ begin
     reviewed_at = case when payload ->> 'reviewStatus' = 'reviewed'
       then timezone('utc', now())::text else null end,
     emergency_visible = (payload ->> 'emergencyVisible')::boolean
-  where id = current_record.source_id and user_id = current_user_id;
+  where id::text = current_record.source_id and user_id = current_user_id;
 
   select * into result_record from public.sync_records
   where record_id = target_record_id

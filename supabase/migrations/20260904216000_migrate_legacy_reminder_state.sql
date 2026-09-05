@@ -72,7 +72,7 @@ select
   nullif(entry.value ->> 'roomId',''), nullif(entry.value ->> 'roomName',''),
   entry.value ->> 'group', entry.value ->> 'timeLabel',
   entry.value ->> 'priority', nullif(entry.value ->> 'repeat',''),
-  nullif(entry.value ->> 'documentId',''), nullif(entry.value ->> 'documentTitle',''),
+  nullif(entry.value ->> 'documentId','')::uuid, nullif(entry.value ->> 'documentTitle',''),
   nullif(entry.value ->> 'assignedTo',''),
   public.legacy_reminder_timestamp(entry.value ->> 'dueAt'),
   'USER_CREATED', 'custom', coalesce(nullif(entry.value ->> 'timeZone',''),'Europe/London'),
@@ -88,7 +88,7 @@ where public.is_valid_legacy_reminder(entry.value)
     or nullif(entry.value ->> 'dueAt','') is null
     or public.legacy_reminder_timestamp(entry.value ->> 'dueAt') is not null)
   and (nullif(entry.value ->> 'documentId','') is null or exists (
-    select 1 from public.documents where id = entry.value ->> 'documentId'
+    select 1 from public.documents where id::text = entry.value ->> 'documentId'
   ))
 on conflict (id) do nothing;
 
@@ -104,7 +104,7 @@ select
   nullif(entry.value ->> 'note',''), nullif(entry.value ->> 'roomId',''),
   nullif(entry.value ->> 'roomName',''), entry.value ->> 'group',
   entry.value ->> 'timeLabel', entry.value ->> 'priority',
-  nullif(entry.value ->> 'repeat',''), nullif(entry.value ->> 'documentId',''),
+  nullif(entry.value ->> 'repeat',''), nullif(entry.value ->> 'documentId','')::uuid,
   nullif(entry.value ->> 'documentTitle',''), nullif(entry.value ->> 'assignedTo',''),
   public.legacy_reminder_timestamp(entry.value ->> 'dueAt'),
   'USER_CREATED', 'custom', coalesce(nullif(entry.value ->> 'timeZone',''),'Europe/London'),
@@ -130,6 +130,6 @@ where public.is_valid_legacy_reminder(entry.value)
     or nullif(entry.value ->> 'dueAt','') is null
     or public.legacy_reminder_timestamp(entry.value ->> 'dueAt') is not null)
   and (nullif(entry.value ->> 'documentId','') is null or exists (
-    select 1 from public.documents where id = entry.value ->> 'documentId'
+    select 1 from public.documents where id::text = entry.value ->> 'documentId'
   ))
 on conflict (id) do nothing;

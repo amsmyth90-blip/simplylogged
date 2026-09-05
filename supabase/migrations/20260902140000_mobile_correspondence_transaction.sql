@@ -63,7 +63,7 @@ begin
       review_status = 'reviewed',
       reviewed_at = timezone('utc', now())::text,
       updated_at = timezone('utc', now())
-    where id = document_id and user_id = current_user_id;
+    where id::text = document_id and user_id = current_user_id;
   end if;
 
   return query select state_row.payload, state_row.updated_at;

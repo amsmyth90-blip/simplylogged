@@ -35,5 +35,5 @@ update public.sync_records as record set
 from public.documents as document
 where record.owner_id = document.user_id
   and record.entity_type = 'document'
-  and record.source_id = document.id
+  and record.source_id = document.id::text
   and record.deleted_at is null;

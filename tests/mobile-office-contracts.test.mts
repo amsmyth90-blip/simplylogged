@@ -152,7 +152,7 @@ test("mobile contracts API is owner-derived, revisioned, bounded and atomic", as
   assert.match(server, /input_document_kind: "contract"/);
   assert.match(migration, /security definer/i);
   assert.match(migration, /auth\.role\(\) is distinct from 'service_role'/);
-  assert.match(migration, /where id = document_id and user_id = input_user_id/);
+  assert.match(migration, /where id::text = document_id and user_id = input_user_id/);
   assert.match(migration, /apply_mobile_contract_state[\s\S]*authenticated, service_role/);
 });
 
