@@ -71,6 +71,7 @@ test("mobile onboarding is authenticated, bounded, encrypted offline and special
   assert.match(route, /authenticateHybridRequest/); assert.match(route, /readBoundedJson\(request, 8 \* 1024\)/);
   assert.match(route, /checkServerRateLimit/); assert.match(route, /RequestObservation/);
   assert.match(server, /apply_mobile_onboarding/); assert.match(client, /readBoundedJsonResponse\(response, 32 \* 1024\)/);
+  assert.match(client, /could not reach its secure service/);
   assert.match(hook, /tryPutReadModel\(store, CACHE_KEY/);
   assert.match(hook, /tryRemoveReadModel\(store, CACHE_KEY/);
   assert.doesNotMatch(`${client}\n${hook}\n${screen}`, /localStorage|sessionStorage/);

@@ -6,6 +6,7 @@ import type { SignUp } from "./auth-types";
 type SignUpScreenProps = {
   error: string | null;
   onBack: () => void;
+  onForgotPassword: () => void;
   onSignUp: SignUp;
 };
 
@@ -18,7 +19,7 @@ function validate(email: string, password: string, confirmation: string) {
   return null;
 }
 
-export function SignUpScreen({ error, onBack, onSignUp }: SignUpScreenProps) {
+export function SignUpScreen({ error, onBack, onForgotPassword, onSignUp }: SignUpScreenProps) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
@@ -49,13 +50,16 @@ export function SignUpScreen({ error, onBack, onSignUp }: SignUpScreenProps) {
           <header className="auth-card-header">
             <BrandMark />
             <p className="eyebrow">One secure step</p>
-            <h1 id="signup-confirmation-title">Check your email</h1>
-            <p>We sent a confirmation link to {confirmationEmail}.</p>
+            <h1 id="signup-confirmation-title">Check your inbox or sign in</h1>
+            <p>We processed the request for {confirmationEmail}.</p>
           </header>
           <div className="auth-confirmation">
             {error ? <p className="form-message form-error" role="alert">{error}</p> : null}
-            <p>Open the link on this device. DiaryDock will return here securely and continue with your private setup.</p>
-            <button type="button" onClick={onBack}>Back to sign in</button>
+            <p>If this is a new address, open the confirmation link on this device. If you
+              have used it before, the account may already be verified.</p>
+            <button type="button" onClick={onBack}>Sign in</button>
+            <button type="button" className="auth-text-button"
+              onClick={onForgotPassword}>Forgot password</button>
           </div>
         </section>
       </main>

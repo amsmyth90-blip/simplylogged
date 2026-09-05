@@ -145,6 +145,8 @@ test("mobile account creation and password recovery are native", async () => {
   assert.match(login, /onCreateAccount/);
   assert.match(login, /onForgotPassword/);
   assert.match(signup, /autoComplete="new-password"/);
+  assert.match(signup, /account may already be verified/);
+  assert.match(signup, /onForgotPassword/);
   assert.match(forgot, /onRequest/);
   assert.match(reset, /onUpdate/);
   assert.match(session, /auth\.signUp/);
