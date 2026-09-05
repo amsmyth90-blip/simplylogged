@@ -23,7 +23,8 @@ export function SignedOutApp(props: SignedOutAppProps) {
     onBack={() => setScreen("SIGN_IN")} />;
   if (screen === "SIGN_UP") {
     return <SignUpScreen error={props.signUpError} onSignUp={props.onSignUp}
-      onBack={() => setScreen("SIGN_IN")} />;
+      onBack={() => setScreen("SIGN_IN")}
+      onForgotPassword={() => setScreen("FORGOT_PASSWORD")} />;
   }
   return <LoginScreen error={props.signInError} message={props.signInMessage}
     onSignIn={props.onSignIn}
