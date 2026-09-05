@@ -27,18 +27,35 @@ test("production runtime configuration accepts distinct bounded credentials", ()
   assert.deepEqual(inspectProductionReleaseEnvironment(validEnvironment), []);
 });
 
+test("production runtime configuration accepts an explicit scanner waiver", () => {
+  const environment = {
+    ...validEnvironment,
+    DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "false",
+    DIARYDOCK_MALWARE_SCANNER_URL: "",
+    DIARYDOCK_MALWARE_SCANNER_TOKEN: "",
+  };
+  assert.deepEqual(inspectProductionRuntimeEnvironment(environment), []);
+  assert.deepEqual(inspectProductionReleaseEnvironment(environment), []);
+});
+
 test("production runtime configuration rejects public server keys and unsafe endpoints", () => {
   const issues = inspectProductionRuntimeEnvironment({
     ...validEnvironment,
     SUPABASE_SERVICE_ROLE_KEY: validEnvironment.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "false",
     DIARYDOCK_MALWARE_SCANNER_URL: "http://scanner.internal.example/v1/scan?token=visible",
   });
   assert.deepEqual(issues.map(({ key }) => key), [
     "SUPABASE_SERVICE_ROLE_KEY",
-    "DIARYDOCK_CAPTURE_SCANNER_REQUIRED",
     "DIARYDOCK_MALWARE_SCANNER_URL",
   ]);
+});
+
+test("production runtime configuration rejects an ambiguous scanner mode", () => {
+  const issues = inspectProductionRuntimeEnvironment({
+    ...validEnvironment,
+    DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "sometimes",
+  });
+  assert.deepEqual(issues.map(({ key }) => key), ["DIARYDOCK_CAPTURE_SCANNER_REQUIRED"]);
 });
 
 test("release configuration requires complete enabled inbound-email credentials", () => {
