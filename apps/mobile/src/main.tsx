@@ -69,6 +69,12 @@ async function start() {
     Application = (await import("@mobile/preview/MobilePreview")).MobilePreview;
   } else if (previewEnabled && preview === "login") {
     Application = (await import("@mobile/preview/LoginPreview")).LoginPreview;
+  } else if (previewEnabled && preview === "signup") {
+    Application = (await import("@mobile/preview/SignUpPreview")).SignUpPreview;
+  } else if (previewEnabled && preview === "forgot-password") {
+    Application = (await import("@mobile/preview/ForgotPasswordPreview")).ForgotPasswordPreview;
+  } else if (previewEnabled && preview === "reset-password") {
+    Application = (await import("@mobile/preview/ResetPasswordPreview")).ResetPasswordPreview;
   } else if (previewEnabled && preview === "home") {
     Application = (await import("@mobile/preview/HomePreview")).HomePreview;
   } else if (previewEnabled && preview === "files") {

@@ -77,6 +77,11 @@
   box-shadow: 0 0 0 0.25rem var(--dd-green-soft);
 }
 
+.auth-form label small {
+  color: var(--dd-muted);
+  font-size: 0.75rem;
+}
+
 .auth-form button,
 .sign-out-button {
   min-height: 3rem;
@@ -128,6 +133,29 @@
   background: var(--dd-paper);
 }
 
+.auth-confirmation {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.auth-confirmation > p:not(.form-message) {
+  margin: 0;
+  color: var(--dd-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.auth-confirmation > button {
+  min-height: 3rem;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--dd-green);
+}
+
 .form-message {
   margin: 0;
   padding: 0.8rem 1rem;
@@ -140,4 +168,10 @@
   color: #9f1239;
   border: 1px solid #fecdd3;
   background: #fff1f2;
+}
+
+.form-success {
+  color: #26553b;
+  border: 1px solid #bbd8c3;
+  background: #eef8f0;
 }

@@ -1,13 +1,15 @@
 import { Suspense } from "react";
 
-import { LoginScreen } from "@mobile/auth/LoginScreen";
+import { ResetPasswordScreen } from "@mobile/auth/ResetPasswordScreen";
+import { SignedOutApp } from "@mobile/auth/SignedOutApp";
 import { useMobileSession } from "@mobile/auth/use-mobile-session";
 import { SignedInApp } from "@mobile/SignedInApp";
 import { useHouseholdInviteLink } from "@mobile/family/use-household-invite-link";
 
 export function MobileApp() {
-  const { state, signIn, signInError, signOut } = useMobileSession();
+  const session = useMobileSession();
   const invite = useHouseholdInviteLink();
+  const { state } = session;
 
   if (state.status === "LOADING") {
     return (
@@ -26,8 +28,15 @@ export function MobileApp() {
     );
   }
   if (state.status === "SIGNED_OUT") {
-    return <LoginScreen error={signInError} onSignIn={signIn} />;
+    return <SignedOutApp passwordResetError={session.passwordResetError}
+      signInError={session.signInError} signUpError={session.signUpError}
+      signInMessage={session.signInMessage}
+      onPasswordReset={session.requestPasswordReset}
+      onSignIn={session.signIn} onSignUp={session.signUp} />;
   }
+  if (state.status === "PASSWORD_RECOVERY") return <ResetPasswordScreen
+    error={session.recoveredPasswordError} onCancel={() => void session.cancelPasswordRecovery()}
+    onUpdate={session.finishPasswordRecovery} />;
   return (
     <Suspense
       fallback={
@@ -36,7 +45,7 @@ export function MobileApp() {
         </main>
       }
     >
-      <SignedInApp key={state.session.user.id} state={state} onSignOut={signOut}
+      <SignedInApp key={state.session.user.id} state={state} onSignOut={session.signOut}
         inviteToken={invite.token} onInviteHandled={invite.clear} />
     </Suspense>
   );

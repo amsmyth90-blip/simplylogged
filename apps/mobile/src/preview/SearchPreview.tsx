@@ -13,6 +13,7 @@ export function SearchPreview() {
       syncStatus="READY"
       onBack={() => undefined}
       onNavigate={() => undefined}
+      onOpenArea={() => undefined}
     />
   );
 }

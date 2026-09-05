@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
-
 import { roomProfiles } from "@diarydock/home";
 import type { LifeCheckTarget } from "@diarydock/life-check";
-
 import type { MobileDestination } from "@mobile/components/MobileBottomNav";
 import { useNativeShareNavigation } from "@mobile/capture/native-share-import";
 import { HomeScreen } from "@mobile/home/HomeScreen";
@@ -164,6 +162,7 @@ export function SignedInApp({
         syncStatus={sync.status}
         onBack={() => setDestination("HOME")}
         onNavigate={navigate}
+        onOpenArea={openRoom}
       />
     );
   if (destination === "GUARDIAN")

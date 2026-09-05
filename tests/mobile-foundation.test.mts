@@ -126,14 +126,26 @@ test("mobile authentication persists tokens only in native secure storage", asyn
   assert.match(registry, /offline-account-state/);
 });
 
-test("mobile account creation and recovery stay on the approved first-party origin", async () => {
-  const [browser, login] = await Promise.all([
-    read("apps/mobile/src/auth/auth-browser.ts"),
+test("mobile account creation and password recovery are native", async () => {
+  const [login, signup, forgot, reset, session, links, manifest] = await Promise.all([
     read("apps/mobile/src/auth/LoginScreen.tsx"),
+    read("apps/mobile/src/auth/SignUpScreen.tsx"),
+    read("apps/mobile/src/auth/ForgotPasswordScreen.tsx"),
+    read("apps/mobile/src/auth/ResetPasswordScreen.tsx"),
+    read("apps/mobile/src/auth/use-mobile-session.ts"),
+    read("apps/mobile/src/auth/use-mobile-auth-links.ts"),
+    read("android/app/src/main/AndroidManifest.xml"),
   ]);
-  assert.match(browser, /new URL\(page, getSecureRuntime\(\)\.apiOrigin\)/);
-  assert.match(browser, /Browser\.open/);
-  assert.match(login, /open\("\/signup"\)/);
-  assert.match(login, /open\("\/forgot-password"\)/);
-  assert.doesNotMatch(browser, /signUp|resetPasswordForEmail|diarydock\.com/);
+  assert.match(login, /onCreateAccount/);
+  assert.match(login, /onForgotPassword/);
+  assert.match(signup, /autoComplete="new-password"/);
+  assert.match(forgot, /onRequest/);
+  assert.match(reset, /onUpdate/);
+  assert.match(session, /auth\.signUp/);
+  assert.match(session, /resetPasswordForEmail/);
+  assert.match(session, /auth\.updateUser/);
+  assert.match(links, /exchangeCodeForSession/);
+  assert.match(manifest, /android:scheme="diarydock" android:host="auth" android:path="\/confirm"/);
+  assert.match(manifest, /android:scheme="diarydock" android:host="auth" android:path="\/reset"/);
+  assert.doesNotMatch(login, /Browser\.open|forgot-password/);
 });
