@@ -293,7 +293,6 @@ export function SignedInApp({
       onOpenReminders={() => setDestination("REMINDERS")}
       onOpenArea={openRoom}
       onNavigate={navigate}
-      onSignOut={() => void signOutSafely()}
     />
   );
 }

@@ -1,6 +1,7 @@
 import type { RoomProfile } from "@diarydock/home";
 
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
+import { MobileIcon } from "@mobile/components/MobileIcon";
 import { roomScenes, type RoomSceneAction } from "./room-scene-config";
 
 type Props = {
@@ -42,9 +43,12 @@ export function RoomSceneScreen(props: Props) {
         </nav>
       </section>
       <header className="native-room-header">
-        <button type="button" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
-        <div><small>{scene.eyebrow}</small><strong>{scene.name}</strong></div>
-        <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
+        <button type="button" onClick={props.onBack} aria-label="Back to the estate map">
+          <MobileIcon name="arrow-left" />
+        </button>
+        <div className="native-room-title"><small>{scene.eyebrow}</small><strong>{scene.name}</strong></div>
+        <span className="native-room-header-spacer" aria-hidden="true" />
+        <span className="native-room-sync-status" aria-live="polite">
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
         </span>
       </header>

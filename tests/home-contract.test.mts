@@ -50,7 +50,8 @@ test("web and packaged clients share room identity and mobile room navigation", 
   assert.match(webRooms, /roomProfiles/);
   assert.match(homeScreen, /onOpenArea\(area\.id\)/);
   assert.match(mobileApp, /<RoomScreen/);
-  assert.match(navigation, /onNavigate\("FAMILY"\)/);
+  assert.match(navigation, /id: "FAMILY", icon: "users", label: "Family Room"/);
+  assert.match(navigation, /onNavigate\(item\.id\)/);
   assert.doesNotMatch(navigation, /disabled><span>♙<\/span>Family/);
 });
 

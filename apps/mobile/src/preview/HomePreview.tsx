@@ -9,7 +9,6 @@ export function HomePreview() {
       onOpenArea={() => undefined}
       onOpenReminders={() => undefined}
       onNavigate={() => undefined}
-      onSignOut={() => undefined}
     />
   );
 }
