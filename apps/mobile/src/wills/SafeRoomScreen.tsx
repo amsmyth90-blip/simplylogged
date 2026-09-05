@@ -26,6 +26,7 @@ import { useWills } from "./use-wills";
 type Props = {
   accessToken: string;
   disableOnline?: boolean;
+  initialView?: WillsView;
   initialSnapshot?: WillsSnapshot;
   store: OfflineStore;
   syncStatus: string;
@@ -53,7 +54,7 @@ export function SafeRoomScreen(props: Props) {
   });
   const files = useDocuments(props.store, props.syncStatus, props.synchronize);
   const reminders = useReminders(props.store, props.syncStatus, props.synchronize);
-  const [view, setView] = useState<WillsView>("overview");
+  const [view, setView] = useState<WillsView>(props.initialView ?? "overview");
   const [editingDetails, setEditingDetails] = useState(false);
   const [editingWishes, setEditingWishes] = useState(false);
   const [addingVersion, setAddingVersion] = useState(false);

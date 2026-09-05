@@ -23,6 +23,7 @@ type Props = {
   disableScheduleOnline?: boolean;
   initialHousehold?: HouseholdDirectory;
   initialScheduleSnapshot?: HouseholdSchedulesSnapshot;
+  initialView?: "household" | "inbox" | "schedules";
   store: OfflineStore;
   syncStatus: string;
   synchronize: () => Promise<unknown>;
@@ -44,7 +45,7 @@ export function FamilyScreen(props: Props) {
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
-  const [schedulesOpen, setSchedulesOpen] = useState(false);
+  const [schedulesOpen, setSchedulesOpen] = useState(props.initialView === "schedules");
   const household = model.household;
 
   if (schedulesOpen) return <FamilySchedulesScreen

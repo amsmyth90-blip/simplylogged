@@ -25,6 +25,7 @@ import { useAttic } from "./use-attic";
 type Props = {
   accessToken: string;
   disableOnline?: boolean;
+  initialSection?: AtticSectionId;
   initialSnapshot?: AtticSnapshot;
   store: OfflineStore;
   syncStatus: string;
@@ -52,7 +53,9 @@ export function AtticScreen(props: Props) {
   });
   const files = useDocuments(props.store, props.syncStatus, props.synchronize);
   const reminders = useReminders(props.store, props.syncStatus, props.synchronize);
-  const [sectionId, setSectionId] = useState<AtticSectionId>("family-history");
+  const [sectionId, setSectionId] = useState<AtticSectionId>(
+    props.initialSection ?? "family-history",
+  );
   const [addingReminder, setAddingReminder] = useState(false);
   const [addingStory, setAddingStory] = useState(false);
   const [viewingId, setViewingId] = useState<string | null>(null);

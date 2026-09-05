@@ -19,6 +19,7 @@ import { useReminders } from "@mobile/reminders/use-reminders";
 type Props = {
   accessToken: string;
   disableOnline?: boolean;
+  initialView?: HealthView;
   initialSnapshot?: HealthSnapshot;
   store: OfflineStore;
   syncStatus: string;
@@ -50,7 +51,7 @@ export function HealthScreen(props: Props) {
   });
   const files = useDocuments(props.store, props.syncStatus, props.synchronize);
   const reminders = useReminders(props.store, props.syncStatus, props.synchronize);
-  const [view, setView] = useState<HealthView>("overview");
+  const [view, setView] = useState<HealthView>(props.initialView ?? "overview");
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [editingOverview, setEditingOverview] = useState(false);
