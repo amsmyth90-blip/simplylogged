@@ -7,6 +7,7 @@ import { HomeScreen } from "@mobile/home/HomeScreen";
 import { useHomeSummary } from "@mobile/home/use-home-summary";
 import { useMobileOnboarding } from "@mobile/onboarding/use-mobile-onboarding";
 import { shouldShowSetup } from "@mobile/onboarding/onboarding-model";
+import { kitchenDestinationFor, lifeCheckRoomFor } from "@mobile/room-navigation";
 import {
   CaptureScreen,
   EmergencyScreen,
@@ -58,8 +59,8 @@ export function SignedInApp({
 
   function navigate(next: MobileDestination) {
     if (next === "FAMILY") {
-      setRoomId(null);
-      setDestination(next);
+      setRoomId("family-room");
+      setDestination("HOME");
       return;
     }
     setRoomId(null);
@@ -69,13 +70,11 @@ export function SignedInApp({
 
   function openRoom(nextRoomId: string) {
     if (nextRoomId !== "front-gate" && !roomProfiles[nextRoomId]) return;
-    setRoomId(nextRoomId === "family-room" ? null : nextRoomId);
-    setDestination(nextRoomId === "family-room" ? "FAMILY" : "HOME");
+    setRoomId(nextRoomId);
+    setDestination("HOME");
   }
   function openLifeCheckTarget(target: LifeCheckTarget) {
-    const rooms: Partial<Record<LifeCheckTarget, string>> = { GARAGE: "garage", GARDEN: "garden",
-      DRIVEWAY: "driveway", OFFICE: "office", MAILBOX: "mailbox", FRONT_GATE: "front-gate" };
-    const room = rooms[target];
+    const room = lifeCheckRoomFor(target);
     if (room) { openRoom(room); return; }
     setDestination(target === "FILES" || target === "SCAN" || target === "REMINDERS"
       || target === "FAMILY" || target === "EMERGENCY" ? target : "HOME");
@@ -129,6 +128,7 @@ export function SignedInApp({
   if (profile)
     return (
       <SignedInRoom
+        key={profile.id}
         accessToken={state.session.access_token}
         profile={profile}
         store={state.store}
@@ -136,9 +136,10 @@ export function SignedInApp({
         synchronize={sync.synchronize}
         onBack={closeRoom}
         onNavigate={navigate}
-        onOpenKitchen={() => {
+        onOpenKitchen={() => { setRoomId(null); setDestination("KITCHEN"); }}
+        onOpenKitchenAction={(actionId) => {
           setRoomId(null);
-          setDestination("KITCHEN");
+          setDestination(kitchenDestinationFor(actionId));
         }}
         onOpenSafeRoom={() => openRoom("safe-room")} onScan={scanInto}
       />

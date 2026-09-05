@@ -25,6 +25,7 @@ import { useReminders } from "@mobile/reminders/use-reminders";
 
 type Props = {
   accessToken: string;
+  initialSection?: GardenSectionId;
   store: OfflineStore;
   syncStatus: string;
   synchronize: () => Promise<unknown>;
@@ -48,7 +49,9 @@ export function GardenScreen(props: Props) {
     props.syncStatus,
     props.synchronize,
   );
-  const [sectionId, setSectionId] = useState<GardenSectionId>("jobs");
+  const [sectionId, setSectionId] = useState<GardenSectionId>(
+    props.initialSection ?? "jobs",
+  );
   const [addingReminder, setAddingReminder] = useState(false);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const section = getGardenSection(sectionId);

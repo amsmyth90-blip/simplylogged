@@ -1,23 +1,17 @@
-import { useMemo } from "react";
-
 import { roomProfiles } from "@diarydock/home";
 
-import { PreviewStore } from "@mobile/preview/MobilePreview";
-import { RoomScreen } from "@mobile/rooms/RoomScreen";
+import { RoomSceneScreen } from "@mobile/rooms/RoomSceneScreen";
 
 export function RoomPreview() {
-  const store = useMemo(() => new PreviewStore(), []);
+  const roomId = new URLSearchParams(window.location.search).get("room") ?? "office";
+  const profile = roomProfiles[roomId] ?? roomProfiles.office!;
   return (
-    <RoomScreen
-      accessToken="preview-token-not-used-123456"
-      profile={roomProfiles.office!}
-      store={store}
+    <RoomSceneScreen
+      profile={profile}
       syncStatus="READY"
-      synchronize={async () => true}
       onBack={() => undefined}
       onNavigate={() => undefined}
-      onOpenKitchen={() => undefined}
-      onScan={() => undefined}
+      onOpen={() => undefined}
     />
   );
 }

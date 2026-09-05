@@ -17,6 +17,7 @@ import { useGarage } from "./use-garage";
 type Props = {
   accessToken: string;
   disableOnline?: boolean;
+  initialTab?: GarageTab;
   initialSnapshot?: GarageSnapshot;
   store: OfflineStore;
   syncStatus: string;
@@ -35,7 +36,7 @@ const tabs: Array<{ id: GarageTab; label: string }> = [
 export function GarageScreen(props: Props) {
   const garage = useGarage(props);
   const [selectedId, setSelectedId] = useState("");
-  const [tab, setTab] = useState<GarageTab>("overview");
+  const [tab, setTab] = useState<GarageTab>(props.initialTab ?? "overview");
   const [addingVehicle, setAddingVehicle] = useState(false);
   const vehicles = useMemo(
     () => garage.snapshot?.vehicles ?? [],
