@@ -270,6 +270,10 @@ test("mobile Kitchen planning is authenticated, bounded, observed and service-on
   }
   assert.match(planner, /operation: "SWAP_MEALS"/);
   assert.match(planner, /operation: "ADD_WEEK_TO_SHOPPING"/);
+  assert.match(planner, /meal-planner-family-table\.png/);
+  assert.match(planner, /weekly-meal-thumbnails\.png/);
+  assert.match(planner, /className="meal-family-table"/);
+  assert.doesNotMatch(planner, /className="meal-days"/);
   assert.match(book, /Open full recipe/);
   assert.doesNotMatch(book, /Open the web app/i);
   assert.match(signedIn, /destination === "KITCHEN_RECIPES" \|\| destination === "KITCHEN_MEALS"/);
