@@ -16,9 +16,6 @@ import {
   GuardianScreen,
   HouseholdInviteScreen,
   HomeHandoverScreen,
-  KitchenNoticeboardScreen,
-  KitchenPlanningScreen,
-  KitchenScreen,
   LifeCheckScreen,
   OnboardingScreen,
   PhysicalLinksScreen,
@@ -28,6 +25,7 @@ import {
   TrustedAccessScreen,
 } from "@mobile/signed-in-screens";
 import { SignedInRoom } from "@mobile/SignedInRoom";
+import { SignedInKitchen } from "@mobile/SignedInKitchen";
 import { useBackgroundSync } from "@mobile/sync/use-background-sync";
 import { signedInFirstName, type SignedInState } from "@mobile/signed-in-identity";
 
@@ -215,40 +213,11 @@ export function SignedInApp({
         syncStatus={sync.status} onBack={() => { setRoomId("front-gate"); setDestination("HOME"); }}
         onNavigate={navigate} />
     );
-  if (destination === "KITCHEN")
-    return (
-      <KitchenScreen
-        accessToken={state.session.access_token}
-        store={state.store}
-        syncStatus={sync.status}
-        onBack={() => { setRoomId("kitchen"); setDestination("HOME"); }}
-        onNavigate={navigate}
-        onOpenNoticeboard={() => setDestination("KITCHEN_NOTICES")}
-        onOpenRecipes={() => setDestination("KITCHEN_RECIPES")}
-        onOpenMealPlanner={() => setDestination("KITCHEN_MEALS")}
-      />
-    );
-  if (destination === "KITCHEN_NOTICES")
-    return (
-      <KitchenNoticeboardScreen
-        accessToken={state.session.access_token}
-        store={state.store}
-        syncStatus={sync.status}
-        onBack={() => setDestination("KITCHEN")}
-        onNavigate={navigate}
-      />
-    );
-  if (destination === "KITCHEN_RECIPES" || destination === "KITCHEN_MEALS")
-    return (
-      <KitchenPlanningScreen
-        accessToken={state.session.access_token}
-        store={state.store}
-        syncStatus={sync.status}
-        initialView={destination === "KITCHEN_RECIPES" ? "RECIPES" : "MEALS"}
-        onBack={() => setDestination("KITCHEN")}
-        onNavigate={navigate}
-      />
-    );
+  if (destination.startsWith("KITCHEN")) return <SignedInKitchen
+    accessToken={state.session.access_token} destination={destination}
+    store={state.store} syncStatus={sync.status}
+    onBackToRoom={() => { setRoomId("kitchen"); setDestination("HOME"); }}
+    onNavigate={navigate} />;
   if (destination === "FAMILY")
     return (
       <FamilyScreen

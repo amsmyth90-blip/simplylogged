@@ -27,7 +27,9 @@ type Props = {
 };
 
 const tabs: Array<{ id: GarageTab; label: string }> = [
-  { id: "overview", label: "Overview" },
+  { id: "profile", label: "Profile" },
+  { id: "mot-tax", label: "MOT & Tax" },
+  { id: "insurance", label: "Insurance" },
   { id: "services", label: "Service" },
   { id: "costs", label: "Costs" },
   { id: "notes", label: "Notes" },
@@ -36,7 +38,7 @@ const tabs: Array<{ id: GarageTab; label: string }> = [
 export function GarageScreen(props: Props) {
   const garage = useGarage(props);
   const [selectedId, setSelectedId] = useState("");
-  const [tab, setTab] = useState<GarageTab>(props.initialTab ?? "overview");
+  const [tab, setTab] = useState<GarageTab>(props.initialTab ?? "profile");
   const [addingVehicle, setAddingVehicle] = useState(false);
   const vehicles = useMemo(
     () => garage.snapshot?.vehicles ?? [],
@@ -142,8 +144,8 @@ export function GarageScreen(props: Props) {
                 </button>
               ))}
             </div>
-            {tab === "overview" ? (
-              <GarageOverview vehicle={vehicle} />
+            {tab === "profile" || tab === "mot-tax" || tab === "insurance" ? (
+              <GarageOverview vehicle={vehicle} view={tab} />
             ) : (
               <GarageRecords tab={tab} vehicle={vehicle} />
             )}

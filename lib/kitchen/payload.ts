@@ -57,17 +57,23 @@ export function mutateKitchenPayload(
   const payload = structuredClone(object(current));
   const rawItems = Array.isArray(payload.kitchenItems) ? [...payload.kitchenItems] : [];
   const valid = validKitchenItems(rawItems);
-  if (mutation.operation === "ADD_ITEM") {
-    if (valid.length >= 300) return { status: "CAPACITY", payload: null };
-    const duplicate = valid.some((item) => item.section === mutation.section
-      && normalise(item.name) === normalise(mutation.name));
-    if (duplicate) return { status: "DUPLICATE", payload: null };
-    payload.kitchenItems = [...rawItems, {
-      id: `kitchen-${createId()}`,
-      name: mutation.name,
-      checked: mutation.section === "Pantry",
-      section: mutation.section,
-    }];
+  if (mutation.operation === "ADD_ITEM" || mutation.operation === "ADD_ITEMS") {
+    const names = mutation.operation === "ADD_ITEM" ? [mutation.name] : mutation.names;
+    const existing = new Set(valid.filter((item) => item.section === mutation.section)
+      .map((item) => normalise(item.name)));
+    const additions: KitchenItem[] = [];
+    for (const name of names) {
+      const key = normalise(name);
+      if (existing.has(key)) continue;
+      existing.add(key);
+      additions.push({ id: `kitchen-${createId()}`, name,
+        checked: mutation.section === "Pantry", section: mutation.section });
+    }
+    if (!additions.length) return mutation.operation === "ADD_ITEMS"
+      ? { status: "OK", payload }
+      : { status: "DUPLICATE", payload: null };
+    if (valid.length + additions.length > 300) return { status: "CAPACITY", payload: null };
+    payload.kitchenItems = [...rawItems, ...additions];
     return { status: "OK", payload };
   }
   const index = rawItems.findIndex((entry) => object(entry).id === mutation.itemId);

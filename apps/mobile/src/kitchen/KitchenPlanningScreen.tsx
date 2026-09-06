@@ -21,27 +21,17 @@ export function KitchenPlanningScreen(props: {
   onNavigate: (destination: MobileDestination) => void;
 }) {
   const planning = useKitchenPlanning(props);
-  const [view, setView] = useState<KitchenPlanningView>(props.initialView ?? "RECIPES");
+  const [view] = useState<KitchenPlanningView>(props.initialView ?? "RECIPES");
   const mealsOpen = view === "MEALS";
   return (
     <main className={`kitchen-planning-screen ${mealsOpen ? "is-meal-planner" : ""}`}>
-      {!mealsOpen ? <><header className="planning-header"><button type="button" onClick={props.onBack}
-        aria-label="Back to the Kitchen">‹</button><div><small>Kitchen</small>
-        <h1>Family recipes</h1></div>
-        <span className={planning.online ? "is-live" : "is-cached"}>
-          {planning.online ? "Live" : "Offline copy"}</span></header>
-      <nav className="planning-tabs" aria-label="Kitchen planning">
-        <button type="button" className={view === "RECIPES" ? "is-active" : ""}
-          onClick={() => setView("RECIPES")}>Recipes</button>
-        <button type="button" onClick={() => setView("MEALS")}>Meal planner</button>
-      </nav></> : null}
       {planning.message ? <p className="planning-message" role="status">{planning.message}</p> : null}
       {planning.loading && !planning.snapshot ? <p className="planning-loading">
         Opening Kitchen planning securely…</p> : null}
       {planning.snapshot ? view === "RECIPES"
         ? <RecipeBook accessToken={props.accessToken} snapshot={planning.snapshot} online={planning.online}
           busy={planning.busy} loadingRecipeId={planning.loadingRecipeId}
-          loadRecipe={planning.loadRecipe} mutate={planning.mutate} />
+          loadRecipe={planning.loadRecipe} mutate={planning.mutate} onBack={props.onBack} />
         : <MealPlannerMobile snapshot={planning.snapshot} online={planning.online}
           busy={planning.busy} mutate={planning.mutate} onBack={props.onBack} /> : null}
       <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />

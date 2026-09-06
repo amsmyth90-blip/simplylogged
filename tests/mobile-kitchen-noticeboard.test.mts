@@ -96,8 +96,9 @@ test("smart notice capture uses hybrid auth, bounded media validation and safe e
 });
 
 test("native noticeboard is encrypted-offline, conflict-aware and fully navigable", async () => {
-  const [app, screen, hook, client, capture, manifest, plist] = await Promise.all([
+  const [app, kitchenRouter, screen, hook, client, capture, manifest, plist] = await Promise.all([
     read("apps/mobile/src/SignedInApp.tsx"),
+    read("apps/mobile/src/SignedInKitchen.tsx"),
     read("apps/mobile/src/kitchen/KitchenNoticeboardScreen.tsx"),
     read("apps/mobile/src/kitchen/use-kitchen-noticeboard.ts"),
     read("apps/mobile/src/kitchen/noticeboard-client.ts"),
@@ -105,7 +106,8 @@ test("native noticeboard is encrypted-offline, conflict-aware and fully navigabl
     read("android/app/src/main/AndroidManifest.xml"),
     read("ios/App/App/Info.plist"),
   ]);
-  assert.match(app, /destination === "KITCHEN_NOTICES"/);
+  assert.match(app, /destination\.startsWith\("KITCHEN"\)/);
+  assert.match(kitchenRouter, /destination === "KITCHEN_NOTICES"/);
   assert.match(screen, /SAVE_NOTICE/);
   assert.match(screen, /SET_NOTICE_STATE/);
   assert.match(hook, /tryPutReadModel\(store, CACHE_KEY/);

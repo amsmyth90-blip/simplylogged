@@ -107,8 +107,12 @@ test("API routes never use unbounded framework body materializers", async () => 
   const sources = await Promise.all(routes.map((route) => readFile(route, "utf8")));
   assert.equal(sources.some((source) => /request\.(?:json|formData)\s*\(/.test(source)), false);
   const pantry = await readFile(new URL("../app/api/kitchen/analyse/route.ts", import.meta.url), "utf8");
-  assert.match(pantry, /readBoundedMultiFile/);
-  assert.match(pantry, /inspectCaptureFile/);
-  assert.match(pantry, /AbortSignal\.timeout\(45_000\)/);
-  assert.doesNotMatch(pantry, /error\.message/);
+  const pantryRequest = await readFile(
+    new URL("../lib/kitchen/pantry-analysis-request.ts", import.meta.url), "utf8",
+  );
+  assert.match(pantry, /analysePantryRequest/);
+  assert.match(pantryRequest, /readBoundedMultiFile/);
+  assert.match(pantryRequest, /inspectCaptureFile/);
+  assert.match(pantryRequest, /AbortSignal\.timeout\(45_000\)/);
+  assert.doesNotMatch(`${pantry}\n${pantryRequest}`, /error\.message/);
 });

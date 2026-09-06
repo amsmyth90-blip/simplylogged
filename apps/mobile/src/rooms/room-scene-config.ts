@@ -94,9 +94,9 @@ export const roomScenes: Record<string, RoomScene> = {
     image: garageImage, imageAlt: "A warm organised garage with a car and workbench",
     name: "Garage", eyebrow: "Vehicles & transport", tone: "#4b4033",
     actions: [
-      action("overview", "Vehicle Profile", "Identity and ownership", "70.5%", "58%"),
-      action("overview", "MOT & Tax", "Tests and renewals", "70.5%", "63.5%"),
-      action("overview", "Insurance", "Motor and breakdown cover", "70.5%", "69%"),
+      action("profile", "Vehicle Profile", "Identity and ownership", "70.5%", "58%"),
+      action("mot-tax", "MOT & Tax", "Tests and renewals", "70.5%", "63.5%"),
+      action("insurance", "Insurance", "Motor and breakdown cover", "70.5%", "69%"),
       action("services", "Service Records", "Maintenance and repairs", "70.5%", "74.5%"),
       action("costs", "Receipts", "Vehicle costs and proof", "70.5%", "80%"),
     ],
@@ -117,16 +117,16 @@ export const roomScenes: Record<string, RoomScene> = {
     name: "Driveway", eyebrow: "Travel & access", tone: "#594b3b",
     actions: [
       action("trips", "My Trips", "Journeys, bookings and travel plans", "30.5%", "64.5%"),
-      action("checklist", "Travel Checklist", "Packing lists and departure checks", "74.5%", "69.5%"),
-      action("permits", "Parking & Permits", "Visitor parking and access permits", "70%", "52.5%"),
+      action("travel-checklist", "Travel Checklist", "Packing lists and departure checks", "74.5%", "69.5%"),
+      action("parking-permits", "Parking & Permits", "Visitor parking and access permits", "70%", "52.5%"),
     ],
   },
   mailbox: {
     image: mailboxImage, imageAlt: "A calm place for incoming letters and household paperwork",
     name: "Mailbox", eyebrow: "Incoming & to file", tone: "#5b5148",
     actions: [
-      action("inbox", "Incoming items", "Letters and paperwork to review", "50%", "52%"),
-      action("inbox", "Needs filing", "Send paperwork to the right room", "50%", "62%"),
+      action("all", "Incoming items", "Letters and paperwork to review", "50%", "52%"),
+      action("new", "Needs filing", "Send paperwork to the right room", "50%", "62%"),
       action("scan", "Scan post", "Add a new incoming document", "50%", "72%"),
     ],
   },

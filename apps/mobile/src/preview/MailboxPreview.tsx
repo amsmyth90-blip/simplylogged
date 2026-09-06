@@ -26,7 +26,9 @@ const snapshot: MailboxSnapshot = {
 
 export function MailboxPreview() {
   const store = useMemo(() => new PreviewStore(), []);
+  const initialFilter = new URLSearchParams(window.location.search).get("filter") === "all"
+    ? "all" : "new";
   return <MailboxScreen accessToken="preview-access-token-that-is-long-enough" disableOnline
-    initialSnapshot={snapshot} store={store} syncStatus="READY" synchronize={async () => true}
+    initialSnapshot={snapshot} initialFilter={initialFilter} store={store} syncStatus="READY" synchronize={async () => true}
     onBack={() => undefined} onNavigate={() => undefined} onScan={() => undefined} />;
 }

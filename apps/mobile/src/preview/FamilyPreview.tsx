@@ -45,11 +45,15 @@ const schedules: HouseholdSchedulesSnapshot = {
 
 export function FamilyPreview() {
   const store = useMemo(() => new PreviewStore(), []);
+  const requested = new URLSearchParams(window.location.search).get("view");
+  const initialView = requested === "inbox" || requested === "schedules"
+    ? requested : "household";
   return <FamilyScreen
     accessToken="preview-token-not-used-123456"
     disableScheduleOnline
     initialHousehold={household}
     initialScheduleSnapshot={schedules}
+    initialView={initialView}
     store={store}
     syncStatus="READY"
     synchronize={async () => true}

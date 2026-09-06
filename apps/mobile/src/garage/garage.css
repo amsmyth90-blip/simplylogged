@@ -177,16 +177,18 @@
   background: #42382d;
 }
 .garage-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 0.3rem;
   margin-top: 0.7rem;
   padding: 0.22rem;
   border-radius: 0.85rem;
+  overflow-x: auto;
   background: rgb(255 255 255 / 55%);
+  scrollbar-width: none;
 }
 .garage-tabs button {
-  min-width: 0;
+  min-width: 5.2rem;
+  flex: 1 0 auto;
   min-height: 2.6rem;
   color: #766e63;
   font-size: 0.62rem;
