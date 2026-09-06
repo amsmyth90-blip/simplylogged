@@ -54,6 +54,29 @@ test("native room scenes fill the viewport and render accessible image labels", 
   assert.match(styles, /color: #284334/);
 });
 
+test("room artwork and edge labels remain visible on narrow screens", async () => {
+  const [screen, styles, config] = await Promise.all([
+    read("apps/mobile/src/rooms/RoomSceneScreen.tsx"),
+    read("apps/mobile/src/rooms/rooms.css"),
+    read("apps/mobile/src/rooms/room-scene-config.ts"),
+  ]);
+  const positions = [...config.matchAll(
+    /action\([^\n]+?,\s*"([\d.]+)%",\s*"([\d.]+)%"\)/g,
+  )];
+
+  assert.match(styles, /width: min\(100vw, 56\.27dvh\)/);
+  assert.match(styles, /height: min\(100dvh, 177\.71vw\)/);
+  assert.match(styles, /@media \(max-width: 420px\)/);
+  assert.match(styles, /\.native-room-label\[data-edge="left"\]/);
+  assert.match(styles, /\.native-room-label\[data-edge="right"\]/);
+  assert.match(screen, /data-edge={labelEdge\(item\.left\)}/);
+  assert.ok(positions.length >= 40, "expected every configured room action");
+  for (const [, left, top] of positions) {
+    assert.ok(Number(left) >= 15 && Number(left) <= 85, `unsafe horizontal position ${left}`);
+    assert.ok(Number(top) >= 15 && Number(top) <= 85, `unsafe vertical position ${top}`);
+  }
+});
+
 test("room labels open the matching secure native workspace", async () => {
   const [router, app, navigation, preview, scenes] = await Promise.all([
     read("apps/mobile/src/SignedInRoom.tsx"),
