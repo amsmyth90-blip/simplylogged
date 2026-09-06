@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 
-import { BrandMark } from "@mobile/components/BrandMark";
+import doorImage from "../../../../public/images/auth/diarydock-door-login.webp";
+import "./login.css";
 
 type LoginScreenProps = {
   error: string | null;
@@ -10,8 +11,25 @@ type LoginScreenProps = {
   onSignIn: (email: string, password: string) => Promise<{ ok: boolean }>;
 };
 
+function EmailIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17v11h-17z" />
+    <path d="m4.5 7.5 7.5 6 7.5-6" /></svg>;
+}
+
+function LockIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></svg>;
+}
+
+function EyeIcon({ hidden }: { hidden: boolean }) {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z" />
+    <circle cx="12" cy="12" r="2.5" />{hidden ? <path d="m4 4 16 16" /> : null}</svg>;
+}
+
 export function LoginScreen({ error, message, onCreateAccount, onForgotPassword, onSignIn }: LoginScreenProps) {
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const background = { "--login-door-image": `url(${doorImage})` } as CSSProperties;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -25,36 +43,43 @@ export function LoginScreen({ error, message, onCreateAccount, onForgotPassword,
   }
 
   return (
-    <main className="mobile-shell">
-      <section className="auth-card" aria-labelledby="login-title">
-        <header className="auth-card-header">
-          <BrandMark />
-          <p className="eyebrow">DiaryDock</p>
+    <main className="login-shell" style={background}>
+      <section className="login-panel" aria-labelledby="login-title">
+        <header className="login-header">
+          <p className="login-wordmark">DiaryDock</p>
           <h1 id="login-title">Welcome back</h1>
-          <p>Sign in to your digital home for everyday life.</p>
+          <span className="login-ornament" aria-hidden="true" />
         </header>
-        <form className="auth-form" onSubmit={submit}>
+        <form className="login-form" onSubmit={submit}>
           {error ? <p className="form-message form-error" role="alert">{error}</p> : null}
           {message ? <p className="form-message form-success" role="status">{message}</p> : null}
-          <label>
-            <span>Email</span>
-            <input type="email" name="email" autoComplete="email" required />
+          <label className="login-field">
+            <span className="login-sr-only">Email</span>
+            <span className="login-field-icon"><EmailIcon /></span>
+            <input type="email" name="email" placeholder="Email" autoCapitalize="none"
+              autoCorrect="off" inputMode="email" autoComplete="email" required />
           </label>
-          <label>
-            <span>Password</span>
-            <input type="password" name="password" autoComplete="current-password" required />
+          <label className="login-field">
+            <span className="login-sr-only">Password</span>
+            <span className="login-field-icon"><LockIcon /></span>
+            <input type={showPassword ? "text" : "password"} name="password"
+              placeholder="Password" autoComplete="current-password" required />
+            <button type="button" className="login-password-toggle"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)}>
+              <EyeIcon hidden={showPassword} />
+            </button>
           </label>
-          <button type="submit" disabled={busy}>
+          <button type="submit" className="login-submit" disabled={busy}>
             {busy ? "Signing in…" : "Sign in"}
           </button>
-          <button type="button" className="auth-text-button"
-            onClick={onForgotPassword}>Forgot password?</button>
+          <button type="button" className="login-forgot" onClick={onForgotPassword}>
+            <span>Forgot password?</span>
+          </button>
         </form>
-        <footer className="auth-card-footer">
-          <strong>New to DiaryDock?</strong>
-          <p>Create your account and complete the same private setup used by the web app.</p>
+        <footer className="login-footer">
+          <span>New to DiaryDock?</span>
           <button type="button" onClick={onCreateAccount}>Create account</button>
-          <small>Create your account and complete private setup without leaving the app.</small>
         </footer>
       </section>
     </main>
