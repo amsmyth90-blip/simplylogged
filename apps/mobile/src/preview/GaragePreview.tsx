@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { GarageSnapshot } from "@diarydock/vehicles";
 
 import { GarageScreen } from "@mobile/garage/GarageScreen";
+import type { GarageTab } from "@mobile/garage/GarageRecords";
 import { PreviewStore } from "@mobile/preview/MobilePreview";
 
 const snapshot: GarageSnapshot = {
@@ -80,11 +81,15 @@ const snapshot: GarageSnapshot = {
 
 export function GaragePreview() {
   const store = useMemo(() => new PreviewStore(), []);
+  const requested = new URLSearchParams(window.location.search).get("view");
+  const tabs: GarageTab[] = ["profile", "mot-tax", "insurance", "services", "costs", "notes"];
+  const initialTab = tabs.includes(requested as GarageTab) ? requested as GarageTab : "profile";
   return (
     <GarageScreen
       accessToken="preview-access-token-that-is-long-enough"
       disableOnline
       initialSnapshot={snapshot}
+      initialTab={initialTab}
       store={store}
       syncStatus="READY"
       onBack={() => undefined}

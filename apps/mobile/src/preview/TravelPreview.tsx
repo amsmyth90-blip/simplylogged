@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import type { TravelSnapshot } from "@diarydock/travel";
 
 import { PreviewStore } from "@mobile/preview/PreviewStore";
-import { DrivewayScreen } from "@mobile/travel/DrivewayScreen";
+import { DrivewayScreen, type DrivewayView } from "@mobile/travel/DrivewayScreen";
 
 const snapshot: TravelSnapshot = {
   schemaVersion: 1,
@@ -63,7 +63,10 @@ const snapshot: TravelSnapshot = {
 
 export function TravelPreview() {
   const store = useMemo(() => new PreviewStore(), []);
+  const requested = new URLSearchParams(window.location.search).get("view");
+  const views: DrivewayView[] = ["trips", "travel-checklist", "parking-permits"];
+  const initialView = views.includes(requested as DrivewayView) ? requested as DrivewayView : "trips";
   return <DrivewayScreen accessToken="preview-access-token-that-is-long-enough" disableOnline
-    initialSnapshot={snapshot} store={store} syncStatus="READY" onBack={() => undefined}
+    initialSnapshot={snapshot} initialView={initialView} store={store} syncStatus="READY" onBack={() => undefined}
     synchronize={async () => true} onNavigate={() => undefined} onScan={() => undefined} />;
 }

@@ -2,7 +2,7 @@ import type { LifeCheckTarget } from "@diarydock/life-check";
 import type { MobileDestination } from "@mobile/components/MobileBottomNav";
 
 const kitchenDestinations: Record<string, MobileDestination> = {
-  calendar: "KITCHEN_MEALS",
+  calendar: "KITCHEN_CALENDAR",
   documents: "FILES",
   "meal-planner": "KITCHEN_MEALS",
   noticeboard: "KITCHEN_NOTICES",

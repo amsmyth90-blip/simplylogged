@@ -238,7 +238,7 @@ test("mobile Kitchen planning is authenticated, bounded, observed and service-on
     read("apps/mobile/src/kitchen/KitchenPlanningScreen.tsx"),
     read("apps/mobile/src/kitchen/RecipeBook.tsx"),
     read("apps/mobile/src/kitchen/MealPlannerMobile.tsx"),
-    read("apps/mobile/src/SignedInApp.tsx"),
+    read("apps/mobile/src/SignedInKitchen.tsx"),
   ]);
   assert.match(route, /authenticateHybridRequest/);
   assert.match(route, /readBoundedJson\(request, 384 \* 1024\)/);
@@ -275,6 +275,11 @@ test("mobile Kitchen planning is authenticated, bounded, observed and service-on
   assert.match(planner, /className="meal-family-table"/);
   assert.doesNotMatch(planner, /className="meal-days"/);
   assert.match(book, /Open full recipe/);
+  for (const label of ["Family recipes", "Ingredients", "You might also like",
+    "Start cooking", "Add to day", "Recipe directory"]) {
+    assert.match(book, new RegExp(label));
+  }
   assert.doesNotMatch(book, /Open the web app/i);
-  assert.match(signedIn, /destination === "KITCHEN_RECIPES" \|\| destination === "KITCHEN_MEALS"/);
+  assert.match(signedIn,
+    /props\.destination === "KITCHEN_RECIPES" \|\| props\.destination === "KITCHEN_MEALS"/);
 });

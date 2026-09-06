@@ -36,6 +36,23 @@ test("Kitchen writes preserve unrelated web state and enforce duplicates", () =>
   })).status, "DUPLICATE");
 });
 
+test("Kitchen photo results can be saved as one bounded idempotent batch", () => {
+  const source = { privateFlag: "keep", kitchenItems: [
+    { id: "existing", name: "Milk", checked: true, section: "Pantry" },
+  ] };
+  const mutation = parseKitchenMutation({ operation: "ADD_ITEMS", revision,
+    names: [" milk ", "Bread", "Eggs"], section: "Pantry" });
+  let nextId = 0;
+  const result = mutateKitchenPayload(source, mutation, () => String(++nextId));
+  assert.equal(result.status, "OK");
+  if (result.status !== "OK") return;
+  assert.equal((result.payload.kitchenItems as unknown[]).length, 3);
+  assert.equal(result.payload.privateFlag, "keep");
+  assert.equal(mutateKitchenPayload(result.payload, mutation).status, "OK");
+  assert.throws(() => parseKitchenMutation({ operation: "ADD_ITEMS", revision,
+    names: Array.from({ length: 121 }, () => "Item"), section: "Pantry" }), /invalid/);
+});
+
 test("Kitchen projection excludes malformed and unrelated legacy data", () => {
   const snapshot = projectKitchenSnapshot({
     bankAccount: "not-for-mobile",
@@ -111,8 +128,13 @@ test("Kitchen item database writes are revision checked and service-only", async
 });
 
 test("mobile Kitchen is owner-scoped, bounded, revision-safe and encrypted offline", async () => {
-  const [route, service, hook, app, room, migration] = await Promise.all([
+  const [route, analysisRoute, analysisRequest, analysisClient, pantry, service, hook, app,
+    room, migration] = await Promise.all([
     read("app/api/mobile/kitchen/route.ts"),
+    read("app/api/mobile/kitchen/analyse/route.ts"),
+    read("lib/kitchen/pantry-analysis-request.ts"),
+    read("apps/mobile/src/kitchen/pantry-analysis-client.ts"),
+    read("apps/mobile/src/kitchen/PantryCaptureStage.tsx"),
     read("lib/kitchen/snapshot-server.ts"),
     read("apps/mobile/src/kitchen/use-kitchen.ts"),
     read("apps/mobile/src/signed-in-screens.ts"),
@@ -125,6 +147,14 @@ test("mobile Kitchen is owner-scoped, bounded, revision-safe and encrypted offli
   assert.match(route, /RequestObservation/);
   assert.doesNotMatch(route, /body\.ownerId|body\.userId/);
   assert.match(route, /getSupabaseAdminClient/);
+  assert.match(analysisRoute, /authenticateHybridRequest/);
+  assert.match(analysisRoute, /checkServerRateLimit/);
+  assert.match(analysisRequest, /readBoundedMultiFile/);
+  assert.match(analysisRequest, /inspectCaptureFile/);
+  assert.match(analysisClient, /readBoundedJsonResponse/);
+  assert.match(analysisClient, /requestDeadline\(90_000\)/);
+  for (const label of ["See what&apos;s in your kitchen", "Take photos", "Choose photos",
+    "Check my kitchen", "Pantry", "Shopping"]) assert.match(pantry, new RegExp(label));
   assert.match(service, /\.eq\("id", userId\)/);
   assert.match(service, /apply_mobile_kitchen_items_state/);
   assert.match(service, /status: "CONFLICT"/);

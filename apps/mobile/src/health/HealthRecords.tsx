@@ -5,7 +5,9 @@ export type HealthView =
   | "medications"
   | "appointments"
   | "allergies"
-  | "history";
+  | "history"
+  | "documents"
+  | "emergency";
 
 type DisplayRecord = {
   id: string;
@@ -132,7 +134,8 @@ export function HealthOverview({
   );
 }
 
-export function HealthRecordList({ health, view }: { health: HealthRecord; view: Exclude<HealthView, "overview"> }) {
+export function HealthRecordList({ health, view }: { health: HealthRecord;
+  view: "medications" | "appointments" | "allergies" | "history" }) {
   const visible = records(health, view);
   const titles = { medications: "Medications", appointments: "Appointments", allergies: "Allergies & conditions", history: "Health timeline" };
   return (

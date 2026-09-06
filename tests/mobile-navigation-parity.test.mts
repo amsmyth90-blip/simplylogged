@@ -32,16 +32,18 @@ test("every specialist room is reachable from the packaged product navigation", 
 });
 
 test("every declared mobile destination has a signed-in rendering path", async () => {
-  const [app, navigation] = await Promise.all([
+  const [app, kitchen, navigation] = await Promise.all([
     read("apps/mobile/src/SignedInApp.tsx"),
+    read("apps/mobile/src/SignedInKitchen.tsx"),
     read("apps/mobile/src/components/MobileBottomNav.tsx"),
   ]);
+  const routes = `${app}\n${kitchen}`;
   const declaration = navigation.match(/export type MobileDestination = ([\s\S]*?);/)?.[1] ?? "";
   const destinations = [...declaration.matchAll(/"([A-Z_]+)"/g)].map((match) => match[1]);
   assert.ok(destinations.length >= 15);
   for (const destination of destinations) {
     if (destination === "HOME") continue;
-    assert.match(app, new RegExp(`destination === ["']${destination}["']`));
+    assert.match(routes, new RegExp(`(?:props\\.)?destination === ["']${destination}["']`));
   }
 });
 
@@ -60,4 +62,20 @@ test("native navigation reproduces the wrapper labels and drawn icons", async ()
   assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
   assert.match(icons, /viewBox="0 0 24 24"/);
   assert.match(styles, /background: #edf4e9/);
+});
+
+test("specialist room labels retain distinct native landing states", async () => {
+  const [scenes, router, family] = await Promise.all([
+    read("apps/mobile/src/rooms/room-scene-config.ts"),
+    read("apps/mobile/src/SignedInRoom.tsx"),
+    read("apps/mobile/src/family/FamilyScreen.tsx"),
+  ]);
+  for (const id of ["profile", "mot-tax", "insurance", "travel-checklist",
+    "parking-permits", "medical-records", "emergency", "all", "new"]) {
+    assert.match(scenes, new RegExp(`action\\("${id}"`));
+  }
+  assert.match(router, /DrivewayView/);
+  assert.match(router, /initialFilter/);
+  assert.match(family, /initialView === "inbox"/);
+  assert.match(family, /FamilyInboxScreen/);
 });

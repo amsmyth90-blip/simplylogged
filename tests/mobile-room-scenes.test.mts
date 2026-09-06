@@ -55,19 +55,31 @@ test("native room scenes fill the viewport and render accessible image labels", 
 });
 
 test("room labels open the matching secure native workspace", async () => {
-  const [router, app, navigation, preview] = await Promise.all([
+  const [router, app, navigation, preview, scenes] = await Promise.all([
     read("apps/mobile/src/SignedInRoom.tsx"),
     read("apps/mobile/src/SignedInApp.tsx"),
     read("apps/mobile/src/room-navigation.ts"),
     read("apps/mobile/src/preview/RoomPreview.tsx"),
+    read("apps/mobile/src/rooms/room-scene-config.ts"),
   ]);
 
   assert.match(router, /if \(!activeAction\)[\s\S]*?<RoomSceneScreen/);
   assert.match(router, /initialSection={activeAction as AtticSectionId}/);
   assert.match(router, /initialTab={activeAction as GarageTab}/);
+  assert.match(scenes, /action\("profile", "Vehicle Profile"/);
+  assert.match(scenes, /action\("mot-tax", "MOT & Tax"/);
+  assert.match(scenes, /action\("insurance", "Insurance"/);
+  assert.match(router, /"medical-records": "documents"/);
+  assert.match(router, /emergency: "emergency"/);
+  assert.match(scenes, /action\("all", "Incoming items"/);
+  assert.match(scenes, /action\("new", "Needs filing"/);
+  assert.match(router, /initialFilter={initialFilter}/);
+  assert.match(scenes, /action\("travel-checklist", "Travel Checklist"/);
+  assert.match(scenes, /action\("parking-permits", "Parking & Permits"/);
+  assert.match(router, /initialView={activeAction as DrivewayView}/);
   assert.match(router, /initialView={activeAction as WillsView}/);
   assert.match(router, /initialView={activeAction as "household" \| "inbox" \| "schedules"}/);
-  assert.match(navigation, /calendar: "KITCHEN_MEALS"/);
+  assert.match(navigation, /calendar: "KITCHEN_CALENDAR"/);
   assert.match(navigation, /noticeboard: "KITCHEN_NOTICES"/);
   assert.match(navigation, /recipes: "KITCHEN_RECIPES"/);
   assert.match(app, /kitchenDestinationFor\(actionId\)/);

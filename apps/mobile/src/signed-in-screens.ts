@@ -65,6 +65,11 @@ export const KitchenScreen = lazy(() =>
     default: module.KitchenScreen,
   })),
 );
+export const KitchenCalendarScreen = lazy(() =>
+  import("@mobile/kitchen/KitchenCalendarScreen").then((module) => ({
+    default: module.KitchenCalendarScreen,
+  })),
+);
 export const KitchenNoticeboardScreen = lazy(() =>
   import("@mobile/kitchen/KitchenNoticeboardScreen").then((module) => ({
     default: module.KitchenNoticeboardScreen,

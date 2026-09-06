@@ -9,11 +9,13 @@ import { useDocuments } from "@mobile/files/use-documents";
 import { TripDetail } from "./TripDetail";
 import { TripDirectory } from "./TripDirectory";
 import { TripEditor } from "./TripEditor";
+import { DrivewayFeatureScreen } from "./DrivewayFeatureScreen";
 import { useTravel } from "./use-travel";
 
 type Props = {
   accessToken: string;
   disableOnline?: boolean;
+  initialView?: DrivewayView;
   initialSnapshot?: TravelSnapshot;
   store: OfflineStore;
   syncStatus: string;
@@ -22,6 +24,8 @@ type Props = {
   onNavigate: (destination: MobileDestination) => void;
   onScan: (roomName: string) => void;
 };
+
+export type DrivewayView = "trips" | "travel-checklist" | "parking-permits";
 
 export function DrivewayScreen(props: Props) {
   const travel = useTravel(props);
@@ -42,6 +46,14 @@ export function DrivewayScreen(props: Props) {
     if (removed) setSelectedId(null);
     return removed;
   }
+
+  if (!selected && props.initialView && props.initialView !== "trips") return <main
+    className="travel-screen travel-feature-screen">
+    <DrivewayFeatureScreen busy={travel.busy} online={travel.online}
+      snapshot={travel.snapshot} view={props.initialView} mutate={travel.mutate}
+      onBack={props.onBack} />
+    <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
+  </main>;
 
   return <main className="travel-screen">
     {selected ? <TripDetail busy={travel.busy} checklist={checklist} documents={files.documents}

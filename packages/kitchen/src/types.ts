@@ -17,6 +17,7 @@ export type KitchenSnapshot = {
 
 export type KitchenMutation =
   | { operation: "ADD_ITEM"; revision: string | null; name: string; section: KitchenSection }
+  | { operation: "ADD_ITEMS"; revision: string | null; names: string[]; section: KitchenSection }
   | { operation: "TOGGLE_ITEM"; revision: string | null; itemId: string }
   | { operation: "MOVE_ITEM"; revision: string | null; itemId: string; section: KitchenSection }
   | { operation: "DELETE_ITEM"; revision: string | null; itemId: string };

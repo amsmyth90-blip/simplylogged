@@ -4,6 +4,7 @@ import type { HealthSnapshot } from "@diarydock/health";
 import type { LocalRecord } from "@diarydock/offline-store";
 
 import { HealthScreen } from "@mobile/health/HealthScreen";
+import type { HealthView } from "@mobile/health/HealthRecords";
 import { PreviewStore } from "@mobile/preview/MobilePreview";
 
 const ownerId = "f330a7d2-8ef1-4f6e-a6ec-118ea3a14f51";
@@ -93,5 +94,8 @@ const records: LocalRecord[] = [{
 
 export function HealthPreview() {
   const store = useMemo(() => new PreviewStore(records), []);
-  return <HealthScreen accessToken="preview-access-token-that-is-long-enough" disableOnline initialSnapshot={snapshot} store={store} syncStatus="READY" synchronize={async () => true} onBack={() => undefined} onNavigate={() => undefined} onScan={() => undefined} />;
+  const requested = new URLSearchParams(window.location.search).get("view");
+  const views: HealthView[] = ["overview", "history", "allergies", "medications", "appointments", "documents", "emergency"];
+  const initialView = views.includes(requested as HealthView) ? requested as HealthView : "overview";
+  return <HealthScreen accessToken="preview-access-token-that-is-long-enough" disableOnline initialSnapshot={snapshot} initialView={initialView} store={store} syncStatus="READY" synchronize={async () => true} onBack={() => undefined} onNavigate={() => undefined} onScan={() => undefined} />;
 }

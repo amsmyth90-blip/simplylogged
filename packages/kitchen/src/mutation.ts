@@ -14,6 +14,18 @@ export function parseKitchenMutation(value: unknown): KitchenMutation {
       section: parseKitchenSection(mutation.section),
     };
   }
+  if (operation === "ADD_ITEMS") {
+    exact(mutation, ["operation", "revision", "names", "section"], "Kitchen update");
+    if (!Array.isArray(mutation.names) || mutation.names.length < 1 || mutation.names.length > 120) {
+      throw new Error("Kitchen items are invalid.");
+    }
+    return {
+      operation,
+      revision: revision(mutation.revision),
+      names: mutation.names.map((name) => text(name, "Kitchen item name", 120)),
+      section: parseKitchenSection(mutation.section),
+    };
+  }
   if (operation === "MOVE_ITEM") {
     exact(mutation, ["operation", "revision", "itemId", "section"], "Kitchen update");
     return {

@@ -11,6 +11,7 @@ import { MailboxItemCard } from "./MailboxItemCard";
 import { useMailbox } from "./use-mailbox";
 
 type Props = { accessToken: string; disableOnline?: boolean; initialSnapshot?: MailboxSnapshot;
+  initialFilter?: "new" | "all";
   store: OfflineStore; syncStatus: string; synchronize: () => Promise<unknown>;
   onBack: () => void; onNavigate: (destination: MobileDestination) => void;
   onScan: (roomName: string) => void };
@@ -18,7 +19,7 @@ type Props = { accessToken: string; disableOnline?: boolean; initialSnapshot?: M
 export function MailboxScreen(props: Props) {
   const mailbox = useMailbox(props);
   const files = useDocuments(props.store, props.syncStatus, props.synchronize);
-  const [filter, setFilter] = useState<"new" | "all">("new");
+  const [filter, setFilter] = useState<"new" | "all">(props.initialFilter ?? "new");
   const [viewingId, setViewingId] = useState<string | null>(null);
   const items = useMemo(() => mailbox.snapshot?.items.filter((item) =>
     filter === "all" || item.routeStatus === "new") ?? [], [filter, mailbox.snapshot]);

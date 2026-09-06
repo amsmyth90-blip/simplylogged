@@ -1,12 +1,12 @@
-import { useState, type FormEvent } from "react";
-
-import type { KitchenItem, KitchenSection, KitchenSnapshot } from "@diarydock/kitchen";
+import type { KitchenItem, KitchenSnapshot } from "@diarydock/kitchen";
 import type { OfflineStore } from "@diarydock/offline-store";
 
-import kitchenImage from "../../../../public/images/kitchen-command-centre.webp";
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
-import { KitchenList } from "./KitchenList";
+import { MobileIcon } from "@mobile/components/MobileIcon";
+import { PantryCaptureStage } from "./PantryCaptureStage";
+import { PantryFlowStages } from "./PantryFlowStages";
 import { useKitchen } from "./use-kitchen";
+import { usePantryPlanner } from "./use-pantry-planner";
 
 type KitchenScreenProps = {
   accessToken: string;
@@ -16,120 +16,74 @@ type KitchenScreenProps = {
   syncStatus: string;
   onBack: () => void;
   onNavigate: (destination: MobileDestination) => void;
-  onOpenMealPlanner: () => void;
-  onOpenNoticeboard: () => void;
-  onOpenRecipes: () => void;
 };
 
 export function KitchenScreen(props: KitchenScreenProps) {
   const kitchen = useKitchen(props);
-  const [section, setSection] = useState<KitchenSection>("Shopping");
-  const [name, setName] = useState("");
+  const planner = usePantryPlanner({ accessToken: props.accessToken,
+    mutate: kitchen.mutate, online: kitchen.online });
 
-  async function addItem(event: FormEvent) {
-    event.preventDefault();
-    if (!name.trim()) return;
-    if (await kitchen.mutate({ operation: "ADD_ITEM", name, section })) setName("");
+  function back() {
+    if (planner.stage === "capture") { props.onBack(); return; }
+    if (planner.stage === "meals") planner.setStage("confirm");
+    else if (planner.stage === "shopping") planner.setStage("meals");
+    else planner.setStage("capture");
   }
 
-  function move(item: KitchenItem) {
-    void kitchen.mutate({
-      operation: "MOVE_ITEM",
-      itemId: item.id,
-      section: item.section === "Pantry" ? "Shopping" : "Pantry",
+  function toggleIngredient(name: string) {
+    const key = name.trim().toLocaleLowerCase("en-GB");
+    planner.setConfirmed((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
     });
   }
 
-  function remove(item: KitchenItem) {
-    if (!window.confirm(`Remove ${item.name} from ${item.section}?`)) return;
-    void kitchen.mutate({ operation: "DELETE_ITEM", itemId: item.id });
+  function toggleItem(item: KitchenItem) {
+    void kitchen.mutate({ operation: "TOGGLE_ITEM", itemId: item.id });
   }
 
-  return (
-    <main className="kitchen-screen">
-      <header className="kitchen-header">
-        <button type="button" onClick={props.onBack} aria-label="Back to the Kitchen room">‹</button>
-        <div><strong>Kitchen</strong><small>Pantry & shopping</small></div>
+  async function addShoppingItem(name: string) {
+    await kitchen.mutate({ operation: "ADD_ITEM", name, section: "Shopping" });
+  }
+
+  return <main className="pantry-screen">
+    <div className="pantry-shell">
+      <header className="pantry-header">
+        <button type="button" onClick={back} aria-label="Back"><MobileIcon name="arrow-left" /></button>
+        <div><small>Kitchen</small><h1>Pantry &amp; shopping</h1></div>
         <span className={kitchen.source === "NETWORK" ? "is-live" : "is-cached"}>
-          {kitchen.source === "NETWORK" ? "Live" : "Offline copy"}
-        </span>
+          {kitchen.source === "NETWORK" ? "Live" : "Offline"}</span>
       </header>
-
-      <section className="kitchen-hero" style={{ backgroundImage: `url(${kitchenImage})` }}>
-        <div />
-        <article>
-          <p>Everyday kitchen</p>
-          <h1>Pantry & shopping</h1>
-          <span>Know what is at home and what to pick up next.</span>
-        </article>
-      </section>
-
-      <section className="kitchen-sheet">
-        <div className="kitchen-feature-links">
-          <button type="button" className="kitchen-noticeboard-link" onClick={props.onOpenRecipes}>
-            <span>R</span><div><strong>Family recipes</strong>
-              <small>Save favourites and cook step by step</small></div><b>›</b></button>
-          <button type="button" className="kitchen-noticeboard-link" onClick={props.onOpenMealPlanner}>
-            <span>7</span><div><strong>Weekly meal planner</strong>
-              <small>Plan meals and build the shopping list</small></div><b>›</b></button>
-          <button type="button" className="kitchen-noticeboard-link" onClick={props.onOpenNoticeboard}>
-            <span>▦</span><div><strong>Family noticeboard</strong>
-              <small>Pin household notes, plans and reminders</small></div><b>›</b></button>
-        </div>
-        <form className="kitchen-add" onSubmit={(event) => void addItem(event)}>
-          <label htmlFor="kitchen-item-name">Add an item</label>
-          <div>
-            <input
-              id="kitchen-item-name"
-              value={name}
-              maxLength={120}
-              disabled={kitchen.busy || !kitchen.online}
-              placeholder={kitchen.online ? `Add to ${section.toLowerCase()}` : "Connect to add an item"}
-              onChange={(event) => setName(event.target.value)}
-            />
-            <button type="submit" disabled={kitchen.busy || !kitchen.online || !name.trim()}>Add</button>
-          </div>
-        </form>
-
-        <div className="kitchen-tabs" role="tablist" aria-label="Kitchen lists">
-          {(["Shopping", "Pantry"] as const).map((item) => (
-            <button
-              type="button"
-              role="tab"
-              aria-selected={section === item}
-              className={section === item ? "is-active" : ""}
-              onClick={() => setSection(item)}
-              key={item}
-            >{item}<span>{kitchen.snapshot?.items.filter((entry) => entry.section === item).length ?? 0}</span></button>
-          ))}
-        </div>
-
-        {kitchen.message ? <p className="kitchen-message" role="status">{kitchen.message}</p> : null}
-        {kitchen.loading && !kitchen.snapshot ? <p className="kitchen-loading">Opening your Kitchen securely…</p> : null}
-        {kitchen.snapshot ? (
-          <div className="kitchen-list-grid">
-            <KitchenList
-              busy={kitchen.busy}
-              items={kitchen.snapshot.items}
-              online={kitchen.online}
-              section={section}
-              onDelete={remove}
-              onMove={move}
-              onToggle={(item) => void kitchen.mutate({ operation: "TOGGLE_ITEM", itemId: item.id })}
-            />
-            <KitchenList
-              busy={kitchen.busy}
-              items={kitchen.snapshot.items}
-              online={kitchen.online}
-              section={section === "Pantry" ? "Shopping" : "Pantry"}
-              onDelete={remove}
-              onMove={move}
-              onToggle={(item) => void kitchen.mutate({ operation: "TOGGLE_ITEM", itemId: item.id })}
-            />
-          </div>
-        ) : null}
-      </section>
-      <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
-    </main>
-  );
+      {kitchen.loading && !kitchen.snapshot ? <p className="pantry-alert">Opening your Kitchen securely…</p> : null}
+      {kitchen.message && planner.stage === "capture" ? <p className="pantry-alert" role="status">{kitchen.message}</p> : null}
+      <PantryCaptureStage
+        addItem={addShoppingItem}
+        busy={kitchen.busy}
+        captures={planner.captures.length}
+        error={planner.error}
+        items={kitchen.snapshot?.items ?? []}
+        online={kitchen.online}
+        previews={planner.previews}
+        setCaptures={() => planner.setCaptures([])}
+        onAddPhoto={(source) => void planner.add(source)}
+        onAnalyse={() => void planner.analyse()}
+        onToggle={toggleItem}
+        stage={planner.stage}
+      />
+      <PantryFlowStages
+        analysis={planner.analysis}
+        confirmed={planner.confirmed}
+        meal={planner.meal}
+        selectedMeal={planner.selectedMeal}
+        stage={planner.stage}
+        onAddMissing={() => void planner.addMissing()}
+        onConfirm={() => void planner.confirmStock()}
+        onReset={planner.reset}
+        onSelectMeal={planner.setSelectedMeal}
+        onToggleIngredient={toggleIngredient}
+      />
+    </div>
+    <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
+  </main>;
 }

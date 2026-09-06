@@ -12,6 +12,7 @@ import type { OfficeArea } from "@mobile/office/OfficeOverview";
 import { RoomSceneScreen } from "@mobile/rooms/RoomSceneScreen";
 import type { RoomSceneAction } from "@mobile/rooms/room-scene-config";
 import type { WillsView } from "@mobile/wills/wills-model";
+import type { DrivewayView } from "@mobile/travel/DrivewayScreen";
 import {
   AtticScreen,
   DrivewayScreen,
@@ -77,20 +78,26 @@ export function SignedInRoom(props: Props) {
     return <GarageScreen {...common} initialTab={activeAction as GarageTab} />;
   }
   if (props.profile.id === "driveway") {
-    return <DrivewayScreen {...common} synchronize={props.synchronize} />;
+    return <DrivewayScreen {...common} initialView={activeAction as DrivewayView}
+      synchronize={props.synchronize} />;
   }
   if (props.profile.id === "garden") {
     return <GardenScreen {...common} initialSection={activeAction as GardenSectionId}
       synchronize={props.synchronize} />;
   }
   if (props.profile.id === "bedroom") {
-    const view = activeAction === "medications" || activeAction === "appointments"
-      ? activeAction : "overview";
+    const views: Record<string, HealthView> = {
+      "health-profile": "overview", "medical-records": "documents",
+      medications: "medications", appointments: "appointments", emergency: "emergency",
+    };
+    const view = views[activeAction] ?? "overview";
     return <HealthScreen {...common} initialView={view as HealthView}
       synchronize={props.synchronize} />;
   }
   if (props.profile.id === "mailbox") {
-    return <MailboxScreen {...common} synchronize={props.synchronize} />;
+    const initialFilter = activeAction === "all" ? "all" : "new";
+    return <MailboxScreen {...common} initialFilter={initialFilter}
+      synchronize={props.synchronize} />;
   }
   if (props.profile.id === "safe-room") {
     return <SafeRoomScreen {...common} initialView={activeAction as WillsView}

@@ -15,10 +15,15 @@ const dates = [
   ["Breakdown cover", "breakdownRenewalDate"],
 ] as const;
 
-export function GarageOverview({ vehicle }: { vehicle: GarageVehicle }) {
+export function GarageOverview({ vehicle, view = "profile" }: {
+  vehicle: GarageVehicle;
+  view?: "profile" | "mot-tax" | "insurance";
+}) {
+  const visibleDates = view === "mot-tax" ? dates.slice(0, 2)
+    : view === "insurance" ? [dates[2], dates[4]] : dates;
   return (
     <>
-      <section className="garage-summary-grid" aria-label="Vehicle summary">
+      {view === "profile" ? <section className="garage-summary-grid" aria-label="Vehicle summary">
         <article>
           <small>Registration</small>
           <strong>{vehicle.registration || "Not recorded"}</strong>
@@ -35,17 +40,18 @@ export function GarageOverview({ vehicle }: { vehicle: GarageVehicle }) {
           <small>Documents</small>
           <strong>{vehicle.documentCount.toLocaleString("en-GB")}</strong>
         </article>
-      </section>
+      </section> : null}
 
       <section className="garage-panel">
         <header>
           <div>
             <p>Stay ahead</p>
-            <h2>Key dates</h2>
+            <h2>{view === "mot-tax" ? "MOT & road tax" : view === "insurance"
+              ? "Insurance & breakdown cover" : "Key dates"}</h2>
           </div>
         </header>
         <div className="garage-date-list">
-          {dates.map(([label, key]) => (
+          {visibleDates.map(([label, key]) => (
             <article key={key}>
               <span
                 className={`garage-date-mark is-${dateStatus(vehicle[key])}`}

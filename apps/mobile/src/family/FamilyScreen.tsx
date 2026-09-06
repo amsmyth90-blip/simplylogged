@@ -6,6 +6,7 @@ import type { OfflineStore } from "@diarydock/offline-store";
 import familyImage from "../../../../public/images/pages/family-room-hero.webp";
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
 import { FamilyRecords } from "./FamilyRecords";
+import { FamilyInboxScreen } from "./FamilyInboxScreen";
 import { FamilyScheduleCard } from "./FamilyScheduleCard";
 import { FamilySchedulesScreen } from "./FamilySchedulesScreen";
 import { HouseholdInviteForm } from "./HouseholdInviteForm";
@@ -54,6 +55,10 @@ export function FamilyScreen(props: Props) {
     onBack={() => setSchedulesOpen(false)}
     onNavigate={props.onNavigate}
   />;
+  if (props.initialView === "inbox") return <FamilyInboxScreen
+    accessToken={props.accessToken} store={props.store} syncStatus={props.syncStatus}
+    synchronize={props.synchronize} onBack={props.onBack} onNavigate={props.onNavigate}
+    onScan={() => props.onScan("Family Room")} />;
 
   async function change(mutation: HouseholdMutation, success: string) {
     try {

@@ -2,7 +2,7 @@ import type { GarageVehicle } from "@diarydock/vehicles";
 
 import { garageDate, garageMileage, garageMoney } from "./garage-format";
 
-export type GarageTab = "overview" | "services" | "costs" | "notes";
+export type GarageTab = "profile" | "mot-tax" | "insurance" | "services" | "costs" | "notes";
 
 export function GarageRecords({
   tab,

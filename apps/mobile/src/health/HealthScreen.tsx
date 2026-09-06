@@ -35,6 +35,8 @@ const views: Array<{ id: HealthView; label: string; icon: string }> = [
   { id: "appointments", label: "Visits", icon: "◷" },
   { id: "allergies", label: "Alerts", icon: "!" },
   { id: "history", label: "Timeline", icon: "•" },
+  { id: "documents", label: "Documents", icon: "▤" },
+  { id: "emergency", label: "Emergency", icon: "+" },
 ];
 
 function belongsToHealth(item: { roomId?: string; roomName?: string }) {
@@ -147,7 +149,7 @@ export function HealthScreen(props: Props) {
         {health.loading && !record ? (
           <p className="health-status">Opening your encrypted health records…</p>
         ) : null}
-        {record ? view === "overview" ? (
+        {record ? (view === "overview" || view === "emergency" ? (
           <>
             <HealthOverview health={record} onEdit={() => setEditingOverview(true)} />
             <HealthConnections
@@ -157,7 +159,7 @@ export function HealthScreen(props: Props) {
               onEditOverview={() => setEditingOverview(true)}
             />
           </>
-        ) : <HealthRecordList health={record} view={view} /> : null}
+        ) : view !== "documents" ? <HealthRecordList health={record} view={view} /> : null) : null}
         <section className="health-card health-files-card">
           <header>
             <div><p>Secure files</p><h2>Health documents</h2></div>

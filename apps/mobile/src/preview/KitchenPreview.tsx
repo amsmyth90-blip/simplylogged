@@ -29,9 +29,6 @@ export function KitchenPreview() {
       syncStatus="READY"
       onBack={() => undefined}
       onNavigate={() => undefined}
-      onOpenMealPlanner={() => undefined}
-      onOpenNoticeboard={() => undefined}
-      onOpenRecipes={() => undefined}
     />
   );
 }

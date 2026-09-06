@@ -108,6 +108,9 @@ async function start() {
   } else if (previewEnabled && preview === "kitchen-noticeboard") {
     Application = (await import("@mobile/preview/KitchenNoticeboardPreview"))
       .KitchenNoticeboardPreview;
+  } else if (previewEnabled && preview === "kitchen-calendar") {
+    Application = (await import("@mobile/preview/KitchenCalendarPreview"))
+      .KitchenCalendarPreview;
   } else if (previewEnabled && preview === "kitchen-recipes") {
     Application = (await import("@mobile/preview/KitchenPlanningPreview"))
       .KitchenRecipesPreview;
