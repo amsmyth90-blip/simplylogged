@@ -12,6 +12,13 @@ type Props = {
   onOpen: (action: RoomSceneAction) => void;
 };
 
+function labelEdge(left: string) {
+  const position = Number.parseFloat(left);
+  if (position <= 22.5) return "left";
+  if (position >= 77.5) return "right";
+  return undefined;
+}
+
 export function RoomSceneScreen(props: Props) {
   const scene = roomScenes[props.profile.id];
   if (!scene) return null;
@@ -33,6 +40,7 @@ export function RoomSceneScreen(props: Props) {
               type="button"
               key={`${item.id}-${index}`}
               className="native-room-label"
+              data-edge={labelEdge(item.left)}
               style={{ left: item.left, top: item.top }}
               aria-label={`Open ${item.label}: ${item.description}`}
               onClick={() => props.onOpen(item)}
