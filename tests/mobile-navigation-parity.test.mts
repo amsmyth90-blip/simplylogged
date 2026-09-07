@@ -63,7 +63,35 @@ test("native navigation keeps only the three primary destinations", async () => 
   assert.match(styles, /grid-template-columns: repeat\(3,/);
   assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
   assert.match(icons, /viewBox="0 0 24 24"/);
-  assert.match(styles, /background: #edf4e9/);
+  assert.match(styles, /border: 1px solid #d6ad4e/);
+  assert.match(styles, /linear-gradient\(145deg, #0c3127, #061f19 62%, #09271f\)/);
+  assert.match(styles, /radial-gradient\(circle at 35% 25%, #ffe9a0/);
+  assert.match(styles, /button \+ button::before/);
+});
+
+test("native scan entry reproduces the wrapper capture experience", async () => {
+  const [nativeCapture, wrapperCapture, wrapperWorkspace, styles] = await Promise.all([
+    read("apps/mobile/src/capture/CaptureScreen.tsx"),
+    read("components/document-capture/CaptureIdleView.tsx"),
+    read("components/DocumentCaptureWorkspace.tsx"),
+    read("apps/mobile/src/capture/capture-entry.css"),
+  ]);
+  for (const label of [
+    "Add document",
+    "Add every page in reading order",
+    "Add one or more pages",
+    "Photograph each page or choose several together.",
+    "Take photo",
+    "Choose pages",
+    "You can add up to 12 pages",
+  ]) {
+    assert.ok(`${wrapperWorkspace}\n${wrapperCapture}`.includes(label), `wrapper capture is missing ${label}`);
+    assert.ok(nativeCapture.includes(label), `native capture is missing ${label}`);
+  }
+  assert.match(nativeCapture, /capture-document-stack\.png/);
+  assert.match(nativeCapture, /estate-dashboard-country\.webp/);
+  assert.match(styles, /background: rgb\(255 255 255 \/ 68%\)/);
+  assert.doesNotMatch(nativeCapture, /Secure capture|Choose photo|Choose file/);
 });
 
 test("specialist room labels retain distinct native landing states", async () => {

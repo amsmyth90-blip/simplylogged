@@ -1,74 +1,14 @@
-.capture-screen {
-  width: min(100%, 68rem);
-  min-height: 100dvh;
-  margin: 0 auto;
-  padding: max(1rem, env(safe-area-inset-top)) 1rem 7rem;
-}
-
-.capture-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.capture-header .sync-pill { margin: 0; }
-
-.capture-hero,
 .capture-review,
 .capture-queue {
-  margin-top: 1.25rem;
+  width: min(100%, 28rem);
+  margin: 1.5rem auto 0;
   padding: clamp(1.25rem, 5vw, 2.25rem);
-  border: 1px solid rgb(255 255 255 / 80%);
+  border: 1px solid rgb(255 255 255 / 90%);
   border-radius: 2rem;
-  background: rgb(255 253 248 / 88%);
-  box-shadow: 0 1.75rem 4rem -2.6rem rgb(32 53 42 / 42%);
+  background: rgb(255 255 255 / 68%);
+  box-shadow: 0 1.75rem 4.4rem -2.2rem rgb(39 72 77 / 48%);
+  backdrop-filter: blur(24px);
 }
-
-.capture-hero {
-  background: linear-gradient(135deg, #fffdf8f2, #edf2e9e8);
-}
-
-.capture-hero .eyebrow,
-.capture-queue .eyebrow { margin: 0; }
-
-.capture-hero h1 {
-  margin-top: 0.5rem;
-  font-size: clamp(2.3rem, 10vw, 3.6rem);
-}
-
-.capture-hero > p:not(.eyebrow) {
-  max-width: 37rem;
-  margin: 0.8rem 0 0;
-  color: var(--dd-muted);
-  line-height: 1.55;
-}
-
-.capture-actions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.65rem;
-  margin-top: 1.25rem;
-}
-
-.capture-actions button {
-  display: grid;
-  min-height: 7.5rem;
-  place-items: center;
-  align-content: center;
-  gap: 0.25rem;
-  padding: 0.8rem;
-  color: var(--dd-ink);
-  font: inherit;
-  border: 1px solid rgb(32 53 42 / 10%);
-  border-radius: 1.25rem;
-  background: rgb(255 255 255 / 78%);
-}
-
-.capture-actions button > span { color: var(--dd-green); font-size: 1.65rem; }
-.capture-actions button small { color: var(--dd-muted); font-size: 0.65rem; }
-.capture-actions button:disabled { opacity: 0.5; }
-.capture-file-input { display: none; }
 
 .capture-review {
   display: grid;
@@ -206,8 +146,6 @@
 .queue-failed { background: #c24141; }
 
 @media (max-width: 600px) {
-  .capture-actions { grid-template-columns: 1fr 1fr; }
-  .capture-actions button:last-of-type { grid-column: 1 / -1; min-height: 5rem; }
   .capture-review { grid-template-columns: 1fr; }
   .capture-fields { grid-template-columns: 1fr; }
   .capture-preview { min-height: 11rem; max-height: 18rem; }

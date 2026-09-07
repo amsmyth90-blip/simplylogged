@@ -7,6 +7,7 @@ import "@mobile/auth/auth.css";
 import "@mobile/attic/attic.css";
 import "@mobile/attic/attic-editor.css";
 import "@mobile/attic/attic-records.css";
+import "@mobile/capture/capture-entry.css";
 import "@mobile/capture/capture.css";
 import "@mobile/components/mobile-navigation.css";
 import "@mobile/emergency/emergency.css";
