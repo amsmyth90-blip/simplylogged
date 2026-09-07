@@ -6,6 +6,7 @@ export type MobileIconName =
   | "camera"
   | "calendar"
   | "check"
+  | "file"
   | "folder"
   | "home"
   | "leaf"
@@ -27,6 +28,7 @@ export function MobileIcon({ className, name }: Props) {
     camera: <><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8H3v-8a2 2 0 0 1 2-2Z" /><circle cx="12" cy="13" r="3" /></>,
     calendar: <><rect x="4" y="6" width="16" height="14" rx="2" /><path d="M8 4v4M16 4v4M4 10h16" /></>,
     check: <path d="m5 12 4 4L19 6" />,
+    file: <><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h4M9 12h6M9 16h6" /></>,
     folder: <><path d="M3.5 8.5h5l1.5 2h9v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" /><path d="M3.5 8.5v-1a2 2 0 0 1 2-2h3l1.5 2" /></>,
     home: <><path d="m4 11 8-6 8 6" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" /></>,
     leaf: <><path d="M19 4C11 4 5 8 5 15c0 3 2 5 5 5 7 0 10-8 9-16Z" /><path d="M5 20c3-5 7-8 12-11" /></>,

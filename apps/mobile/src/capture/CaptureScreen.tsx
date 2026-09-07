@@ -4,12 +4,14 @@ import { ACCEPTED_DOCUMENT_TYPES } from "@diarydock/documents";
 import { documentCategories, estateRooms } from "@diarydock/capture";
 import type { OfflineStore } from "@diarydock/offline-store";
 
-import { BrandMark } from "@mobile/components/BrandMark";
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
+import { MobileIcon } from "@mobile/components/MobileIcon";
+
+import documentStackImage from "../../../../public/images/capture-document-stack.png";
+import estateImage from "../../../../public/images/estate-dashboard-country.webp";
 
 import {
   capturedDocumentFromFile,
-  chooseDocumentPhoto,
   takeDocumentPhoto,
   type CapturedDocument,
 } from "./capture-source";
@@ -85,26 +87,43 @@ export function CaptureScreen(props: CaptureScreenProps) {
 
   return (
     <main className="capture-screen">
+      <div className="capture-backdrop" aria-hidden="true">
+        {/* Packaged artwork is bundled locally and never loaded from a remote origin. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={estateImage} alt="" />
+      </div>
+      <div className="capture-backdrop-wash" aria-hidden="true" />
       <header className="capture-header">
-        <div className="app-brand"><BrandMark /><div><strong>DiaryDock</strong><span>Your digital home</span></div></div>
-        <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
-          {props.syncStatus.toLowerCase().replaceAll("_", " ")}
+        <button type="button" aria-label="Back to All Files" onClick={() => props.onNavigate("FILES")}>
+          <MobileIcon name="arrow-left" />
+        </button>
+        <div>
+          <h1>{queue.captures.length ? "Check details" : "Add document"}</h1>
+          <p>{queue.captures.length ? "Nothing is saved until you confirm" : "Add every page in reading order"}</p>
+        </div>
+        <span className="capture-page-count">
+          {queue.captures.length
+            ? `${queue.captures.length} page${queue.captures.length === 1 ? "" : "s"}`
+            : <MobileIcon name="shield" />}
         </span>
       </header>
 
-      <section className="capture-hero">
-        <p className="eyebrow">Secure capture</p>
-        <h1>Add a document{props.initialRoomName ? ` to ${props.initialRoomName}` : ""}</h1>
-        <p>Photograph or choose a file. It stays encrypted on this device whenever you are offline.</p>
+      {!queue.captures.length ? <section className="capture-hero">
+        <div className="capture-artwork">
+          {/* This packaged illustration exactly matches the wrapper capture screen. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={documentStackImage} alt="A secure stack of household documents ready to add" />
+        </div>
+        <div className="capture-intro">
+          <h2>Add one or more pages</h2>
+          <p>Photograph each page or choose several together.</p>
+        </div>
         <div className="capture-actions">
           <button type="button" disabled={working} onClick={() => void select(takeDocumentPhoto)}>
-            <span aria-hidden="true">◎</span><strong>Take photo</strong><small>Use the rear camera</small>
-          </button>
-          <button type="button" disabled={working} onClick={() => void select(chooseDocumentPhoto)}>
-            <span aria-hidden="true">▧</span><strong>Choose photo</strong><small>Open your library</small>
+            <span aria-hidden="true"><MobileIcon name="camera" /></span><strong>Take photo</strong>
           </button>
           <button type="button" disabled={working} onClick={() => inputRef.current?.click()}>
-            <span aria-hidden="true">▱</span><strong>Choose file</strong><small>PDF or image</small>
+            <span aria-hidden="true"><MobileIcon name="file" /></span><strong>Choose pages</strong>
           </button>
           <input
             ref={inputRef}
@@ -115,7 +134,9 @@ export function CaptureScreen(props: CaptureScreenProps) {
             onChange={(event) => void fromFile(event)}
           />
         </div>
-      </section>
+        <p className="capture-page-limit"><MobileIcon name="leaf" />You can add up to 12 pages</p>
+        {props.initialRoomName ? <p className="capture-room-target">These pages will be filed in {props.initialRoomName}.</p> : null}
+      </section> : null}
 
       {queue.captures.length ? (
         <section className="capture-review">
