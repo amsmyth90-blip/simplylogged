@@ -63,9 +63,9 @@ test("native navigation keeps only the three primary destinations", async () => 
   assert.match(styles, /grid-template-columns: repeat\(3,/);
   assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
   assert.match(icons, /viewBox="0 0 24 24"/);
-  assert.match(styles, /border: 1px solid #d6ad4e/);
-  assert.match(styles, /linear-gradient\(145deg, #0c3127, #061f19 62%, #09271f\)/);
-  assert.match(styles, /radial-gradient\(circle at 35% 25%, #ffe9a0/);
+  assert.match(styles, /border: 1px solid #c99b3d/);
+  assert.match(styles, /linear-gradient\(145deg, #fffdf8, #f7f4ec 62%, #fffdf9\)/);
+  assert.match(styles, /radial-gradient\(circle at 35% 25%, #fff4c8/);
   assert.match(styles, /button \+ button::before/);
 });
 
