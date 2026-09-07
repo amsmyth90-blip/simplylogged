@@ -60,7 +60,6 @@ export function RoomScreen(props: RoomScreenProps) {
     [props.profile.id, props.profile.name, reminders.reminders],
   );
   const viewing = documents.find((item) => item.syncId === viewingId) ?? null;
-  const active = props.profile.id === "family-room" ? "FAMILY" : "HOME";
 
   return (
     <main className="room-screen">
@@ -124,7 +123,7 @@ export function RoomScreen(props: RoomScreenProps) {
 
       {files.error || reminders.error ? <p className="form-message form-error">{files.error ?? reminders.error}</p> : null}
       {viewing ? <DocumentViewer accessToken={props.accessToken} document={viewing} store={props.store} onClose={() => setViewingId(null)} /> : null}
-      <MobileBottomNav active={active} onNavigate={props.onNavigate} />
+      <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
     </main>
   );
 }

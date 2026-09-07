@@ -141,7 +141,7 @@ export function FamilyScreen(props: Props) {
       {model.loading ? <p className="form-message">Opening your household securely…</p> : null}
       {model.error ? <p className="form-message form-error" role="alert">{model.error} <button type="button" onClick={() => void model.refresh().catch(() => undefined)}>Try again</button></p> : null}
       {message ? <p className="form-message" role="status">{message}</p> : null}
-      <MobileBottomNav active="FAMILY" onNavigate={props.onNavigate} />
+      <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
     </main>
   );
 }

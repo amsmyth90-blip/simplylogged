@@ -60,8 +60,7 @@ export function RoomSceneScreen(props: Props) {
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
         </span>
       </header>
-      <MobileBottomNav active={props.profile.id === "family-room" ? "FAMILY" : "HOME"}
-        floating onNavigate={props.onNavigate} />
+      <MobileBottomNav active="HOME" floating onNavigate={props.onNavigate} />
     </main>
   );
 }

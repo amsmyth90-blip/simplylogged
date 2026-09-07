@@ -94,6 +94,6 @@ export function FamilySchedulesScreen({
     {model.message ? <p className="family-schedule-status" role="status">{model.message}</p> : null}
     {editing !== undefined ? <FamilyScheduleEditor busy={model.busy} people={people}
       routine={editing} onCancel={() => setEditing(undefined)} onDelete={remove} onSave={save} /> : null}
-    <MobileBottomNav active="FAMILY" onNavigate={onNavigate} />
+    <MobileBottomNav active="HOME" onNavigate={onNavigate} />
   </main>;
 }
