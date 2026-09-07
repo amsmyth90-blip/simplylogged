@@ -23,6 +23,6 @@ export function FamilyInboxScreen(props: {
       synchronize={props.synchronize} onScan={props.onScan}
       onAllFiles={() => props.onNavigate("FILES")}
       onAllReminders={() => props.onNavigate("REMINDERS")} />
-    <MobileBottomNav active="FAMILY" onNavigate={props.onNavigate} />
+    <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
   </main>;
 }

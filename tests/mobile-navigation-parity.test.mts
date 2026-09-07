@@ -47,18 +47,20 @@ test("every declared mobile destination has a signed-in rendering path", async (
   }
 });
 
-test("native navigation reproduces the wrapper labels and drawn icons", async () => {
+test("native navigation keeps only the three primary destinations", async () => {
   const [navigation, icons, styles] = await Promise.all([
     read("apps/mobile/src/components/MobileBottomNav.tsx"),
     read("apps/mobile/src/components/MobileIcon.tsx"),
     read("apps/mobile/src/components/mobile-navigation.css"),
   ]);
-  for (const label of ["Home", "All Files", "Scan", "Reminders", "Family Room"]) {
+  for (const label of ["Home", "Scan", "All Files"]) {
     assert.ok(navigation.includes(`label: "${label}"`));
   }
-  for (const icon of ["home", "folder", "plus", "calendar", "users"]) {
+  for (const icon of ["home", "plus", "folder"]) {
     assert.ok(navigation.includes(`icon: "${icon}"`));
   }
+  assert.doesNotMatch(navigation, /label: "(?:Reminders|Family Room)"/);
+  assert.match(styles, /grid-template-columns: repeat\(3,/);
   assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
   assert.match(icons, /viewBox="0 0 24 24"/);
   assert.match(styles, /background: #edf4e9/);

@@ -18,10 +18,8 @@ const destinations: ReadonlyArray<{
   label: string;
 }> = [
   { id: "HOME", icon: "home", label: "Home" },
-  { id: "FILES", icon: "folder", label: "All Files" },
   { id: "SCAN", icon: "plus", label: "Scan" },
-  { id: "REMINDERS", icon: "calendar", label: "Reminders" },
-  { id: "FAMILY", icon: "users", label: "Family Room" },
+  { id: "FILES", icon: "folder", label: "All Files" },
 ];
 
 export function MobileBottomNav(props: MobileBottomNavProps) {
