@@ -10,7 +10,6 @@ export type SmartPlanRequest = {
   useUp: string[];
   skip: string[];
   appliances: string[];
-  shops: string[];
   rotation: number;
 };
 

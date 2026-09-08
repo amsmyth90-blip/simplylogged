@@ -22,7 +22,7 @@ test("smart week planning honours time, ingredient and appliance preferences", (
   ];
   const plan = buildSmartWeekPlan(recipes, { dates, servings: 3, maximumMinutes: 30,
     focus: "USE_UP", useUp: ["chicken"], skip: ["spinach"], appliances: ["air fryer"],
-    shops: ["tesco"], rotation: 0 });
+    rotation: 0 });
   assert.equal(plan.length, 3);
   assert.equal(plan[0]?.meal?.recipeId, "air fryer chicken");
   assert.equal(plan.every((entry) => entry.meal?.servings === 3), true);
@@ -31,7 +31,7 @@ test("smart week planning honours time, ingredient and appliance preferences", (
   assert.doesNotThrow(() => buildSmartWeekPlan([
     recipe("bounded", { time: `${"0".repeat(20_000)} min` }),
   ], { dates, servings: 2, maximumMinutes: 30, focus: "QUICK", useUp: [], skip: [],
-    appliances: ["hob"], shops: [], rotation: 0 }));
+    appliances: ["hob"], rotation: 0 }));
 });
 
 test("generated week mutations are exact, bounded and confined to one week", () => {
@@ -51,7 +51,7 @@ test("starter recipes let a new account create and save its first smart plan", (
   const starterRecipeIds = smartStarterRecipes.map((item) => item.id);
   const meals = buildSmartWeekPlan(smartStarterRecipes, { dates, servings: 4,
     maximumMinutes: 45, focus: "VARIETY", useUp: [], skip: [],
-    appliances: ["oven", "hob"], shops: [], rotation: 0 });
+    appliances: ["oven", "hob"], rotation: 0 });
   assert.equal(meals.length, dates.length);
   const parsed = parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
     meals, addToShopping: true, starterRecipeIds });
@@ -81,6 +81,17 @@ test("saving a generated shopping list opens the complete Kitchen list", async (
   assert.match(source, /addToShopping \? "Save & view list" : "Save my week"/);
   assert.match(source, /if \(addToShopping\) props\.onOpenShopping\(\)/);
   assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
+});
+
+test("smart planning omits the unused supermarket step", async () => {
+  const source = await readFile(new URL(
+    "../apps/mobile/src/kitchen/SmartMealPlanner.tsx", import.meta.url), "utf8");
+  const visuals = await readFile(new URL(
+    "../apps/mobile/src/kitchen/SmartPlannerVisuals.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /Where do you shop\?|ShopVisual|shopChoices|shops/);
+  assert.match(source, /\["APPLIANCES", "PREFERENCES", "REVIEW"\]/);
+  assert.match(source, /\/3<\/span>/);
+  assert.doesNotMatch(visuals, /Tesco|Sainsbury|ShopVisual|shopChoices/);
 });
 
 test("generated week and pantry-aware shopping list are saved atomically", () => {
