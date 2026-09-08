@@ -109,7 +109,7 @@ export function parseKitchenMeal(value: unknown): KitchenMeal {
   };
 }
 
-function plannedMeal(value: unknown): KitchenPlannedMeal {
+export function parseKitchenPlannedMeal(value: unknown): KitchenPlannedMeal {
   const item = record(value, "Meal-plan entry");
   exact(item, ["date", "meal"], "Meal-plan entry");
   return { date: date(item.date), meal: item.meal === null ? null : parseKitchenMeal(item.meal) };
@@ -138,7 +138,7 @@ export function parseKitchenPlanningSnapshot(value: unknown): KitchenPlanningSna
   if (snapshot.schemaVersion !== KITCHEN_PLANNING_SCHEMA_VERSION) {
     throw new Error("Please update DiaryDock to open Kitchen planning.");
   }
-  const meals = array(snapshot.meals, "Meal plan", 730).map(plannedMeal);
+  const meals = array(snapshot.meals, "Meal plan", 730).map(parseKitchenPlannedMeal);
   if (new Set(meals.map((entry) => entry.date)).size !== meals.length) {
     throw new Error("Meal plan contains duplicate dates.");
   }

@@ -1,0 +1,58 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { buildSmartWeekPlan, parseKitchenPlanningMutation,
+  type KitchenRecipe } from "../packages/kitchen/src/index.ts";
+import { mutateKitchenPlanningPayload } from "../lib/kitchen/planning-mutation.ts";
+
+function recipe(id: string, overrides: Partial<KitchenRecipe> = {}): KitchenRecipe {
+  return { contentComplete: true, id, version: 1, name: id, time: "35 min", servings: 4,
+    image: "", ingredients: ["1 onion"], instructions: "Cook and serve.", steps: [],
+    favourite: false, source: "diarydock", sourceUrl: null, ...overrides };
+}
+
+const dates = ["2026-09-07", "2026-09-08", "2026-09-09"];
+
+test("smart week planning honours time, ingredient and appliance preferences", () => {
+  const recipes = [
+    recipe("slow roast", { time: "2 hr", favourite: true }),
+    recipe("air fryer chicken", { time: "20 min", ingredients: ["chicken", "paprika"] }),
+    recipe("quick pasta", { time: "15 min", ingredients: ["pasta", "spinach"] }),
+  ];
+  const plan = buildSmartWeekPlan(recipes, { dates, servings: 3, maximumMinutes: 30,
+    focus: "USE_UP", useUp: ["chicken"], skip: ["spinach"], appliances: ["air fryer"],
+    shops: ["tesco"], rotation: 0 });
+  assert.equal(plan.length, 3);
+  assert.equal(plan[0]?.meal?.recipeId, "air fryer chicken");
+  assert.equal(plan.every((entry) => entry.meal?.servings === 3), true);
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "slow roast"), false);
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "quick pasta"), false);
+});
+
+test("generated week mutations are exact, bounded and confined to one week", () => {
+  const meal = { name: "Soup", cookTime: "30 min", servings: 4, note: "Warm",
+    imageIndex: 0, recipeId: "soup" };
+  const parsed = parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
+    meals: dates.map((date) => ({ date, meal })), addToShopping: true });
+  assert.equal(parsed.operation, "SET_WEEK_PLAN");
+  assert.throws(() => parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
+    meals: [{ date: dates[0], meal }, { date: "2026-09-14", meal }], addToShopping: true }),
+  /one week/);
+  assert.throws(() => parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
+    meals: [{ date: dates[0], meal }], addToShopping: "yes" }), /invalid/);
+});
+
+test("generated week and pantry-aware shopping list are saved atomically", () => {
+  const soup = recipe("soup", { name: "Garden soup", ingredients: ["1 onion", "2 carrots"] });
+  const meals = dates.map((date) => ({ date, meal: { name: soup.name, cookTime: soup.time,
+    servings: 4, note: soup.instructions, imageIndex: 0, recipeId: soup.id } }));
+  const result = mutateKitchenPlanningPayload({ kitchenRecipes: [soup], mealPlan: {},
+    kitchenItems: [{ id: "pantry-onion", name: "Onion", checked: true, section: "Pantry" }] },
+  { operation: "SET_WEEK_PLAN", revision: null, meals, addToShopping: true }, () => "fixed");
+  assert.equal(result.status, "OK");
+  assert.equal(Object.keys(result.payload?.mealPlan as object).length, 3);
+  assert.equal(result.addedCount, 1);
+  assert.deepEqual((result.payload?.kitchenItems as Array<Record<string, unknown>>)[1], {
+    id: "shopping-fixed", name: "2 carrots", checked: false, section: "Shopping",
+  });
+});

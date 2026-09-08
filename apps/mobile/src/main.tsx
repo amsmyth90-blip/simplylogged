@@ -31,6 +31,7 @@ import "@mobile/kitchen/kitchen.css";
 import "@mobile/kitchen/noticeboard.css";
 import "@mobile/kitchen/notice-editor.css";
 import "@mobile/kitchen/planning.css";
+import "@mobile/kitchen/smart-meal-planner.css";
 import "@mobile/life-check/life-check.css";
 import "@mobile/mailbox/mailbox.css";
 import "@mobile/onboarding/onboarding.css";
