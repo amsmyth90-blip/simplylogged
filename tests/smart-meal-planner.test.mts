@@ -5,6 +5,7 @@ import test from "node:test";
 import { buildSmartWeekPlan, parseKitchenPlanningMutation, smartStarterRecipes,
   requiredKitchenRecipeAppliances, type KitchenRecipe } from "../packages/kitchen/src/index.ts";
 import { mutateKitchenPlanningPayload } from "../lib/kitchen/planning-mutation.ts";
+import { normaliseRecipe } from "../lib/kitchen/planning-normalize.ts";
 
 function recipe(id: string, overrides: Partial<KitchenRecipe> = {}): KitchenRecipe {
   return { contentComplete: true, id, version: 1, name: id, time: "35 min", servings: 4,
@@ -81,6 +82,21 @@ test("saving a generated shopping list opens the complete Kitchen list", async (
   assert.match(source, /addToShopping \? "Save & view list" : "Save my week"/);
   assert.match(source, /if \(addToShopping\) props\.onOpenShopping\(\)/);
   assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
+});
+
+test("starter recipes use matched provider photos and refresh legacy blank records", () => {
+  for (const starter of smartStarterRecipes) {
+    assert.equal(starter.source, "themealdb");
+    assert.match(starter.image, /^https:\/\/www\.themealdb\.com\/images\/media\/meals\//);
+    assert.match(starter.sourceUrl ?? "", /^https:\/\/www\.themealdb\.com\/meal\/\d+/);
+    assert.ok(starter.ingredients.length >= 7);
+  }
+  const fresh = smartStarterRecipes[0]!;
+  const upgraded = normaliseRecipe({ ...fresh, name: "Legacy starter", image: "",
+    source: "diarydock", sourceUrl: null, favourite: true });
+  assert.equal(upgraded?.name, fresh.name);
+  assert.equal(upgraded?.image, fresh.image);
+  assert.equal(upgraded?.favourite, true);
 });
 
 test("appliances are strict compatibility constraints rather than decorative scores", () => {

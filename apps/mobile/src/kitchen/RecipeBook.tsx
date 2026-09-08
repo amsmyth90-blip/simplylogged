@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { scaleKitchenRecipeIngredient, type KitchenPlanningSnapshot,
   type KitchenRecipe } from "@diarydock/kitchen";
+import { Browser } from "@capacitor/browser";
 
 import { MobileIcon } from "@mobile/components/MobileIcon";
 import type { KitchenPlanningDraftMutation } from "./planning-client";
@@ -76,6 +77,7 @@ export function RecipeBook(props: Props) {
       onFavourite={() => selected && void props.mutate({ operation: "TOGGLE_RECIPE_FAVOURITE",
         recipeId: selected.id })} />
     {selected ? <RecipeFeatureCard recipe={selected} servings={servings} checked={checked}
+      onSource={() => selected.sourceUrl && void Browser.open({ url: selected.sourceUrl })}
       onToggle={(index) => setChecked((current) => { const next = new Set(current);
         if (next.has(index)) next.delete(index); else next.add(index); return next; })} />
       : <EmptyBook online={props.online} onAdd={() => setEditor("NEW")}
@@ -133,10 +135,13 @@ function RecipeHeader(props: { selected: KitchenRecipe | null; online: boolean; 
 }
 
 function RecipeFeatureCard(props: { recipe: KitchenRecipe; servings: number; checked: Set<number>;
-  onToggle: (index: number) => void }) {
+  onSource: () => void; onToggle: (index: number) => void }) {
   return <section className="recipe-feature-card"><div className="recipe-feature-image"
     style={imageStyle(props.recipe.image)} role="img" aria-label={props.recipe.name} /><div className="recipe-page">
-    <h2>{props.recipe.name}</h2><hr/><div className="recipe-feature-meta"><span>Ingredients · {props.servings} servings</span>
+    <h2>{props.recipe.name}</h2>{props.recipe.source === "themealdb" && props.recipe.sourceUrl
+      ? <button className="recipe-source" type="button" onClick={props.onSource}>
+        Recipe source · TheMealDB ↗</button> : null}<hr/>
+    <div className="recipe-feature-meta"><span>Ingredients · {props.servings} servings</span>
       <span>{props.checked.size} of {props.recipe.ingredients.length}</span></div>
     <div className="recipe-feature-ingredients">{props.recipe.ingredients.map((item, index) =>
       <button type="button" key={`${item}-${index}`} className={props.checked.has(index) ? "is-checked" : ""}

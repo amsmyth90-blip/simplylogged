@@ -3,6 +3,7 @@ import {
   parseKitchenMeal,
   parseKitchenMealDate,
   parseKitchenRecipe,
+  refreshLegacyStarterRecipe,
   type KitchenCookingProgress,
   type KitchenMeal,
   type KitchenPlannedMeal,
@@ -61,7 +62,7 @@ export function normaliseRecipe(value: unknown): KitchenRecipe | null {
   const source = entry.source === "scanned" || entry.source === "themealdb"
     ? entry.source : "diarydock";
   try {
-    return parseKitchenRecipe({
+    return refreshLegacyStarterRecipe(parseKitchenRecipe({
       contentComplete: true,
       id,
       version: integer(entry.version, 1, 1_000_000, 1),
@@ -77,7 +78,7 @@ export function normaliseRecipe(value: unknown): KitchenRecipe | null {
       favourite: entry.favourite === true,
       source,
       sourceUrl: safeUrl(entry.sourceUrl) || null,
-    });
+    }));
   } catch { return null; }
 }
 
