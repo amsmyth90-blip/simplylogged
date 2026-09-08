@@ -11,6 +11,7 @@ import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
 import { RequestObservation } from "@/lib/observability/request-observation";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { authenticateHybridRequest } from "@/lib/supabase/hybrid-request";
+import { exactMealDbMatch, mealDbRecipeUrl, type MealDbMeal } from "@/lib/kitchen/themealdb";
 
 const MAX_RECIPE_IMAGE_BYTES = 4 * 1024 * 1024;
 const supportedImages = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -40,7 +41,6 @@ const recipeSchema = {
 } as const;
 
 type ScanData = Record<string, unknown>;
-type MealDbMatch = { strMealThumb?: unknown; strSource?: unknown };
 
 const prompt = [
   "Read this photographed recipe card, cookbook page, or handwritten recipe.",
@@ -71,14 +71,6 @@ function safeUrl(value: unknown, image = false) {
   } catch { return ""; }
 }
 
-function mealDbMatch(value: unknown): MealDbMatch | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const meals = (value as Record<string, unknown>).meals;
-  if (!Array.isArray(meals) || !meals[0] || typeof meals[0] !== "object"
-    || Array.isArray(meals[0])) return null;
-  return meals[0] as MealDbMatch;
-}
-
 async function findPhoto(name: string) {
   const key = (process.env.THEMEALDB_API_KEY || "1").trim();
   if (!/^[a-zA-Z0-9_-]{1,120}$/.test(key)) return null;
@@ -87,11 +79,11 @@ async function findPhoto(name: string) {
     { signal: AbortSignal.timeout(8_000) },
   );
   if (!response.ok) return null;
-  try { return mealDbMatch(await readBoundedJsonResponse(response, 512 * 1024)); }
+  try { return exactMealDbMatch(await readBoundedJsonResponse(response, 512 * 1024), name); }
   catch (error) { if (error instanceof ExternalResponseError) return null; throw error; }
 }
 
-function parsedRecipe(scanned: ScanData, match: MealDbMatch | null): KitchenRecipe {
+function parsedRecipe(scanned: ScanData, match: MealDbMeal | null): KitchenRecipe {
   return parseKitchenRecipe({
     contentComplete: true,
     id: `scanned-${crypto.randomUUID()}`,
@@ -109,7 +101,7 @@ function parsedRecipe(scanned: ScanData, match: MealDbMatch | null): KitchenReci
     }) : scanned.steps,
     favourite: false,
     source: "scanned",
-    sourceUrl: safeUrl(match?.strSource) || null,
+    sourceUrl: match ? mealDbRecipeUrl(match) : null,
   });
 }
 

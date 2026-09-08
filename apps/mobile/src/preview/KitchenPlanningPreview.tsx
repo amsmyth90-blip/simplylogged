@@ -1,5 +1,6 @@
 import {
   KITCHEN_PLANNING_SCHEMA_VERSION,
+  smartStarterRecipes,
   type KitchenPlanningSnapshot,
 } from "@diarydock/kitchen";
 
@@ -12,34 +13,14 @@ import { PreviewStore } from "./PreviewStore";
 const snapshot: KitchenPlanningSnapshot = {
   schemaVersion: KITCHEN_PLANNING_SCHEMA_VERSION,
   revision: "2026-09-04T10:00:00.000Z",
-  recipes: [
-    { contentComplete: true, id: "recipe-soup", version: 2, name: "Roasted tomato soup", time: "35 min",
-      servings: 4, image: "", ingredients: ["2 tins tomatoes", "400ml vegetable stock",
-        "1 large onion", "2 cloves garlic", "Fresh basil"],
-      instructions: "Roast the tomatoes, onion and garlic until soft. Simmer with stock, then blend and finish with basil.",
-      steps: [
-        { title: "Prepare", instruction: "Heat the oven and place the vegetables on a roasting tray.",
-          durationMinutes: 10, temperature: "200°C", tip: "Keep the pieces an even size." },
-        { title: "Roast", instruction: "Roast until soft and lightly caramelised.",
-          durationMinutes: 25, temperature: "200°C", tip: "Turn once halfway through." },
-        { title: "Blend and serve", instruction: "Simmer with stock, blend smooth and add basil.",
-          durationMinutes: 10, temperature: "low heat", tip: "Check the seasoning before serving." },
-      ], favourite: true, source: "diarydock", sourceUrl: null },
-    { contentComplete: true, id: "recipe-pasta", version: 1, name: "Garden vegetable pasta", time: "25 min",
-      servings: 4, image: "", ingredients: ["400g pasta", "2 courgettes", "Cherry tomatoes",
-        "Parmesan"], instructions: "Cook the pasta and fold through the sautéed vegetables.",
-      steps: [], favourite: false, source: "diarydock", sourceUrl: null },
-    { contentComplete: true, id: "recipe-curry", version: 1, name: "Chickpea curry", time: "40 min",
-      servings: 4, image: "", ingredients: ["2 tins chickpeas", "400ml coconut milk", "Spinach"],
-      instructions: "Simmer gently until rich, then stir in the spinach.", steps: [],
-      favourite: false, source: "diarydock", sourceUrl: null },
-  ],
+  recipes: structuredClone(smartStarterRecipes.slice(0, 3)),
   meals: [
-    { date: "2026-09-07", meal: { name: "Roasted tomato soup", cookTime: "35 min",
-      servings: 4, note: "Serve with warm sourdough.", imageIndex: 0, recipeId: "recipe-soup" } },
-    { date: "2026-09-09", meal: { name: "Garden vegetable pasta", cookTime: "25 min",
-      servings: 4, note: "Use courgettes from the garden.", imageIndex: 1,
-      recipeId: "recipe-pasta" } },
+    { date: "2026-09-07", meal: { name: smartStarterRecipes[0]!.name,
+      cookTime: smartStarterRecipes[0]!.time, servings: 4, note: "Family dinner.", imageIndex: 0,
+      recipeId: smartStarterRecipes[0]!.id } },
+    { date: "2026-09-09", meal: { name: smartStarterRecipes[1]!.name,
+      cookTime: smartStarterRecipes[1]!.time, servings: 4, note: "Midweek meal.", imageIndex: 1,
+      recipeId: smartStarterRecipes[1]!.id } },
   ],
   cookingProgress: null,
 };

@@ -7,6 +7,7 @@ import { RequestObservation } from "@/lib/observability/request-observation";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { correctRecipeSearchQuery } from "@/lib/recipe-search";
 import { authenticateHybridRequest } from "@/lib/supabase/hybrid-request";
+import { mealDbRecipeUrl } from "@/lib/kitchen/themealdb";
 
 type MealDbMeal = Record<string, string | null>;
 type MealDbPayload = { meals: MealDbMeal[] | null };
@@ -106,7 +107,7 @@ function mapMeal(meal: MealDbMeal): KitchenRecipe | null {
     steps: [],
     favourite: false,
     source: "themealdb",
-    sourceUrl: httpsUrl(meal.strSource) || httpsUrl(meal.strYoutube) || null,
+    sourceUrl: mealDbRecipeUrl(meal),
   };
 }
 

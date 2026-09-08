@@ -1,14 +1,16 @@
 import { useState } from "react";
 
 import { buildSmartWeekPlan, smartStarterRecipes, type KitchenPlannedMeal, type KitchenRecipe,
-  type SmartPlanFocus } from "@diarydock/kitchen";
+  type KitchenAppliance, type SmartPlanFocus } from "@diarydock/kitchen";
 
-import { ApplianceVisual, shopChoices, ShopVisual } from "./SmartPlannerVisuals";
+import { ApplianceVisual } from "./SmartPlannerVisuals";
 
-type Stage = "APPLIANCES" | "SHOPS" | "PREFERENCES" | "REVIEW";
-type Props = { busy: boolean; dates: Date[]; online: boolean; recipes: KitchenRecipe[];
+type Stage = "APPLIANCES" | "PREFERENCES" | "REVIEW";
+type Props = { busy: boolean; dates: Date[]; initialAppliances: KitchenAppliance[];
+  online: boolean; recipes: KitchenRecipe[];
   onClose: () => void; onApply: (meals: KitchenPlannedMeal[], shop: boolean,
-    starterRecipeIds: string[]) => Promise<boolean>; onOpenShopping: () => void };
+    starterRecipeIds: string[], appliances: KitchenAppliance[]) => Promise<boolean>;
+  onOpenShopping: () => void };
 
 const focuses: Array<{ id: SmartPlanFocus; label: string; detail: string }> = [
   { id: "QUICK", label: "Quick & easy", detail: "Shorter cooking times first" },
@@ -26,7 +28,7 @@ function list(value: string) {
   return value.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 12);
 }
 
-function toggle(current: string[], id: string) {
+function toggle<T extends string>(current: T[], id: T) {
   return current.includes(id) ? current.filter((item) => item !== id) : [...current, id];
 }
 
@@ -34,8 +36,7 @@ export function SmartMealPlanner(props: Props) {
   const allDates = props.dates.map(key);
   const planningRecipes = props.recipes.length ? props.recipes : smartStarterRecipes;
   const [stage, setStage] = useState<Stage>("APPLIANCES");
-  const [appliances, setAppliances] = useState(["oven", "hob", "microwave"]);
-  const [shops, setShops] = useState<string[]>([]);
+  const [appliances, setAppliances] = useState<KitchenAppliance[]>(props.initialAppliances);
   const [dates, setDates] = useState(allDates);
   const [servings, setServings] = useState(4);
   const [maximumMinutes, setMaximumMinutes] = useState<number | null>(45);
@@ -49,7 +50,7 @@ export function SmartMealPlanner(props: Props) {
   function create(nextRotation = rotation) {
     const orderedDates = allDates.filter((date) => dates.includes(date));
     const next = buildSmartWeekPlan(planningRecipes, { dates: orderedDates, servings, maximumMinutes, focus,
-      useUp: list(useUp), skip: list(skip), appliances, shops, rotation: nextRotation });
+      useUp: list(useUp), skip: list(skip), appliances, rotation: nextRotation });
     setProposal(next); setStage("REVIEW");
   }
   function changeRecipe(index: number, recipeId: string) {
@@ -62,7 +63,7 @@ export function SmartMealPlanner(props: Props) {
   }
   async function apply() {
     const starterRecipeIds = props.recipes.length ? [] : planningRecipes.map((recipe) => recipe.id);
-    if (!await props.onApply(proposal, addToShopping, starterRecipeIds)) return;
+    if (!await props.onApply(proposal, addToShopping, starterRecipeIds, appliances)) return;
     props.onClose();
     if (addToShopping) props.onOpenShopping();
   }
@@ -70,26 +71,20 @@ export function SmartMealPlanner(props: Props) {
   return <section className="smart-planner" role="dialog" aria-modal="true"
     aria-label="Plan my week"><header><button type="button" onClick={props.onClose}>×</button>
       <div><small>DiaryDock meal planner</small><h2>{stage === "APPLIANCES" ? "How do you cook?"
-        : stage === "SHOPS" ? "Where do you shop?" : stage === "PREFERENCES"
-          ? "Shape your week" : "Your week is ready"}</h2></div>
-      <span>{["APPLIANCES", "SHOPS", "PREFERENCES", "REVIEW"].indexOf(stage) + 1}/4</span>
+        : stage === "PREFERENCES" ? "Shape your week" : "Your week is ready"}</h2></div>
+      <span>{["APPLIANCES", "PREFERENCES", "REVIEW"].indexOf(stage) + 1}/3</span>
     </header><div className="smart-progress"><i className={`stage-${stage}`} /></div>
-    <main>{stage === "APPLIANCES" ? <><p>Select everything available in your kitchen.</p>
+    <main>{stage === "APPLIANCES" ? <><p>Select every appliance you can use. Your plan will only
+      include recipes that work with this equipment.</p>
       <ApplianceVisual selected={appliances} onToggle={(id) => setAppliances(toggle(appliances, id))} />
       <button className="smart-primary" type="button" disabled={!appliances.length}
-        onClick={() => setStage("SHOPS")}>Continue</button></> : null}
-    {stage === "SHOPS" ? <><p>Choose the shops you use. You can select more than one.</p>
-      <ShopVisual selected={shops} onToggle={(id) => setShops(toggle(shops, id))} />
-      <button className="smart-primary" type="button" onClick={() => setStage("PREFERENCES")}>
-        {shops.length ? "Continue" : "No preference"}</button></> : null}
+        onClick={() => setStage("PREFERENCES")}>Continue</button></> : null}
     {stage === "PREFERENCES" ? <Preferences dates={props.dates} selectedDates={dates}
       setDates={setDates} servings={servings} setServings={setServings} focus={focus}
       setFocus={setFocus} maximumMinutes={maximumMinutes} setMaximumMinutes={setMaximumMinutes}
       useUp={useUp} setUseUp={setUseUp} skip={skip} setSkip={setSkip}
       onCreate={() => create()} /> : null}
-    {stage === "REVIEW" ? <><p>{shops.length ? `Ready for ${shops.map((shop) =>
-      shopChoices.find((choice) => choice.id === shop)?.label ?? shop).join(" and ")}.`
-      : "Your shopping list will stay flexible."}</p>
+    {stage === "REVIEW" ? <><p>Every meal matches your selected cooking equipment.</p>
       {proposal.length ? <div className="smart-plan-list">{proposal.map((entry, index) => <label key={entry.date}>
         <span>{new Date(`${entry.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short",
           day: "numeric" })}</span><select value={entry.meal?.recipeId ?? ""}
@@ -100,9 +95,9 @@ export function SmartMealPlanner(props: Props) {
       <label className="smart-shopping-toggle"><input type="checkbox" checked={addToShopping}
         onChange={(event) => setAddToShopping(event.target.checked)} />Build my shopping list too</label>
       <div className="smart-review-actions"><button type="button" onClick={() => {
-        if (!proposal.length) { setStage("PREFERENCES"); return; }
+        if (!proposal.length) { setStage("APPLIANCES"); return; }
         const next = rotation + 1; setRotation(next); create(next);
-      }}>{proposal.length ? "Try another mix" : "Change preferences"}</button>
+      }}>{proposal.length ? "Try another mix" : "Change equipment"}</button>
         <button type="button" disabled={!props.online || props.busy || !proposal.length}
           onClick={() => void apply()}>{props.busy ? "Saving…"
             : addToShopping ? "Save & view list" : "Save my week"}</button></div>

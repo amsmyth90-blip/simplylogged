@@ -3,8 +3,9 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { buildSmartWeekPlan, parseKitchenPlanningMutation, smartStarterRecipes,
-  type KitchenRecipe } from "../packages/kitchen/src/index.ts";
+  requiredKitchenRecipeAppliances, type KitchenRecipe } from "../packages/kitchen/src/index.ts";
 import { mutateKitchenPlanningPayload } from "../lib/kitchen/planning-mutation.ts";
+import { normaliseRecipe } from "../lib/kitchen/planning-normalize.ts";
 
 function recipe(id: string, overrides: Partial<KitchenRecipe> = {}): KitchenRecipe {
   return { contentComplete: true, id, version: 1, name: id, time: "35 min", servings: 4,
@@ -22,7 +23,7 @@ test("smart week planning honours time, ingredient and appliance preferences", (
   ];
   const plan = buildSmartWeekPlan(recipes, { dates, servings: 3, maximumMinutes: 30,
     focus: "USE_UP", useUp: ["chicken"], skip: ["spinach"], appliances: ["air fryer"],
-    shops: ["tesco"], rotation: 0 });
+    rotation: 0 });
   assert.equal(plan.length, 3);
   assert.equal(plan[0]?.meal?.recipeId, "air fryer chicken");
   assert.equal(plan.every((entry) => entry.meal?.servings === 3), true);
@@ -31,7 +32,7 @@ test("smart week planning honours time, ingredient and appliance preferences", (
   assert.doesNotThrow(() => buildSmartWeekPlan([
     recipe("bounded", { time: `${"0".repeat(20_000)} min` }),
   ], { dates, servings: 2, maximumMinutes: 30, focus: "QUICK", useUp: [], skip: [],
-    appliances: ["hob"], shops: [], rotation: 0 }));
+    appliances: ["hob"], rotation: 0 }));
 });
 
 test("generated week mutations are exact, bounded and confined to one week", () => {
@@ -51,7 +52,7 @@ test("starter recipes let a new account create and save its first smart plan", (
   const starterRecipeIds = smartStarterRecipes.map((item) => item.id);
   const meals = buildSmartWeekPlan(smartStarterRecipes, { dates, servings: 4,
     maximumMinutes: 45, focus: "VARIETY", useUp: [], skip: [],
-    appliances: ["oven", "hob"], shops: [], rotation: 0 });
+    appliances: ["oven", "hob"], rotation: 0 });
   assert.equal(meals.length, dates.length);
   const parsed = parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
     meals, addToShopping: true, starterRecipeIds });
@@ -81,6 +82,59 @@ test("saving a generated shopping list opens the complete Kitchen list", async (
   assert.match(source, /addToShopping \? "Save & view list" : "Save my week"/);
   assert.match(source, /if \(addToShopping\) props\.onOpenShopping\(\)/);
   assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
+});
+
+test("starter recipes use matched provider photos and refresh legacy blank records", () => {
+  for (const starter of smartStarterRecipes) {
+    assert.equal(starter.source, "themealdb");
+    assert.match(starter.image, /^https:\/\/www\.themealdb\.com\/images\/media\/meals\//);
+    assert.match(starter.sourceUrl ?? "", /^https:\/\/www\.themealdb\.com\/meal\/\d+/);
+    assert.ok(starter.ingredients.length >= 7);
+  }
+  const fresh = smartStarterRecipes[0]!;
+  const upgraded = normaliseRecipe({ ...fresh, name: "Legacy starter", image: "",
+    source: "diarydock", sourceUrl: null, favourite: true });
+  assert.equal(upgraded?.name, fresh.name);
+  assert.equal(upgraded?.image, fresh.image);
+  assert.equal(upgraded?.favourite, true);
+});
+
+test("appliances are strict compatibility constraints rather than decorative scores", () => {
+  const recipes = [
+    recipe("oven traybake", { instructions: "Roast in the oven until cooked." }),
+    recipe("hob pasta", { instructions: "Simmer in a saucepan." }),
+    recipe("no-cook salad", { instructions: "Mix and serve." }),
+  ];
+  assert.deepEqual(requiredKitchenRecipeAppliances(recipes[0]!), ["oven"]);
+  assert.deepEqual(requiredKitchenRecipeAppliances(recipes[1]!), ["hob"]);
+  const plan = buildSmartWeekPlan(recipes, { dates, servings: 4, maximumMinutes: null,
+    focus: "VARIETY", useUp: [], skip: [], appliances: ["hob"], rotation: 0 });
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "oven traybake"), false);
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "hob pasta"), true);
+  assert.equal(buildSmartWeekPlan(recipes, { dates, servings: 4, maximumMinutes: null,
+    focus: "VARIETY", useUp: [], skip: [], appliances: [], rotation: 0 }).length, 0);
+});
+
+test("smart planning omits the unused supermarket step", async () => {
+  const source = await readFile(new URL(
+    "../apps/mobile/src/kitchen/SmartMealPlanner.tsx", import.meta.url), "utf8");
+  const visuals = await readFile(new URL(
+    "../apps/mobile/src/kitchen/SmartPlannerVisuals.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /Where do you shop\?|ShopVisual|shopChoices|shops/);
+  assert.match(source, /\["APPLIANCES", "PREFERENCES", "REVIEW"\]/);
+  assert.match(source, /\/3<\/span>/);
+  assert.doesNotMatch(visuals, /Tesco|Sainsbury|ShopVisual|shopChoices/);
+});
+
+test("appliance preferences use encrypted account-specific storage", async () => {
+  const preferences = await readFile(new URL(
+    "../apps/mobile/src/kitchen/appliance-preferences.ts", import.meta.url), "utf8");
+  const planner = await readFile(new URL(
+    "../apps/mobile/src/kitchen/MealPlannerMobile.tsx", import.meta.url), "utf8");
+  assert.match(preferences, /tryGetReadModel/);
+  assert.match(preferences, /tryPutReadModel/);
+  assert.doesNotMatch(preferences, /localStorage|sessionStorage/);
+  assert.match(planner, /saveKitchenAppliances\(props\.store, selectedAppliances\)/);
 });
 
 test("generated week and pantry-aware shopping list are saved atomically", () => {

@@ -9,8 +9,8 @@
 .smart-planner>header h2 { margin:.14rem 0 0; font-family:Georgia,serif; font-size:1.3rem; line-height:1.1; }
 .smart-planner>header>span { padding:.35rem .55rem; color:#607755; font-size:.55rem; font-weight:900; border-radius:999px; background:white; }
 .smart-progress { width:min(100%,32rem); height:.25rem; margin:.65rem auto 0; overflow:hidden; border-radius:99px; background:rgb(255 255 255 / 72%); }
-.smart-progress i { display:block; width:25%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#708e64,#9ab18f); transition:width .35s ease; }
-.smart-progress .stage-SHOPS { width:50%; }.smart-progress .stage-PREFERENCES { width:75%; }.smart-progress .stage-REVIEW { width:100%; }
+.smart-progress i { display:block; width:33.333%; height:100%; border-radius:inherit; background:linear-gradient(90deg,#708e64,#9ab18f); transition:width .35s ease; }
+.smart-progress .stage-PREFERENCES { width:66.666%; }.smart-progress .stage-REVIEW { width:100%; }
 .smart-planner>main { width:min(100%,32rem); min-height:0; flex:1; margin:.8rem auto 0; overflow-y:auto; scrollbar-width:none; }
 .smart-planner>main>p { margin:0 0 .7rem; color:#68746e; font-size:.67rem; line-height:1.45; }
 .smart-kitchen-scene { position:relative; height:10.5rem; overflow:hidden; border:1px solid white; border-radius:1.75rem; background:linear-gradient(180deg,#e7efe4 0 64%,#b7a88d 64% 68%,#d9cab2 68%); box-shadow:0 1.5rem 2.8rem -2rem rgb(42 61 49 / 55%); }
@@ -27,10 +27,6 @@
 .smart-choice-grid button.is-selected { color:#315143; border-color:#94aa8a; background:#edf5e9; box-shadow:0 0 0 2px rgb(140 164 128 / 18%); }
 .smart-choice-grid i { display:grid; width:2rem; height:2rem; place-items:center; color:#607b55; font-size:.9rem; font-style:normal; border-radius:.65rem; background:#e7efe3; }
 .smart-choice-grid span { overflow:hidden; font-size:.63rem; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }.smart-choice-grid b { color:#708d64; text-align:center; }
-.smart-shop-scene { height:7rem; padding:1rem; overflow:hidden; border:1px solid white; border-radius:1.65rem; background:linear-gradient(145deg,#263b35,#456355); box-shadow:0 1.5rem 2.8rem -2rem rgb(31 51 42 / 80%); }
-.smart-shop-scene>span { color:#d9c69b; font-family:Georgia,serif; font-size:1.05rem; }
-.smart-shop-scene>div { display:flex; width:max-content; gap:.5rem; margin-top:1.05rem; animation:smart-shops 18s linear infinite; }
-.smart-shop-scene i { min-width:5.5rem; padding:.65rem .8rem; color:#33433b; font-size:.62rem; font-style:normal; font-weight:850; text-align:center; border-radius:.75rem; background:#fffdf7; }
 .smart-primary { width:100%; min-height:3rem; margin-top:.85rem; color:white; font-size:.7rem; font-weight:900; border:0; border-radius:999px; background:#263b35; box-shadow:0 1rem 1.8rem -1.15rem rgb(38 59 53 / 70%); }.smart-primary:disabled { opacity:.45; }
 .smart-days { display:grid; grid-template-columns:repeat(7,1fr); gap:.3rem; }
 .smart-days button { min-width:0; height:3.3rem; padding:.35rem 0; color:#77827b; border:1px solid white; border-radius:1rem; background:rgb(255 255 255 / 72%); }.smart-days button.is-selected { color:white; border-color:#6f8b62; background:#6f8b62; box-shadow:0 .5rem 1rem -.7rem #47623e; }
@@ -49,6 +45,5 @@
 .smart-review-actions { display:grid; grid-template-columns:.85fr 1.15fr; gap:.5rem; margin-top:.7rem; }.smart-review-actions button { min-height:2.8rem; color:#607b55; font-size:.62rem; font-weight:900; border:1px solid #d5dfd0; border-radius:999px; background:white; }.smart-review-actions button+button { color:white; border-color:#263b35; background:#263b35; }.smart-review-actions button:disabled { opacity:.45; }
 @keyframes smart-leaves { to { transform:rotate(10deg) translateX(.15rem); } }
 @keyframes smart-appliance { 50% { transform:translateY(-.18rem); box-shadow:0 .75rem 1.1rem -.7rem #203027; } }
-@keyframes smart-shops { to { transform:translateX(calc(-50% - .25rem)); } }
-@media (prefers-reduced-motion:reduce) { .smart-window i,.smart-scene-appliance.is-on,.smart-shop-scene>div { animation:none; } }
+@media (prefers-reduced-motion:reduce) { .smart-window i,.smart-scene-appliance.is-on { animation:none; } }
 @media (max-width:370px) { .meal-planner-header p { display:none; }.meal-header-actions .meal-shop-button { display:none; }.smart-kitchen-scene { height:9rem; }.smart-choice-grid { gap:.35rem; } }

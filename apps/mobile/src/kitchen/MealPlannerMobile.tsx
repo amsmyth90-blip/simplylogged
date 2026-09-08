@@ -1,14 +1,18 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import {
   defaultKitchenMealForDate,
   type KitchenMeal,
+  type KitchenAppliance,
   type KitchenPlanningSnapshot,
 } from "@diarydock/kitchen";
+import type { OfflineStore } from "@diarydock/offline-store";
 
 import tableImage from "../../../../public/images/meal-planner-family-table.png";
 import thumbnailsImage from "../../../../public/images/weekly-meal-thumbnails.png";
 import { MobileIcon } from "@mobile/components/MobileIcon";
+import { defaultKitchenAppliances, loadKitchenAppliances,
+  saveKitchenAppliances } from "./appliance-preferences";
 import type { KitchenPlanningDraftMutation } from "./planning-client";
 import { SmartMealPlanner } from "./SmartMealPlanner";
 
@@ -16,6 +20,7 @@ type Props = {
   busy: boolean;
   online: boolean;
   snapshot: KitchenPlanningSnapshot;
+  store: OfflineStore;
   mutate: (mutation: KitchenPlanningDraftMutation) => Promise<unknown>;
   onBack: () => void;
 };
@@ -64,7 +69,14 @@ export function MealPlannerMobile(props: Props) {
   const selectedMeal = meal(props.snapshot, selectedDate);
   const [editing, setEditing] = useState(false);
   const [smartOpen, setSmartOpen] = useState(false);
+  const [appliances, setAppliances] = useState<KitchenAppliance[]>(defaultKitchenAppliances);
   const [draft, setDraft] = useState<KitchenMeal>(selectedMeal ?? emptyMeal());
+
+  useEffect(() => {
+    let active = true;
+    void loadKitchenAppliances(props.store).then((value) => { if (active) setAppliances(value); });
+    return () => { active = false; };
+  }, [props.store]);
 
   function changeWeek(change: number) {
     setOffset((value) => {
@@ -91,9 +103,14 @@ export function MealPlannerMobile(props: Props) {
     void props.mutate({ operation: "ADD_WEEK_TO_SHOPPING", dates: dates.map(key) });
   }
   async function applySmartPlan(meals: KitchenPlanningSnapshot["meals"], addToShopping: boolean,
-    starterRecipeIds: string[]) {
-    return Boolean(await props.mutate({ operation: "SET_WEEK_PLAN", meals, addToShopping,
+    starterRecipeIds: string[], selectedAppliances: KitchenAppliance[]) {
+    const saved = Boolean(await props.mutate({ operation: "SET_WEEK_PLAN", meals, addToShopping,
       starterRecipeIds }));
+    if (saved) {
+      setAppliances(selectedAppliances);
+      await saveKitchenAppliances(props.store, selectedAppliances);
+    }
+    return saved;
   }
 
   return <>
@@ -173,7 +190,8 @@ export function MealPlannerMobile(props: Props) {
         onChange={(event) => setDraft((current) => ({ ...current, note: event.target.value }))} /></label>
       <button className="planning-primary" type="submit">Save meal</button></form></div> : null}
     {smartOpen ? <SmartMealPlanner busy={props.busy} dates={dates} online={props.online}
-      recipes={props.snapshot.recipes} onClose={() => setSmartOpen(false)}
+      recipes={props.snapshot.recipes} initialAppliances={appliances}
+      onClose={() => setSmartOpen(false)}
       onApply={applySmartPlan} onOpenShopping={props.onBack} /> : null}
   </>;
 }

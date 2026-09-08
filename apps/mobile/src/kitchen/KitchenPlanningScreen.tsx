@@ -33,7 +33,8 @@ export function KitchenPlanningScreen(props: {
           busy={planning.busy} loadingRecipeId={planning.loadingRecipeId}
           loadRecipe={planning.loadRecipe} mutate={planning.mutate} onBack={props.onBack} />
         : <MealPlannerMobile snapshot={planning.snapshot} online={planning.online}
-          busy={planning.busy} mutate={planning.mutate} onBack={props.onBack} /> : null}
+          busy={planning.busy} mutate={planning.mutate} store={props.store}
+          onBack={props.onBack} /> : null}
       <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
     </main>
   );
