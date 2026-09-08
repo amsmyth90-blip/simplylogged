@@ -1,13 +1,14 @@
 import { useState } from "react";
 
-import { buildSmartWeekPlan, type KitchenPlannedMeal, type KitchenRecipe,
+import { buildSmartWeekPlan, smartStarterRecipes, type KitchenPlannedMeal, type KitchenRecipe,
   type SmartPlanFocus } from "@diarydock/kitchen";
 
 import { ApplianceVisual, shopChoices, ShopVisual } from "./SmartPlannerVisuals";
 
 type Stage = "APPLIANCES" | "SHOPS" | "PREFERENCES" | "REVIEW";
 type Props = { busy: boolean; dates: Date[]; online: boolean; recipes: KitchenRecipe[];
-  onClose: () => void; onApply: (meals: KitchenPlannedMeal[], shop: boolean) => Promise<boolean> };
+  onClose: () => void; onApply: (meals: KitchenPlannedMeal[], shop: boolean,
+    starterRecipeIds: string[]) => Promise<boolean> };
 
 const focuses: Array<{ id: SmartPlanFocus; label: string; detail: string }> = [
   { id: "QUICK", label: "Quick & easy", detail: "Shorter cooking times first" },
@@ -31,6 +32,7 @@ function toggle(current: string[], id: string) {
 
 export function SmartMealPlanner(props: Props) {
   const allDates = props.dates.map(key);
+  const planningRecipes = props.recipes.length ? props.recipes : smartStarterRecipes;
   const [stage, setStage] = useState<Stage>("APPLIANCES");
   const [appliances, setAppliances] = useState(["oven", "hob", "microwave"]);
   const [shops, setShops] = useState<string[]>([]);
@@ -46,12 +48,12 @@ export function SmartMealPlanner(props: Props) {
 
   function create(nextRotation = rotation) {
     const orderedDates = allDates.filter((date) => dates.includes(date));
-    const next = buildSmartWeekPlan(props.recipes, { dates: orderedDates, servings, maximumMinutes, focus,
+    const next = buildSmartWeekPlan(planningRecipes, { dates: orderedDates, servings, maximumMinutes, focus,
       useUp: list(useUp), skip: list(skip), appliances, shops, rotation: nextRotation });
     setProposal(next); setStage("REVIEW");
   }
   function changeRecipe(index: number, recipeId: string) {
-    const recipe = props.recipes.find((item) => item.id === recipeId);
+    const recipe = planningRecipes.find((item) => item.id === recipeId);
     if (!recipe) return;
     setProposal((current) => current.map((entry, itemIndex) => itemIndex !== index ? entry : ({
       ...entry, meal: { name: recipe.name, cookTime: recipe.time, servings,
@@ -59,7 +61,8 @@ export function SmartMealPlanner(props: Props) {
     })));
   }
   async function apply() {
-    if (await props.onApply(proposal, addToShopping)) props.onClose();
+    const starterRecipeIds = props.recipes.length ? [] : planningRecipes.map((recipe) => recipe.id);
+    if (await props.onApply(proposal, addToShopping, starterRecipeIds)) props.onClose();
   }
 
   return <section className="smart-planner" role="dialog" aria-modal="true"
@@ -81,14 +84,14 @@ export function SmartMealPlanner(props: Props) {
       setDates={setDates} servings={servings} setServings={setServings} focus={focus}
       setFocus={setFocus} maximumMinutes={maximumMinutes} setMaximumMinutes={setMaximumMinutes}
       useUp={useUp} setUseUp={setUseUp} skip={skip} setSkip={setSkip}
-      onCreate={() => create()} recipes={props.recipes.length} /> : null}
+      onCreate={() => create()} /> : null}
     {stage === "REVIEW" ? <><p>{shops.length ? `Ready for ${shops.map((shop) =>
       shopChoices.find((choice) => choice.id === shop)?.label ?? shop).join(" and ")}.`
       : "Your shopping list will stay flexible."}</p>
       {proposal.length ? <div className="smart-plan-list">{proposal.map((entry, index) => <label key={entry.date}>
         <span>{new Date(`${entry.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short",
           day: "numeric" })}</span><select value={entry.meal?.recipeId ?? ""}
-          onChange={(event) => changeRecipe(index, event.target.value)}>{props.recipes.map((recipe) =>
+          onChange={(event) => changeRecipe(index, event.target.value)}>{planningRecipes.map((recipe) =>
           <option value={recipe.id} key={recipe.id}>{recipe.name}</option>)}</select></label>)}</div>
         : <div className="smart-plan-empty"><b>No matching recipes</b><span>Adjust the time or skipped
           ingredients, then try again.</span></div>}
@@ -108,7 +111,7 @@ function Preferences(props: { dates: Date[]; selectedDates: string[]; setDates: 
   servings: number; setServings: (value: number) => void; focus: SmartPlanFocus;
   setFocus: (value: SmartPlanFocus) => void; maximumMinutes: number | null;
   setMaximumMinutes: (value: number | null) => void; useUp: string; setUseUp: (value: string) => void;
-  skip: string; setSkip: (value: string) => void; onCreate: () => void; recipes: number }) {
+  skip: string; setSkip: (value: string) => void; onCreate: () => void }) {
   return <><p>Choose the days and what matters most this week.</p><div className="smart-days">
     {props.dates.map((date) => { const value = key(date); const active = props.selectedDates.includes(value);
       return <button type="button" className={active ? "is-selected" : ""} key={value}
@@ -128,6 +131,6 @@ function Preferences(props: { dates: Date[]; selectedDates: string[]; setDates: 
     <label className="smart-text-field">Skip ingredients<input value={props.skip} maxLength={240}
       placeholder="e.g. mushrooms, nuts" onChange={(event) => props.setSkip(event.target.value)} /></label>
     <small className="smart-safety">Always check recipe ingredients for allergies.</small>
-    <button className="smart-primary" type="button" disabled={!props.selectedDates.length || !props.recipes}
-      onClick={props.onCreate}>{props.recipes ? "Create my plan" : "Add recipes first"}</button></>;
+    <button className="smart-primary" type="button" disabled={!props.selectedDates.length}
+      onClick={props.onCreate}>Create my plan</button></>;
 }

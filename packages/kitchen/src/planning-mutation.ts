@@ -42,12 +42,18 @@ export function parseKitchenPlanningMutation(value: unknown): KitchenPlanningMut
     };
   }
   if (operation === "SET_WEEK_PLAN") {
-    exact(mutation, ["operation", "revision", "meals", "addToShopping"],
+    exact(mutation, ["operation", "revision", "meals", "addToShopping", "starterRecipeIds"],
       "Kitchen planning update");
     const meals = array(mutation.meals, "Generated meal plan", 7)
       .map(parseKitchenPlannedMeal);
+    const starterRecipeIds = mutation.starterRecipeIds === undefined ? []
+      : array(mutation.starterRecipeIds, "Starter recipes", 7)
+        .map((entry) => text(entry, "Starter recipe ID", 128));
     if (!meals.length || typeof mutation.addToShopping !== "boolean") {
       throw new Error("Generated meal plan is invalid.");
+    }
+    if (new Set(starterRecipeIds).size !== starterRecipeIds.length) {
+      throw new Error("Starter recipes contain duplicates.");
     }
     const timestamps = meals.map(({ date }) => Date.parse(`${date}T00:00:00Z`));
     const monday = new Date(timestamps[0]!);
@@ -57,7 +63,8 @@ export function parseKitchenPlanningMutation(value: unknown): KitchenPlanningMut
       || timestamps.some((value) => value < monday.getTime() || value > end)) {
       throw new Error("Generated meals must belong to one week.");
     }
-    return { operation, revision: parsedRevision, meals, addToShopping: mutation.addToShopping };
+    return { operation, revision: parsedRevision, meals, addToShopping: mutation.addToShopping,
+      starterRecipeIds };
   }
   if (operation === "SWAP_MEALS") {
     exact(mutation, ["operation", "revision", "sourceDate", "targetDate"], "Kitchen planning update");
