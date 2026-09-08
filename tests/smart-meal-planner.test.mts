@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildSmartWeekPlan, parseKitchenPlanningMutation,
+import { buildSmartWeekPlan, parseKitchenPlanningMutation, smartStarterRecipes,
   type KitchenRecipe } from "../packages/kitchen/src/index.ts";
 import { mutateKitchenPlanningPayload } from "../lib/kitchen/planning-mutation.ts";
 
@@ -44,6 +44,32 @@ test("generated week mutations are exact, bounded and confined to one week", () 
   /one week/);
   assert.throws(() => parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
     meals: [{ date: dates[0], meal }], addToShopping: "yes" }), /invalid/);
+});
+
+test("starter recipes let a new account create and save its first smart plan", () => {
+  const starterRecipeIds = smartStarterRecipes.map((item) => item.id);
+  const meals = buildSmartWeekPlan(smartStarterRecipes, { dates, servings: 4,
+    maximumMinutes: 45, focus: "VARIETY", useUp: [], skip: [],
+    appliances: ["oven", "hob"], shops: [], rotation: 0 });
+  assert.equal(meals.length, dates.length);
+  const parsed = parseKitchenPlanningMutation({ operation: "SET_WEEK_PLAN", revision: null,
+    meals, addToShopping: true, starterRecipeIds });
+  const result = mutateKitchenPlanningPayload({}, parsed, () => "starter");
+  assert.equal(result.status, "OK");
+  assert.equal((result.payload?.kitchenRecipes as KitchenRecipe[]).length,
+    smartStarterRecipes.length);
+  assert.equal(result.addedCount > 0, true);
+});
+
+test("only server-owned starter recipes can be installed with a smart plan", () => {
+  const starter = smartStarterRecipes[0]!;
+  const meals = dates.slice(0, 1).map((date) => ({ date, meal: { name: starter.name,
+    cookTime: starter.time, servings: 4, note: starter.instructions,
+    imageIndex: 0, recipeId: starter.id } }));
+  const result = mutateKitchenPlanningPayload({}, { operation: "SET_WEEK_PLAN", revision: null,
+    meals, addToShopping: false, starterRecipeIds: ["not-a-diarydock-starter"] });
+  assert.equal(result.status, "INVALID_REFERENCE");
+  assert.equal(result.payload, null);
 });
 
 test("generated week and pantry-aware shopping list are saved atomically", () => {

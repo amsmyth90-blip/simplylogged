@@ -90,8 +90,10 @@ export function MealPlannerMobile(props: Props) {
   function shopWeek() {
     void props.mutate({ operation: "ADD_WEEK_TO_SHOPPING", dates: dates.map(key) });
   }
-  async function applySmartPlan(meals: KitchenPlanningSnapshot["meals"], addToShopping: boolean) {
-    return Boolean(await props.mutate({ operation: "SET_WEEK_PLAN", meals, addToShopping }));
+  async function applySmartPlan(meals: KitchenPlanningSnapshot["meals"], addToShopping: boolean,
+    starterRecipeIds: string[]) {
+    return Boolean(await props.mutate({ operation: "SET_WEEK_PLAN", meals, addToShopping,
+      starterRecipeIds }));
   }
 
   return <>

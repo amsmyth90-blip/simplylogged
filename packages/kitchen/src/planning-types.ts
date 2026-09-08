@@ -74,6 +74,7 @@ export type KitchenPlanningMutation =
       operation: "SET_WEEK_PLAN";
       meals: KitchenPlannedMeal[];
       addToShopping: boolean;
+      starterRecipeIds?: string[];
     })
   | (Revisioned & { operation: "SWAP_MEALS"; sourceDate: string; targetDate: string })
   | (Revisioned & { operation: "SET_COOKING_PROGRESS"; progress: KitchenCookingProgress | null })

@@ -13,4 +13,5 @@ export * from "./planning-parser.ts";
 export * from "./planning-rules.ts";
 export * from "./planning-types.ts";
 export * from "./smart-week-plan.ts";
+export * from "./smart-starter-recipes.ts";
 export * from "./types.ts";

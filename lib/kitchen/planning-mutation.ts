@@ -3,6 +3,7 @@ import {
   defaultKitchenMealForDate,
   normaliseKitchenRecipeIngredient,
   scaleKitchenRecipeIngredient,
+  smartStarterRecipes,
   type KitchenMeal,
   type KitchenPlannedMeal,
   type KitchenPlanningMutation,
@@ -117,6 +118,27 @@ function setWeekPlan(payload: JsonRecord, meals: KitchenPlannedMeal[],
     meals.map(({ date }) => date)), createId);
 }
 
+function prepareWeekRecipes(payload: JsonRecord, recipes: KitchenRecipe[], starterIds: string[]) {
+  if (!starterIds.length) return { status: "OK" as const, recipes };
+  const catalog = new Map(smartStarterRecipes.map((recipe) => [recipe.id, recipe]));
+  const requested = starterIds.map((id) => catalog.get(id));
+  if (requested.some((recipe) => !recipe)) {
+    return { status: "INVALID_REFERENCE" as const, recipes };
+  }
+  const existingIds = new Set(recipes.map((recipe) => recipe.id));
+  const additions = requested.filter((recipe): recipe is KitchenRecipe => {
+    return recipe !== undefined && !existingIds.has(recipe.id);
+  });
+  if (recipes.length + additions.length > 150) {
+    return { status: "CAPACITY" as const, recipes };
+  }
+  if (additions.length) {
+    const source = Array.isArray(payload.kitchenRecipes) ? payload.kitchenRecipes : [];
+    payload.kitchenRecipes = [...structuredClone(additions), ...source];
+  }
+  return { status: "OK" as const, recipes: [...additions, ...recipes] };
+}
+
 function swapMeals(payload: JsonRecord, sourceDate: string, targetDate: string) {
   const plan = object(payload.mealPlan);
   const source = mealForDate(plan, sourceDate);
@@ -199,7 +221,9 @@ export function mutateKitchenPlanningPayload(
     return bounded(setMeal(payload, mutation.date, mutation.meal, recipes));
   }
   if (mutation.operation === "SET_WEEK_PLAN") {
-    return bounded(setWeekPlan(payload, mutation.meals, recipes,
+    const prepared = prepareWeekRecipes(payload, recipes, mutation.starterRecipeIds ?? []);
+    if (prepared.status !== "OK") return result(prepared.status);
+    return bounded(setWeekPlan(payload, mutation.meals, prepared.recipes,
       mutation.addToShopping, createId));
   }
   if (mutation.operation === "SWAP_MEALS") {
