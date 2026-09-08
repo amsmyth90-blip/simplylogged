@@ -19,9 +19,34 @@ function words(values: string[]) {
 }
 
 function minutes(value: string) {
-  const hours = value.match(/(\d+(?:\.\d+)?)\s*(?:h|hr|hour)/i);
-  const mins = value.match(/(\d+)\s*(?:m|min)/i);
-  const total = (hours ? Number(hours[1]) * 60 : 0) + (mins ? Number(mins[1]) : 0);
+  const lower = value.toLowerCase();
+  let total = 0;
+  let index = 0;
+  while (index < value.length) {
+    while (index < value.length) {
+      const code = value.charCodeAt(index);
+      if (code >= 48 && code <= 57) break;
+      index += 1;
+    }
+    const numberStart = index;
+    while (index < value.length) {
+      const code = value.charCodeAt(index);
+      if (code < 48 || code > 57) break;
+      index += 1;
+    }
+    if (numberStart === index) break;
+    const amount = Number(value.slice(numberStart, index));
+    while (value[index] === " ") index += 1;
+    const unitStart = index;
+    while (index < value.length) {
+      const code = lower.charCodeAt(index);
+      if (code < 97 || code > 122) break;
+      index += 1;
+    }
+    const unit = lower.slice(unitStart, index);
+    if (unit.startsWith("h")) total += amount * 60;
+    else if (unit.startsWith("m")) total += amount;
+  }
   return Number.isFinite(total) && total > 0 ? total : null;
 }
 

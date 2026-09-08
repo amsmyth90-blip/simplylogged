@@ -27,6 +27,10 @@ test("smart week planning honours time, ingredient and appliance preferences", (
   assert.equal(plan.every((entry) => entry.meal?.servings === 3), true);
   assert.equal(plan.some((entry) => entry.meal?.recipeId === "slow roast"), false);
   assert.equal(plan.some((entry) => entry.meal?.recipeId === "quick pasta"), false);
+  assert.doesNotThrow(() => buildSmartWeekPlan([
+    recipe("bounded", { time: `${"0".repeat(20_000)} min` }),
+  ], { dates, servings: 2, maximumMinutes: 30, focus: "QUICK", useUp: [], skip: [],
+    appliances: ["hob"], shops: [], rotation: 0 }));
 });
 
 test("generated week mutations are exact, bounded and confined to one week", () => {
