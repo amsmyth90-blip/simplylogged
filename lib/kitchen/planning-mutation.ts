@@ -4,6 +4,7 @@ import {
   normaliseKitchenRecipeIngredient,
   scaleKitchenRecipeIngredient,
   type KitchenMeal,
+  type KitchenPlannedMeal,
   type KitchenPlanningMutation,
   type KitchenRecipe,
 } from "@diarydock/kitchen";
@@ -103,6 +104,19 @@ function setMeal(payload: JsonRecord, date: string, meal: KitchenMeal | null,
   return result("OK", payload);
 }
 
+function setWeekPlan(payload: JsonRecord, meals: KitchenPlannedMeal[],
+  recipes: KitchenRecipe[], addToShopping: boolean, createId: () => string) {
+  if (meals.some(({ meal }) => meal?.recipeId && !activeRecipe(recipes, meal.recipeId))) {
+    return result("INVALID_REFERENCE");
+  }
+  const plan = { ...object(payload.mealPlan) };
+  for (const entry of meals) plan[entry.date] = entry.meal;
+  payload.mealPlan = plan;
+  if (!addToShopping) return result("OK", payload);
+  return appendShopping(payload, weekIngredients(payload, recipes,
+    meals.map(({ date }) => date)), createId);
+}
+
 function swapMeals(payload: JsonRecord, sourceDate: string, targetDate: string) {
   const plan = object(payload.mealPlan);
   const source = mealForDate(plan, sourceDate);
@@ -183,6 +197,10 @@ export function mutateKitchenPlanningPayload(
   }
   if (mutation.operation === "SET_MEAL") {
     return bounded(setMeal(payload, mutation.date, mutation.meal, recipes));
+  }
+  if (mutation.operation === "SET_WEEK_PLAN") {
+    return bounded(setWeekPlan(payload, mutation.meals, recipes,
+      mutation.addToShopping, createId));
   }
   if (mutation.operation === "SWAP_MEALS") {
     return bounded(swapMeals(payload, mutation.sourceDate, mutation.targetDate));

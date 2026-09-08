@@ -10,6 +10,7 @@ import tableImage from "../../../../public/images/meal-planner-family-table.png"
 import thumbnailsImage from "../../../../public/images/weekly-meal-thumbnails.png";
 import { MobileIcon } from "@mobile/components/MobileIcon";
 import type { KitchenPlanningDraftMutation } from "./planning-client";
+import { SmartMealPlanner } from "./SmartMealPlanner";
 
 type Props = {
   busy: boolean;
@@ -62,6 +63,7 @@ export function MealPlannerMobile(props: Props) {
   const selectedDate = key(dates[selectedIndex]!);
   const selectedMeal = meal(props.snapshot, selectedDate);
   const [editing, setEditing] = useState(false);
+  const [smartOpen, setSmartOpen] = useState(false);
   const [draft, setDraft] = useState<KitchenMeal>(selectedMeal ?? emptyMeal());
 
   function changeWeek(change: number) {
@@ -88,6 +90,9 @@ export function MealPlannerMobile(props: Props) {
   function shopWeek() {
     void props.mutate({ operation: "ADD_WEEK_TO_SHOPPING", dates: dates.map(key) });
   }
+  async function applySmartPlan(meals: KitchenPlanningSnapshot["meals"], addToShopping: boolean) {
+    return Boolean(await props.mutate({ operation: "SET_WEEK_PLAN", meals, addToShopping }));
+  }
 
   return <>
     <header className="meal-planner-header">
@@ -96,8 +101,10 @@ export function MealPlannerMobile(props: Props) {
       </button>
       <div><small>Kitchen</small><h1>Weekly meal planner</h1>
         <p>Plan meals. Shop smart. Eat together.</p></div>
-      <button type="button" className="meal-shop-button" disabled={!props.online || props.busy}
-        onClick={shopWeek}><MobileIcon name="plus" />Shop week</button>
+      <aside className="meal-header-actions"><button type="button" className="meal-plan-button"
+        onClick={() => setSmartOpen(true)}>Plan for me</button>
+        <button type="button" className="meal-shop-button" disabled={!props.online || props.busy}
+          onClick={shopWeek}><MobileIcon name="plus" />Shop</button></aside>
     </header>
     <div className="meal-planner-mobile">
       <header className="meal-week-nav">
@@ -163,5 +170,8 @@ export function MealPlannerMobile(props: Props) {
       <label>Notes<textarea rows={5} value={draft.note} maxLength={2_000}
         onChange={(event) => setDraft((current) => ({ ...current, note: event.target.value }))} /></label>
       <button className="planning-primary" type="submit">Save meal</button></form></div> : null}
+    {smartOpen ? <SmartMealPlanner busy={props.busy} dates={dates} online={props.online}
+      recipes={props.snapshot.recipes} onClose={() => setSmartOpen(false)}
+      onApply={applySmartPlan} /> : null}
   </>;
 }

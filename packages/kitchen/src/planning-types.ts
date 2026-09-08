@@ -70,6 +70,11 @@ export type KitchenPlanningMutation =
   | (Revisioned & { operation: "DELETE_RECIPE"; recipeId: string })
   | (Revisioned & { operation: "TOGGLE_RECIPE_FAVOURITE"; recipeId: string })
   | (Revisioned & { operation: "SET_MEAL"; date: string; meal: KitchenMeal | null })
+  | (Revisioned & {
+      operation: "SET_WEEK_PLAN";
+      meals: KitchenPlannedMeal[];
+      addToShopping: boolean;
+    })
   | (Revisioned & { operation: "SWAP_MEALS"; sourceDate: string; targetDate: string })
   | (Revisioned & { operation: "SET_COOKING_PROGRESS"; progress: KitchenCookingProgress | null })
   | (Revisioned & {

@@ -12,4 +12,5 @@ export * from "./planning-mutation.ts";
 export * from "./planning-parser.ts";
 export * from "./planning-rules.ts";
 export * from "./planning-types.ts";
+export * from "./smart-week-plan.ts";
 export * from "./types.ts";

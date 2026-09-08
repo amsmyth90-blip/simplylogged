@@ -4,6 +4,7 @@ import {
   parseKitchenInteger,
   parseKitchenMeal,
   parseKitchenMealDate,
+  parseKitchenPlannedMeal,
   parseKitchenRecipe,
 } from "./planning-parser.ts";
 import type { KitchenPlanningMutation } from "./planning-types.ts";
@@ -39,6 +40,24 @@ export function parseKitchenPlanningMutation(value: unknown): KitchenPlanningMut
       date: parseKitchenMealDate(mutation.date),
       meal: mutation.meal === null ? null : parseKitchenMeal(mutation.meal),
     };
+  }
+  if (operation === "SET_WEEK_PLAN") {
+    exact(mutation, ["operation", "revision", "meals", "addToShopping"],
+      "Kitchen planning update");
+    const meals = array(mutation.meals, "Generated meal plan", 7)
+      .map(parseKitchenPlannedMeal);
+    if (!meals.length || typeof mutation.addToShopping !== "boolean") {
+      throw new Error("Generated meal plan is invalid.");
+    }
+    const timestamps = meals.map(({ date }) => Date.parse(`${date}T00:00:00Z`));
+    const monday = new Date(timestamps[0]!);
+    monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+    const end = monday.getTime() + (6 * 86_400_000);
+    if (new Set(timestamps).size !== timestamps.length
+      || timestamps.some((value) => value < monday.getTime() || value > end)) {
+      throw new Error("Generated meals must belong to one week.");
+    }
+    return { operation, revision: parsedRevision, meals, addToShopping: mutation.addToShopping };
   }
   if (operation === "SWAP_MEALS") {
     exact(mutation, ["operation", "revision", "sourceDate", "targetDate"], "Kitchen planning update");
