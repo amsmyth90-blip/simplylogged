@@ -174,6 +174,6 @@ export function MealPlannerMobile(props: Props) {
       <button className="planning-primary" type="submit">Save meal</button></form></div> : null}
     {smartOpen ? <SmartMealPlanner busy={props.busy} dates={dates} online={props.online}
       recipes={props.snapshot.recipes} onClose={() => setSmartOpen(false)}
-      onApply={applySmartPlan} /> : null}
+      onApply={applySmartPlan} onOpenShopping={props.onBack} /> : null}
   </>;
 }

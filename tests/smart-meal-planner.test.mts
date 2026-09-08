@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { buildSmartWeekPlan, parseKitchenPlanningMutation, smartStarterRecipes,
@@ -70,6 +71,16 @@ test("only server-owned starter recipes can be installed with a smart plan", () 
     meals, addToShopping: false, starterRecipeIds: ["not-a-diarydock-starter"] });
   assert.equal(result.status, "INVALID_REFERENCE");
   assert.equal(result.payload, null);
+});
+
+test("saving a generated shopping list opens the complete Kitchen list", async () => {
+  const source = await readFile(new URL(
+    "../apps/mobile/src/kitchen/SmartMealPlanner.tsx", import.meta.url), "utf8");
+  const parent = await readFile(new URL(
+    "../apps/mobile/src/kitchen/MealPlannerMobile.tsx", import.meta.url), "utf8");
+  assert.match(source, /addToShopping \? "Save & view list" : "Save my week"/);
+  assert.match(source, /if \(addToShopping\) props\.onOpenShopping\(\)/);
+  assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
 });
 
 test("generated week and pantry-aware shopping list are saved atomically", () => {

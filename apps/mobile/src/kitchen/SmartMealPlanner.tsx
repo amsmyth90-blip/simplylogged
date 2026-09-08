@@ -8,7 +8,7 @@ import { ApplianceVisual, shopChoices, ShopVisual } from "./SmartPlannerVisuals"
 type Stage = "APPLIANCES" | "SHOPS" | "PREFERENCES" | "REVIEW";
 type Props = { busy: boolean; dates: Date[]; online: boolean; recipes: KitchenRecipe[];
   onClose: () => void; onApply: (meals: KitchenPlannedMeal[], shop: boolean,
-    starterRecipeIds: string[]) => Promise<boolean> };
+    starterRecipeIds: string[]) => Promise<boolean>; onOpenShopping: () => void };
 
 const focuses: Array<{ id: SmartPlanFocus; label: string; detail: string }> = [
   { id: "QUICK", label: "Quick & easy", detail: "Shorter cooking times first" },
@@ -62,7 +62,9 @@ export function SmartMealPlanner(props: Props) {
   }
   async function apply() {
     const starterRecipeIds = props.recipes.length ? [] : planningRecipes.map((recipe) => recipe.id);
-    if (await props.onApply(proposal, addToShopping, starterRecipeIds)) props.onClose();
+    if (!await props.onApply(proposal, addToShopping, starterRecipeIds)) return;
+    props.onClose();
+    if (addToShopping) props.onOpenShopping();
   }
 
   return <section className="smart-planner" role="dialog" aria-modal="true"
@@ -102,7 +104,8 @@ export function SmartMealPlanner(props: Props) {
         const next = rotation + 1; setRotation(next); create(next);
       }}>{proposal.length ? "Try another mix" : "Change preferences"}</button>
         <button type="button" disabled={!props.online || props.busy || !proposal.length}
-          onClick={() => void apply()}>{props.busy ? "Saving…" : "Save my week"}</button></div>
+          onClick={() => void apply()}>{props.busy ? "Saving…"
+            : addToShopping ? "Save & view list" : "Save my week"}</button></div>
       {!props.online ? <small className="smart-offline">Connect to save this plan.</small> : null}
     </> : null}</main></section>;
 }
