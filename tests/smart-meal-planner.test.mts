@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { buildSmartWeekPlan, parseKitchenPlanningMutation, smartStarterRecipes,
-  type KitchenRecipe } from "../packages/kitchen/src/index.ts";
+  requiredKitchenRecipeAppliances, type KitchenRecipe } from "../packages/kitchen/src/index.ts";
 import { mutateKitchenPlanningPayload } from "../lib/kitchen/planning-mutation.ts";
 
 function recipe(id: string, overrides: Partial<KitchenRecipe> = {}): KitchenRecipe {
@@ -83,6 +83,22 @@ test("saving a generated shopping list opens the complete Kitchen list", async (
   assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
 });
 
+test("appliances are strict compatibility constraints rather than decorative scores", () => {
+  const recipes = [
+    recipe("oven traybake", { instructions: "Roast in the oven until cooked." }),
+    recipe("hob pasta", { instructions: "Simmer in a saucepan." }),
+    recipe("no-cook salad", { instructions: "Mix and serve." }),
+  ];
+  assert.deepEqual(requiredKitchenRecipeAppliances(recipes[0]!), ["oven"]);
+  assert.deepEqual(requiredKitchenRecipeAppliances(recipes[1]!), ["hob"]);
+  const plan = buildSmartWeekPlan(recipes, { dates, servings: 4, maximumMinutes: null,
+    focus: "VARIETY", useUp: [], skip: [], appliances: ["hob"], rotation: 0 });
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "oven traybake"), false);
+  assert.equal(plan.some((entry) => entry.meal?.recipeId === "hob pasta"), true);
+  assert.equal(buildSmartWeekPlan(recipes, { dates, servings: 4, maximumMinutes: null,
+    focus: "VARIETY", useUp: [], skip: [], appliances: [], rotation: 0 }).length, 0);
+});
+
 test("smart planning omits the unused supermarket step", async () => {
   const source = await readFile(new URL(
     "../apps/mobile/src/kitchen/SmartMealPlanner.tsx", import.meta.url), "utf8");
@@ -92,6 +108,17 @@ test("smart planning omits the unused supermarket step", async () => {
   assert.match(source, /\["APPLIANCES", "PREFERENCES", "REVIEW"\]/);
   assert.match(source, /\/3<\/span>/);
   assert.doesNotMatch(visuals, /Tesco|Sainsbury|ShopVisual|shopChoices/);
+});
+
+test("appliance preferences use encrypted account-specific storage", async () => {
+  const preferences = await readFile(new URL(
+    "../apps/mobile/src/kitchen/appliance-preferences.ts", import.meta.url), "utf8");
+  const planner = await readFile(new URL(
+    "../apps/mobile/src/kitchen/MealPlannerMobile.tsx", import.meta.url), "utf8");
+  assert.match(preferences, /tryGetReadModel/);
+  assert.match(preferences, /tryPutReadModel/);
+  assert.doesNotMatch(preferences, /localStorage|sessionStorage/);
+  assert.match(planner, /saveKitchenAppliances\(props\.store, selectedAppliances\)/);
 });
 
 test("generated week and pantry-aware shopping list are saved atomically", () => {

@@ -1,6 +1,8 @@
 export const KITCHEN_PLANNING_SCHEMA_VERSION = 1;
 
 export type KitchenRecipeSource = "diarydock" | "scanned" | "themealdb";
+export type KitchenAppliance = "oven" | "hob" | "air fryer" | "slow cooker"
+  | "microwave" | "barbecue";
 
 export type KitchenRecipeStep = {
   title: string;

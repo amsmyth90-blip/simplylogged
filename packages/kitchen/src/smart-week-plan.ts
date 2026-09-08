@@ -1,4 +1,5 @@
-import type { KitchenMeal, KitchenPlannedMeal, KitchenRecipe } from "./planning-types.ts";
+import type { KitchenAppliance, KitchenMeal, KitchenPlannedMeal,
+  KitchenRecipe } from "./planning-types.ts";
 
 export type SmartPlanFocus = "QUICK" | "USE_UP" | "FAVOURITES" | "VARIETY";
 
@@ -9,9 +10,31 @@ export type SmartPlanRequest = {
   focus: SmartPlanFocus;
   useUp: string[];
   skip: string[];
-  appliances: string[];
+  appliances: KitchenAppliance[];
   rotation: number;
 };
+
+const appliancePatterns: Array<[KitchenAppliance, RegExp]> = [
+  ["air fryer", /\bair[ -]?fry(?:er|ing)?\b/i],
+  ["slow cooker", /\b(?:slow cooker|crock[ -]?pot)\b/i],
+  ["microwave", /\bmicrowave(?:d|s|ing)?\b/i],
+  ["barbecue", /\b(?:barbecue|barbeque|bbq)\b/i],
+  ["oven", /\b(?:oven|bake|baked|baking|roast|roasted|roasting|traybake|casserole)\b/i],
+  ["hob", /\b(?:hob|stove|saucepan|frying pan|skillet|wok|simmer|boil|saute|sauté|pasta|curry|fajita)\b/i],
+];
+const noCookPattern = /\b(?:no[ -]?cook|salad|sandwich|smoothie|overnight oats)\b/i;
+
+export function requiredKitchenRecipeAppliances(recipe: KitchenRecipe) {
+  const content = `${recipe.name} ${recipe.instructions} ${recipe.steps
+    .map((step) => `${step.title} ${step.instruction}`).join(" ")}`;
+  const specialised = appliancePatterns.slice(0, 4)
+    .filter(([, pattern]) => pattern.test(content)).map(([appliance]) => appliance);
+  if (specialised.length) return specialised;
+  const conventional = appliancePatterns.slice(4)
+    .filter(([, pattern]) => pattern.test(content)).map(([appliance]) => appliance);
+  if (conventional.length || noCookPattern.test(content)) return conventional;
+  return null;
+}
 
 function words(values: string[]) {
   return values.map((value) => value.trim().toLowerCase()).filter(Boolean).slice(0, 12);
@@ -80,10 +103,14 @@ function meal(recipe: KitchenRecipe, servings: number, imageIndex: number): Kitc
 
 export function buildSmartWeekPlan(recipes: KitchenRecipe[], request: SmartPlanRequest) {
   const skipped = words(request.skip);
+  const available = new Set(request.appliances);
+  if (!available.size) return [];
   const eligible = recipes.filter((recipe) => {
     const content = searchable(recipe);
     const duration = minutes(recipe.time);
+    const required = requiredKitchenRecipeAppliances(recipe);
     return !skipped.some((term) => content.includes(term))
+      && required !== null && required.every((appliance) => available.has(appliance))
       && (!request.maximumMinutes || !duration || duration <= request.maximumMinutes);
   });
   if (!eligible.length || !request.dates.length) return [];

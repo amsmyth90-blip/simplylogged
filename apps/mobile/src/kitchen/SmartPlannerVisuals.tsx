@@ -1,6 +1,8 @@
+import type { KitchenAppliance } from "@diarydock/kitchen";
+
 type Choice = { id: string; label: string; symbol: string };
 
-export const applianceChoices: Choice[] = [
+export const applianceChoices: Array<Choice & { id: KitchenAppliance }> = [
   { id: "oven", label: "Oven", symbol: "▤" },
   { id: "hob", label: "Hob", symbol: "◎" },
   { id: "air fryer", label: "Air fryer", symbol: "◫" },
@@ -17,7 +19,10 @@ function ChoiceButton(props: { choice: Choice; selected: boolean; onToggle: () =
   </button>;
 }
 
-export function ApplianceVisual(props: { selected: string[]; onToggle: (id: string) => void }) {
+export function ApplianceVisual(props: {
+  selected: KitchenAppliance[];
+  onToggle: (id: KitchenAppliance) => void;
+}) {
   return <><div className="smart-kitchen-scene" aria-hidden="true">
     <span className="smart-window"><i /><i /><i /></span><span className="smart-pendant" />
     <span className="smart-counter"><i /><b /></span>
