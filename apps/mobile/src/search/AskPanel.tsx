@@ -62,11 +62,9 @@ export function AskPanel(props: {
 
   return (
     <section className="ask-panel">
-      <div className="ask-intro">
-        <span aria-hidden="true">✦</span>
-        <div><h2>Ask about your DiaryDock</h2><p>Answers come only from records you are allowed to open.</p></div>
-        {turns.length ? <button type="button" onClick={() => { setTurns([]); setError(null); }}>New chat</button> : null}
-      </div>
+      {turns.length ? <div className="ask-actions">
+        <button type="button" onClick={() => { setTurns([]); setError(null); }}>New chat</button>
+      </div> : null}
 
       <div className="ask-thread" aria-live="polite">
         <article className="ask-bubble is-assistant">

@@ -78,7 +78,8 @@ export function SearchScreen(props: SearchScreenProps) {
         <span className="search-security">Encrypted</span>
       </header>
       <section className="search-hero">
-        <p className="eyebrow">{mode === "ASK" ? "Your private assistant" : "Your secure index"}</p><h1>{mode === "ASK" ? "How can I help?" : "What do you need?"}</h1>
+        {mode === "SEARCH" ? <p className="eyebrow">Your secure index</p> : null}
+        <h1>{mode === "ASK" ? "How can I help?" : "What do you need?"}</h1>
         <div className="search-modes" role="tablist">
           <button type="button" role="tab" aria-selected={mode === "SEARCH"} onClick={() => setMode("SEARCH")}>Search</button>
           <button type="button" role="tab" aria-selected={mode === "ASK"} onClick={() => setMode("ASK")}>✦ Ask DiaryDock</button>

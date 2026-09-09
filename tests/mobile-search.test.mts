@@ -50,5 +50,7 @@ test("mobile Ask is a dedicated conversation surface without changing primary na
   assert.match(panel, /ask-thread/);
   assert.match(panel, /turns\.map/);
   assert.match(panel, /New chat/);
+  assert.doesNotMatch(panel, /Ask about your DiaryDock/);
+  assert.doesNotMatch(app, /Your private assistant/);
   assert.doesNotMatch(navigation, /label: "Ask/);
 });
