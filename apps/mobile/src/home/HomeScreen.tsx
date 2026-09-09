@@ -10,6 +10,7 @@ type HomeScreenProps = {
   reminderCount: number;
   syncStatus: string;
   visibleAreaIds?: readonly string[];
+  onAsk: () => void;
   onOpenReminders: () => void;
   onOpenArea: (areaId: string) => void;
   onNavigate: (destination: MobileDestination) => void;
@@ -49,6 +50,10 @@ export function HomeScreen(props: HomeScreenProps) {
       </header>
 
       <div className="home-overlay home-quick-row">
+        <button type="button" className="home-quick home-ask" onClick={props.onAsk}>
+          <span className="home-quick-icon is-ask"><MobileIcon name="message" /></span>
+          <span><strong>Ask DiaryDock</strong><small>Questions about your records</small></span>
+        </button>
         {props.reminderCount ? (
           <button type="button" className="home-quick" onClick={props.onOpenReminders}>
             <span className="home-quick-icon is-today"><MobileIcon name="calendar" /></span>

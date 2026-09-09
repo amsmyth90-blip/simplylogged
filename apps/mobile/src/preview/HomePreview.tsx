@@ -6,6 +6,7 @@ export function HomePreview() {
       firstName="Amy"
       reminderCount={3}
       syncStatus="READY"
+      onAsk={() => undefined}
       onOpenArea={() => undefined}
       onOpenReminders={() => undefined}
       onNavigate={() => undefined}

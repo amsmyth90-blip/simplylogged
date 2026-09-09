@@ -95,6 +95,8 @@ async function start() {
     Application = (await import("@mobile/preview/HouseholdInvitePreview")).HouseholdInvitePreview;
   } else if (previewEnabled && preview === "search") {
     Application = (await import("@mobile/preview/SearchPreview")).SearchPreview;
+  } else if (previewEnabled && preview === "ask") {
+    Application = (await import("@mobile/preview/SearchPreview")).AskPreview;
   } else if (previewEnabled && preview === "guardian") {
     Application = (await import("@mobile/preview/GuardianPreview"))
       .GuardianPreview;

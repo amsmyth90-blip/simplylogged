@@ -25,6 +25,7 @@ type SearchScreenProps = {
   disableOnline?: boolean;
   store: OfflineStore;
   syncStatus: string;
+  initialMode?: "ASK" | "SEARCH";
   onBack: () => void;
   onNavigate: (destination: MobileDestination) => void;
   onOpenArea: (roomId: string) => void;
@@ -37,7 +38,7 @@ const categoryLabels: Record<SearchCategory, string> = {
 };
 
 export function SearchScreen(props: SearchScreenProps) {
-  const [mode, setMode] = useState<"ASK" | "SEARCH">("SEARCH");
+  const [mode, setMode] = useState<"ASK" | "SEARCH">(props.initialMode ?? "SEARCH");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<SearchCategory>("all");
   const [date, setDate] = useState<SearchDateFilter>("all");
@@ -70,14 +71,14 @@ export function SearchScreen(props: SearchScreenProps) {
   }
 
   return (
-    <main className="search-screen">
+    <main className={`search-screen ${mode === "ASK" ? "is-chat" : ""}`}>
       <header className="search-header">
         <button type="button" className="search-back" onClick={props.onBack} aria-label="Back">‹</button>
-        <div className="search-brand"><BrandMark /><span><strong>Find anything</strong><small>DiaryDock</small></span></div>
+        <div className="search-brand"><BrandMark /><span><strong>{mode === "ASK" ? "Ask DiaryDock" : "Find anything"}</strong><small>Private and permission checked</small></span></div>
         <span className="search-security">Encrypted</span>
       </header>
       <section className="search-hero">
-        <p className="eyebrow">Your secure index</p><h1>What do you need?</h1>
+        <p className="eyebrow">{mode === "ASK" ? "Your private assistant" : "Your secure index"}</p><h1>{mode === "ASK" ? "How can I help?" : "What do you need?"}</h1>
         <div className="search-modes" role="tablist">
           <button type="button" role="tab" aria-selected={mode === "SEARCH"} onClick={() => setMode("SEARCH")}>Search</button>
           <button type="button" role="tab" aria-selected={mode === "ASK"} onClick={() => setMode("ASK")}>✦ Ask DiaryDock</button>
