@@ -1,6 +1,6 @@
 import { MobileIcon, type MobileIconName } from "./MobileIcon";
 
-export type MobileDestination = "EMERGENCY" | "FAMILY" | "FILES" | "GUARDIAN" | "HOME"
+export type MobileDestination = "ASK" | "EMERGENCY" | "FAMILY" | "FILES" | "GUARDIAN" | "HOME"
   | "KITCHEN" | "KITCHEN_CALENDAR" | "KITCHEN_MEALS" | "KITCHEN_NOTICES" | "KITCHEN_RECIPES"
   | "HOME_HANDOVER" | "LIFE_CHECK" | "PHYSICAL_LINKS" | "REMINDERS" | "SCAN" | "SEARCH"
   | "ONBOARDING"

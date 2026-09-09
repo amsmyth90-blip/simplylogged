@@ -10,6 +10,7 @@ export type MobileIconName =
   | "folder"
   | "home"
   | "leaf"
+  | "message"
   | "phone"
   | "plus"
   | "search"
@@ -32,6 +33,7 @@ export function MobileIcon({ className, name }: Props) {
     folder: <><path d="M3.5 8.5h5l1.5 2h9v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" /><path d="M3.5 8.5v-1a2 2 0 0 1 2-2h3l1.5 2" /></>,
     home: <><path d="m4 11 8-6 8 6" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" /></>,
     leaf: <><path d="M19 4C11 4 5 8 5 15c0 3 2 5 5 5 7 0 10-8 9-16Z" /><path d="M5 20c3-5 7-8 12-11" /></>,
+    message: <><path d="M5 5h14v11H9l-4 3z" /><path d="M8 9h8M8 12h5" /></>,
     phone: <path d="M6 4h3.5l1.5 4-2.2 1.7a12.5 12.5 0 0 0 5.5 5.5L16 13l4 1.5V18a2 2 0 0 1-2 2A14 14 0 0 1 4 6a2 2 0 0 1 2-2Z" />,
     plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
     search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,

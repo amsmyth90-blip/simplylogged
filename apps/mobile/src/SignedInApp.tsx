@@ -153,10 +153,12 @@ export function SignedInApp({
         onNavigate={navigate}
       />
     );
-  if (destination === "SEARCH")
+  if (destination === "ASK" || destination === "SEARCH")
     return (
       <SearchScreen
+        key={destination}
         accessToken={state.session.access_token}
+        initialMode={destination === "ASK" ? "ASK" : "SEARCH"}
         store={state.store}
         syncStatus={sync.status}
         onBack={() => setDestination("HOME")}
@@ -259,6 +261,7 @@ export function SignedInApp({
       syncStatus={sync.status}
       visibleAreaIds={onboarding.snapshot?.dashboardAreasConfigured
         ? onboarding.snapshot.selectedAreaIds : undefined}
+      onAsk={() => setDestination("ASK")}
       onOpenReminders={() => setDestination("REMINDERS")}
       onOpenArea={openRoom}
       onNavigate={navigate}
