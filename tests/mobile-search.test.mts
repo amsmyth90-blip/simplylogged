@@ -35,3 +35,20 @@ test("mobile search uses encrypted local records and never browser storage", asy
   assert.match(screen, /DocumentViewer/);
   assert.match(app, /import\("@mobile\/search\/SearchScreen"\)/);
 });
+
+test("mobile Ask is a dedicated conversation surface without changing primary navigation", async () => {
+  const [panel, home, app, navigation] = await Promise.all([
+    read("apps/mobile/src/search/AskPanel.tsx"),
+    read("apps/mobile/src/home/HomeScreen.tsx"),
+    read("apps/mobile/src/SignedInApp.tsx"),
+    read("apps/mobile/src/components/MobileBottomNav.tsx"),
+  ]);
+  assert.match(home, /Ask DiaryDock/);
+  assert.match(home, /props\.onAsk/);
+  assert.match(app, /destination === "ASK" \|\| destination === "SEARCH"/);
+  assert.match(app, /initialMode=\{destination === "ASK" \? "ASK" : "SEARCH"\}/);
+  assert.match(panel, /ask-thread/);
+  assert.match(panel, /turns\.map/);
+  assert.match(panel, /New chat/);
+  assert.doesNotMatch(navigation, /label: "Ask/);
+});
