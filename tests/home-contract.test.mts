@@ -33,6 +33,9 @@ test("the packaged home preview uses the local estate artwork", async () => {
   assert.match(screen, /estateAreas\.filter/);
   assert.match(screen, /visibleAreaIds/);
   assert.match(screen, /visibleAreas\.map/);
+  for (const label of ["Attic", "Office", "Family Room", "Kitchen", "Garage", "Pets & Garden"]) {
+    assert.ok(screen.includes(`"${label}"`), `native home needs the direct ${label} label`);
+  }
   assert.match(entry, /previewEnabled && preview === "home"/);
 });
 

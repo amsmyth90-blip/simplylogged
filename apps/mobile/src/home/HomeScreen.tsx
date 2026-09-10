@@ -16,6 +16,23 @@ type HomeScreenProps = {
   onNavigate: (destination: MobileDestination) => void;
 };
 
+const areaLabels: Record<string, string> = {
+  attic: "Attic",
+  bedroom: "Health",
+  office: "Office",
+  "family-room": "Family Room",
+  kitchen: "Kitchen",
+  garage: "Garage",
+  mailbox: "Inbox",
+  garden: "Pets & Garden",
+  driveway: "Travel",
+  "front-gate": "Settings",
+};
+
+function areaLabel(id: string, fallback: string) {
+  return areaLabels[id] ?? fallback;
+}
+
 function greeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Good morning";
@@ -43,8 +60,7 @@ export function HomeScreen(props: HomeScreenProps) {
           </button>
           <button type="button" className="home-ready" onClick={() => props.onNavigate("LIFE_CHECK")} aria-label={`DiaryDock status: ${status}`}>
             <span className={ready ? "status-dot is-ready" : "status-dot"} />
-            <span className="ready-word">{ready ? "Ready" : status}</span>
-            <strong>{ready ? "Synced" : "Check"}</strong>
+            <strong>{ready ? "Synced" : status}</strong>
           </button>
         </div>
       </header>
@@ -52,7 +68,7 @@ export function HomeScreen(props: HomeScreenProps) {
       <div className="home-overlay home-quick-row">
         <button type="button" className="home-quick home-ask" onClick={props.onAsk}>
           <span className="home-quick-icon is-ask"><MobileIcon name="message" /></span>
-          <span><strong>Ask DiaryDock</strong><small>Questions about your records</small></span>
+          <span><strong>Ask DiaryDock</strong></span>
         </button>
         {props.reminderCount ? (
           <button type="button" className="home-quick" onClick={props.onOpenReminders}>
@@ -62,7 +78,7 @@ export function HomeScreen(props: HomeScreenProps) {
         ) : null}
         <button type="button" className="home-quick" onClick={() => props.onNavigate("GUARDIAN")}>
           <span className="home-quick-icon"><MobileIcon name="shield" /></span>
-          <span><strong>Guardian</strong><small>Protection checks</small></span>
+          <span><strong>Guardian</strong></span>
         </button>
       </div>
 
@@ -80,10 +96,10 @@ export function HomeScreen(props: HomeScreenProps) {
               type="button"
               className={`estate-hotspot hotspot-${area.id}`}
               style={{ left: area.left, top: area.top }}
-              aria-label={`${area.dashboardLabel ?? area.name} mobile workspace`}
+              aria-label={`${areaLabel(area.id, area.dashboardLabel ?? area.name)} workspace`}
               onClick={() => props.onOpenArea(area.id)}
             >
-              <span>{area.dashboardLabel ?? area.name}</span>
+              <span>{areaLabel(area.id, area.dashboardLabel ?? area.name)}</span>
             </button>
           ))}
         </div>

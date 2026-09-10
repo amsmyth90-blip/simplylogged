@@ -70,5 +70,5 @@ test("native Safe Room uses encrypted snapshots and dedicated specialist routing
   assert.match(router, /profile\.id === "safe-room"/);
   assert.match(screens, /@mobile\/wills\/SafeRoomScreen/);
   assert.match(app, /onOpenSafeRoom=\{\(\) => openRoom\("safe-room"\)\}/);
-  assert.match(office, /Open Safe Room · Wills & wishes/);
+  assert.match(office, />Wills & Wishes<\/button>/);
 });

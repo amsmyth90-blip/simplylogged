@@ -99,7 +99,6 @@ export function CaptureScreen(props: CaptureScreenProps) {
         </button>
         <div>
           <h1>{queue.captures.length ? "Check details" : "Add document"}</h1>
-          <p>{queue.captures.length ? "Nothing is saved until you confirm" : "Add every page in reading order"}</p>
         </div>
         <span className="capture-page-count">
           {queue.captures.length
@@ -116,7 +115,6 @@ export function CaptureScreen(props: CaptureScreenProps) {
         </div>
         <div className="capture-intro">
           <h2>Add one or more pages</h2>
-          <p>Photograph each page or choose several together.</p>
         </div>
         <div className="capture-actions">
           <button type="button" disabled={working} onClick={() => void select(takeDocumentPhoto)}>
@@ -213,7 +211,7 @@ export function CaptureScreen(props: CaptureScreenProps) {
 
       {queue.uploads.length ? (
         <section className="capture-queue" aria-live="polite">
-          <div><p className="eyebrow">Upload queue</p><h2>Safe on this device</h2></div>
+          <div><h2>Upload queue</h2></div>
           {queue.uploads.map((item) => (
             <article key={item.jobId}>
               <span className={`queue-state queue-${item.state.toLowerCase()}`} />

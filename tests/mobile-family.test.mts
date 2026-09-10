@@ -42,6 +42,11 @@ test("mobile Family provides native sharing and preserves Family Room files and 
   assert.match(screen, /HouseholdInvites/);
   assert.match(screen, /HouseholdOwnershipTransfer/);
   assert.match(screen, /HouseholdPeople/);
+  assert.match(screen, /managing \? "Manage" : "People"/);
+  assert.match(screen, /initialView === "inbox"/);
+  assert.match(screen, /initialView === "schedules"/);
+  assert.ok(screen.indexOf("<HouseholdPeople") < screen.indexOf("<HouseholdMembers"),
+    "People should be visible before access administration");
   assert.match(records, /useDocuments/);
   assert.match(records, /useReminders/);
   assert.match(invites, /Share\.share/);

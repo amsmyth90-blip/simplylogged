@@ -213,7 +213,7 @@ test("mobile Family Schedules use bounded APIs, encrypted cache and complete con
   assert.match(hook, /tryPutReadModel/);
   assert.doesNotMatch(hook, /localStorage|sessionStorage|indexedDB/i);
   assert.match(client, /\/api\/mobile\/family\/schedules/);
-  assert.match(family, /<FamilyScheduleCard/);
+  assert.match(family, /<FamilySchedulesScreen/);
   assert.match(screen, /familyScheduleDays/);
   assert.match(screen, /SAVE_ROUTINE/);
   assert.match(editor, /Delete routine/);

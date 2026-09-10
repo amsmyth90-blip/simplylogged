@@ -198,13 +198,6 @@
 .native-room-label:active { transform: translate(-50%, -50%) scale(0.96); }
 .native-room-label:focus-visible { outline: 3px solid white; outline-offset: 2px; }
 
-@media (max-width: 420px) {
-  .native-room-label[data-edge="left"] { transform: translate(-12.5%, -50%); }
-  .native-room-label[data-edge="right"] { transform: translate(-87.5%, -50%); }
-  .native-room-label[data-edge="left"]:active { transform: translate(-12.5%, -50%) scale(0.96); }
-  .native-room-label[data-edge="right"]:active { transform: translate(-87.5%, -50%) scale(0.96); }
-}
-
 .native-room-header {
   position: absolute;
   z-index: 4;

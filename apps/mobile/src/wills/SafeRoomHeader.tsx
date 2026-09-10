@@ -17,8 +17,7 @@ export function SafeRoomHeader({ syncStatus, onBack }: Props) {
           ‹
         </button>
         <div>
-          <strong>Safe Room</strong>
-          <small>Wills, wishes & trusted planning</small>
+          <strong>Wills & Wishes</strong>
         </div>
         <span className={`sync-pill sync-${syncStatus.toLowerCase()}`}>
           {syncStatus.toLowerCase().replaceAll("_", " ")}
@@ -30,12 +29,7 @@ export function SafeRoomHeader({ syncStatus, onBack }: Props) {
       >
         <div />
         <article>
-          <p>Private planning</p>
-          <h1>Wills & wishes</h1>
-          <span>
-            Organise the records and practical details your trusted people may one
-            day need.
-          </span>
+          <h1>Wills & Wishes</h1>
         </article>
       </section>
     </>

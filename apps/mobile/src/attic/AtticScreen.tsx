@@ -91,13 +91,13 @@ export function AtticScreen(props: Props) {
     <main className="attic-screen">
       <header className="attic-header">
         <button type="button" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
-        <div><strong>Attic</strong><small>Memories, stories & legacy</small></div>
+        <div><strong>Attic</strong></div>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>{props.syncStatus.toLowerCase().replaceAll("_", " ")}</span>
       </header>
 
       <section className="attic-hero" style={{ backgroundImage: `url(${atticImage})` }}>
         <div />
-        <article><p>Your family archive</p><h1>Attic</h1><span>Family memories, meaningful objects and the stories behind them — preserved with care.</span></article>
+        <article><h1>Attic</h1></article>
       </section>
 
       <section className="attic-sheet">
@@ -108,9 +108,7 @@ export function AtticScreen(props: Props) {
           <button type="button" onClick={() => props.onScan("Attic")}>＋ Scan into Attic</button>
         </section>
         <AtticSectionPicker selected={sectionId} onSelect={setSectionId} />
-        <section className="attic-section-intro">
-          <p>{section.scope.join(" · ")}</p><h2>{section.title}</h2><span>{section.description}</span>
-        </section>
+        <section className="attic-section-intro"><h2>{section.title}</h2></section>
         {attic.message ? <p className="attic-status-message">{attic.message}</p> : null}
         {attic.loading && !attic.snapshot ? <p className="attic-status-message">Opening your encrypted family archive…</p> : null}
         <AtticRecords

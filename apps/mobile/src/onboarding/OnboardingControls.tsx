@@ -6,7 +6,7 @@ export function SetupProgress({ step }: { step: number }) {
   return <div className="setup-progress" aria-label="Setup progress">
     <div>{onboardingStepTitles.map((title, index) => <span key={title}
       className={index <= step ? "active" : ""}><i /><b>{title}</b></span>)}</div>
-    <p>Step {step + 1} of {onboardingStepTitles.length} · {onboardingStepTitles[step]}</p>
+    <p>Step {step + 1} of {onboardingStepTitles.length}</p>
   </div>;
 }
 
