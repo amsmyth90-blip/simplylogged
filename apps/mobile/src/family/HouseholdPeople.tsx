@@ -77,7 +77,7 @@ export function HouseholdPeople(props: {
         <h2>People</h2>
         {props.canManage ? (
           <button type="button" onClick={() => setAdding((value) => !value)}>
-            {adding ? "Cancel" : "Add someone"}
+            {adding ? "Cancel" : "Add person"}
           </button>
         ) : null}
       </div>

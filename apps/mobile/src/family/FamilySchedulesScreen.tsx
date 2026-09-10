@@ -54,14 +54,13 @@ export function FamilySchedulesScreen({
   return <main className="family-schedule-screen">
     <header className="family-schedule-header">
       <button type="button" onClick={onBack} aria-label="Back to Family Room">‹</button>
-      <div><p>Family Room</p><h1>Family Schedules</h1>
-        <span>Repeating routines and weekly plans.</span></div>
+      <div><h1>Schedules</h1></div>
       <button type="button" className="family-schedule-add"
         disabled={!model.online || !model.snapshot}
         onClick={() => setEditing(null)}>＋ Add</button>
     </header>
     <section className="family-schedule-toolbar">
-      <label>Show schedules for<select aria-label="Show schedules for" value={person}
+      <label>Person<select aria-label="Show schedules for" value={person}
         onChange={(event) => setPerson(event.target.value)}>
         <option>All</option>{people.map((item) => <option key={item}>{item}</option>)}
       </select></label>

@@ -54,7 +54,7 @@ export function RoomSceneScreen(props: Props) {
         <button type="button" onClick={props.onBack} aria-label="Back to the estate map">
           <MobileIcon name="arrow-left" />
         </button>
-        <div className="native-room-title"><small>{scene.eyebrow}</small><strong>{scene.name}</strong></div>
+        <div className="native-room-title"><strong>{scene.name}</strong></div>
         <span className="native-room-header-spacer" aria-hidden="true" />
         <span className="native-room-sync-status" aria-live="polite">
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}

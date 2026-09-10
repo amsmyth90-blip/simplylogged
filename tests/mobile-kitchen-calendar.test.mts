@@ -130,7 +130,7 @@ test("native Kitchen calendar matches the wrapper layout and security boundaries
   assert.match(hook, /tryGetReadModel\(store, CACHE_KEY\)/);
   assert.doesNotMatch(hook, /localStorage|sessionStorage/);
   assert.match(router, /calendar: "KITCHEN_CALENDAR"/);
-  for (const label of ["Family calendar", "Appointments", "School", "Meals", "Family"]) {
+  for (const label of ["Calendar", "Appointments", "School", "Meals", "Family"]) {
     assert.match(`${screen}\n${model}`, new RegExp(label));
     assert.match(`${wrapper}\n${wrapperModel}`, new RegExp(label));
   }

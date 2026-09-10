@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path: string) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("native rooms use the same full-scene artwork and labels as the web rooms", async () => {
+test("native rooms use the same full-scene artwork with clear destination labels", async () => {
   const config = await read("apps/mobile/src/rooms/room-scene-config.ts");
   const expectedImages = [
     "attic-memory-room-v1.webp",
@@ -20,17 +20,17 @@ test("native rooms use the same full-scene artwork and labels as the web rooms",
     "safe-room-hero.webp",
   ];
   const expectedLabels = [
-    "Photo Albums",
-    "Health Documents",
-    "Admin inbox",
-    "Today’s admin",
-    "Family inbox",
+    "Photos",
+    "Health files",
+    "Inbox",
+    "Bills",
+    "Household",
     "Meal planner",
-    "Vehicle Profile",
-    "Garden Jobs",
-    "Travel Checklist",
-    "Incoming items",
-    "My Will",
+    "Vehicle",
+    "Jobs",
+    "Packing list",
+    "All items",
+    "Will",
   ];
 
   for (const image of expectedImages) assert.match(config, new RegExp(image));
@@ -89,16 +89,16 @@ test("room labels open the matching secure native workspace", async () => {
   assert.match(router, /if \(!activeAction\)[\s\S]*?<RoomSceneScreen/);
   assert.match(router, /initialSection={activeAction as AtticSectionId}/);
   assert.match(router, /initialTab={activeAction as GarageTab}/);
-  assert.match(scenes, /action\("profile", "Vehicle Profile"/);
-  assert.match(scenes, /action\("mot-tax", "MOT & Tax"/);
+  assert.match(scenes, /action\("profile", "Vehicle"/);
+  assert.match(scenes, /action\("mot-tax", "MOT & tax"/);
   assert.match(scenes, /action\("insurance", "Insurance"/);
   assert.match(router, /"medical-records": "documents"/);
   assert.match(router, /emergency: "emergency"/);
-  assert.match(scenes, /action\("all", "Incoming items"/);
-  assert.match(scenes, /action\("new", "Needs filing"/);
+  assert.match(scenes, /action\("all", "All items"/);
+  assert.match(scenes, /action\("new", "To file"/);
   assert.match(router, /initialFilter={initialFilter}/);
-  assert.match(scenes, /action\("travel-checklist", "Travel Checklist"/);
-  assert.match(scenes, /action\("parking-permits", "Parking & Permits"/);
+  assert.match(scenes, /action\("travel-checklist", "Packing list"/);
+  assert.match(scenes, /action\("parking-permits", "Parking"/);
   assert.match(router, /initialView={activeAction as DrivewayView}/);
   assert.match(router, /initialView={activeAction as WillsView}/);
   assert.match(router, /initialView={activeAction as "household" \| "inbox" \| "schedules"}/);

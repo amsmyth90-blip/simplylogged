@@ -41,12 +41,12 @@ export function GuardianScreen(props: {
     <main className="guardian-screen">
       <header className="guardian-header">
         <button type="button" onClick={props.onBack} aria-label="Back">‹</button>
-        <div><BrandMark /><span><strong>Guardian</strong><small>A calm, private check-in</small></span></div>
+        <div><BrandMark /><span><strong>Guardian</strong></span></div>
         <span className={guardian.online ? "guardian-online" : "guardian-offline"}>{guardian.online ? "Live" : "Offline"}</span>
       </header>
       <section className="guardian-hero">
         <span className="guardian-shield">♢</span>
-        <div><p>Your briefing</p><h1>{guardian.loading ? "Checking your saved dates…" : heading}</h1></div>
+        <div><h1>{guardian.loading ? "Checking saved dates…" : heading}</h1></div>
       </section>
       {guardian.error ? <p className="guardian-message" role="status">{guardian.error}</p> : null}
       {!guardian.loading && !guardian.findings.length ? (

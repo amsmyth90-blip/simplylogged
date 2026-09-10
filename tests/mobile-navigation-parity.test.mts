@@ -69,9 +69,11 @@ test("native navigation keeps only the three primary destinations", async () => 
   assert.match(styles, /-webkit-backdrop-filter: blur\(18px\) saturate\(145%\)/);
   assert.match(styles, /radial-gradient\(circle at 35% 25%, #fff4c8/);
   assert.match(styles, /button \+ button::before/);
+  assert.match(await read("apps/mobile/src/home/home.css"),
+    /home-quick-row[\s\S]*grid-template-columns: 1\.35fr 1fr 1fr/);
 });
 
-test("native scan entry reproduces the wrapper capture experience", async () => {
+test("native scan entry keeps the wrapper actions without repeated helper copy", async () => {
   const [nativeCapture, wrapperCapture, wrapperWorkspace, styles] = await Promise.all([
     read("apps/mobile/src/capture/CaptureScreen.tsx"),
     read("components/document-capture/CaptureIdleView.tsx"),
@@ -80,9 +82,7 @@ test("native scan entry reproduces the wrapper capture experience", async () => 
   ]);
   for (const label of [
     "Add document",
-    "Add every page in reading order",
     "Add one or more pages",
-    "Photograph each page or choose several together.",
     "Take photo",
     "Choose pages",
     "You can add up to 12 pages",
@@ -90,6 +90,8 @@ test("native scan entry reproduces the wrapper capture experience", async () => 
     assert.ok(`${wrapperWorkspace}\n${wrapperCapture}`.includes(label), `wrapper capture is missing ${label}`);
     assert.ok(nativeCapture.includes(label), `native capture is missing ${label}`);
   }
+  assert.doesNotMatch(nativeCapture, /Add every page in reading order/);
+  assert.doesNotMatch(nativeCapture, /Photograph each page or choose several together/);
   assert.match(nativeCapture, /capture-document-stack\.png/);
   assert.match(nativeCapture, /estate-dashboard-country\.webp/);
   assert.match(styles, /background: rgb\(255 255 255 \/ 68%\)/);

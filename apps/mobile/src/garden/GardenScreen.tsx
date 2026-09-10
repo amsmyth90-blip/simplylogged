@@ -106,7 +106,6 @@ export function GardenScreen(props: Props) {
         </button>
         <div>
           <strong>Pets & Garden</strong>
-          <small>Care, outdoor spaces & jobs</small>
         </div>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
@@ -119,12 +118,7 @@ export function GardenScreen(props: Props) {
       >
         <div />
         <article>
-          <p>Your outdoor picture</p>
           <h1>Pets & Garden</h1>
-          <span>
-            Care records, seasonal jobs and everything outdoors, kept in one
-            calm place.
-          </span>
         </article>
       </section>
 
@@ -147,11 +141,7 @@ export function GardenScreen(props: Props) {
           </button>
         </section>
         <GardenSectionPicker selected={sectionId} onSelect={setSectionId} />
-        <section className="garden-section-intro">
-          <p>{section.scope.join(" · ")}</p>
-          <h2>{section.title}</h2>
-          <span>{section.description}</span>
-        </section>
+        <section className="garden-section-intro"><h2>{section.title}</h2></section>
         <GardenRecords
           documents={sectionDocuments}
           reminders={sectionReminders}

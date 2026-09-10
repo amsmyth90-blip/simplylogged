@@ -84,8 +84,7 @@ export function HealthScreen(props: Props) {
           ‹
         </button>
         <div>
-          <strong>My Health</strong>
-          <small>Private health & wellbeing</small>
+          <strong>Health</strong>
         </div>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
@@ -97,12 +96,7 @@ export function HealthScreen(props: Props) {
       >
         <div />
         <article>
-          <p>Private space</p>
-          <h1>Health & wellbeing</h1>
-          <span>
-            Your health information, appointments and essential details kept calm
-            and easy to find.
-          </span>
+          <h1>Health</h1>
         </article>
       </section>
       <section className="health-sheet">
@@ -162,7 +156,7 @@ export function HealthScreen(props: Props) {
         ) : view !== "documents" ? <HealthRecordList health={record} view={view} /> : null) : null}
         <section className="health-card health-files-card">
           <header>
-            <div><p>Secure files</p><h2>Health documents</h2></div>
+            <div><h2>Health files</h2></div>
             <button type="button" onClick={() => props.onScan("Bedroom")}>＋ Scan</button>
           </header>
           <div>

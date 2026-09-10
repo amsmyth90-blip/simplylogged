@@ -101,7 +101,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
         </span>
-        <div><p>Settings</p><h1>Your Front Gate</h1><strong>Account, privacy and device protection.</strong></div>
+        <div><h1>Settings</h1></div>
       </header>
 
       <section className="settings-profile">
@@ -110,7 +110,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
       </section>
 
       <section className="settings-card">
-        <p className="eyebrow">This device</p><h2>Protected offline</h2>
+        <h2>This device</h2>
         <div className="settings-row"><span>Encrypted local database</span><strong>On</strong></div>
         <div className="settings-row"><span>Device-protected key storage</span><strong>On</strong></div>
         <div className="settings-row"><span>Secure synchronisation</span><strong>{props.syncStatus.toLowerCase().replaceAll("_", " ")}</strong></div>
@@ -118,51 +118,47 @@ export function SettingsScreen(props: SettingsScreenProps) {
       </section>
 
       <section className="settings-card">
-        <p className="eyebrow">Smart labels</p><h2>Physical Links</h2>
-        <p>Manage private QR codes and NFC tags for appliances, boilers and household equipment.</p>
+        <h2>Physical Links</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("PHYSICAL_LINKS")}>
-          <span><strong>Open Physical Links</strong><small>Available as an encrypted offline copy</small></span><b>›</b>
+          <span><strong>Open</strong></span><b>›</b>
         </button>
       </section>
 
       <section className="settings-card">
-        <p className="eyebrow">Personal setup</p><h2>Life Check</h2>
-        <p>Choose what applies to you and see a transparent organisation score.</p>
+        <h2>Life Check</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("LIFE_CHECK")}>
-          <span><strong>Open Life Check</strong><small>Available as an encrypted offline copy</small></span><b>›</b>
+          <span><strong>Open</strong></span><b>›</b>
         </button>
       </section>
 
       <section className="settings-card">
-        <p className="eyebrow">Your dashboard</p><h2>Personalise your areas</h2>
-        <p>Choose which specialist spaces appear on your DiaryDock home.</p>
+        <h2>Home areas</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("ONBOARDING")}>
-          <span><strong>Review my setup</strong><small>Profile, household and dashboard choices</small></span><b>›</b>
+          <span><strong>Choose areas</strong></span><b>›</b>
         </button>
       </section>
 
       <section className="settings-card">
-        <p className="eyebrow">Moving home</p><h2>Home Handover</h2>
-        <p>Prepare a private preview of deliberately selected home information.</p>
+        <h2>Home Handover</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("HOME_HANDOVER")}>
-          <span><strong>Open Home Handover</strong><small>Available as an encrypted offline copy</small></span><b>›</b>
+          <span><strong>Open</strong></span><b>›</b>
         </button>
       </section>
 
       {summary?.storage ? (
         <section className="settings-card">
-          <p className="eyebrow">Document storage</p><h2>{bytes(summary.storage.usedBytes)} of {bytes(summary.storage.limitBytes)}</h2>
+          <h2>Storage</h2><p>{bytes(summary.storage.usedBytes)} of {bytes(summary.storage.limitBytes)}</p>
           <div className="settings-storage"><span style={{ width: `${usedPercent}%` }} /></div>
           <small>{summary.storage.tier} plan · pending reservations are included before upload</small>
         </section>
       ) : null}
 
       <section className="settings-card">
-        <p className="eyebrow">Privacy</p><h2>Your choices</h2>
+        <h2>Privacy</h2>
         <label className="settings-switch">
           <span><strong>Share anonymous product usage</strong><small>No document names, contents, contacts or questions. Retained for {summary?.analytics.retentionDays ?? 90} days.</small></span>
           <input type="checkbox" disabled={busy || !summary} checked={summary?.analytics.enabled ?? false} onChange={() => void toggleAnalytics()} />
@@ -177,7 +173,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
       </section>
 
       <section className="settings-card settings-account-actions">
-        <p className="eyebrow">Account</p><h2>Account controls</h2>
+        <h2>Account</h2>
         <button type="button" className="settings-secondary" onClick={props.onSignOut}>Sign out and remove offline data</button>
         {!deleting ? <button type="button" className="settings-danger-link" onClick={() => setDeleting(true)}>Request account deletion</button> : (
           <div className="settings-delete">

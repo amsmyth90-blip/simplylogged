@@ -16,21 +16,19 @@ export function HomeHandoverScreen(props: { accessToken: string; disableOnline?:
   const snapshot = handover.snapshot; const draft = snapshot?.draft;
   return <main className="handover-screen"><header className="handover-header">
     <button type="button" onClick={props.onBack} aria-label="Back to the Front Gate">‹</button>
-    <div><small>Private preparation</small><h1>Home Handover</h1>
-      <p>Select useful home details without exposing personal records.</p></div>
+    <div><h1>Home Handover</h1></div>
     <span className={handover.online ? "is-live" : "is-cached"}>
       {handover.online ? "Live" : "Offline copy"}</span></header>
     {handover.message ? <p className="handover-message" role="status">{handover.message}</p> : null}
     {handover.loading && !snapshot ? <p className="handover-message">Opening your private draft…</p> : null}
-    <section className="handover-safety"><span>⌂</span><div><small>Private by design</small>
-      <h2>Deliberate and revocable</h2><p>Nothing is shared automatically. You select every item and one verified recipient.</p></div></section>
-    {snapshot && !draft ? <section className="handover-card"><small>Start safely</small>
-      <h2>Create a private draft</h2><label>Draft name<input maxLength={120} value={name}
+    <section className="handover-safety"><span>⌂</span><div>
+      <h2>Private and revocable</h2><p>Nothing is shared automatically. You select every item and one verified recipient.</p></div></section>
+    {snapshot && !draft ? <section className="handover-card">
+      <h2>Create draft</h2><label>Name<input maxLength={120} value={name}
         onChange={(event) => setName(event.target.value)} /></label><button type="button"
         disabled={!handover.online || Boolean(handover.busyKey) || !name.trim()}
-        onClick={() => void handover.createDraft(name)}>Create private draft</button></section> : null}
-    {draft && snapshot ? <><section className="handover-heading"><small>Draft</small>
-      <h2>{draft.name}</h2><p>Eligible property documents appear only when linked to an eligible home item.</p></section>
+        onClick={() => void handover.createDraft(name)}>Create</button></section> : null}
+    {draft && snapshot ? <><section className="handover-heading"><h2>{draft.name}</h2></section>
       <section className="handover-candidates">{snapshot.candidates.length
         ? snapshot.candidates.map((item) => { const key = `${item.resourceType}:${item.resourceId}`;
           const request = { scope: "OWNER" as const, resourceType: item.resourceType,
@@ -44,7 +42,7 @@ export function HomeHandoverScreen(props: { accessToken: string; disableOnline?:
               onClick={() => void handover.toggleItem(item)}>{item.selected ? "Remove" : "Add"}</button></article>; })
         : <p>No eligible appliances, boilers or equipment are available yet. Add them under Physical Links first.</p>}
       </section><section className="handover-card"><div className="handover-preview-title"><div>
-        <small>Private preview</small><h2>{snapshot.items.length} selected {snapshot.items.length === 1 ? "item" : "items"}</h2>
+        <h2>{snapshot.items.length} selected {snapshot.items.length === 1 ? "item" : "items"}</h2>
       </div><b>Not shared</b></div>{snapshot.items.length ? <div className="handover-items">
         {snapshot.items.map((item) => { const request = { scope: "OWNER" as const,
           resourceType: item.resourceType, resourceId: item.resourceId }; return <article key={item.id}>
@@ -57,8 +55,8 @@ export function HomeHandoverScreen(props: { accessToken: string; disableOnline?:
       busy={Boolean(handover.busyKey)} detailFor={handover.detailFor}
       detailLoading={handover.detailLoading} onLoadDetail={handover.loadDetail}
       onPublish={handover.publish} onRevoke={handover.revoke} /> : null}
-    {snapshot ? <section className="handover-card handover-exclusions"><small>Always excluded</small>
-      <h2>Sensitive information stays out</h2><p>These rules are enforced by the data model.</p><div>
+    {snapshot ? <section className="handover-card handover-exclusions">
+      <h2>Never shared</h2><div>
         {snapshot.exclusions.map((item) => <span key={item}>✓ {item}</span>)}</div></section> : null}
     <MobileBottomNav active={null} onNavigate={props.onNavigate} /></main>;
 }

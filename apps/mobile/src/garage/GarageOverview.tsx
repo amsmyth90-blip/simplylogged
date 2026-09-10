@@ -45,7 +45,6 @@ export function GarageOverview({ vehicle, view = "profile" }: {
       <section className="garage-panel">
         <header>
           <div>
-            <p>Stay ahead</p>
             <h2>{view === "mot-tax" ? "MOT & road tax" : view === "insurance"
               ? "Insurance & breakdown cover" : "Key dates"}</h2>
           </div>

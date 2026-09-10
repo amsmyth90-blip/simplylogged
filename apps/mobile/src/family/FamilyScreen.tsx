@@ -76,7 +76,7 @@ export function FamilyScreen(props: Props) {
         <div className="family-hero-shade" />
         <button type="button" className="family-back" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>{props.syncStatus.toLowerCase().replaceAll("_", " ")}</span>
-        <div><h1>Family Room</h1></div>
+        <div><h1>Household</h1></div>
       </header>
 
       <section className="family-intro family-card">
@@ -88,13 +88,21 @@ export function FamilyScreen(props: Props) {
         </span>
       </section>
 
-      <FamilyScheduleCard loading={schedules.loading} message={schedules.message}
-        snapshot={schedules.snapshot} onOpen={() => setSchedulesOpen(true)} />
+      {household ? <HouseholdPeople
+        accessToken={props.accessToken}
+        canManage={household.role === "owner"}
+      /> : null}
+      {household ? <HouseholdMembers
+        household={household}
+        busy={model.busy}
+        onRole={async (userId, role) => { await change({ action: "update-role", userId, role }, "Household access updated."); }}
+        onRemove={async (userId) => { await change({ action: "remove-member", userId }, "Household member removed."); }}
+      /> : null}
 
       {household?.role === "owner" ? (
         <section className="family-card family-owner-actions">
-          <button type="button" className="family-primary" onClick={() => setInviting(true)}>＋ Invite someone</button>
-          {!renaming ? <button type="button" onClick={() => { setName(household.householdName); setRenaming(true); }}>Rename household</button> : (
+          <button type="button" className="family-primary" onClick={() => setInviting(true)}>＋ Invite to app</button>
+          {!renaming ? <button type="button" onClick={() => { setName(household.householdName); setRenaming(true); }}>Rename</button> : (
             <form onSubmit={(event) => { event.preventDefault(); void change({ action: "rename", name }, "Household name updated.").then((result) => { if (result) setRenaming(false); }); }}>
               <input required maxLength={80} value={name} onChange={(event) => setName(event.target.value)} aria-label="Household name" />
               <button type="submit" disabled={model.busy}>Save</button><button type="button" onClick={() => setRenaming(false)}>Cancel</button>
@@ -110,16 +118,8 @@ export function FamilyScreen(props: Props) {
         }} />
       ) : null}
 
-      {household ? <HouseholdMembers
-        household={household}
-        busy={model.busy}
-        onRole={async (userId, role) => { await change({ action: "update-role", userId, role }, "Household access updated."); }}
-        onRemove={async (userId) => { await change({ action: "remove-member", userId }, "Household member removed."); }}
-      /> : null}
-      {household ? <HouseholdPeople
-        accessToken={props.accessToken}
-        canManage={household.role === "owner"}
-      /> : null}
+      <FamilyScheduleCard loading={schedules.loading} message={schedules.message}
+        snapshot={schedules.snapshot} onOpen={() => setSchedulesOpen(true)} />
       {household ? <HouseholdOwnershipTransfer household={household} busy={model.busy} onChange={change} /> : null}
       {household?.role === "owner" ? <HouseholdInvites
         busy={model.busy}
