@@ -54,3 +54,35 @@ export type HouseholdAccessEvent = {
   createdAt: string;
   metadata: Record<string, unknown>;
 };
+
+export const HOUSEHOLD_PEOPLE_SCHEMA_VERSION = 1;
+
+export type HouseholdPersonType =
+  | "owner"
+  | "adult"
+  | "teen"
+  | "child"
+  | "dependent"
+  | "trusted_contact";
+
+export type HouseholdPerson = {
+  id: string;
+  householdId: string;
+  linkedUserId: string | null;
+  firstName: string;
+  lastName: string;
+  preferredName: string;
+  relationship: string;
+  personType: HouseholdPersonType;
+  dateOfBirth: string | null;
+  avatarStoragePath: string | null;
+  status: "active" | "archived";
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type HouseholdPeopleDirectory = {
+  householdId: string;
+  currentUserRole: HouseholdRole;
+  people: HouseholdPerson[];
+};

@@ -4,6 +4,8 @@ import type {
   HouseholdAccessEvent,
   HouseholdDirectory,
   HouseholdInvitePreview,
+  HouseholdPeopleDirectory,
+  HouseholdPersonType,
   HouseholdRole,
 } from "@diarydock/household";
 
@@ -13,6 +15,9 @@ export type {
   HouseholdDirectoryInvite,
   HouseholdDirectoryMember,
   HouseholdInvitePreview,
+  HouseholdPeopleDirectory,
+  HouseholdPerson,
+  HouseholdPersonType,
   HouseholdOwnershipTransfer,
   HouseholdRole,
 } from "@diarydock/household";
@@ -86,6 +91,23 @@ export async function renewHouseholdInvite(token: string) {
 export async function loadHouseholdDirectory(): Promise<HouseholdDirectory | null> {
   const payload = await householdRequest<{ household: HouseholdDirectory | null }>();
   return payload.household;
+}
+
+export async function loadHouseholdPeople(): Promise<HouseholdPeopleDirectory | null> {
+  const payload = await householdRequest<{ people: HouseholdPeopleDirectory | null }>("?view=people");
+  return payload.people;
+}
+
+export async function createHouseholdPerson(input: {
+  firstName: string;
+  lastName: string;
+  preferredName: string;
+  relationship: string;
+  personType: Exclude<HouseholdPersonType, "owner">;
+  dateOfBirth: string;
+}) {
+  const payload = await householdMutation<{ personId: string }>("create-person", input);
+  return payload.personId;
 }
 
 export async function updateHouseholdMemberRole(

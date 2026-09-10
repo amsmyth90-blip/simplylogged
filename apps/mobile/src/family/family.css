@@ -58,6 +58,10 @@
 .family-invite-form fieldset strong { font-size: 0.72rem; }
 .family-invite-form fieldset small,
 .family-invite-form > p { margin: 0; color: var(--dd-muted); font-size: 0.58rem; line-height: 1.45; }
+.family-person-form { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .9rem; }
+.family-person-form label { display: grid; gap: .3rem; color: var(--dd-muted); font-size: .63rem; font-weight: 750; }
+.family-person-form input,.family-person-form select { width: 100%; min-height: 2.8rem; padding: .65rem; color: var(--dd-ink); font: inherit; border: 1px solid rgb(32 53 42 / 14%); border-radius: .8rem; background: white; }
+.family-person-form button { grid-column: 1 / -1; }
 
 .family-invite-list article { padding: 0.85rem; border-radius: 1rem; background: #f4f2ea; }
 .family-invite-list article > div:first-child { display: grid; min-width: 0; gap: 0.2rem; }

@@ -9,6 +9,7 @@ import {
   loadHouseholdDirectory,
   loadHouseholdInvitePreview,
 } from "@/lib/household/directory-server";
+import { createHouseholdPerson, loadHouseholdPeople } from "@/lib/household/people-server";
 import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
 import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient, isSupabaseConfiguredServer } from "@/lib/supabase/server";
@@ -25,6 +26,7 @@ const recentAuthenticationActions = new Set([
   "create-invite", "create-role-invite", "cancel-invite", "renew-invite",
   "accept-invite", "update-role", "remove-member", "rename", "leave", "initiate-ownership-transfer",
   "resolve-ownership-transfer",
+  "create-person",
 ]);
 
 const actionFields: Record<string, ReadonlySet<string>> = {
@@ -39,6 +41,10 @@ const actionFields: Record<string, ReadonlySet<string>> = {
   "resolve-ownership-transfer": new Set(["action", "transferId", "decision"]),
   rename: new Set(["action", "name"]),
   leave: new Set(["action"]),
+  "create-person": new Set([
+    "action", "firstName", "lastName", "preferredName", "relationship",
+    "personType", "dateOfBirth",
+  ]),
 };
 
 function response(body: Record<string, unknown>, status = 200) {
@@ -97,6 +103,9 @@ export async function GET(request: Request) {
     }));
     return response({ events });
   }
+  if (view === "people") {
+    return response({ people: await loadHouseholdPeople(supabase, authData.user.id) });
+  }
   return response({ household: await loadHouseholdDirectory(supabase, authData.user.id) });
 }
 
@@ -130,6 +139,8 @@ export async function POST(request: Request) {
       code: "RECENT_AUTH_REQUIRED",
     }, 403);
   }
-  const result = await executeHouseholdMutation(supabase, action, body);
+  const result = action === "create-person"
+    ? await createHouseholdPerson(supabase, body)
+    : await executeHouseholdMutation(supabase, action, body);
   return response(result.body, result.status);
 }

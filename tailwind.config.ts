@@ -18,7 +18,8 @@ const config: Config = {
         soft: "0 12px 30px -18px rgba(77, 105, 133, 0.25)"
       },
       fontFamily: {
-        sans: ["SF Pro Display", "ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        serif: ["ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"]
       },
       backgroundImage: {
         aurora:

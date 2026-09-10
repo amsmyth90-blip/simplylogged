@@ -4,10 +4,16 @@ import type {
   HouseholdDirectoryMember,
   HouseholdInvitePreview,
   HouseholdOwnershipTransfer,
+  HouseholdPeopleDirectory,
+  HouseholdPerson,
+  HouseholdPersonType,
   HouseholdRole,
 } from "./types.ts";
 
 const roles = new Set<HouseholdRole>(["owner", "member", "viewer"]);
+const personTypes = new Set<HouseholdPersonType>([
+  "owner", "adult", "teen", "child", "dependent", "trusted_contact",
+]);
 
 function record(value: unknown, label: string) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -135,4 +141,63 @@ export function parseHouseholdDirectory(value: unknown): HouseholdDirectory {
     }
   }
   return directory;
+}
+
+function optionalText(value: unknown, label: string, maximum: number) {
+  if (value === null) return null;
+  if (typeof value !== "string" || value.length > maximum) {
+    throw new Error(`${label} is invalid.`);
+  }
+  return value;
+}
+
+function person(value: unknown, householdId: string): HouseholdPerson {
+  const item = record(value, "Household person");
+  exactKeys(item, [
+    "id", "householdId", "linkedUserId", "firstName", "lastName", "preferredName",
+    "relationship", "personType", "dateOfBirth", "avatarStoragePath", "status",
+    "createdAt", "updatedAt",
+  ], "Household person");
+  const itemHouseholdId = text(item.householdId, "Person household ID", 128);
+  if (itemHouseholdId !== householdId) throw new Error("Household person tenant is invalid.");
+  if (typeof item.personType !== "string"
+    || !personTypes.has(item.personType as HouseholdPersonType)) {
+    throw new Error("Household person type is invalid.");
+  }
+  if (item.status !== "active" && item.status !== "archived") {
+    throw new Error("Household person status is invalid.");
+  }
+  const dateOfBirth = optionalText(item.dateOfBirth, "Person date of birth", 10);
+  if (dateOfBirth && !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+    throw new Error("Person date of birth is invalid.");
+  }
+  return {
+    id: text(item.id, "Person ID", 128),
+    householdId: itemHouseholdId,
+    linkedUserId: optionalText(item.linkedUserId, "Linked user ID", 128),
+    firstName: text(item.firstName, "Person first name", 100),
+    lastName: optionalText(item.lastName, "Person last name", 100) ?? "",
+    preferredName: optionalText(item.preferredName, "Person preferred name", 100) ?? "",
+    relationship: text(item.relationship, "Person relationship", 100),
+    personType: item.personType as HouseholdPersonType,
+    dateOfBirth,
+    avatarStoragePath: optionalText(item.avatarStoragePath, "Person avatar", 500),
+    status: item.status,
+    createdAt: date(item.createdAt, "Person creation date"),
+    updatedAt: date(item.updatedAt, "Person update date"),
+  };
+}
+
+export function parseHouseholdPeopleDirectory(value: unknown): HouseholdPeopleDirectory {
+  const item = record(value, "Household people directory");
+  exactKeys(item, ["householdId", "currentUserRole", "people"], "Household people directory");
+  const householdId = text(item.householdId, "Household ID", 128);
+  if (!Array.isArray(item.people) || item.people.length > 50) {
+    throw new Error("Household people are invalid.");
+  }
+  return {
+    householdId,
+    currentUserRole: role(item.currentUserRole),
+    people: item.people.map((entry) => person(entry, householdId)),
+  };
 }

@@ -41,10 +41,28 @@ test("mobile Family provides native sharing and preserves Family Room files and 
   assert.match(screen, /HouseholdMembers/);
   assert.match(screen, /HouseholdInvites/);
   assert.match(screen, /HouseholdOwnershipTransfer/);
+  assert.match(screen, /HouseholdPeople/);
   assert.match(records, /useDocuments/);
   assert.match(records, /useReminders/);
   assert.match(invites, /Share\.share/);
   assert.match(app, /import\("@mobile\/family\/FamilyScreen"\)/);
+});
+
+test("native non-login people use the bounded tenant-derived household boundary", async () => {
+  const [screen, people, client, route] = await Promise.all([
+    read("apps/mobile/src/family/FamilyScreen.tsx"),
+    read("apps/mobile/src/family/HouseholdPeople.tsx"),
+    read("apps/mobile/src/family/household-client.ts"),
+    read("app/api/mobile/household/route.ts"),
+  ]);
+  assert.match(screen, /canManage={household.role === "owner"}/);
+  assert.match(people, /createMobileHouseholdPerson/);
+  assert.doesNotMatch(people, /localStorage|sessionStorage/);
+  assert.match(client, /parseHouseholdPeopleDirectory/);
+  assert.match(client, /HOUSEHOLD_PEOPLE_SCHEMA_VERSION/);
+  assert.match(route, /createHouseholdPerson\(supabase, body\)/);
+  assert.match(route, /loadHouseholdPeople\(supabase, user\.id\)/);
+  assert.doesNotMatch(route, /body.householdId|body.linkedUserId|body.createdBy/);
 });
 
 test("household invite links accept only exact first-party or app URLs", () => {
