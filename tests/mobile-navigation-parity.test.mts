@@ -112,4 +112,6 @@ test("specialist room labels retain distinct native landing states", async () =>
   assert.match(router, /initialFilter/);
   assert.match(family, /initialView === "inbox"/);
   assert.match(family, /FamilyInboxScreen/);
+  assert.match(scenes, /action\("people", "People"/);
+  assert.match(scenes, /action\("inbox", "Files"/);
 });

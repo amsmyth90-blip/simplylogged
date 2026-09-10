@@ -15,7 +15,7 @@ export function FamilyInboxScreen(props: {
 }) {
   return <main className="family-screen family-inbox-screen"><header className="family-inbox-header">
     <button type="button" onClick={props.onBack} aria-label="Back to Family Room">
-      <MobileIcon name="arrow-left" /></button><div><h1>Inbox</h1></div>
+      <MobileIcon name="arrow-left" /></button><div><h1>Files</h1></div>
   </header>
     <FamilyRecords accessToken={props.accessToken} store={props.store} syncStatus={props.syncStatus}
       synchronize={props.synchronize} onScan={props.onScan}

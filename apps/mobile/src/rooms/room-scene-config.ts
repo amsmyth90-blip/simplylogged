@@ -72,9 +72,9 @@ export const roomScenes: Record<string, RoomScene> = {
     image: familyImage, imageAlt: "A warm fireside family room with household shelves",
     name: "Family Room", tone: "#6d5942",
     actions: [
-      action("household", "Household", "Household members and access", "47%", "26%"),
+      action("people", "People", "Household members and app access", "47%", "26%"),
       action("schedules", "Schedules", "Plans, routines and responsibilities", "82%", "21%"),
-      action("inbox", "Inbox", "Shared household items", "65%", "38%"),
+      action("inbox", "Files", "Shared household files and reminders", "65%", "38%"),
     ],
   },
   kitchen: {

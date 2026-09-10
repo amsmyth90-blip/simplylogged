@@ -106,61 +106,46 @@ export function SettingsScreen(props: SettingsScreenProps) {
 
       <section className="settings-profile">
         <span>{name.slice(0, 2).toUpperCase()}</span>
-        <div><h2>{name}</h2><p>{email}</p><small>Member since {new Date(summary?.profile.memberSince ?? props.user.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</small></div>
+        <div><h2>{name}</h2><p>{email}</p></div>
       </section>
 
-      <section className="settings-card">
-        <h2>This device</h2>
-        <div className="settings-row"><span>Encrypted local database</span><strong>On</strong></div>
-        <div className="settings-row"><span>Device-protected key storage</span><strong>On</strong></div>
-        <div className="settings-row"><span>Secure synchronisation</span><strong>{props.syncStatus.toLowerCase().replaceAll("_", " ")}</strong></div>
-        <button type="button" className="settings-secondary" disabled={busy} onClick={() => void props.synchronize()}>Sync now</button>
-      </section>
-
-      <section className="settings-card">
-        <h2>Physical Links</h2>
+      <section className="settings-card settings-menu">
+        <h2>App</h2>
+        <div className="settings-row"
+          aria-label="Encrypted local database and device-protected key storage on">
+          <span>Device security</span><strong>On</strong>
+        </div>
+        <button type="button" className="settings-link-row" disabled={busy}
+          onClick={() => void props.synchronize()}>
+          <span><strong>Sync now</strong></span><b>›</b>
+        </button>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("PHYSICAL_LINKS")}>
-          <span><strong>Open</strong></span><b>›</b>
+          <span><strong>Physical Links</strong></span><b>›</b>
         </button>
-      </section>
-
-      <section className="settings-card">
-        <h2>Life Check</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("LIFE_CHECK")}>
-          <span><strong>Open</strong></span><b>›</b>
+          <span><strong>Life Check</strong></span><b>›</b>
         </button>
-      </section>
-
-      <section className="settings-card">
-        <h2>Home areas</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("ONBOARDING")}>
-          <span><strong>Choose areas</strong></span><b>›</b>
+          <span><strong>Home areas</strong></span><b>›</b>
         </button>
-      </section>
-
-      <section className="settings-card">
-        <h2>Home Handover</h2>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("HOME_HANDOVER")}>
-          <span><strong>Open</strong></span><b>›</b>
+          <span><strong>Home Handover</strong></span><b>›</b>
         </button>
-      </section>
-
-      {summary?.storage ? (
-        <section className="settings-card">
-          <h2>Storage</h2><p>{bytes(summary.storage.usedBytes)} of {bytes(summary.storage.limitBytes)}</p>
+        {summary?.storage ? <div className="settings-storage-row">
+          <span><strong>Storage</strong><small>{bytes(summary.storage.usedBytes)} of {bytes(summary.storage.limitBytes)}</small></span>
+          <b>{summary.storage.tier}</b>
           <div className="settings-storage"><span style={{ width: `${usedPercent}%` }} /></div>
-          <small>{summary.storage.tier} plan · pending reservations are included before upload</small>
-        </section>
-      ) : null}
+        </div> : null}
+      </section>
 
       <section className="settings-card">
         <h2>Privacy</h2>
         <label className="settings-switch">
-          <span><strong>Share anonymous product usage</strong><small>No document names, contents, contacts or questions. Retained for {summary?.analytics.retentionDays ?? 90} days.</small></span>
+          <span><strong>Share anonymous usage</strong></span>
           <input type="checkbox" disabled={busy || !summary} checked={summary?.analytics.enabled ?? false} onChange={() => void toggleAnalytics()} />
         </label>
         {summary?.forwarding.configured ? (
@@ -168,14 +153,14 @@ export function SettingsScreen(props: SettingsScreenProps) {
             <span><strong>Email forwarding</strong><small>{summary.forwarding.address}</small></span><b>Copy</b>
           </button>
         ) : null}
-        <button type="button" className="settings-link-row" onClick={() => void openPublicPage("/privacy")}><span><strong>Privacy policy</strong><small>How DiaryDock handles your information</small></span><b>›</b></button>
-        <button type="button" className="settings-link-row" onClick={() => void openPublicPage("/terms")}><span><strong>Terms of use</strong><small>Your rights and responsibilities</small></span><b>›</b></button>
+        <button type="button" className="settings-link-row" onClick={() => void openPublicPage("/privacy")}><span><strong>Privacy policy</strong></span><b>›</b></button>
+        <button type="button" className="settings-link-row" onClick={() => void openPublicPage("/terms")}><span><strong>Terms</strong></span><b>›</b></button>
       </section>
 
       <section className="settings-card settings-account-actions">
         <h2>Account</h2>
-        <button type="button" className="settings-secondary" onClick={props.onSignOut}>Sign out and remove offline data</button>
-        {!deleting ? <button type="button" className="settings-danger-link" onClick={() => setDeleting(true)}>Request account deletion</button> : (
+        <button type="button" className="settings-secondary" onClick={props.onSignOut}>Sign out</button>
+        {!deleting ? <button type="button" className="settings-danger-link" onClick={() => setDeleting(true)}>Delete account</button> : (
           <div className="settings-delete">
             <p>Type DELETE. A recent sign-in is required, and the request is verified before processing.</p>
             <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="DELETE" autoCapitalize="characters" />
@@ -184,7 +169,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
         )}
       </section>
 
-      {loading ? <p className="form-message">Loading online account details…</p> : null}
+      {loading ? <p className="form-message">Loading…</p> : null}
       {error ? <p className="form-message form-error" role="alert">{error}</p> : null}
       {message ? <p className="form-message" role="status">{message}</p> : null}
       <MobileBottomNav active={null} onNavigate={props.onNavigate} />

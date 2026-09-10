@@ -110,7 +110,7 @@ export function SignedInRoom(props: Props) {
   }
   if (props.profile.id === "family-room") {
     return <FamilyScreen {...common}
-      initialView={activeAction as "household" | "inbox" | "schedules"}
+      initialView={activeAction as "people" | "inbox" | "schedules"}
       synchronize={props.synchronize} />;
   }
   return <RoomScreen {...common} profile={props.profile}

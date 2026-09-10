@@ -24,7 +24,7 @@ test("native rooms use the same full-scene artwork with clear destination labels
     "Health files",
     "Inbox",
     "Bills",
-    "Household",
+    "People",
     "Meal planner",
     "Vehicle",
     "Jobs",
@@ -101,7 +101,7 @@ test("room labels open the matching secure native workspace", async () => {
   assert.match(scenes, /action\("parking-permits", "Parking"/);
   assert.match(router, /initialView={activeAction as DrivewayView}/);
   assert.match(router, /initialView={activeAction as WillsView}/);
-  assert.match(router, /initialView={activeAction as "household" \| "inbox" \| "schedules"}/);
+  assert.match(router, /initialView={activeAction as "people" \| "inbox" \| "schedules"}/);
   assert.match(navigation, /calendar: "KITCHEN_CALENDAR"/);
   assert.match(navigation, /noticeboard: "KITCHEN_NOTICES"/);
   assert.match(navigation, /recipes: "KITCHEN_RECIPES"/);

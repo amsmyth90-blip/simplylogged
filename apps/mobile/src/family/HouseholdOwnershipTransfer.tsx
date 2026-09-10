@@ -38,8 +38,8 @@ export function HouseholdOwnershipTransfer({ household, busy, onChange }: Props)
   }
 
   return <section className="family-card family-transfer">
-    <div className="family-section-title"><div><p>Household administration</p><h2>Transfer ownership</h2></div></div>
-    <p>Ownership controls household members and settings. Private records remain with their account owner.</p>
+    <div className="family-section-title"><h2>Transfer ownership</h2></div>
+    <p>Choose who manages this household. Files stay private.</p>
     {!transfer ? eligible.length ? <div className="family-transfer-form">
       <label>New household owner
         <select value={effectiveSelectedId}
