@@ -1,9 +1,13 @@
 import {
   HOUSEHOLD_DIRECTORY_SCHEMA_VERSION,
+  HOUSEHOLD_PEOPLE_SCHEMA_VERSION,
   parseHouseholdDirectory,
   parseHouseholdInvitePreview,
+  parseHouseholdPeopleDirectory,
   type HouseholdDirectory,
   type HouseholdInvitePreview,
+  type HouseholdPeopleDirectory,
+  type HouseholdPersonType,
 } from "@diarydock/household";
 
 import { readBoundedJsonResponse } from "@mobile/platform/bounded-json-response";
@@ -63,6 +67,19 @@ async function authorizedRequest(accessToken: string, path: string, init?: Reque
   return payload;
 }
 
+function parsePeopleResponse(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Household people response is invalid.");
+  }
+  const payload = value as Record<string, unknown>;
+  const allowed = new Set(["people", "personId", "schemaVersion"]);
+  if (Object.keys(payload).some((key) => !allowed.has(key))
+    || payload.schemaVersion !== HOUSEHOLD_PEOPLE_SCHEMA_VERSION) {
+    throw new Error("Please update DiaryDock to open household people.");
+  }
+  return parseHouseholdPeopleDirectory(payload.people);
+}
+
 async function request(accessToken: string, init?: RequestInit) {
   return parseResponse(await authorizedRequest(accessToken, "/api/mobile/household", init));
 }
@@ -73,6 +90,31 @@ export function loadMobileHousehold(accessToken: string) {
 
 export function mutateMobileHousehold(accessToken: string, mutation: HouseholdMutation) {
   return request(accessToken, { method: "POST", body: JSON.stringify(mutation) });
+}
+
+export async function loadMobileHouseholdPeople(
+  accessToken: string,
+): Promise<HouseholdPeopleDirectory> {
+  return parsePeopleResponse(
+    await authorizedRequest(accessToken, "/api/mobile/household?view=people"),
+  );
+}
+
+export async function createMobileHouseholdPerson(
+  accessToken: string,
+  input: {
+    firstName: string;
+    lastName: string;
+    preferredName: string;
+    relationship: string;
+    personType: Exclude<HouseholdPersonType, "owner">;
+    dateOfBirth: string;
+  },
+) {
+  return parsePeopleResponse(await authorizedRequest(accessToken, "/api/mobile/household", {
+    method: "POST",
+    body: JSON.stringify({ action: "create-person", ...input }),
+  }));
 }
 
 export async function loadMobileHouseholdInvite(

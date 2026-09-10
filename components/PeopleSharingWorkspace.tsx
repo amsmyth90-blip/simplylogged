@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { PageHeader } from "@/components/PageHeader";
 import { HouseholdAccessActivity, HouseholdMembersCard, HouseholdOwnershipTransfer, PeopleSharingModals } from "@/components/people-sharing/PeopleSharingPanels";
+import { HouseholdPeopleCard } from "@/components/people-sharing/HouseholdPeopleCard";
 import { emptyInvite, type InviteDraft } from "@/components/people-sharing/people-sharing-model";
 import { sharedDocumentSummary } from "@/lib/household-access";
 import {
@@ -214,9 +215,7 @@ export function PeopleSharingWorkspace() {
   return (
     <div className="immersive-page space-y-5 pb-6">
       <PageHeader
-        eyebrow="Family Room"
         title="People & Sharing"
-        subtitle="See who belongs to your household and what you have deliberately shared."
         backHref="/family"
         backLabel="People"
         action={canManageHousehold && connected ? (
@@ -245,6 +244,7 @@ export function PeopleSharingWorkspace() {
             onOpenMember={openMember}
             onRename={() => { setHouseholdName(household?.householdName ?? ""); setMessage(""); setRenameOpen(true); }}
           />
+          <HouseholdPeopleCard canManage={canManageHousehold} />
 
           <HouseholdAccessActivity
             busy={busy}

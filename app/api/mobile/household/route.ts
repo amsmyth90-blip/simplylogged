@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { HOUSEHOLD_DIRECTORY_SCHEMA_VERSION } from "@diarydock/household";
+import {
+  HOUSEHOLD_DIRECTORY_SCHEMA_VERSION,
+  HOUSEHOLD_PEOPLE_SCHEMA_VERSION,
+} from "@diarydock/household";
 
 import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
 import {
@@ -9,6 +12,7 @@ import {
   loadHouseholdDirectory,
   loadHouseholdInvitePreview,
 } from "@/lib/household/directory-server";
+import { createHouseholdPerson, loadHouseholdPeople } from "@/lib/household/people-server";
 import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
 import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
 import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
@@ -27,6 +31,10 @@ const actionFields: Record<string, ReadonlySet<string>> = {
   "resolve-ownership-transfer": new Set(["action", "transferId", "decision"]),
   rename: new Set(["action", "name"]),
   leave: new Set(["action"]),
+  "create-person": new Set([
+    "action", "firstName", "lastName", "preferredName", "relationship",
+    "personType", "dateOfBirth",
+  ]),
 };
 
 function response(request: Request, body: Record<string, unknown>, status = 200) {
@@ -61,6 +69,11 @@ export async function GET(request: Request) {
   });
   if (!rate.allowed) return response(request, { error: "Household access is busy. Try again shortly." }, 429);
   const url = new URL(request.url);
+  if (url.searchParams.get("view") === "people") {
+    const people = await loadHouseholdPeople(supabase, user.id);
+    if (!people) return response(request, { error: "Your household people could not be loaded." }, 503);
+    return response(request, { schemaVersion: HOUSEHOLD_PEOPLE_SCHEMA_VERSION, people });
+  }
   if (url.searchParams.get("view") === "invite") {
     const token = householdText(url.searchParams.get("token"), 120);
     if (!token) return response(request, { error: "The invitation link is incomplete." }, 400);
@@ -105,7 +118,17 @@ export async function POST(request: Request) {
       code: "RECENT_AUTH_REQUIRED",
     }, 403);
   }
-  const mutation = await executeHouseholdMutation(supabase, action, body);
+  const mutation = action === "create-person"
+    ? await createHouseholdPerson(supabase, body)
+    : await executeHouseholdMutation(supabase, action, body);
+  if (action === "create-person") {
+    if (mutation.status !== 201) return response(request, mutation.body, mutation.status);
+    const people = await loadHouseholdPeople(supabase, user.id);
+    if (!people) return response(request, { error: "The person was saved, but the household could not be refreshed." }, 503);
+    return response(request, {
+      ...mutation.body, schemaVersion: HOUSEHOLD_PEOPLE_SCHEMA_VERSION, people,
+    }, 201);
+  }
   if (mutation.status !== 200) return response(request, mutation.body, mutation.status);
   const household = await loadHouseholdDirectory(supabase, user.id);
   if (!household) return response(request, { error: "The change was saved, but your household could not be refreshed." }, 503);

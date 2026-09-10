@@ -3,7 +3,7 @@ import Link from "next/link";
 import { UiIcon } from "@/components/UiIcon";
 
 type PageHeaderProps = {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   subtitle?: string;
   backHref?: string;
@@ -65,7 +65,7 @@ export function PageHeader({
           </div>
 
           <div className="mt-auto max-w-2xl pb-24 sm:pb-20">
-            <p className="text-[10px] font-medium uppercase tracking-[0.27em] text-white/72">{eyebrow}</p>
+            {eyebrow ? <p className="text-[10px] font-medium uppercase tracking-[0.27em] text-white/72">{eyebrow}</p> : null}
             <h1 className="mt-2 max-w-xl font-serif text-[40px] font-normal leading-[0.98] tracking-[-0.045em] text-white drop-shadow-sm sm:text-[46px]">
               {title}
             </h1>
@@ -90,8 +90,8 @@ export function PageHeader({
       ) : null}
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/45">{eyebrow}</p>
-          <h1 className="mt-1.5 text-[28px] font-semibold leading-tight tracking-tight text-ink sm:text-[32px]">
+          {eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/45">{eyebrow}</p> : null}
+          <h1 className={`${eyebrow ? "mt-1.5 " : ""}text-[28px] font-semibold leading-tight tracking-tight text-ink sm:text-[32px]`}>
             {title}
           </h1>
           {subtitle ? <p className="mt-2 max-w-2xl text-[15px] leading-6 text-ink/60">{subtitle}</p> : null}

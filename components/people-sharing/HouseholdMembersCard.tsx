@@ -28,15 +28,9 @@ export function HouseholdMembersCard({
     <section className="estate-sheet p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
-            Your household
-          </p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">
+          <h2 className="text-xl font-semibold tracking-tight text-ink">
             {householdName}
           </h2>
-          <p className="mt-1 text-sm text-ink/50">
-            {members.length} active account{members.length === 1 ? "" : "s"}
-          </p>
         </div>
         {canManage ? (
           <button
@@ -90,19 +84,26 @@ export function HouseholdMembersCard({
           );
         })}
       </div>
-      <div className="mt-4 flex flex-col gap-2 border-t border-black/5 pt-4 sm:flex-row">
+      <div className="mt-4 grid gap-2 border-t border-black/5 pt-4 sm:grid-cols-3">
+        {canManage ? (
+          <Link
+            href="/family/new-member"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-ink px-4 text-sm font-semibold text-white"
+          >
+            <UiIcon name="plus" className="h-4 w-4" /> Add someone
+          </Link>
+        ) : null}
         <Link
           href="/family/household/profiles"
           className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/75 px-4 text-sm font-semibold text-ink/65"
         >
-          <UiIcon name="users" className="h-4 w-4" /> Profiles for meals &
-          schedules
+          <UiIcon name="users" className="h-4 w-4" /> Profiles
         </Link>
         <Link
           href="/files?filter=shared"
           className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-4 text-sm font-semibold text-white"
         >
-          <UiIcon name="folder" className="h-4 w-4" /> Review shared documents
+          <UiIcon name="folder" className="h-4 w-4" /> Shared files
         </Link>
       </div>
     </section>

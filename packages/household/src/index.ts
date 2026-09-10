@@ -1,4 +1,8 @@
-export { parseHouseholdDirectory, parseHouseholdInvitePreview } from "./parser.ts";
+export {
+  parseHouseholdDirectory,
+  parseHouseholdInvitePreview,
+  parseHouseholdPeopleDirectory,
+} from "./parser.ts";
 export {
   parseHouseholdSchedulesMutation,
   parseHouseholdSchedulesSnapshot,
@@ -9,7 +13,10 @@ export {
   householdScheduleColours,
   householdScheduleRepeats,
 } from "./schedule-types.ts";
-export { HOUSEHOLD_DIRECTORY_SCHEMA_VERSION } from "./types.ts";
+export {
+  HOUSEHOLD_DIRECTORY_SCHEMA_VERSION,
+  HOUSEHOLD_PEOPLE_SCHEMA_VERSION,
+} from "./types.ts";
 export type {
   HouseholdAccessEvent,
   HouseholdDirectory,
@@ -17,6 +24,9 @@ export type {
   HouseholdDirectoryMember,
   HouseholdInvitePreview,
   HouseholdOwnershipTransfer,
+  HouseholdPeopleDirectory,
+  HouseholdPerson,
+  HouseholdPersonType,
   HouseholdRole,
 } from "./types.ts";
 export type {

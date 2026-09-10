@@ -13,8 +13,8 @@ import { HouseholdInviteForm } from "./HouseholdInviteForm";
 import { HouseholdInvites } from "./HouseholdInvites";
 import { HouseholdMembers } from "./HouseholdMembers";
 import { HouseholdOwnershipTransfer } from "./HouseholdOwnershipTransfer";
+import { HouseholdPeople } from "./HouseholdPeople";
 import type { HouseholdMutation } from "./household-client";
-import { roleLabel } from "./family-utils";
 import { useHousehold } from "./use-household";
 import { useFamilySchedules } from "./use-family-schedules";
 import "./family-schedules.css";
@@ -76,18 +76,12 @@ export function FamilyScreen(props: Props) {
         <div className="family-hero-shade" />
         <button type="button" className="family-back" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>{props.syncStatus.toLowerCase().replaceAll("_", " ")}</span>
-        <div><p>{household?.householdName ?? "Your household"}</p><h1>Family Room</h1><strong>Your household, together.</strong></div>
+        <div><h1>Family Room</h1></div>
       </header>
 
       <section className="family-intro family-card">
         <div>
-          <p className="eyebrow">Household access</p>
           <h2>{household?.householdName ?? "Opening your household…"}</h2>
-          <span>
-            {household
-              ? `${roleLabel(household.role)} · ${household.members.length} active account${household.members.length === 1 ? "" : "s"}`
-              : "Encrypted and private by default"}
-          </span>
         </div>
         <span className={model.source === "CACHE" ? "is-cached" : "is-online"}>
           {model.source === "CACHE" ? "Offline copy" : "Up to date"}
@@ -122,6 +116,10 @@ export function FamilyScreen(props: Props) {
         onRole={async (userId, role) => { await change({ action: "update-role", userId, role }, "Household access updated."); }}
         onRemove={async (userId) => { await change({ action: "remove-member", userId }, "Household member removed."); }}
       /> : null}
+      {household ? <HouseholdPeople
+        accessToken={props.accessToken}
+        canManage={household.role === "owner"}
+      /> : null}
       {household ? <HouseholdOwnershipTransfer household={household} busy={model.busy} onChange={change} /> : null}
       {household?.role === "owner" ? <HouseholdInvites
         busy={model.busy}
@@ -135,7 +133,7 @@ export function FamilyScreen(props: Props) {
         onScan={() => props.onScan("Family Room")} onAllFiles={() => props.onNavigate("FILES")} onAllReminders={() => props.onNavigate("REMINDERS")}
       />
 
-      {household && household.role !== "owner" ? <section className="family-card family-leave"><div><h2>Leave this household</h2><p>Shared access will be revoked. Your private records remain yours.</p></div><button type="button" disabled={model.busy} onClick={() => {
+      {household && household.role !== "owner" ? <section className="family-card family-leave"><h2>Leave this household</h2><button type="button" disabled={model.busy} onClick={() => {
         if (window.confirm("Leave this household and revoke its shared access?")) void change({ action: "leave" }, "You have left the household.");
       }}>Leave household</button></section> : null}
       {model.loading ? <p className="form-message">Opening your household securely…</p> : null}
