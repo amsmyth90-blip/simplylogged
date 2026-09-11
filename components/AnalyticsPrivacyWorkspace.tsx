@@ -70,9 +70,8 @@ export function AnalyticsPrivacyWorkspace() {
   return (
     <div className="space-y-5 pb-28">
       <PageHeader
-        eyebrow="Privacy control"
         title="Help improve DiaryDock"
-        subtitle="Choose whether DiaryDock may record a small set of anonymous-style product events. This is off until you opt in."
+        subtitle="Choose whether to share basic app usage. This is off until you turn it on."
         backHref="/settings"
         backLabel="Settings"
         meta={
@@ -151,10 +150,6 @@ export function AnalyticsPrivacyWorkspace() {
 
       <section className="estate-sheet p-5">
         <h2 className="font-serif text-xl">What is never included</h2>
-        <p className="mt-1 text-sm leading-6 text-[#667068]">
-          The event service rejects unknown names and properties at both the
-          server and database.
-        </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {[
             "Questions or AI answers",

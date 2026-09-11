@@ -99,7 +99,7 @@ export function TrustedAccessScreen(props: {
           <section className="trusted-safety trusted-card">
             <span>♢</span>
             <div>
-              <h2>A narrow emergency view</h2>
+              <h2>Who can accept an invitation?</h2>
               <p>
                 Invitations must be accepted by the invited email. Changes
                 require a recent sign-in and are recorded in the security
@@ -130,7 +130,6 @@ export function TrustedAccessScreen(props: {
           ) : null}
           {directory.notifications.length ? (
             <section className="trusted-card trusted-notices">
-              <p className="trusted-kicker">Security history</p>
               <h2>Recent access changes</h2>
               <ProgressiveRecordList
                 initialCount={8}
@@ -164,8 +163,8 @@ export function TrustedAccessScreen(props: {
         <section className="trusted-card trusted-empty-state">
           <h2>Connect to open trusted access</h2>
           <p>
-            This screen is deliberately not stored offline so revoked access
-            cannot remain available from an old directory.
+            Connect to the internet to check which information is still shared
+            with you.
           </p>
         </section>
       ) : null}

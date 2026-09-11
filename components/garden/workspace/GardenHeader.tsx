@@ -29,9 +29,6 @@ export function GardenHeader({ view }: { view: GardenViewModel }) {
           >
             <UiIcon name="arrow-left" className="h-5 w-5" />
           </Link>
-          <span className="rounded-full border border-white/50 bg-white/20 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-xl">
-            Pets & Garden
-          </span>
           <div className="flex gap-2">
             <Link
               href="/search"
@@ -51,16 +48,9 @@ export function GardenHeader({ view }: { view: GardenViewModel }) {
           </div>
         </div>
         <div className="mt-auto max-w-[560px] rounded-[24px] border border-white/30 bg-[#20352a]/45 p-4 shadow-xl backdrop-blur-md sm:p-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.23em] text-white/75">
-            Outdoor life
-          </p>
           <h1 className="mt-2 font-serif text-[38px] leading-none tracking-[-0.04em] sm:text-5xl">
-            Everything beyond the back door
+            Pets & Garden
           </h1>
-          <p className="mt-3 max-w-lg text-sm leading-6 text-white/90">
-            Keep pets, outdoor spaces, jobs and everything beyond the back door
-            organised in one place.
-          </p>
         </div>
       </div>
     </header>

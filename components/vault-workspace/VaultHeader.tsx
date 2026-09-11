@@ -1,5 +1,4 @@
 import { PageHeader } from "@/components/PageHeader";
-import { SectionHeader } from "@/components/SectionHeader";
 import { UiIcon } from "@/components/UiIcon";
 import type { VaultController } from "@/components/vault-workspace/useVaultController";
 import type { VaultSort } from "@/components/vault-workspace/vault-workspace-model";
@@ -8,16 +7,14 @@ export function VaultHeader({ controller }: { controller: VaultController }) {
   return (
     <>
       <PageHeader
-        eyebrow={controller.reviewInboxMode ? "Review inbox" : "All files"}
         title={controller.reviewInboxMode ? "Review Inbox" : "All Files"}
         subtitle={
           controller.reviewInboxMode
-            ? "Check new scans, shares and emailed documents before DiaryDock files them away."
-            : "Every document, securely stored in one place."
+            ? "Open the original, check the folder, then choose File here."
+            : undefined
         }
         heroImage="/images/pages/vault-hero.webp"
         heroPosition="center 44%"
-        badge="Secure archive"
         action={
           <div className="flex items-center gap-2">
             <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
@@ -93,46 +90,6 @@ export function VaultHeader({ controller }: { controller: VaultController }) {
           </select>
         </div>
       </section>
-      {controller.reviewInboxMode ? (
-        <section className="estate-sheet border border-amber-200/65 bg-amber-50/82 p-4">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/88 text-amber-700">
-              <UiIcon name="alert" className="h-5 w-5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <SectionHeader
-                title="Review inbox"
-                hint={
-                  controller.emailImportQueue.length
-                    ? `${controller.emailImportQueue.length} emailed document${controller.emailImportQueue.length === 1 ? "" : "s"} waiting`
-                    : "Scans and emailed files stay here until checked"
-                }
-              />
-              <p className="mt-1.5 text-xs leading-5 text-ink/62">
-                Open the original, check the suggested place, then mark it
-                reviewed or delete obvious duplicates.
-              </p>
-            </div>
-          </div>
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {[
-              { label: "Check", detail: "Open original" },
-              { label: "File", detail: "Use suggestion" },
-              { label: "Done", detail: "Mark reviewed" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="rounded-2xl bg-white/78 px-3 py-2.5"
-              >
-                <p className="text-xs font-semibold text-ink">{item.label}</p>
-                <p className="mt-0.5 text-[10px] leading-4 text-ink/50">
-                  {item.detail}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
     </>
   );
 }

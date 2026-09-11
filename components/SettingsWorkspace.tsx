@@ -118,12 +118,9 @@ export function SettingsWorkspace() {
     <>
       <div className="immersive-page">
         <PageHeader
-          eyebrow="Settings"
           title="Your Settings, Your Peace of Mind"
-          subtitle="Personalize your experience and stay protected."
           heroImage="/images/pages/settings-hero.webp"
           heroPosition="center 50%"
-          badge="Estate control"
           action={(
             <span className="hidden rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[11px] font-semibold text-white/80 backdrop-blur-md sm:inline-flex">
               {repositoryMode === "supabase" ? "Secure sync" : "Local session"}

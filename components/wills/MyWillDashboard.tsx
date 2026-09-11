@@ -225,7 +225,7 @@ export function MyWillDashboard() {
 
   return (
     <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
-      <WillPageHeader title="My Will" subtitle="Store, organise and review the information connected to your will." />
+      <WillPageHeader title="My Will" />
 
       <WillStatusCard
         currentVersion={currentVersion}

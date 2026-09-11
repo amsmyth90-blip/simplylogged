@@ -110,9 +110,8 @@ export function SearchWorkspace() {
   return (
     <div className="space-y-4">
       <PageHeader
-        eyebrow="Private search"
-        title="Find anything"
-        subtitle="Search only records your signed-in account is allowed to open. Full OCR, private notes and phone numbers are not searched."
+        title="Search"
+        subtitle="Search your records. Document text, private notes and phone numbers are not included."
         backHref="/dashboard"
         backLabel="Home"
         action={
@@ -123,12 +122,6 @@ export function SearchWorkspace() {
             <UiIcon name="star" className="h-4 w-4" />
             <span className="hidden sm:inline">Ask DiaryDock</span>
           </Link>
-        }
-        meta={
-          <>
-            <span className="estate-chip">Permission checked first</span>
-            <span className="estate-chip">No AI required</span>
-          </>
         }
       />
       <SearchControls

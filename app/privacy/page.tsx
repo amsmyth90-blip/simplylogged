@@ -11,7 +11,6 @@ function paragraph(...parts: string[]) {
 export default function PrivacyPage() {
   return (
     <LegalPage
-      eyebrow="Privacy"
       title="Privacy Policy"
       subtitle="How DiaryDock collects, uses, and protects your family's information."
       effectiveDate="1 September 2026"

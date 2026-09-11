@@ -45,7 +45,6 @@ export function LettersDashboard() {
     <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader
         title="Letters of Wishes"
-        subtitle="Share your thoughts, love and guidance with the people who matter most."
         backHref="/wills"
       />
 

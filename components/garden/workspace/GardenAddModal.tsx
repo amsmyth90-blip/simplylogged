@@ -33,7 +33,6 @@ export function GardenAddModal({ view }: { view: GardenViewModel }) {
     <ModalShell
       open={view.addOpen}
       title="Add to Garden"
-      subtitle="Only actions already supported by DiaryDock are shown here."
       onClose={() => view.setAddOpen(false)}
     >
       <div className="space-y-2">

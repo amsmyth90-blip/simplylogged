@@ -20,7 +20,7 @@ export function InviteHouseholdModal(props: InviteModalProps) {
     <ModalShell
       open={props.inviteOpen}
       title="Invite someone"
-      subtitle="Create an email-bound link. It is not sent automatically."
+      subtitle="Create an invite for this email address, then copy and send the link."
       onClose={props.onCloseInvite}
       footer={
         <button

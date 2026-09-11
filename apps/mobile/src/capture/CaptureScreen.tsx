@@ -200,7 +200,6 @@ export function CaptureScreen(props: CaptureScreenProps) {
               ) : null}
             </div>
           ) : null}
-          <p className="capture-security-note">The file type and contents are checked now and checked again by the secure server before storage.</p>
           <button className="capture-save" type="button" disabled={!queue.draft.title.trim()} onClick={() => void queue.stage()}>
             Save {queue.captures.length > 1 ? `${queue.captures.length} pages` : "securely"}
           </button>

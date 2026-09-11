@@ -36,9 +36,7 @@ export function DrivewayFeatureScreen(props: {
 }
 
 function PermitPlaceholder() {
-  const items = ["Visitor parking", "Permit details", "Access codes", "Restrictions"];
   return <section className="driveway-permit-card"><span><MobileIcon name="briefcase" /></span>
-    <h2>Parking & permits</h2>
-    <div>{items.map((item) => <strong key={item}><MobileIcon name="check" />{item}</strong>)}</div>
+    <p>Parking tools are not available yet. You can save parking documents in All Files.</p>
   </section>;
 }

@@ -40,7 +40,7 @@ export function DocumentCorrectionModal({
     <ModalShell
       open={open}
       title="Correct document"
-      subtitle="Update the AI capture, move it to the right room, and save a reviewed record."
+      subtitle="Check the details against the original, then choose where to save it."
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
@@ -254,7 +254,7 @@ export function DocumentCorrectionModal({
             </span>
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-ink">OCR text</span>
+            <span className="text-sm font-semibold text-ink">Text from document</span>
             <textarea
               value={draft.extractedText}
               onChange={(event) => update("extractedText", event.target.value)}

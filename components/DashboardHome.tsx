@@ -72,7 +72,7 @@ export function DashboardHome() {
           href: "/review-inbox",
           icon: "alert" as const,
           title: "Review",
-          detail: `${reviewCount} capture${reviewCount === 1 ? "" : "s"}`,
+          detail: `${reviewCount} file${reviewCount === 1 ? "" : "s"}`,
           tone: "bg-amber-100 text-amber-700"
         }
       : null,
@@ -80,7 +80,7 @@ export function DashboardHome() {
       ? {
           href: "/reminders",
           icon: "calendar" as const,
-          title: "Today",
+          title: "Reminders",
           detail: `${activeReminderCount} action${activeReminderCount === 1 ? "" : "s"}`,
           tone: "bg-mist text-sky-700"
         }

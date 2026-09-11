@@ -10,18 +10,16 @@ type LegalSection = {
 };
 
 type LegalPageProps = {
-  eyebrow: string;
   title: string;
   subtitle: string;
   effectiveDate: string;
   sections: LegalSection[];
 };
 
-export function LegalPage({ eyebrow, title, subtitle, effectiveDate, sections }: LegalPageProps) {
+export function LegalPage({ title, subtitle, effectiveDate, sections }: LegalPageProps) {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-5 pb-10">
       <PageHeader
-        eyebrow={eyebrow}
         title={title}
         subtitle={subtitle}
         backHref="/settings"

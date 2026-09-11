@@ -155,7 +155,7 @@ export function TripOverviewSection({
         <DetailCard
           icon="users"
           title={`${trip.travellerRecords.length} travellers`}
-          detail="Linked to canonical people records"
+          detail="Linked household profiles"
           href={`/driveway/trips/${trip.id}/travellers`}
         />
         <DetailCard

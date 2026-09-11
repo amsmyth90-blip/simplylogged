@@ -78,8 +78,7 @@ export function GardenRoom() {
     <>
       <DesktopSpaceLanding
         title="Pets & garden"
-        eyebrow="Outdoor life"
-        description="Care for pets, outdoor spaces, seasonal jobs and everything that lives beyond the back door."
+        description="Pets, plants and garden jobs."
         image="/images/pages/garden-command-centre-v2.webp"
         imageAlt="A calm garden workspace with a cat and dog"
         imagePosition="center 48%"

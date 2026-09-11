@@ -20,7 +20,6 @@ export function VaultDocumentModal({
     <ModalShell
       open={controller.open}
       title={controller.editingId ? "Edit document" : "Add document"}
-      subtitle="Shared with rooms and mailbox routing through the DiaryDock data layer."
       onClose={controller.closeModal}
       footer={
         <div className="flex items-center justify-end gap-3">

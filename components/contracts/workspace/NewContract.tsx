@@ -175,7 +175,7 @@ export function NewContract() {
     <BillsShell>
       <BillsHeader
         title="Add a Contract"
-        subtitle="Upload a contract for a helpful first read, or enter the details yourself."
+        subtitle="Upload a contract to extract its details, or enter them yourself."
         backHref="/office/contracts"
       />
       <BillsCard>

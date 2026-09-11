@@ -33,9 +33,8 @@ export function HomeHandoverWorkspace() {
   return (
     <div className="space-y-5 pb-28">
       <PageHeader
-        eyebrow="Home Handover"
         title="Prepare useful home information"
-        subtitle="Prepare selected appliance, boiler and property information, then grant one person time-limited read-only access."
+        subtitle="Choose home information to share with one person, and set when their viewing access ends."
         backHref="/settings"
         backLabel="Settings"
         meta={

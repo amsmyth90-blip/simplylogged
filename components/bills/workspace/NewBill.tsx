@@ -185,7 +185,7 @@ export function NewBill() {
     <BillsShell>
       <BillsHeader
         title="Add a bill"
-        subtitle="Upload a bill for a helpful first read, or enter the details yourself."
+        subtitle="Upload a bill to extract its details, or enter them yourself."
         backHref="/office/bills"
       />
       <BillsCard>

@@ -109,8 +109,7 @@ export function GarageWorkspace() {
     <>
       <DesktopSpaceLanding
         title="Vehicles"
-        eyebrow="Garage"
-        description="Keep each vehicle’s identity, legal dates, insurance, maintenance and costs together."
+        description="Vehicles, renewal dates, servicing and costs."
         image="/images/pages/garage-folio-hero-v5.webp"
         imageAlt="A warm organised garage with a car and workbench"
         imagePosition="center 46%"

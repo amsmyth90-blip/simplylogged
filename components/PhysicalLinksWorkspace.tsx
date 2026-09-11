@@ -16,9 +16,8 @@ export function PhysicalLinksWorkspace() {
     <main className="min-h-[100svh] bg-[#f5f1e8] px-4 pb-28 pt-[max(1rem,env(safe-area-inset-top))] text-[#20352a] sm:px-6">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          eyebrow="Private smart labels"
           title="Physical Links"
-          subtitle="Connect a QR code or NFC tag to an appliance or boiler without putting its private record ID on the label."
+          subtitle="Use a QR code or NFC tag to open an item’s saved details."
           backHref="/settings"
           action={
             <button

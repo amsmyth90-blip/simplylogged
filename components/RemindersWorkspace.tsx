@@ -151,9 +151,7 @@ function RemindersWorkspaceInner() {
     <>
       <div className="immersive-page">
         <PageHeader
-          eyebrow="Reminders"
           title="What Matters, When It Matters"
-          subtitle="Gentle reminders to keep your life in order."
           heroImage="/images/pages/reminders-hero.webp"
           heroPosition="center 36%"
           badge={

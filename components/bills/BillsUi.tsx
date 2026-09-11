@@ -18,7 +18,7 @@ export function BillsHeader({
   backHref = "/room/office",
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   backHref?: string;
 }) {
   return (
@@ -47,15 +47,12 @@ export function BillsHeader({
         </span>
       </div>
       <div className="relative z-10 mt-7 max-w-[28rem]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#6f8e72]">
-          Office room
-        </p>
-        <h1 className="mt-2 font-serif text-[40px] font-normal leading-none tracking-[-0.035em] text-[#20352a]">
+        <h1 className="font-serif text-[40px] font-normal leading-none tracking-[-0.035em] text-[#20352a]">
           {title}
         </h1>
-        <p className="mt-3 max-w-sm text-[14px] leading-6 text-[#5f6b63]">
+        {subtitle ? <p className="mt-3 max-w-sm text-[14px] leading-6 text-[#5f6b63]">
           {subtitle}
-        </p>
+        </p> : null}
         {title === "Insurance Hub" ? (
           <div className="mt-5 flex flex-wrap gap-2">
             <Link

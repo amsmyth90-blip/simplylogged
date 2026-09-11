@@ -24,7 +24,7 @@ export function HomeInsuranceDashboard() {
   if (!policy) {
     return (
       <BillsShell>
-        <BillsHeader title="Home Insurance" subtitle="Protect your home, belongings and peace of mind by keeping the information you rely on organised." backHref="/office/insurance" />
+        <BillsHeader title="Home Insurance" backHref="/office/insurance" />
         <NoHomePolicy />
       </BillsShell>
     );
@@ -35,7 +35,7 @@ export function HomeInsuranceDashboard() {
   const included = policy.coverItems.filter(item => item.included);
   return (
     <BillsShell>
-      <BillsHeader title="Home Insurance" subtitle="Your policy details, documents, home inventory and claims in one secure place." backHref="/office/insurance" />
+      <BillsHeader title="Home Insurance" backHref="/office/insurance" />
       <BillsCard>
         <div className="flex items-start gap-3">
           <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-[#f1ead7] text-[#a06b24]"><UiIcon name="home" className="h-6 w-6" /></span>
