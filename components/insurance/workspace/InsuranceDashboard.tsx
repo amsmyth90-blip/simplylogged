@@ -62,7 +62,6 @@ export function InsuranceDashboard() {
     <BillsShell>
       <BillsHeader
         title="Insurance Hub"
-        subtitle="Keep home and personal protection policies, renewals and claims organised in one calm place."
         backHref="/room/office"
       />
       <BillsCard className="bg-[#355540] text-white">

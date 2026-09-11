@@ -172,7 +172,7 @@ export function NewInsurancePolicy() {
     <BillsShell>
       <BillsHeader
         title="Add a Policy"
-        subtitle="Upload a policy for a helpful first read, or enter the details yourself."
+        subtitle="Upload a policy to extract its details, or enter them yourself."
         backHref="/office/insurance"
       />
       <BillsCard>

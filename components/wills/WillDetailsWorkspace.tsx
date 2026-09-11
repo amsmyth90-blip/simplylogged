@@ -34,7 +34,6 @@ export function WillDetailsWorkspace() {
     >
       <WillPageHeader
         title="Will details"
-        subtitle="Keep the practical information around your current will together."
         backHref="/wills/my-will"
       />
       <WillImportantDetailsCard view={view} />

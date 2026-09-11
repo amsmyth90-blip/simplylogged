@@ -54,8 +54,7 @@ export function FamilyRoomScene({
     <>
       <DesktopSpaceLanding
         title="People"
-        eyebrow={householdName ?? "Family room"}
-        description="Keep household profiles, shared schedules, invitations and the family inbox together."
+        description={householdName ? `People and schedules for ${householdName}.` : "Household profiles, schedules and shared files."}
         image="/images/family-fireside-clean.webp"
         imageAlt="A warm fireside family room"
         items={[

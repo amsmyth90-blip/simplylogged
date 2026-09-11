@@ -80,7 +80,7 @@ export function GuardianWorkspace() {
   return (
     <main className="min-h-[100svh] bg-[#f5f1e8] px-4 pb-28 pt-[max(1rem,env(safe-area-inset-top))] text-[#20352a] sm:px-6">
       <div className="mx-auto max-w-3xl">
-        <PageHeader eyebrow="A calm check-in" title="Guardian" subtitle="A short, private briefing from dates already saved in DiaryDock." backHref="/dashboard" />
+        <PageHeader title="Guardian" subtitle="Upcoming dates and items to check, based on your saved records." backHref="/dashboard" />
         {message ? <p role="status" className="mt-4 rounded-2xl border border-[#6f8e72]/15 bg-white/75 px-4 py-3 text-sm text-[#52705a]">{message}</p> : null}
         <section className="mt-5 rounded-[28px] bg-[#315443] p-6 text-white shadow-[0_24px_55px_-38px_rgba(32,53,42,0.9)] sm:p-7">
           <div className="flex items-center gap-3">

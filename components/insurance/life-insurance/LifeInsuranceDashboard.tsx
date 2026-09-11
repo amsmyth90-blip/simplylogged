@@ -26,7 +26,7 @@ export function LifeInsuranceDashboard() {
   if (!policy) {
     return (
       <BillsShell>
-        <BillsHeader title="Life Insurance" subtitle="Protect the people you love by keeping the information they may need organised." backHref="/office/insurance" />
+        <BillsHeader title="Life Insurance" backHref="/office/insurance" />
         <NoLifePolicy />
       </BillsShell>
     );
@@ -57,7 +57,7 @@ export function LifeInsuranceDashboard() {
   };
   return (
     <BillsShell>
-      <BillsHeader title="Life Insurance" subtitle="Keep your policy, beneficiaries and family claim information organised and easy to find." backHref="/office/insurance" />
+      <BillsHeader title="Life Insurance" backHref="/office/insurance" />
       <BillsCard>
         <div className="flex items-start gap-3">
           <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-[#eef2e9] text-[#52705a]"><UiIcon name="shield" className="h-6 w-6" /></span>

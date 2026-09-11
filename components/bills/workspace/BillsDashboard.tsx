@@ -104,7 +104,6 @@ export function BillsDashboard() {
     <BillsShell>
       <BillsHeader
         title="Bills"
-        subtitle="Stay on top of household bills, due dates and payments without mixing them with the rest of your financial records."
       />
       <Overview dueSoon={dueSoon} month={month} overdue={overdue} paid={paid} />
       <BillsCard>

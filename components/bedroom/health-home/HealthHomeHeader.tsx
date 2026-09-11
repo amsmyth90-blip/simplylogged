@@ -20,10 +20,6 @@ export function HealthHomeHeader({ view }: { view: BedroomHealthViewModel }) {
             Bedroom
           </p>
           <h1 className="mt-1 font-serif text-4xl tracking-tight">My Health</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#667068]">
-            Keep your health records, appointments and important medical
-            information organised in one private place.
-          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -95,7 +91,7 @@ function HealthSearch({ view }: { view: BedroomHealthViewModel }) {
             ))
           ) : (
             <p className="p-3 text-xs text-[#667068]">
-              No authorised Bedroom records match that search.
+              No health records match your search.
             </p>
           )}
         </div>

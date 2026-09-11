@@ -9,7 +9,7 @@ export function OfficeInboxModal({ controller }: { controller: OfficeController 
     <ModalShell
       open={controller.panel === "inbox"}
       title="Office inbox"
-      subtitle="Incoming paperwork suggested for household administration."
+      subtitle="Review incoming files for the Office."
       onClose={() => controller.setPanel(null)}
       footer={<Link href="/intake" className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#24372f] px-4 py-3 text-sm font-semibold text-white"><UiIcon name="mail" className="h-4 w-4" />Open Mailbox</Link>}
     >

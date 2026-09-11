@@ -23,7 +23,6 @@ export function VaultDocumentBrowser({
       <section className="space-y-3">
         <SectionHeader
           title="Categories"
-          hint={`${controller.documents.length} documents across your secure collections`}
         />
         <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
@@ -221,7 +220,7 @@ function VaultDocumentRow({
               disabled={controller.busyDocumentId === document.id}
               className="inline-flex min-h-9 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-2 text-[10px] font-semibold text-red-700 disabled:opacity-55"
             >
-              Duplicate
+              Delete duplicate
             </button>
           </div>
         </div>

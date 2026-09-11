@@ -35,7 +35,6 @@ export function AllContracts() {
     <BillsShell>
       <BillsHeader
         title="My Contracts"
-        subtitle="Search and filter household and personal contracts in one place."
         backHref="/office/contracts"
       />
       <BillsCard>

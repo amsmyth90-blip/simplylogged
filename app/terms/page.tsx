@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: "Terms" };
 export default function TermsPage() {
   return (
     <LegalPage
-      eyebrow="Terms"
       title="Terms of Use"
       subtitle="The terms that apply when you use DiaryDock."
       effectiveDate="17 August 2026"

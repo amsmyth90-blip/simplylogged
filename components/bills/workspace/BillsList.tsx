@@ -45,7 +45,6 @@ export function BillsList() {
     <BillsShell>
       <BillsHeader
         title="My Bills"
-        subtitle="Search, filter and open your reviewed household bills."
         backHref="/office/bills"
       />
       <BillsCard>

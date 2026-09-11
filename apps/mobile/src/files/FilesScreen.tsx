@@ -123,7 +123,10 @@ export function FilesScreen(props: FilesScreenProps) {
           />
         ))}
         {!loading && !visible.length ? (
-          <div className="empty-files"><h2>No files here yet</h2><p>Files added on the web will appear after a secure sync.</p></div>
+          <div className="empty-files">
+            <h2>{documents.length ? "No matching files" : "No files here yet"}</h2>
+            <p>{documents.length ? "Try a different search or filter." : "Add a document to get started."}</p>
+          </div>
         ) : null}
       </section>
       <DocumentEditor

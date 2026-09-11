@@ -34,7 +34,6 @@ export function EmergencyEditorModal(props: EmergencyEditorModalProps) {
     <ModalShell
       open={props.mode !== null}
       title={title}
-      subtitle="Shared across the app through the DiaryDock data layer."
       onClose={props.onClose}
       footer={
         <div className="flex items-center justify-end gap-3">

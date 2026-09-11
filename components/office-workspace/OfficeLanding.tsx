@@ -10,8 +10,7 @@ export function OfficeLanding({ controller }: { controller: OfficeController }) 
     <>
       <DesktopSpaceLanding
         title="Documents"
-        eyebrow="Office"
-        description="Organise personal documents, household administration, bills, correspondence and future wishes."
+        description="Documents, bills, letters and important contacts."
         image="/images/office-interactive-v1.webp"
         imageAlt="A warm organised home office"
         imagePosition="center 45%"

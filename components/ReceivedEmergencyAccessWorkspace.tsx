@@ -55,9 +55,8 @@ export function ReceivedEmergencyAccessWorkspace() {
   return (
     <div className="space-y-5 pb-28">
       <PageHeader
-        eyebrow="Trusted access"
         title="Shared with me"
-        subtitle="Only the emergency items another DiaryDock user explicitly selected for you appear here."
+        subtitle="Emergency information others have shared with you."
         backHref="/dashboard"
         backLabel="Home"
         meta={

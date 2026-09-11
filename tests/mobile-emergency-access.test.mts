@@ -29,7 +29,7 @@ test("trusted access remains online-only and invitation secrets are never cached
   assert.doesNotMatch(hook, /getReadModel|putReadModel|localStorage|sessionStorage/);
   assert.doesNotMatch(form, /store|localStorage|sessionStorage/);
   assert.match(form, /Share\.share/);
-  assert.match(screen, /This screen is deliberately not stored offline/);
+  assert.match(screen, /Connect to the internet to check which information is still shared/);
 });
 
 test("received emergency files re-check the live grant and verify bytes end to end", async () => {

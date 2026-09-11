@@ -203,7 +203,7 @@ export function NewCorrespondence() {
     <BillsShell>
       <BillsHeader
         title="Add Correspondence"
-        subtitle="Upload or photograph a letter for a helpful first read, or enter it manually."
+        subtitle="Upload a letter to extract its details, or enter them yourself."
         backHref="/office/correspondence"
       />
       <BillsCard>

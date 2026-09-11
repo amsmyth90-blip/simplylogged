@@ -39,9 +39,9 @@ export function SettingsDataModal({
         : "Request account deletion";
   const subtitle =
     mode === "profile"
-      ? "Stored through the DiaryDock data layer."
+      ? undefined
       : mode === "export"
-        ? "Prepare a local JSON copy of this DiaryDock estate."
+        ? "Download your DiaryDock records as a JSON file."
         : "Ask DiaryDock to delete your account and eligible personal data.";
   const action =
     mode === "profile"

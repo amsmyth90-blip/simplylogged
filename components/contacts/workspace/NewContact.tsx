@@ -46,7 +46,6 @@ export function NewContact() {
     <BillsShell>
       <BillsHeader
         title="Add Professional Contact"
-        subtitle="Keep a useful private record of an adviser, provider or professional."
         backHref="/office/contacts"
       />
       <BillsCard>

@@ -53,7 +53,6 @@ export function CorrespondenceFolders() {
     <BillsShell>
       <BillsHeader
         title="Folders & Categories"
-        subtitle="Search, filter and organise your important correspondence."
         backHref="/office/correspondence"
       />
       <BillsCard>

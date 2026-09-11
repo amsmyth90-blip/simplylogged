@@ -81,7 +81,7 @@ export function DocumentFilePreview({
       {document.extractedText ? (
         <details className="estate-sheet group p-3">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-1 text-sm font-semibold text-ink">
-            OCR text
+            Text from document
             <span className="rounded-full bg-white/75 px-2.5 py-1 text-[11px] text-ink/45 group-open:hidden">
               Show
             </span>

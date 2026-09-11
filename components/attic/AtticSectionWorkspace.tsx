@@ -77,15 +77,10 @@ function ActionLink({
 export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
   const { state } = useDiaryDockData();
   const primaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
-  const secondaryHref = section.id === "family-history" ? "/attic/family-history/new" : "/capture?room=attic";
   const primaryDescription =
     section.id === "family-history"
       ? "Add images, write the story and save it as one memory."
       : "Scan or upload a photo, note, letter or item image.";
-  const secondaryDescription =
-    section.id === "family-history"
-      ? "Capture names, places, dates and the details people forget."
-      : "Add context so the memory makes sense later.";
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5f2ea] pb-32 text-[#20352a]">
@@ -121,9 +116,6 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
                 <UiIcon name={section.icon} className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6f8e72]">
-                  Memory room
-                </p>
                 <h2 className="mt-1 font-serif text-2xl text-[#20352a]">
                   {section.intention}
                 </h2>
@@ -134,19 +126,13 @@ export function AtticSectionWorkspace({ section }: { section: AtticSection }) {
             </div>
           </AtticCard>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div>
             <ActionLink
               href={primaryHref}
               icon="camera"
               label={section.primaryAction}
               description={primaryDescription}
               primary
-            />
-            <ActionLink
-              href={secondaryHref}
-              icon={section.icon}
-              label={section.secondaryAction}
-              description={secondaryDescription}
             />
           </div>
 

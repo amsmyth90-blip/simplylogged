@@ -44,7 +44,6 @@ export function RoomEditorModal({
             ? `Add a document to ${roomName}`
             : `Log an update in ${roomName}`
       }
-      subtitle="Shared with the rest of DiaryDock through the app data layer."
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">
