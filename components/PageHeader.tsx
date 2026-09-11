@@ -50,6 +50,7 @@ export function PageHeader({
               {backHref ? (
                 <Link
                   href={backHref}
+                  aria-label={backLabel ?? "Back"}
                   className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/10 text-white shadow-[0_18px_30px_-22px_rgba(15,23,42,0.45)] backdrop-blur-md transition hover:bg-white/20 sm:w-auto sm:gap-1.5 sm:px-3.5"
                 >
                   <UiIcon name="arrow-left" className="h-3.5 w-3.5" />

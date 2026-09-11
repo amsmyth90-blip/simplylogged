@@ -64,9 +64,8 @@ export function AskDiaryDockWorkspace() {
   return (
     <div className="space-y-4 pb-28">
       <PageHeader
-        eyebrow="Private assistant"
         title="Ask DiaryDock"
-        subtitle="Ask about the records in your DiaryDock. Permission checks happen before a small set of relevant details is used to answer."
+        subtitle="Ask a question about your saved records."
         backHref="/dashboard"
         backLabel="Home"
         action={
@@ -77,12 +76,6 @@ export function AskDiaryDockWorkspace() {
           >
             <UiIcon name="search" className="h-4 w-4" />
           </Link>
-        }
-        meta={
-          <>
-            <span className="estate-chip">Permission checked first</span>
-            <span className="estate-chip">Sources included</span>
-          </>
         }
       />
 

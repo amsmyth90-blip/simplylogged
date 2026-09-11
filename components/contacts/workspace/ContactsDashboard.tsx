@@ -85,7 +85,6 @@ export function ContactsDashboard() {
     <BillsShell>
       <BillsHeader
         title="Professional Contacts"
-        subtitle="Keep key people, providers and advisers organised in one private place."
       />
       <BillsCard>
         <div className="grid grid-cols-2 gap-2.5">

@@ -160,7 +160,6 @@ export function SafeRoomScreen(props: Props) {
         <section className="wills-card wills-files-card">
           <header>
             <div>
-              <p>Encrypted files</p>
               <h2>Safe Room documents</h2>
             </div>
             <button type="button" onClick={() => props.onScan("Safe Room")}>

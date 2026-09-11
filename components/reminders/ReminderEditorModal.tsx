@@ -33,7 +33,6 @@ export function ReminderEditorModal({
     <ModalShell
       open={open}
       title={editing ? "Edit reminder" : "New reminder"}
-      subtitle="Shared across the app through the DiaryDock data layer."
       onClose={onClose}
       footer={
         <div className="flex items-center justify-end gap-3">

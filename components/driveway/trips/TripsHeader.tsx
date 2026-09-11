@@ -18,9 +18,7 @@ export function TripsHeader({ controller }: { controller: TripsDirectoryControll
       <header className="flex items-start gap-3">
         <Link href="/room/driveway" aria-label="Back to Driveway" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#20352a]/10 bg-white/80 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"><UiIcon name="arrow-left" className="h-5 w-5" /></Link>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6f8e72]">Travel Room</p>
           <h1 className="font-serif text-3xl leading-tight tracking-tight">My Trips</h1>
-          <p className="mt-1 text-xs text-[#667068]">Plan, organise and keep every journey in one place.</p>
         </div>
         <button type="button" onClick={() => setCreateOpen(true)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#2f5140] px-4 text-xs font-semibold text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] focus-visible:ring-offset-2"><UiIcon name="plus" className="h-4 w-4" />Add trip</button>
       </header>

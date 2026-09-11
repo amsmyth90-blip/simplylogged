@@ -85,8 +85,7 @@ export function KitchenRoom() {
     <>
       <DesktopSpaceLanding
         title="Kitchen"
-        eyebrow="Home & everyday life"
-        description="Plan meals, keep household notes and stay on top of the everyday things that keep home running."
+        description="Meals, shopping, notes and the family calendar."
         image="/images/kitchen-coastal-cottage.webp"
         imageAlt="A light, welcoming family kitchen"
         imagePosition="center"

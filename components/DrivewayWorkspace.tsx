@@ -56,8 +56,7 @@ export function DrivewayWorkspace() {
     <>
       <DesktopSpaceLanding
         title="Plans & travel"
-        eyebrow="Driveway"
-        description="Keep trips, packing lists, parking and travel details ready for the moment you leave home."
+        description="Trips, packing lists and travel details."
         image="/images/designs/driveway/08-car-boot-departure.webp"
         imageAlt="A country driveway with a packed car and travel cases"
         imagePosition="center 58%"

@@ -46,7 +46,6 @@ export function ContactsDirectory() {
     <BillsShell>
       <BillsHeader
         title="Categories & Directory"
-        subtitle="Find professional contacts by name, company, role or category."
         backHref="/office/contacts"
       />
       <BillsCard>

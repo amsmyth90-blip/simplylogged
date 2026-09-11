@@ -28,7 +28,6 @@ export function GardenSectionHeader({
           <UiIcon name="arrow-left" className="h-5 w-5" />
         </Link>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/65">Garden · {meta.eyebrow}</p>
           <h1 className="mt-1 font-serif text-[32px] leading-tight tracking-tight sm:text-4xl">{section.title}</h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/78">{meta.description}</p>
         </div>

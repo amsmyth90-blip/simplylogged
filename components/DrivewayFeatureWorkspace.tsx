@@ -12,25 +12,22 @@ export type DrivewayFeatureId =
 
 const featureDetails: Record<
   DrivewayFeatureId,
-  { title: string; description: string; icon: IconName; belongsHere: string[] }
+  { title: string; description: string; icon: IconName }
 > = {
   trips: {
     title: "My Trips",
     description: "Plan journeys and keep the practical details for each trip together.",
     icon: "map-pin",
-    belongsHere: ["Itineraries", "Bookings", "Travel dates", "Trip notes"],
   },
   "travel-checklist": {
     title: "Travel Checklist",
     description: "Prepare packing lists and departure checks without moving original identity documents out of the Office.",
     icon: "check",
-    belongsHere: ["Packing list", "Home checks", "Documents to take", "Before you leave"],
   },
   "parking-permits": {
     title: "Parking & Permits",
-    description: "Organise visitor parking instructions, permits and access information.",
+    description: "Parking tools are not available yet. You can save parking documents in All Files.",
     icon: "car",
-    belongsHere: ["Visitor parking", "Permit details", "Access codes", "Restrictions"],
   },
 };
 
@@ -63,24 +60,12 @@ export function DrivewayFeatureWorkspace({ feature }: { feature: DrivewayFeature
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#dde6d8] text-[#52705a]">
             <UiIcon name={details.icon} className="h-5 w-5" />
           </span>
-          <h2 className="mt-5 font-serif text-2xl">A calm place to begin</h2>
           <p className="mt-2 text-sm leading-6 text-[#667068]">{details.description}</p>
 
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            {details.belongsHere.map((item) => (
-              <div key={item} className="flex min-h-14 items-center gap-2 rounded-2xl bg-[#f3f3ec] px-3 py-2.5 text-xs font-semibold text-[#3c5145]">
-                <UiIcon name="check" className="h-4 w-4 shrink-0 text-[#6f8e72]" />
-                {item}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-dashed border-[#6f8e72]/35 bg-[#edf2e9]/70 px-4 py-5 text-center">
-            <p className="text-sm font-semibold">Ready for the next design step</p>
-            <p className="mt-1 text-xs leading-5 text-[#667068]">
-              This section is connected from the Driveway. Its detailed tools and layout can now be designed without changing the room scene.
-            </p>
-          </div>
+          <Link href="/files" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#315443] px-4 text-sm font-semibold text-white">
+            Open All Files
+            <UiIcon name="chevron-right" className="h-4 w-4" />
+          </Link>
         </section>
       </div>
 

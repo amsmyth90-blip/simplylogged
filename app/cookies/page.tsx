@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: "Cookie Policy" };
 export default function CookiePolicyPage() {
   return (
     <LegalPage
-      eyebrow="Cookies"
       title="Cookie Policy"
       subtitle="How DiaryDock uses cookies and local storage."
       effectiveDate="1 September 2026"

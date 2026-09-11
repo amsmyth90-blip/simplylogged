@@ -36,7 +36,6 @@ export function InsurancePolicies() {
     <BillsShell>
       <BillsHeader
         title="My Policies"
-        subtitle="Search and filter your confirmed home and personal protection policies."
         backHref="/office/insurance"
       />
       <BillsCard>

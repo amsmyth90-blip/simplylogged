@@ -88,7 +88,6 @@ export function WillSummaryWorkspace() {
     <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader
         title="Will summary"
-        subtitle="A plain-language overview to help you find important information."
         backHref="/wills/my-will"
       />
       {!currentVersion ? (

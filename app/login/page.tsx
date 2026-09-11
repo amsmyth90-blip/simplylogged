@@ -30,15 +30,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="border-b border-[#20352a]/10 bg-[radial-gradient(circle_at_top,_rgba(255,253,248,0.98),_rgba(245,244,237,0.92)_58%,_rgba(221,230,216,0.7))] px-6 pb-7 pt-8">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#667068]">DiaryDock</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#20352a]">Welcome back</h1>
-          <p className="mt-3 text-sm leading-6 text-[#667068]">
-            Sign in to your digital home for everyday life.
-          </p>
         </div>
 
         <div className="space-y-5 px-6 py-6">
           {!authReady ? (
             <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Authentication is not configured yet. Add the Supabase URL and publishable key to continue.
+              Sign-in is currently unavailable. Please try again later.
             </div>
           ) : null}
 

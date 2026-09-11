@@ -26,7 +26,7 @@ export function WillPageHeader({
   backHref = "/wills",
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   backHref?: string;
 }) {
   return (
@@ -55,13 +55,10 @@ export function WillPageHeader({
         </span>
       </div>
       <div className="relative z-10 mt-8 max-w-[31rem]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#6f8e72]">
-          Wills & letters of wishes
-        </p>
-        <h1 className="mt-2 font-serif text-[38px] font-normal leading-[1.02] tracking-[-0.035em] text-[#20352a] sm:text-[44px]">
+        <h1 className="font-serif text-[38px] font-normal leading-[1.02] tracking-[-0.035em] text-[#20352a] sm:text-[44px]">
           {title}
         </h1>
-        <p className="mt-3 text-[14px] leading-6 text-[#5f6b63]">{subtitle}</p>
+        {subtitle ? <p className="mt-3 text-[14px] leading-6 text-[#5f6b63]">{subtitle}</p> : null}
       </div>
     </header>
   );

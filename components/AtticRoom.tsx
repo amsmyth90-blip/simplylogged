@@ -78,8 +78,7 @@ export function AtticRoom() {
     <>
       <DesktopSpaceLanding
         title="Memories"
-        eyebrow="Attic"
-        description="Preserve family photographs, stories, meaningful objects and the memories attached to them."
+        description="Family photos, stories and keepsakes."
         image="/images/pages/attic-memory-room-v1.webp"
         imageAlt="A warm attic filled with albums, keepsakes and family memories"
         items={atticHotspots.map((section, index) => ({

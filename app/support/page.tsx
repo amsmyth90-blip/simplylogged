@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: "Support" };
 export default function SupportPage() {
   return (
     <LegalPage
-      eyebrow="Support"
       title="DiaryDock Support"
       subtitle="Help with your account, privacy, data, and app access."
       effectiveDate="17 August 2026"

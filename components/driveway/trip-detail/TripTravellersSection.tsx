@@ -13,7 +13,7 @@ export function TripTravellersSection({
     <section>
       <SectionHeading
         title="Travellers"
-        detail="People are linked to canonical records; sensitive details are not copied."
+        detail="Choose people from your household profiles."
         action={
           <button
             type="button"

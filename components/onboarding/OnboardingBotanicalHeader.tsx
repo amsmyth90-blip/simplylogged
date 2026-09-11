@@ -18,9 +18,6 @@ export function OnboardingBotanicalHeader({ badge }: { badge: string }) {
         </span>
       </div>
       <div className="relative z-10 mt-10 max-w-xl sm:mt-14">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8c67a5]">
-          Welcome to DiaryDock
-        </p>
         <h1 className="mt-2 font-serif text-[42px] font-normal leading-[0.98] tracking-[-0.045em] sm:text-[50px]">
           Let’s make it yours
         </h1>

@@ -75,7 +75,7 @@ export function EmptyTrips({ onCreate }: { onCreate: () => void }) {
     <div className="rounded-[28px] border border-dashed border-[#6f8e72]/30 bg-[#eef2e9]/72 px-6 py-12 text-center">
       <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-white/90 text-[#52705a] shadow-sm"><UiIcon name="map-pin" className="h-7 w-7" /></span>
       <h2 className="mt-5 font-serif text-2xl text-[#20352a]">Your next adventure starts here</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#667068]">Create a trip to organise its dates, travellers, bookings, checklist and important information in one calm place.</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#667068]">Add a trip to start planning.</p>
       <button type="button" onClick={onCreate} className="mt-5 min-h-12 rounded-full bg-[#2f5140] px-5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] focus-visible:ring-offset-2">Create your first trip</button>
     </div>
   );

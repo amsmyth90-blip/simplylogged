@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: "Account Deletion" };
 export default function AccountDeletionPage() {
   return (
     <LegalPage
-      eyebrow="Account"
       title="Delete your DiaryDock account"
       subtitle="How to request deletion of your account and personal data."
       effectiveDate="17 August 2026"

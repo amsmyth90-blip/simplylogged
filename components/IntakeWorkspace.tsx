@@ -147,9 +147,8 @@ export function IntakeWorkspace() {
   return (
     <div className="immersive-page">
       <PageHeader
-        eyebrow="Mailbox"
         title="Intake Queue"
-        subtitle="A calm place for bills, appointments, letters, shared files and scans before they are filed into the right room."
+        subtitle="Review incoming files and choose where to save them."
         backHref="/dashboard"
         backLabel="Estate map"
         heroImage="/images/pages/mailbox-hero.webp"
@@ -200,7 +199,7 @@ export function IntakeWorkspace() {
       </section>
 
       <section className="space-y-3">
-        <SectionHeader title="Intake sources" hint="What can feed into this queue" actionLabel="Scan now" actionHref="/capture" />
+        <SectionHeader title="Add to your mailbox" actionLabel="Scan now" actionHref="/capture" />
         <div className="grid gap-3 sm:grid-cols-3">
           {sourceCards.map((card) => (
             <article key={card.title} className="estate-sheet p-4">

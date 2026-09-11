@@ -15,9 +15,8 @@ export function EmergencyAccessWorkspace() {
   return (
     <div className="space-y-5 pb-28">
       <PageHeader
-        eyebrow="Trusted access"
         title="Emergency sharing"
-        subtitle="Choose a trusted person, then select only the individual emergency items they may open. This is separate from household sharing."
+        subtitle="Choose who can view each emergency item. Household sharing does not grant this access."
         backHref="/emergency"
         backLabel="Emergency"
         action={

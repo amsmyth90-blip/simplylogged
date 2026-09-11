@@ -58,7 +58,6 @@ export default async function AssetPage({
           <PageHeader
             eyebrow={String(asset.category).toLowerCase()}
             title={asset.name}
-            subtitle="A private smart-item record opened through the usual DiaryDock permission check."
             backHref="/physical-links"
           />
           <section className="mt-5 rounded-[28px] border border-white/80 bg-white/85 p-5 shadow-sm sm:p-6">

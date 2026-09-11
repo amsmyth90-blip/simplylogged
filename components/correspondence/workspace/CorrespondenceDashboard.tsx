@@ -76,7 +76,6 @@ export function CorrespondenceDashboard() {
     <BillsShell>
       <BillsHeader
         title="Important Correspondence"
-        subtitle="Keep track of important letters, notices and messages that need your attention."
       />
       <BillsCard>
         <div className="grid grid-cols-2 gap-2.5">
@@ -116,7 +115,7 @@ export function CorrespondenceDashboard() {
             ))
           ) : (
             <p className="rounded-[18px] bg-[#f6f5ef] px-4 py-7 text-center text-sm text-[#667068]">
-              Add a letter manually or upload it for a helpful first read.
+              Upload a letter or enter its details yourself.
               Nothing is treated as confirmed until you check it.
             </p>
           )}

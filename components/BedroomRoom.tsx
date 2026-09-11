@@ -32,8 +32,7 @@ export function BedroomRoom() {
     <>
       <DesktopSpaceLanding
         title="Health & wellbeing"
-        eyebrow="Private space"
-        description="Keep personal health details, appointments, medication and emergency information calm and easy to find."
+        description="Health records, appointments and medication."
         image="/images/pages/bedroom-health-room-clean.webp"
         imageAlt="A calm private bedroom"
         items={[

@@ -15,7 +15,6 @@ export type DesktopSpaceItem = {
 
 type DesktopSpaceLandingProps = {
   title: string;
-  eyebrow: string;
   description: string;
   image: string;
   imageAlt: string;
@@ -25,7 +24,6 @@ type DesktopSpaceLandingProps = {
 
 export function DesktopSpaceLanding({
   title,
-  eyebrow,
   description,
   image,
   imageAlt,
@@ -44,18 +42,12 @@ export function DesktopSpaceLanding({
               <UiIcon name="arrow-left" className="h-4 w-4" />
               Home
             </Link>
-            <p className="mt-7 text-xs font-bold uppercase tracking-[0.24em] text-[#708675]">
-              {eyebrow}
-            </p>
-            <h1 className="mt-2 font-serif text-5xl leading-[1.02] tracking-[-0.035em] text-[#1f392d] xl:text-6xl">
+            <h1 className="mt-7 font-serif text-5xl leading-[1.02] tracking-[-0.035em] text-[#1f392d] xl:text-6xl">
               {title}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[#596961] xl:text-lg">
               {description}
             </p>
-          </div>
-          <div className="hidden rounded-full border border-[#284536]/10 bg-white/65 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7d72] xl:block">
-            Your digital home
           </div>
         </header>
 
@@ -65,22 +57,9 @@ export function DesktopSpaceLanding({
             className="order-2 xl:order-1"
           >
             <div className="rounded-[2rem] border border-[#284536]/10 bg-[#fbfaf5] p-5 shadow-[0_24px_60px_rgba(45,58,48,0.08)] xl:h-full xl:p-6">
-              <div className="flex items-end justify-between gap-4 px-1 pb-4">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#849486]">
-                    Inside this space
-                  </p>
-                  <h2
-                    id={`${title}-sections`}
-                    className="mt-1 font-serif text-3xl text-[#263e32]"
-                  >
-                    Choose an area
-                  </h2>
-                </div>
-                <span className="text-sm text-[#758279]">
-                  {items.length} sections
-                </span>
-              </div>
+              <h2 id={`${title}-sections`} className="sr-only">
+                {title} sections
+              </h2>
               <nav
                 className="grid gap-3 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2"
                 aria-label={`${title} sections`}
@@ -149,14 +128,6 @@ export function DesktopSpaceLanding({
               style={{ objectPosition: imagePosition }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#14251d]/58 via-transparent to-white/5" />
-            <figcaption className="absolute inset-x-0 bottom-0 p-7 text-white xl:p-9">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">
-                DiaryDock
-              </p>
-              <p className="mt-2 max-w-xl font-serif text-3xl leading-tight xl:text-4xl">
-                Everything in {title.toLowerCase()}, calmly organised.
-              </p>
-            </figcaption>
           </figure>
         </div>
       </div>
