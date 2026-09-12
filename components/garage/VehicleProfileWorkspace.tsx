@@ -92,7 +92,7 @@ export function VehicleProfileWorkspace({
 
   if (!hydrated) {
     return (
-      <div className="mx-auto w-full max-w-[760px] rounded-[28px] bg-white/75 p-8 text-sm text-[#667068]">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] rounded-[28px] bg-white/75 p-8 text-sm text-[#667068]">
         Opening this vehicle profile…
       </div>
     );
@@ -100,7 +100,7 @@ export function VehicleProfileWorkspace({
 
   if (!vehicle) {
     return (
-      <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28">
         <VehicleHeader title="Vehicle not found" />
         <BillsCard>
           <EmptyState
@@ -172,7 +172,7 @@ export function VehicleProfileWorkspace({
     }));
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <VehicleHeader
         title={vehiclePageTitles[initialTab] || vehicleName}
         actionLabel={vehicleActionLabels[initialTab]}

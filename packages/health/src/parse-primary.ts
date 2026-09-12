@@ -65,7 +65,9 @@ export function parseMedication(value: unknown): HealthMedication {
 
 export function parseAppointment(value: unknown): HealthAppointment {
   const item = record(value, "Appointment");
-  exact(item, ["id", "title", "provider", "location", "date", "time", "status", "preparationNotes", "followUpNotes", "reminderId", "createdAt"], "Appointment");
+  exact(item, ["id", "title", "provider", "location", "date", "time", "status", "preparationNotes", "followUpNotes", "reminderId", "createdAt", "documentId", "timeZone", "durationMinutes"], "Appointment");
+  if (item.durationMinutes !== undefined && (!Number.isInteger(item.durationMinutes)
+    || Number(item.durationMinutes) < 5 || Number(item.durationMinutes) > 1440)) throw new Error("Invalid appointment duration.");
   return {
     id: text(item.id, "Appointment ID", 128),
     title: text(item.title, "Appointment title", 200),
@@ -76,6 +78,9 @@ export function parseAppointment(value: unknown): HealthAppointment {
     status: oneOf(item.status, ["planned", "completed", "cancelled"], "Appointment status"),
     preparationNotes: text(item.preparationNotes, "Preparation notes", 4_000, true),
     followUpNotes: text(item.followUpNotes, "Follow-up notes", 4_000, true),
+    documentId: optionalText(item.documentId, "Appointment letter ID", 128),
+    timeZone: optionalText(item.timeZone, "Appointment time zone", 64),
+    durationMinutes: item.durationMinutes as number | undefined,
     reminderId: optionalText(item.reminderId, "Appointment reminder ID", 128),
     createdAt: timestamp(item.createdAt, "Appointment created time"),
   };

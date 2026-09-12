@@ -1,3 +1,4 @@
+import { PhonePhotoUpload } from "@/components/PhonePhotoUpload";
 import Image from "next/image";
 
 import { UiIcon } from "@/components/UiIcon";
@@ -21,7 +22,7 @@ function FileChoice({
     <label
       className={
         camera
-          ? "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[22px] bg-[#86a774] px-3 py-4 text-sm font-semibold text-white shadow-[0_18px_32px_-20px_rgba(65,98,63,0.75)] transition hover:bg-[#789968]"
+          ? "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[22px] bg-[#86a774] px-3 py-4 text-sm font-semibold text-white shadow-[0_18px_32px_-20px_rgba(65,98,63,0.75)] transition hover:bg-[#789968] sm:hidden"
           : "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[22px] border border-white/90 bg-white/82 px-3 py-4 text-sm font-semibold text-slate-800 shadow-[0_18px_34px_-24px_rgba(36,63,72,0.45)] transition hover:bg-white"
       }
     >
@@ -103,6 +104,7 @@ export function CaptureIdleView({
         <div className="mt-5 grid grid-cols-2 gap-3">
           <FileChoice camera onAdd={onAddPages} />
           <FileChoice camera={false} onAdd={onAddPages} />
+          <PhonePhotoUpload multiple onFiles={onAddPages} />
         </div>
         <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#66815f]">
           <UiIcon name="leaf" className="h-3.5 w-3.5" />

@@ -15,7 +15,7 @@ export function MealPlanner() {
   const planner = useMealPlannerController();
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.96),transparent_34%),linear-gradient(180deg,#edf3e9_0%,#fbfcf9_48%,#eef4eb_100%)] text-slate-900">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
         <header className="flex shrink-0 items-center gap-3">
           <Link href="/room/kitchen" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/90 bg-white/75 text-slate-700 shadow-sm backdrop-blur-xl" aria-label="Back to Kitchen"><UiIcon name="arrow-left" className="h-4 w-4" /></Link>
           <div className="min-w-0 flex-1">

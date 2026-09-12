@@ -1,5 +1,7 @@
 "use client";
 
+import { matchesSignedInAccount } from "@/lib/account-boundary";
+
 import { createInitialDiaryDockState, hydrateDiaryDockState } from "@/lib/diarydock-initial-state";
 import { loadDiaryDockBootstrap } from "@/lib/diarydock-bootstrap-client";
 import { loadRemainingDiaryDockRecords } from "@/lib/diarydock-record-page-client";
@@ -41,7 +43,7 @@ function createSessionRepository(): DiaryDockRepository {
   };
 }
 
-function createSupabaseRepository(): DiaryDockRepository {
+function createSupabaseRepository(expectedUserId?: string | null): DiaryDockRepository {
   let privateRevision: string | null = null;
   let householdRevision: string | null = null;
   const getCurrentUserId = async () => {
@@ -72,7 +74,10 @@ function createSupabaseRepository(): DiaryDockRepository {
       const client = getSupabaseBrowserClient();
       if (!client) return;
       const userId = await getCurrentUserId();
-      if (!userId) return;
+      if (!userId) throw new Error("Please sign in again before saving.");
+      if (expectedUserId !== undefined && !matchesSignedInAccount(expectedUserId, userId)) {
+        throw new Error("The signed-in account changed. Reload before saving.");
+      }
       const privateState = {
         ...removeNonOwnedDocumentCache(state, userId),
         reminders: [],
@@ -89,7 +94,7 @@ function createSupabaseRepository(): DiaryDockRepository {
       const response = await fetch("/api/diarydock/state", {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-DiaryDock-Account": userId },
         body,
       });
       const payload = await response.json().catch(() => null);
@@ -103,6 +108,6 @@ function createSupabaseRepository(): DiaryDockRepository {
   };
 }
 
-export function createDiaryDockRepository(): DiaryDockRepository {
-  return isSupabaseConfigured() ? createSupabaseRepository() : createSessionRepository();
+export function createDiaryDockRepository(expectedUserId?: string | null): DiaryDockRepository {
+  return isSupabaseConfigured() ? createSupabaseRepository(expectedUserId) : createSessionRepository();
 }

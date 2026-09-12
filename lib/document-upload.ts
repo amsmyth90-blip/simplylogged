@@ -6,8 +6,8 @@ import {
 } from "./document-rules.ts";
 
 export const DOCUMENT_QUARANTINE_BUCKET = "diarydock-document-quarantine";
-export const DEFAULT_USER_STORAGE_BYTES = 250 * 1024 * 1024;
-export const MAX_USER_STORAGE_BYTES = 10 * 1024 * 1024 * 1024;
+export const DEFAULT_USER_STORAGE_BYTES = 0;
+export const MAX_USER_STORAGE_BYTES = 100 * 1024 * 1024 * 1024;
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

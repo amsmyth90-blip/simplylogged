@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import Link from "next/link";
 import type { ChangeEvent } from "react";
 
@@ -95,7 +96,7 @@ export function VehicleHero({
         <label className="absolute right-4 top-4 z-20 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 text-xs font-semibold text-[#20352a] shadow-sm backdrop-blur-md focus-within:ring-2 focus-within:ring-[#6f8e72]">
           <UiIcon name="camera" className="h-4 w-4" />
           {uploadingPhoto ? "Adding…" : primaryPhoto ? "Change photo" : "Add photo"}
-          <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" onChange={onPhoto} disabled={uploadingPhoto} className="sr-only" />
+          <PhotoFileInput type="file" accept="image/jpeg,image/png,image/webp,image/heic" onChange={onPhoto} disabled={uploadingPhoto} className="sr-only" />
         </label>
       </div>
       <div className="px-5 py-5 sm:px-6">

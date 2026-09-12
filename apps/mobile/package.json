@@ -36,6 +36,7 @@
     "@diarydock/mailbox": "*",
     "@diarydock/offline-store": "*",
     "@diarydock/onboarding": "*",
+    "@diarydock/password-vault": "*",
     "@diarydock/physical-links": "*",
     "@diarydock/reminders": "*",
     "@diarydock/search": "*",

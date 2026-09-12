@@ -13,8 +13,8 @@ const userId = "9d1c54f6-4321-4f8a-b274-cf68191f3b36";
 const documentId = "1da24ac8-f23d-42c1-bcc2-3f5ff8dc562d";
 
 test("document upload allowance has a safe launch default and hard maximum", () => {
-  assert.equal(DEFAULT_USER_STORAGE_BYTES, 250 * 1024 * 1024);
-  assert.equal(MAX_USER_STORAGE_BYTES, 10 * 1024 * 1024 * 1024);
+  assert.equal(DEFAULT_USER_STORAGE_BYTES, 0);
+  assert.equal(MAX_USER_STORAGE_BYTES, 100 * 1024 * 1024 * 1024);
 });
 
 test("stored document references must be in the signed-in user's immutable prefix", () => {

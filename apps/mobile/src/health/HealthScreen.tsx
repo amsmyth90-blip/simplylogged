@@ -15,6 +15,7 @@ import { HealthRecordEditor, type HealthEditorType } from "./HealthRecordEditor"
 import { HealthOverviewEditor } from "./HealthOverviewEditor";
 import { useHealth } from "./use-health";
 import { useReminders } from "@mobile/reminders/use-reminders";
+import { AppointmentLetterButton } from "@mobile/appointments/AppointmentLetterButton";
 
 type Props = {
   accessToken: string;
@@ -133,6 +134,8 @@ export function HealthScreen(props: Props) {
         >
           ＋ Add health record
         </button>
+        {(view === "appointments" || view === "overview") && <AppointmentLetterButton accessToken={props.accessToken}
+          disabled={!health.online} onSaved={async () => { await health.refresh(); await props.synchronize(); }} />}
         <p className="health-privacy-note">
           🔒 Private health information. Sharing is never implied by linking a
           profile or contact.
@@ -153,7 +156,10 @@ export function HealthScreen(props: Props) {
               onEditOverview={() => setEditingOverview(true)}
             />
           </>
-        ) : view !== "documents" ? <HealthRecordList health={record} view={view} /> : null) : null}
+        ) : view !== "documents" ? <HealthRecordList health={record} view={view} onOpenLetter={(id) => {
+          const letter = documents.find((item) => item.id === id);
+          if (letter) setViewingId(letter.syncId); else setView("documents");
+        }} /> : null) : null}
         <section className="health-card health-files-card">
           <header>
             <div><h2>Health files</h2></div>

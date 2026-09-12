@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import Link from "next/link";
 
@@ -17,7 +19,7 @@ export function KitchenRecipesHome({ controller }: Props) {
   } = controller;
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
+    <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[max(124px,calc(env(safe-area-inset-bottom)+124px))] pt-[max(12px,env(safe-area-inset-top))]">
       <header className="flex h-12 shrink-0 items-center gap-3">
         {canReturnToDirectory ? (
           <button type="button" onClick={() => { setCanReturnToDirectory(false); setDirectoryOpen(true); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-[0_8px_20px_-12px_rgba(15,23,42,0.4)]" aria-label="Back to recipe search">
@@ -51,7 +53,7 @@ export function KitchenRecipesHome({ controller }: Props) {
         )}
       </header>
 
-      <main className="mt-2 flex min-h-0 flex-1 flex-col">
+      <main className="mt-2 flex min-h-0 flex-1 flex-col lg:overflow-y-auto lg:pr-2">
         {hasRecipes ? (
           <>
             <section className="relative grid h-[48svh] min-h-[300px] max-h-[420px] shrink-0 grid-cols-[1.05fr_0.95fr] overflow-hidden rounded-[25px] border border-[#e8e0d4] bg-[#fffdf8] shadow-[0_24px_55px_-32px_rgba(68,55,37,0.55)]">
@@ -59,7 +61,7 @@ export function KitchenRecipesHome({ controller }: Props) {
               <div className="relative min-h-0 px-3 pb-3 pt-4">
                 <span className="absolute inset-y-0 left-0 w-px bg-[#ddd4c7]" />
                 <span className="absolute -left-[5px] top-0 h-full w-[10px] bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_10px,#9f927c_11px,#9f927c_13px,transparent_14px,transparent_22px)] opacity-90" />
-                <h2 className="max-w-[120px] font-serif text-[17px] font-semibold leading-[19px]">{selected.name}</h2>
+                <h2 className="max-w-[120px] font-serif text-[17px] font-semibold leading-[19px] lg:max-w-none lg:text-2xl lg:leading-tight">{selected.name}</h2>
                 <div className="mt-2 h-px bg-[#e5ded2]"><span className="block h-px w-5 bg-[#719064]" /></div>
                 <div className="mt-2 flex items-center justify-between text-[8px] text-slate-500">
                   <span>Ingredients · {servings} servings</span><span>{selectedChecked.length} of {selected.ingredients.length}</span>
@@ -125,7 +127,7 @@ function EmptyRecipeBook({ controller }: Props) {
         <button type="button" onClick={() => setDirectoryOpen(true)} className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#6f8f62] text-sm font-semibold text-white shadow-[0_13px_26px_-15px_rgba(67,101,55,0.75)]"><UiIcon name="search" className="h-4 w-4" />Find a recipe</button>
         <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white text-sm font-semibold text-[#607b55]"><UiIcon name="camera" className="h-4 w-4" />Scan a recipe</button>
         <button type="button" onClick={openNewRecipeEditor} className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#d7e3d1] bg-white text-sm font-semibold text-[#607b55]"><UiIcon name="plus" className="h-4 w-4" />Add manually</button>
-        <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
+        <PhotoFileInput ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
       </div>
     </section>
   );

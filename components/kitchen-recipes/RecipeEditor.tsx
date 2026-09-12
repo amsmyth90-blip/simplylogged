@@ -18,7 +18,7 @@ export function RecipeEditor({ controller }: Props) {
   return (
     <div className="absolute inset-0 z-[80] bg-[linear-gradient(180deg,#f8faf5,#f2eee6)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
       <section
-        className="mx-auto flex h-full w-full max-w-lg flex-col"
+        className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col"
         role="dialog"
         aria-modal="true"
         aria-label={editingNewRecipe ? "Add recipe" : "Edit recipe"}

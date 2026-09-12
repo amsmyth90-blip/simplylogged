@@ -5,6 +5,7 @@ import { Browser } from "@capacitor/browser";
 
 import settingsImage from "../../../../public/images/pages/settings-hero.webp";
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
+import { SubscriptionScreen } from "@mobile/subscriptions/SubscriptionScreen";
 
 import {
   loadMobileSettings,
@@ -46,6 +47,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [confirmation, setConfirmation] = useState("");
+  const [showSubscriptions, setShowSubscriptions] = useState(false);
 
   useEffect(() => {
     if (props.initialSummary) return undefined;
@@ -93,6 +95,9 @@ export function SettingsScreen(props: SettingsScreenProps) {
     ? Math.min(100, (summary.storage.usedBytes / Math.max(1, summary.storage.limitBytes)) * 100)
     : 0;
 
+  if (showSubscriptions) return <SubscriptionScreen storage={summary?.storage}
+    onBack={() => setShowSubscriptions(false)} />;
+
   return (
     <main className="settings-screen">
       <header className="settings-hero" style={{ backgroundImage: `url(${settingsImage})` }}>
@@ -111,6 +116,9 @@ export function SettingsScreen(props: SettingsScreenProps) {
 
       <section className="settings-card settings-menu">
         <h2>App</h2>
+        <button type="button" className="settings-link-row" onClick={() => setShowSubscriptions(true)}>
+          <span><strong>Plans &amp; storage</strong><small>Explore Starter, Plus and Family</small></span><b>›</b>
+        </button>
         <div className="settings-row"
           aria-label="Encrypted local database and device-protected key storage on">
           <span>Device security</span><strong>On</strong>
@@ -122,6 +130,10 @@ export function SettingsScreen(props: SettingsScreenProps) {
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("PHYSICAL_LINKS")}>
           <span><strong>Physical Links</strong></span><b>›</b>
+        </button>
+        <button type="button" className="settings-link-row"
+          onClick={() => props.onNavigate("PASSWORDS")}>
+          <span><strong>Password Vault</strong><small>End-to-end encrypted logins</small></span><b>›</b>
         </button>
         <button type="button" className="settings-link-row"
           onClick={() => props.onNavigate("LIFE_CHECK")}>

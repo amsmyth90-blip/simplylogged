@@ -50,7 +50,7 @@ export function DocumentCaptureWorkspace() {
         className={`pointer-events-none absolute inset-0 h-full w-full object-cover object-center transition duration-700 ${activeStage || (capture.draft && capture.stage === "complete") ? "opacity-72" : "scale-105 opacity-32 blur-[2px]"}`}
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(235,246,253,0.78)_0%,rgba(247,251,252,0.46)_40%,rgba(239,247,241,0.9)_100%)]" />
-      <div className="relative mx-auto flex min-h-[calc(100svh-7rem)] w-full max-w-md flex-col px-5 pt-5">
+      <div className="desktop-workspace relative mx-auto flex min-h-[calc(100svh-7rem)] w-full max-w-md flex-col px-5 pt-5">
         <header className="flex items-center justify-between">
           <Link
             href="/files"

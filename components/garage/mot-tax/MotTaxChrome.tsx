@@ -20,7 +20,7 @@ export function MotTaxChrome({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <header className="flex min-h-14 items-center rounded-[20px] border border-[#20352a]/[0.07] bg-white/90 px-2.5 shadow-sm">
         <Link
           href="/room/garage"

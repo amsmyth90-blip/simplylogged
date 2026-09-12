@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -132,7 +134,7 @@ export function ShareImportWorkspace() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-9rem)] w-full max-w-2xl flex-col gap-5 pb-[calc(env(safe-area-inset-bottom)+7.5rem)] pt-2">
+    <div className="desktop-workspace mx-auto flex min-h-[calc(100vh-9rem)] w-full max-w-2xl flex-col gap-5 pb-[calc(env(safe-area-inset-bottom)+7.5rem)] pt-2">
       <header className="rounded-[34px] border border-[#20352a]/[0.08] bg-[#fffdf8] p-6 shadow-[0_18px_45px_rgba(32,53,42,0.10)]">
         <div className="flex items-start justify-between gap-4">
           <Link
@@ -170,7 +172,7 @@ export function ShareImportWorkspace() {
           >
             Choose file
           </button>
-          <input
+          <PhotoFileInput
             ref={fileInputRef}
             type="file"
             multiple

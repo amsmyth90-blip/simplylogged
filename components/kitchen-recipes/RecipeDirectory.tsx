@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import { UiIcon } from "@/components/UiIcon";
 
@@ -17,7 +19,7 @@ export function RecipeDirectory({ controller }: Props) {
 
   return (
     <div data-testid="recipe-directory" className="absolute inset-0 z-[65] bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.98),transparent_40%),linear-gradient(180deg,#f7f6f1,#edf3e9)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col">
         <header className="flex h-12 shrink-0 items-center gap-3">
           <button type="button" onClick={() => { setDirectoryOpen(false); clearSearch(); }} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Close recipe directory">
             <UiIcon name="arrow-left" className="h-4 w-4" />
@@ -39,7 +41,7 @@ export function RecipeDirectory({ controller }: Props) {
           <button type="button" onClick={() => scanInputRef.current?.click()} className="flex h-10 items-center justify-center gap-2 rounded-[16px] bg-[#263b35] text-[10px] font-semibold text-white shadow-sm"><UiIcon name="camera" className="h-4 w-4" />Scan recipe</button>
           <button type="button" onClick={clearSearch} className="flex h-10 items-center justify-center gap-2 rounded-[16px] border border-white bg-white text-[10px] font-semibold text-slate-700 shadow-sm"><UiIcon name="folder" className="h-4 w-4" />My recipes</button>
           <button type="button" onClick={openNewRecipeEditor} className="col-span-2 flex h-10 items-center justify-center gap-2 rounded-[16px] border border-[#d7e3d1] bg-[#fffdf8] text-[10px] font-semibold text-[#607b55] shadow-sm"><UiIcon name="plus" className="h-4 w-4" />Add recipe manually</button>
-          <input ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
+          <PhotoFileInput ref={scanInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void scanRecipe(file); event.target.value = ""; }} />
         </div>
 
         <main className="mt-3 min-h-0 flex-1 overflow-y-auto pb-3 pr-1 [scrollbar-color:#a8bc9f_transparent] [scrollbar-width:thin]">
@@ -50,7 +52,7 @@ export function RecipeDirectory({ controller }: Props) {
                 <h3 className="font-serif text-[12px] font-semibold">Online recipes</h3>
                 <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-wide text-[#718c65]">Scroll to browse <span aria-hidden="true">↓</span></span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
                 {onlineRecipes.map(recipe => (
                   <RecipeCard key={recipe.id} recipe={recipe} online onSelect={() => selectRecipe(recipe, true)} />
                 ))}
@@ -62,7 +64,7 @@ export function RecipeDirectory({ controller }: Props) {
             <h3 className="font-serif text-[12px] font-semibold">Saved in DiaryDock</h3>
             <span className="text-[8px] font-bold uppercase tracking-wide text-slate-400">{visibleRecipes.length} dishes</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
             {visibleRecipes.map(recipe => (
               <RecipeCard key={recipe.id} recipe={recipe} selected={selected.id === recipe.id} onSelect={() => selectRecipe(recipe)} />
             ))}

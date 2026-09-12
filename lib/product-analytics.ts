@@ -36,7 +36,7 @@ export type ProductAnalyticsProperties = {
   organisation_score_viewed: { scoreBand: "0_24" | "25_49" | "50_74" | "75_100" };
   vault_setup_completed: { clientType: "NATIVE" };
   return_session: Record<string, never>;
-  subscription_started: { planTier: "FREE" | "PLUS" | "FAMILY" };
+  subscription_started: { planTier: "STARTER" | "PLUS" | "FAMILY" };
 };
 
 const eventNames = new Set<string>(Object.values(PRODUCT_ANALYTICS_EVENTS));
@@ -52,7 +52,7 @@ const rules: Record<ProductAnalyticsEvent, Record<string, readonly string[]>> = 
   organisation_score_viewed: { scoreBand: ["0_24", "25_49", "50_74", "75_100"] },
   vault_setup_completed: { clientType: ["NATIVE"] },
   return_session: {},
-  subscription_started: { planTier: ["FREE", "PLUS", "FAMILY"] },
+  subscription_started: { planTier: ["STARTER", "PLUS", "FAMILY"] },
 };
 
 export function validateProductAnalyticsEvent(eventName: unknown, properties: unknown) {

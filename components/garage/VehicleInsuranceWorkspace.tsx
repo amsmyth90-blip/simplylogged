@@ -43,14 +43,14 @@ function InsuranceWorkspaceContent({ view }: { view: InsuranceView }) {
   const { hydrated, openPolicy, vehicle } = useVehicleInsuranceModel();
   if (!hydrated) {
     return (
-      <div className="mx-auto max-w-[760px] rounded-[24px] bg-white/80 p-8 text-sm text-[#667068]">
+      <div className="desktop-workspace mx-auto max-w-[760px] rounded-[24px] bg-white/80 p-8 text-sm text-[#667068]">
         Opening Insurance…
       </div>
     );
   }
   if (!vehicle) {
     return (
-      <div className="mx-auto max-w-[760px]">
+      <div className="desktop-workspace mx-auto max-w-[760px]">
         <BillsCard>
           <p className="text-sm font-semibold text-[#20352a]">
             Vehicle not found
@@ -77,7 +77,7 @@ function InsuranceWorkspaceContent({ view }: { view: InsuranceView }) {
   const mileage = latestMileage(vehicle)?.mileage ?? null;
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <header className="flex min-h-14 items-center rounded-[20px] border border-[#20352a]/[0.07] bg-white/90 px-2.5 shadow-sm">
         <Link
           href="/room/garage"

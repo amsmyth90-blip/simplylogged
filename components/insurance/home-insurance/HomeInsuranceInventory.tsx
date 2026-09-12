@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import { UiIcon } from "@/components/UiIcon";
 import { BillsCard, BillsHeader, BillsSectionTitle, BillsShell, fieldClass } from "@/components/bills/BillsUi";
@@ -63,7 +65,7 @@ export function HomeInsuranceInventory({ highValueOnly = false }: { highValueOnl
               <label className="mt-3 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-[13px] border border-[#6f8e72]/30 px-3 text-xs font-semibold text-[#45604d]">
                 <UiIcon name="camera" className="h-4 w-4" />
                 {working === item.id ? "Storing…" : `Add photo or receipt${item.photoDocumentIds.length ? ` · ${item.photoDocumentIds.length}` : ""}`}
-                <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic" onChange={event => void upload(item, event)} disabled={Boolean(working)} className="sr-only" />
+                <PhotoFileInput type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic" onChange={event => void upload(item, event)} disabled={Boolean(working)} className="sr-only" />
               </label>
             </article>
           )) : <p className="rounded-[14px] bg-[#f6f5ef] px-3 py-6 text-center text-xs text-[#667068]">No inventory items match this view.</p>}

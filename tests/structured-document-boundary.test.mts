@@ -92,8 +92,8 @@ test("desktop document helpers use the authenticated service route", async () =>
   assert.match(cleanupRoute, /export async function POST/);
   assert.match(cleanupWorker, /isOwnedDocumentStoragePath/);
   assert.match(cleanupWorker, /nextAttempt/);
-  const vercel = JSON.parse(vercelSource) as { crons?: unknown };
-  assert.deepEqual(vercel.crons, [{
+  const vercel = JSON.parse(vercelSource) as { crons: Array<{ path: string; schedule: string }> };
+  assert.deepEqual(vercel.crons.filter((job) => job.path === "/api/internal/document-cleanup"), [{
     path: "/api/internal/document-cleanup",
     schedule: "17 3 * * *",
   }]);

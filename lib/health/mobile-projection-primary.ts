@@ -95,6 +95,10 @@ export function projectAppointment(value: unknown): HealthAppointment | null {
     status: oneOf(item.status, ["planned", "completed", "cancelled"], "planned"),
     preparationNotes: text(item.preparationNotes, 4_000),
     followUpNotes: text(item.followUpNotes, 4_000),
+    documentId: optionalText(item.documentId, 128),
+    timeZone: optionalText(item.timeZone, 64),
+    durationMinutes: Number.isInteger(item.durationMinutes) && Number(item.durationMinutes) >= 5
+      && Number(item.durationMinutes) <= 1440 ? Number(item.durationMinutes) : undefined,
     reminderId: optionalText(item.reminderId, 128),
     createdAt: timestamp(item.createdAt),
   };

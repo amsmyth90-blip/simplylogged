@@ -118,7 +118,7 @@ function WillsMenuCard({ item }: { item: WillsMenuItem }) {
 
 export function WillsLandingPage() {
   return (
-    <div className="mx-auto w-full max-w-[760px] pb-6">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] pb-6">
       <WillsPageHeader />
 
       <section

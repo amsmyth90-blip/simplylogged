@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -106,7 +108,7 @@ export function KitchenPantryPlanner() {
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.98),transparent_34%),linear-gradient(165deg,#eef5ea_0%,#fbfcf9_50%,#e8f1e7_100%)] text-slate-900">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
         <PantryHeader onBack={stage === "capture" ? undefined : () => setStage(stage === "meals" ? "confirm" : stage === "shopping" ? "meals" : "capture")} />
 
         {stage === "capture" ? (
@@ -127,7 +129,7 @@ export function KitchenPantryPlanner() {
                 <button type="button" onClick={() => libraryInputRef.current?.click()} className="rounded-2xl border border-white/30 bg-white/10 px-3 py-2.5 text-xs font-semibold text-white backdrop-blur-xl">Choose photos</button>
               </div>
               <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" multiple className="hidden" onChange={event => { addPhotos(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
-              <input ref={libraryInputRef} type="file" accept="image/*" multiple className="hidden" onChange={event => { addPhotos(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
+              <PhotoFileInput ref={libraryInputRef} type="file" accept="image/*" multiple className="hidden" onChange={event => { addPhotos(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
             </section>
 
             {selectedFiles.length ? (

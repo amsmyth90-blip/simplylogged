@@ -6,9 +6,11 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode
 } from "react";
+import { usePathname } from "next/navigation";
 
 import {
   createInitialDiaryDockState,
@@ -44,8 +46,11 @@ type DiaryDockDataContextValue = {
 
 const DiaryDockDataContext = createContext<DiaryDockDataContextValue | null>(null);
 
-export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
-  const repository = useMemo(() => createDiaryDockRepository(), []);
+export function DiaryDockDataProvider({ children, accountId }: { children: ReactNode; accountId?: string | null }) {
+  const pathname = usePathname();
+  const publicPage = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/pricing", "/privacy", "/terms", "/support", "/cookies", "/account-deletion"].includes(pathname);
+  const saverLifecycle = useRef({ generation: 0 });
+  const repository = useMemo(() => createDiaryDockRepository(accountId), [accountId]);
   const [persistenceError, setPersistenceError] = useState("");
   const stateSaver = useMemo(
     () => createCoalescedSaver<DiaryDockAppState>(async (next) => {
@@ -71,7 +76,9 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
 
     const load = async () => {
       if (repository.mode === "supabase") {
+        if (!accountId) return;
         const bootstrap = await loadDiaryDockBootstrap();
+        if (bootstrap.userId !== accountId) throw new Error("Account changed while loading.");
         if (!cancelled) {
           repository.adoptRevisions(
             bootstrap.privateRevision,
@@ -105,14 +112,14 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     };
 
     void load().catch(() => {
-      if (!cancelled) setHydrated(true);
+      if (!cancelled) setPersistenceError("Your account data could not be loaded. Reload to try again; editing is paused to protect your saved information.");
     });
 
     return () => {
       cancelled = true;
       controller.abort();
     };
-  }, [repository]);
+  }, [repository, accountId]);
 
   useEffect(() => {
     if (hydrated && repository.mode === "supabase") {
@@ -121,6 +128,8 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
   }, [hydrated, repository]);
 
   useEffect(() => {
+    const lifecycle = saverLifecycle.current;
+    const generation = ++lifecycle.generation;
     const flushWhenHidden = () => {
       if (document.visibilityState === "hidden") {
         void stateSaver.flush().catch(() => undefined);
@@ -135,9 +144,12 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
     return () => {
       document.removeEventListener("visibilitychange", flushWhenHidden);
       window.removeEventListener("pagehide", flushBeforeLeaving);
-      void stateSaver.flush().catch(() => undefined).finally(() => stateSaver.dispose());
+      void stateSaver.flush().catch(() => undefined).finally(() => {
+        // Strict Mode immediately reattaches this effect; keep that saver alive.
+        if (lifecycle.generation === generation) stateSaver.dispose();
+      });
     };
-  }, [stateSaver]);
+  }, [stateSaver, saverLifecycle]);
 
   const refreshHousehold = useCallback(async (reloadState = false) => {
     if (repository.mode !== "supabase") {
@@ -146,6 +158,7 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
 
     if (reloadState) {
       const bootstrap = await loadDiaryDockBootstrap();
+      if (bootstrap.userId !== accountId) throw new Error("Account changed while loading.");
       repository.adoptRevisions(
         bootstrap.privateRevision,
         bootstrap.householdRevision,
@@ -172,20 +185,22 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
       }));
     }
     return nextHousehold;
-  }, [household, repository]);
+  }, [household, repository, accountId]);
 
   const updateState = useCallback((updater: (current: DiaryDockAppState) => DiaryDockAppState) => {
+    if (!hydrated) return;
     setState((current) => {
       const next = updater(current);
       stateSaver.schedule(next);
       return next;
     });
-  }, [stateSaver]);
+  }, [stateSaver, hydrated]);
 
   const persistState = useCallback(async (next: DiaryDockAppState) => {
+    if (!hydrated) throw new Error("Please wait for your account data to load.");
     stateSaver.schedule(next);
     await stateSaver.flush();
-  }, [stateSaver]);
+  }, [stateSaver, hydrated]);
 
   return (
     <DiaryDockDataContext.Provider
@@ -212,7 +227,9 @@ export function DiaryDockDataProvider({ children }: { children: ReactNode }) {
           Reload secure copy
         </button>
       </div> : null}
-      {children}
+      {accountId && !publicPage && !hydrated ? <div className="mx-auto max-w-lg rounded-3xl border border-[#20352a]/10 bg-white p-8 text-center text-[#20352a]" role="status">
+        {persistenceError ? "Your saved information is safe. Please reload to reconnect." : "Loading your DiaryDock account…"}
+      </div> : children}
     </DiaryDockDataContext.Provider>
   );
 }

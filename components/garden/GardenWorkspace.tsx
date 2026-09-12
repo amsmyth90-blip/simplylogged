@@ -12,7 +12,7 @@ export function GardenWorkspace() {
   if (!view.hydrated) {
     return (
       <main className="min-h-screen bg-[#f5f2ea] px-4 pb-32 pt-4">
-        <div className="mx-auto max-w-[760px] animate-pulse space-y-4">
+        <div className="desktop-workspace mx-auto max-w-[760px] animate-pulse space-y-4">
           <div className="h-[520px] rounded-[30px] bg-[#dfe6d8]" />
           <div className="h-48 rounded-[24px] bg-white/70" />
         </div>
@@ -22,7 +22,7 @@ export function GardenWorkspace() {
 
   return (
     <main className="min-h-screen bg-[#f5f2ea] pb-32 text-[#20352a]">
-      <div className="mx-auto max-w-[760px] px-3 pb-8 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
+      <div className="desktop-workspace mx-auto max-w-[760px] px-3 pb-8 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
         <GardenHeader view={view} />
         <GardenOverview view={view} />
         <GardenSectionLinks />

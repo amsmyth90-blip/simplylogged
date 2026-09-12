@@ -31,50 +31,46 @@ export function DesktopSpaceLanding({
   imagePosition = "center",
 }: DesktopSpaceLandingProps) {
   return (
-    <main className="fixed inset-0 hidden overflow-y-auto bg-[#f2efe6] text-[#1d3328] lg:block">
-      <div className="mx-auto min-h-full max-w-[92rem] px-8 py-8 xl:px-12 xl:py-10">
-        <header className="flex items-start justify-between gap-8">
-          <div>
+    <main className="fixed inset-0 hidden overflow-hidden bg-[#f2efe6] text-[#1d3328] lg:block">
+      <div className="mx-auto flex h-full max-w-[92rem] flex-col px-6 py-5 xl:px-9 xl:py-6">
+        <header className="flex shrink-0 items-center gap-5">
             <Link
               href="/dashboard"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#284536]/12 bg-white/70 px-4 text-sm font-semibold text-[#345444] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"
+              className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-[#284536]/12 bg-white/70 px-4 text-sm font-semibold text-[#345444] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72]"
             >
               <UiIcon name="arrow-left" className="h-4 w-4" />
               Home
             </Link>
-            <h1 className="mt-7 font-serif text-5xl leading-[1.02] tracking-[-0.035em] text-[#1f392d] xl:text-6xl">
-              {title}
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#596961] xl:text-lg">
-              {description}
-            </p>
-          </div>
+            <div className="min-w-0">
+              <h1 className="font-serif text-[clamp(2rem,3vw,3rem)] leading-none tracking-[-0.035em] text-[#1f392d]">{title}</h1>
+              <p className="mt-1.5 max-w-3xl text-sm leading-5 text-[#596961] xl:text-base">{description}</p>
+            </div>
         </header>
 
-        <div className="mt-8 grid gap-7 xl:grid-cols-[minmax(25rem,0.86fr)_minmax(32rem,1.14fr)] xl:items-stretch">
+        <div className="mt-5 grid min-h-0 flex-1 gap-5 lg:grid-cols-[minmax(19rem,0.78fr)_minmax(0,1.22fr)] lg:items-stretch xl:grid-cols-[minmax(23rem,0.82fr)_minmax(32rem,1.18fr)]">
           <section
             aria-labelledby={`${title}-sections`}
-            className="order-2 xl:order-1"
+            className="order-1 min-h-0"
           >
-            <div className="rounded-[2rem] border border-[#284536]/10 bg-[#fbfaf5] p-5 shadow-[0_24px_60px_rgba(45,58,48,0.08)] xl:h-full xl:p-6">
+            <div className="h-full overflow-y-auto rounded-[1.65rem] border border-[#284536]/10 bg-[#fbfaf5] p-4 shadow-[0_24px_60px_rgba(45,58,48,0.08)] [scrollbar-width:thin] xl:p-5">
               <h2 id={`${title}-sections`} className="sr-only">
                 {title} sections
               </h2>
               <nav
-                className="grid gap-3 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2"
+                className="grid gap-2.5 xl:grid-cols-2"
                 aria-label={`${title} sections`}
               >
                 {items.map((item) => {
                   const content = (
                     <>
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e4eadf] text-[#526e5d]">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e4eadf] text-[#526e5d]">
                         <UiIcon name={item.icon} className="h-5 w-5" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-base font-bold text-[#24382f]">
+                        <span className="block text-sm font-bold text-[#24382f] xl:text-base">
                           {item.label}
                         </span>
-                        <span className="mt-0.5 block text-sm leading-5 text-[#6b7770]">
+                        <span className="mt-0.5 block text-xs leading-4 text-[#6b7770] xl:text-sm xl:leading-5">
                           {item.description}
                         </span>
                       </span>
@@ -85,8 +81,8 @@ export function DesktopSpaceLanding({
                     </>
                   );
                   const className = [
-                    "group flex min-h-[86px] w-full items-center gap-4 rounded-[1.35rem] border",
-                    "border-[#284536]/9 bg-white px-4 py-3.5 text-left",
+                    "group flex min-h-[68px] w-full items-center gap-3 rounded-[1.15rem] border",
+                    "border-[#284536]/9 bg-white px-3.5 py-2.5 text-left",
                     "shadow-[0_10px_28px_rgba(53,65,56,0.055)] transition",
                     "hover:-translate-y-0.5 hover:border-[#6f8e72]/35",
                     "hover:shadow-[0_16px_34px_rgba(53,65,56,0.1)]",
@@ -117,7 +113,7 @@ export function DesktopSpaceLanding({
             </div>
           </section>
 
-          <figure className="relative order-1 min-h-[320px] overflow-hidden rounded-[2.25rem] border border-white/70 bg-[#283b30] shadow-[0_30px_80px_rgba(32,45,37,0.18)] xl:order-2 xl:min-h-[620px]">
+          <figure className="relative order-2 min-h-0 overflow-hidden rounded-[1.8rem] border border-white/70 bg-[#283b30] shadow-[0_30px_80px_rgba(32,45,37,0.18)]">
             <Image
               src={image}
               alt={imageAlt}

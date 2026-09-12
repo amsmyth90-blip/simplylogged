@@ -36,13 +36,13 @@ export function LettersDashboard() {
 
   if (!hydrated)
     return (
-      <div className="mx-auto w-full max-w-[760px] rounded-[28px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] rounded-[28px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
         Opening your private letters…
       </div>
     );
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader
         title="Letters of Wishes"
         backHref="/wills"

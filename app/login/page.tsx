@@ -30,6 +30,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="border-b border-[#20352a]/10 bg-[radial-gradient(circle_at_top,_rgba(255,253,248,0.98),_rgba(245,244,237,0.92)_58%,_rgba(221,230,216,0.7))] px-6 pb-7 pt-8">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#667068]">DiaryDock</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#20352a]">Welcome back</h1>
+          <p className="mt-3 text-base leading-7 text-[#667068]">Use the same email and password as the DiaryDock app. Your synced information will be here.</p>
         </div>
 
         <div className="space-y-5 px-6 py-6">
@@ -89,6 +90,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               Create an account
             </Link>
           </div>
+          <Link href="/pricing" className="flex min-h-11 items-center justify-center text-sm font-semibold text-[#486a50] underline underline-offset-4">
+            View plans &amp; pricing
+          </Link>
+          <Link href="/" className="flex min-h-11 items-center justify-center text-sm text-[#667068]">Back to DiaryDock</Link>
         </div>
       </div>
     </section>

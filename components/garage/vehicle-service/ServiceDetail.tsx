@@ -21,7 +21,7 @@ export function ServiceDetail() {
   if (!vehicle) return null;
   if (!serviceRecord) {
     return (
-      <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
         <ServiceHeader title="Service Details" backHref={service.base} />
         <BillsCard>
           <ServiceEmpty
@@ -41,7 +41,7 @@ export function ServiceDetail() {
     serviceRecord.nextServiceMileage ?? vehicle.nextServiceMileage;
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <ServiceHeader
         title="Service Details"
         backHref={service.base}

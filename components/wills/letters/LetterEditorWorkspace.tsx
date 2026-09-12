@@ -22,14 +22,14 @@ export function LetterEditorWorkspace({ letterId }: { letterId?: string }) {
 
   if (!view.hydrated) {
     return (
-      <div className="mx-auto w-full max-w-[760px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
         Opening your private writing space…
       </div>
     );
   }
   if (letterId && !view.storedLetter) {
     return (
-      <div className="mx-auto w-full max-w-[680px]">
+      <div className="desktop-workspace mx-auto w-full max-w-[680px]">
         <WillPageHeader
           title="Letter not found"
           subtitle="This letter is not available in your private records."
@@ -48,7 +48,7 @@ export function LetterEditorWorkspace({ letterId }: { letterId?: string }) {
   return (
     <form
       onSubmit={view.saveLetter}
-      className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]"
+      className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]"
     >
       <WillPageHeader
         title={letterId ? view.draft.title || "Edit letter" : "New letter"}

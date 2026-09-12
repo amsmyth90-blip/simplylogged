@@ -90,6 +90,9 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
             </button>
           </form>
 
+          <Link href="/pricing" className="flex min-h-11 items-center justify-center text-sm font-semibold text-[#486a50] underline underline-offset-4">
+            View plans &amp; pricing
+          </Link>
           <p className="text-center text-sm text-[#667068]">
             Already have an account?{" "}
             <Link href="/login" className="inline-flex min-h-11 items-center font-semibold text-[#486a50] underline-offset-4 hover:underline">

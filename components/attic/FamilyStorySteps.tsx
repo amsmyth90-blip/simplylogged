@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import Image from "next/image";
 import Link from "next/link";
 import type { ChangeEvent } from "react";
@@ -14,7 +15,7 @@ type DraftChange = (field: keyof FamilyStoryDraft, value: string) => void;
 export function FamilyStorySaved({ onReset }: { onReset: () => void }) {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5f2ea] pb-32 text-[#20352a]">
-      <div className="mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-[680px] flex-col justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
+      <div className="desktop-workspace mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-[680px] flex-col justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         <section className="rounded-[30px] border border-[#20352a]/[0.07] bg-[#fffdf8]/95 p-6 text-center shadow-[0_24px_55px_-40px_rgba(32,53,42,0.55)]">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e8eee3] text-[#52705a]">
             <UiIcon name="check" className="h-6 w-6" />
@@ -79,7 +80,7 @@ export function FamilyStoryPhotoStep({
         <span className="mt-1 text-xs leading-5 text-[#667068]">
           Up to {MAX_STORY_IMAGES} images · JPG, PNG, WebP or HEIC
         </span>
-        <input
+        <PhotoFileInput
           type="file"
           accept="image/*"
           multiple

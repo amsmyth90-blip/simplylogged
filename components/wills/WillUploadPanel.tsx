@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import type { FormEvent, RefObject } from "react";
 
 import { UiIcon } from "@/components/UiIcon";
@@ -67,7 +68,7 @@ export function WillUploadPanel({
           <span className="text-sm font-semibold text-[#20352a]">
             Will file
           </span>
-          <input
+          <PhotoFileInput
             ref={fileInputRef}
             type="file"
             accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,application/pdf,image/jpeg,image/png,image/webp,image/heic"

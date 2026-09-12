@@ -21,7 +21,7 @@ export function WillDetailsWorkspace() {
 
   if (!view.hydrated) {
     return (
-      <div className="mx-auto w-full max-w-[760px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
+      <div className="desktop-workspace mx-auto w-full max-w-[760px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">
         Opening your private details…
       </div>
     );
@@ -30,7 +30,7 @@ export function WillDetailsWorkspace() {
   return (
     <form
       onSubmit={view.save}
-      className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]"
+      className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]"
     >
       <WillPageHeader
         title="Will details"

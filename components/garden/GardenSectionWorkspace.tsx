@@ -82,7 +82,7 @@ export function GardenSectionWorkspace({
   if (!hydrated) {
     return (
       <main className="min-h-screen bg-[#f5f2ea] p-4">
-        <div className="mx-auto max-w-[760px] animate-pulse space-y-4">
+        <div className="desktop-workspace mx-auto max-w-[760px] animate-pulse space-y-4">
           <div className="h-40 rounded-[28px] bg-white/70" />
           <div className="h-72 rounded-[24px] bg-white/70" />
         </div>
@@ -99,7 +99,7 @@ export function GardenSectionWorkspace({
         <span className="absolute -right-20 top-16 h-72 w-72 rounded-full bg-[#dfe7d8]/60 blur-3xl" />
         <span className="absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-[#ead9c0]/45 blur-3xl" />
       </div>
-      <div className="relative mx-auto w-full max-w-[760px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
+      <div className="desktop-workspace relative mx-auto w-full max-w-[760px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         <GardenSectionHeader
           accent={accent}
           documentCount={documents.length}

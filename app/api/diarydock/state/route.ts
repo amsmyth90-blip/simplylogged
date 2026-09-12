@@ -1,4 +1,6 @@
+import { isSameOriginRequest } from "@/lib/http/same-origin";
 import { NextResponse } from "next/server";
+import { matchesSignedInAccount } from "@/lib/account-boundary";
 
 import {
   MAX_DIARYDOCK_STATE_SAVE_BYTES,
@@ -27,10 +29,7 @@ function respond(
   return NextResponse.json(body, { status, headers });
 }
 
-function isSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  return Boolean(origin && origin === new URL(request.url).origin);
-}
+const isSameOrigin = isSameOriginRequest;
 
 type StateWriteRow = {
   status: "OK" | "CONFLICT";
@@ -54,6 +53,9 @@ export async function POST(request: Request) {
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
     return respond(observation, { error: "Please sign in again to save DiaryDock." }, 401, "unauthenticated");
+  }
+  if (!matchesSignedInAccount(request.headers.get("X-DiaryDock-Account"), authData.user.id)) {
+    return respond(observation, { error: "Your account changed. Reload before saving." }, 409, "account-changed");
   }
   const rate = await checkServerRateLimit(
     createRateLimitKey("desktop:state:write", authData.user.id),

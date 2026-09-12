@@ -11,7 +11,7 @@ import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SOURCE_ICON = path.join(ROOT, "public/brand/diarydock-app-icon.png");
-const BACKGROUND = "#f8f4ec"; // matches tailwind.config.ts `cream`
+const BACKGROUND = "#20352a"; // opaque brand green, including icon corners
 
 async function generateIosAssets(icon, splash) {
   const assets = path.join(ROOT, "ios", "App", "App", "Assets.xcassets");

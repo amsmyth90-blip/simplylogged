@@ -6,7 +6,7 @@ import { UiIcon, type IconName } from "@/components/UiIcon";
 
 export function BillsShell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       {children}
     </div>
   );

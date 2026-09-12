@@ -20,7 +20,7 @@ const navItems: NavItem[] = [
   { id: "home", href: "/dashboard", label: "Home", icon: "home" },
   { id: "files", href: "/files", label: "All Files", icon: "folder" },
   { id: "add", href: "/capture", label: "Scan", icon: "plus", central: true },
-  { id: "reminders", href: "/reminders", label: "Reminders", icon: "calendar", badge: 2 },
+  { id: "reminders", href: "/reminders", label: "Reminders", icon: "calendar" },
   { id: "family", href: "/family", label: "Family Room", icon: "users" }
 ];
 
@@ -47,6 +47,8 @@ export function BottomNav() {
   };
 
   const desktopUtilities: NavItem[] = [
+    { id: "features", href: "/features", label: "All features", icon: "home" },
+    { id: "passwords", href: "/passwords", label: "Password Vault", icon: "lock" },
     { id: "ask", href: "/ask", label: "Ask DiaryDock", icon: "star" },
     { id: "search", href: "/search", label: "Search", icon: "search" },
     { id: "settings", href: "/settings", label: "Settings", icon: "gear" }
@@ -99,7 +101,7 @@ export function BottomNav() {
 
       {showDesktopSidebar ? <aside className="desktop-primary-nav fixed inset-y-0 left-0 z-[70] hidden w-[17rem] flex-col border-r border-[#20352a]/10 bg-[#fffdf8]/[0.97] px-4 py-5 shadow-[20px_0_60px_-48px_rgba(32,53,42,0.42)] backdrop-blur-2xl lg:flex">
         <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2">
-          <Image src="/icons/icon-192.png" alt="" width={44} height={44} className="rounded-[13px] shadow-sm" />
+          <Image src="/icons/icon-192-green.png" alt="" width={44} height={44} className="rounded-[13px] shadow-sm" />
           <span>
             <span className="block font-serif text-[25px] leading-none text-[#20352a]">DiaryDock</span>
             <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6f8e72]">Your digital home</span>

@@ -28,14 +28,14 @@ export function VehicleReceiptsWorkspace({
 
   if (!hydrated) {
     return (
-      <div className="mx-auto max-w-[760px] rounded-[24px] bg-white/80 p-8 text-sm text-[#667068]">
+      <div className="desktop-workspace mx-auto max-w-[760px] rounded-[24px] bg-white/80 p-8 text-sm text-[#667068]">
         Opening Receipts…
       </div>
     );
   }
   if (!vehicle) {
     return (
-      <div className="mx-auto max-w-[760px]">
+      <div className="desktop-workspace mx-auto max-w-[760px]">
         <BillsCard>
           <p className="text-sm font-semibold text-[#20352a]">
             Vehicle not found

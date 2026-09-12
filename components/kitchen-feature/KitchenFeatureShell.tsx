@@ -15,7 +15,7 @@ export function KitchenFeatureShell({
 }) {
   return (
     <div className="relative -mx-4 -mt-5 min-h-[100svh] overflow-x-hidden bg-[linear-gradient(180deg,#e6efe3_0%,#f8faf6_38%,#eef4ec_100%)] pb-28 text-slate-900 sm:-mx-6">
-      <div className="relative mx-auto w-full max-w-lg px-5 pt-5">
+      <div className="desktop-workspace relative mx-auto w-full max-w-lg px-5 pt-5">
         <header className="flex items-center gap-3">
           <Link href="/room/kitchen" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/90 bg-white/72 text-slate-700 shadow-sm backdrop-blur-xl" aria-label="Back to Kitchen">
             <UiIcon name="arrow-left" className="h-4 w-4" />

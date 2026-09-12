@@ -105,6 +105,11 @@ export const PhysicalLinksScreen = lazy(() =>
     default: module.PhysicalLinksScreen,
   })),
 );
+export const PasswordVaultScreen = lazy(() =>
+  import("@mobile/password-vault/PasswordVaultScreen").then((module) => ({
+    default: module.PasswordVaultScreen,
+  })),
+);
 export const ReminderBoard = lazy(() =>
   import("@mobile/reminders/ReminderBoard").then((module) => ({
     default: module.ReminderBoard,

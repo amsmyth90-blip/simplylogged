@@ -28,7 +28,7 @@ export function ServiceWorkspaceChrome({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <ServiceHeader
         title="Service Records"
         backHref="/room/garage"

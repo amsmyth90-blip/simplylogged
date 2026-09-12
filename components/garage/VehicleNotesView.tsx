@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import Link from "next/link";
 import type { ChangeEvent } from "react";
 
@@ -56,7 +57,7 @@ export function VehicleNotesView({
           <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-[15px] border border-dashed border-[#6f8e72]/40 bg-[#f7f7f1] text-[10px] font-semibold text-[#52705a] focus-within:ring-2 focus-within:ring-[#6f8e72]">
             <UiIcon name="plus" className="mb-1 h-5 w-5" />
             Add photo
-            <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" onChange={onPhoto} disabled={uploadingPhoto} className="sr-only" />
+            <PhotoFileInput type="file" accept="image/jpeg,image/png,image/webp,image/heic" onChange={onPhoto} disabled={uploadingPhoto} className="sr-only" />
           </label>
         </div>
       </BillsCard>

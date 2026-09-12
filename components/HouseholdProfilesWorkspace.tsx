@@ -120,7 +120,7 @@ export function HouseholdProfilesWorkspace() {
   return (
     <>
       <div className="fixed inset-0 overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.98),transparent_35%),linear-gradient(180deg,#edf3e9_0%,#fbfaf6_50%,#e8f0e5_100%)] text-slate-900">
-        <main className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+        <main className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
           <header className="flex shrink-0 items-center gap-3">
             <Link
               href="/family"

@@ -1,3 +1,4 @@
+import { isSameOriginRequest } from "@/lib/http/same-origin";
 import { NextResponse } from "next/server";
 
 import { DOCUMENT_BUCKET } from "@/lib/document-rules";
@@ -48,8 +49,7 @@ function respond(
 }
 
 function sameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  return Boolean(origin && origin === new URL(request.url).origin);
+  return isSameOriginRequest(request);
 }
 
 async function authorize(request: Request, operation: string, limit: number) {

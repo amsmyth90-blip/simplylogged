@@ -18,6 +18,7 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: false
   },
   plugins: {
+    PushNotifications: { presentationOptions: ["badge", "sound", "banner", "list"] },
     CapacitorSQLite: {
       iosDatabaseLocation: "Library/DiaryDock",
       iosIsEncryption: true,

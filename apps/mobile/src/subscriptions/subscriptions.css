@@ -1,0 +1,56 @@
+.subscription-screen {
+  max-width: 620px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+  color: #20352a;
+  background: #f8f4ec;
+}
+.subscription-screen button { cursor: pointer; font: inherit; }
+.subscription-screen button:disabled { cursor: not-allowed; opacity: .65; }
+.subscription-screen button:focus-visible,
+.subscription-plan:has(input:focus-visible) { outline: 3px solid #486a50; outline-offset: 4px; }
+.subscription-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.subscription-back { display: flex; align-items: center; gap: 8px; min-height: 44px; border: 0; background: none; color: #20352a; }
+.subscription-back span { font-size: 30px; }
+.subscription-brand { font-size: 13px; font-weight: 700; letter-spacing: .08em; }
+.subscription-intro { padding: 28px 0 20px; }
+.subscription-eyebrow { margin: 0 0 10px; color: #526653; font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.subscription-intro h1 { max-width: 450px; margin: 0; font-size: clamp(30px, 7vw, 40px); line-height: 1.12; letter-spacing: -.035em; }
+.subscription-intro > p:last-child { margin: 14px 0 0; color: #5f6a60; font-size: 15px; line-height: 1.6; }
+.subscription-notice { padding: 16px 18px; margin-bottom: 22px; border: 1px solid #d9dfcf; border-radius: 18px; background: #edf1e7; }
+.subscription-notice strong { font-size: 14px; }
+.subscription-notice p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #4e6050; }
+.subscription-plans { display: grid; gap: 12px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.subscription-plans legend { margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+.subscription-plan { display: flex; align-items: center; gap: 12px; min-height: 98px; padding: 18px 14px; border: 2px solid #e3e2d8; border-radius: 20px; background: #fffdf8; cursor: pointer; }
+.subscription-plan.is-selected { border-color: #486a50; background: #f0f4ea; box-shadow: 0 4px 16px #20352a0a; }
+.subscription-plan input { flex-shrink: 0; width: 19px; height: 19px; margin: 0; accent-color: #486a50; }
+.subscription-plan-copy { display: grid; gap: 7px; min-width: 0; flex: 1; }
+.subscription-plan-copy strong { font-size: 18px; }
+.subscription-plan-copy > span { color: #536154; font-size: 12px; line-height: 1.5; }
+.subscription-plan-price { display: grid; gap: 5px; text-align: right; }
+.subscription-plan-price strong { font-size: 23px; letter-spacing: -.035em; }
+.subscription-plan-price > span { font-size: 12px; color: #536154; }
+.subscription-small { font-size: 12px; color: #5b665d; line-height: 1.6; }
+.subscription-primary { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; min-height: 54px; margin: 18px 0; padding: 14px 18px; border: 0; border-radius: 16px; background: #20352a; color: #fffdf8; font-weight: 700 !important; }
+.subscription-current { margin-top: 26px; padding-top: 20px; border-top: 1px solid #dcded3; }
+.subscription-current h2 { margin: 0 0 10px; font-size: 16px; }
+.subscription-current > p { margin: 5px 0; font-size: 13px; }
+.subscription-review { padding: 22px; border: 1px solid #d9dfcf; border-radius: 24px; background: #fffdf8; }
+.subscription-review h2 { margin: 0; font-size: 27px; }
+.subscription-review-price { margin: 16px 0 24px; font-size: 37px; font-weight: 700; letter-spacing: -.03em; }
+.subscription-review-price span { font-size: 14px; font-weight: 400; letter-spacing: 0; }
+.subscription-review dl { margin: 0; }
+.subscription-review dl > div { display: flex; justify-content: space-between; gap: 12px; padding: 13px 0; border-top: 1px solid #e5e6df; font-size: 13px; }
+.subscription-review dd { margin: 0; font-weight: 700; text-align: right; }
+.subscription-help { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; margin-top: 20px; }
+.subscription-help button, .subscription-footer button { min-height: 44px; padding: 4px; border: 0; background: none; color: #48634c; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.subscription-status { margin: 0; font-size: 13px; line-height: 1.6; color: #48634c; }
+.subscription-status:not(:empty) { padding: 14px; border-radius: 12px; background: #edf1e7; }
+.subscription-footer { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+@media (max-width: 350px) {
+  .subscription-screen { padding-left: 14px; padding-right: 14px; }
+  .subscription-plan { gap: 8px; padding: 14px 10px; }
+  .subscription-plan-price strong { font-size: 21px; }
+}

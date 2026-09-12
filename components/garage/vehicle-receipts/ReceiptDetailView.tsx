@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import type { ReactNode } from "react";
 
 import { BillsCard } from "@/components/bills/BillsUi";
@@ -131,7 +132,7 @@ export function ReceiptDetailView({
         </ReceiptAction>
         <label className="flex min-h-[68px] cursor-pointer items-center justify-center rounded-[16px] border border-[#20352a]/[0.07] bg-white text-center text-xs font-semibold text-[#45604d]">
           {detail.working ? "Replacing…" : "Replace"}
-          <input
+          <PhotoFileInput
             type="file"
             accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
             onChange={(event) => void detail.replaceReceipt(event)}

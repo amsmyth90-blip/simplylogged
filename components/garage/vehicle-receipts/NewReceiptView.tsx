@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import { BillsCard } from "@/components/bills/BillsUi";
 import { UiIcon } from "@/components/UiIcon";
 import type { VehicleRecord } from "@/lib/vehicle-records";
@@ -41,7 +42,7 @@ export function NewReceiptView({
             <span className="mt-1 text-[10px] text-[#667068]">
               PDF, JPG, PNG, WebP or HEIC · maximum 4 MB
             </span>
-            <input
+            <PhotoFileInput
               type="file"
               accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
               capture="environment"

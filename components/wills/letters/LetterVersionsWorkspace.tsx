@@ -77,13 +77,13 @@ export function LetterVersionsWorkspace({ letterId }: { letterId: string }) {
 
   if (!hydrated)
     return (
-      <div className="mx-auto w-full max-w-[680px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068]">
+      <div className="desktop-workspace mx-auto w-full max-w-[680px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068]">
         Opening letter history…
       </div>
     );
   if (!letter)
     return (
-      <div className="mx-auto w-full max-w-[680px]">
+      <div className="desktop-workspace mx-auto w-full max-w-[680px]">
         <WillPageHeader
           title="Letter not found"
           subtitle="This letter is not available in your private records."
@@ -95,7 +95,7 @@ export function LetterVersionsWorkspace({ letterId }: { letterId: string }) {
     (a, b) => b.versionNumber - a.versionNumber,
   );
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader
         title="Letter versions"
         subtitle="Earlier wording stays available whenever you save a new version."

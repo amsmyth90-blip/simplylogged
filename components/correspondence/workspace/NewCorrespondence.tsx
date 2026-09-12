@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
@@ -220,7 +222,7 @@ export function NewCorrespondence() {
           <span className="mt-1 text-xs text-[#667068]">
             You will review all suggested details before saving.
           </span>
-          <input
+          <PhotoFileInput
             type="file"
             accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
             className="sr-only"

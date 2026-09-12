@@ -74,7 +74,7 @@ export function FamilyCalendar() {
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.95),transparent_34%),linear-gradient(180deg,#e8f0e4_0%,#f8faf6_45%,#edf4ea_100%)] text-slate-900">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
         <header className="flex shrink-0 items-center gap-3">
           <Link
             href="/room/kitchen"

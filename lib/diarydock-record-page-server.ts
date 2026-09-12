@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { legacyDocumentPermissionError } from "./legacy-document-permissions.ts";
 
 import {
   decodeDiaryDockRecordCursor,
@@ -65,8 +66,9 @@ async function documentAccess(
     supabase.from("shared_resources").select("id,owner_id,resource_id,visibility")
       .eq("resource_type", "document").in("resource_id", ids),
   ]);
-  if (legacyResult.error || resourceResult.error) {
-    return { legacy, resources, selected, error: legacyResult.error ?? resourceResult.error };
+  const legacyError = legacyDocumentPermissionError(legacyResult.error);
+  if (legacyError || resourceResult.error) {
+    return { legacy, resources, selected, error: legacyError ?? resourceResult.error };
   }
   for (const row of legacyResult.data ?? []) {
     const id = String(row.document_id);

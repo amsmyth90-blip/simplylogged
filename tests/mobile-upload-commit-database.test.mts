@@ -9,7 +9,8 @@ const migrationUrl = new URL(
   import.meta.url,
 );
 
-test("mobile upload commit atomically creates only the owner's bound document", async () => {
+for (const [documentType, reminderType] of [["text", "text"], ["uuid", "text"], ["uuid", "uuid"]]) {
+test(`mobile upload commit preserves ${documentType} documents and ${reminderType} reminders`, async () => {
   const database = new PGlite();
   await database.exec(`
     create role anon;
@@ -22,7 +23,7 @@ test("mobile upload commit atomically creates only the owner's bound document", 
       committed_at timestamptz, cancelled_at timestamptz
     );
     create table public.documents (
-      id text primary key, user_id uuid not null, title text not null, category text not null,
+      id ${documentType} primary key, user_id uuid not null, title text not null, category text not null,
       kind text not null, size_label text not null, room_id text, room_name text,
       issuer text, due_date text, storage_bucket text, storage_path text,
       original_file_name text, mime_type text, extraction_summary text, extracted_text text,
@@ -31,12 +32,13 @@ test("mobile upload commit atomically creates only the owner's bound document", 
       emergency_visible boolean not null
     );
     create table public.reminders (
-      id text primary key, user_id uuid not null, title text not null, note text,
+      id ${reminderType} primary key, user_id uuid not null, title text not null, note text,
       room_id text, room_name text, reminder_group text not null, time_label text not null,
-      priority text not null, document_id text references public.documents(id), document_title text
+      priority text not null, document_id ${documentType} references public.documents(id), document_title text
     );
   `);
   await database.exec(await readFile(migrationUrl, "utf8"));
+  await database.exec(await readFile(new URL("../supabase/migrations/20260911141000_upload_native_id_types.sql", import.meta.url), "utf8"));
   const userId = "11111111-1111-4111-8111-111111111111";
   const reservationId = "22222222-2222-4222-8222-222222222222";
   const documentId = "33333333-3333-4333-8333-333333333333";
@@ -47,6 +49,18 @@ test("mobile upload commit atomically creates only the owner's bound document", 
     $2::text || '/' || $3::text || '/scan.pdf',
     'application/pdf', now() + interval '1 hour', null, null
   )`, [reservationId, userId, documentId]);
+
+  assert.equal((await database.query(
+    "select public.commit_mobile_document_upload($1,$2,$3::jsonb) as committed",
+    ["55555555-5555-4555-8555-555555555555", reservationId, JSON.stringify({ title: "Wrong owner", category: "Finance", roomName: "Office" })],
+  )).rows[0]?.committed, false);
+  assert.equal((await database.query("select count(*)::int as count from public.documents")).rows[0]?.count, 0);
+  await database.exec("set role authenticated");
+  await assert.rejects(database.query(
+    "select public.commit_mobile_document_upload($1,$2,$3::jsonb)",
+    [userId,reservationId,JSON.stringify({ title:"Not a server",category:"Finance",roomName:"Office" })],
+  ), /permission denied/);
+  await database.exec("reset role");
 
   const committed = await database.query<{ committed: boolean }>(
     "select public.commit_mobile_document_upload($1, $2, $3::jsonb) as committed",
@@ -82,3 +96,4 @@ test("mobile upload commit atomically creates only the owner's bound document", 
   assert.equal((await database.query("select count(*)::int as count from public.reminders")).rows[0]?.count, 1);
   await database.close();
 });
+}

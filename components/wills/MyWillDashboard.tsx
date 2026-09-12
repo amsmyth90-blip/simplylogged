@@ -220,11 +220,11 @@ export function MyWillDashboard() {
   };
 
   if (!hydrated) {
-    return <div className="mx-auto w-full max-w-[760px] animate-pulse rounded-[28px] bg-white/60 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">Opening your private will records…</div>;
+    return <div className="desktop-workspace mx-auto w-full max-w-[760px] animate-pulse rounded-[28px] bg-white/60 p-8 text-sm text-[#667068] sm:max-w-[680px] xl:max-w-[760px]">Opening your private will records…</div>;
   }
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader title="My Will" />
 
       <WillStatusCard

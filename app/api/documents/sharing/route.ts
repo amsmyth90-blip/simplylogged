@@ -1,3 +1,4 @@
+import { isSameOriginRequest } from "@/lib/http/same-origin";
 import { NextResponse } from "next/server";
 
 import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
@@ -35,7 +36,7 @@ async function authenticate(observation: RequestObservation) {
 }
 
 function sameOrigin(request: Request) {
-  return request.headers.get("origin") === new URL(request.url).origin;
+  return isSameOriginRequest(request);
 }
 
 export async function GET(request: Request) {

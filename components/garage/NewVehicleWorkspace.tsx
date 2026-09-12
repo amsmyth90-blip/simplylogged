@@ -100,7 +100,7 @@ export function NewVehicleWorkspace() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-4 pb-28">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-4 pb-28">
       <VehicleHeader title="Add a vehicle" />
       <BillsCard>
         <div className="flex items-start gap-3">

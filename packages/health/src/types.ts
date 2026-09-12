@@ -72,6 +72,9 @@ export type HealthAppointment = {
   status: "planned" | "completed" | "cancelled";
   preparationNotes: string;
   followUpNotes: string;
+  documentId?: string;
+  timeZone?: string;
+  durationMinutes?: number;
   reminderId?: string;
   createdAt: string;
 };

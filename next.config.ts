@@ -14,7 +14,7 @@ const contentSecurityPolicy = [
   "media-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDevelopment ? " 'unsafe-eval'" : ""}`,
   `connect-src 'self' ${supabaseOrigin} https://*.supabase.co wss://*.supabase.co https://www.themealdb.com`,
   `frame-src 'self' blob: data: ${supabaseOrigin} https://*.supabase.co`,
   "manifest-src 'self'",

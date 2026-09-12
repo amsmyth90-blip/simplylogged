@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import { useState, type ChangeEvent } from "react";
 import {
@@ -182,7 +184,7 @@ export function ContractCancellationGuide({
           detail="Store the email, letter or screenshot in private document storage"
         />
         <label className="mt-4 flex min-h-24 cursor-pointer items-center justify-center rounded-[18px] border border-dashed border-[#6f8e72]/45 bg-[#f7f7f1] px-4 text-center text-sm font-semibold text-[#45604d]">
-          <input
+          <PhotoFileInput
             type="file"
             accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
             className="sr-only"

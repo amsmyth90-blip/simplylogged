@@ -10,7 +10,10 @@ export async function updateSession(request: NextRequest) {
     request
   });
 
-  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, getSupabasePublicKey() as string, {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publicKey = getSupabasePublicKey();
+  if (!url || !publicKey) return response;
+  const supabase = createServerClient(url, publicKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

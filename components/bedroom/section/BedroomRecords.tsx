@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/UiIcon";
+import Link from "next/link";
 
 import { formatHealthDate } from "./bedroom-section-model";
 import {
@@ -15,6 +16,7 @@ type DisplayRecord = {
   title: string;
   meta: string;
   notes?: string;
+  documentId?: string;
 };
 
 export function BedroomRecords({
@@ -47,7 +49,11 @@ export function BedroomRecords({
       <div className="mt-4 space-y-2">
         {records.length ? (
           records.map((record) => (
-            <HealthRecordRow key={record.id} {...record} />
+            <div key={record.id}>
+              <HealthRecordRow {...record} />
+              {record.documentId && <Link className="ml-3 mt-2 inline-block text-xs underline"
+                href={`/document/${encodeURIComponent(record.documentId)}?from=bedroom`}>View appointment letter</Link>}
+            </div>
           ))
         ) : (
           <HealthEmpty
@@ -89,6 +95,7 @@ function sectionRecords(bedroom: BedroomSectionController): DisplayRecord[] {
   }
   if (section === "appointments") {
     return health.appointments.map((item) => ({
+      documentId: item.documentId,
       id: item.id,
       icon: "calendar",
       title: item.title,

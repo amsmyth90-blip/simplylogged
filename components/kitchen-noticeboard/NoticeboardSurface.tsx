@@ -22,7 +22,7 @@ type NoticeboardSurfaceProps = {
 
 export function NoticeboardSurface(props: NoticeboardSurfaceProps) {
   return (
-    <main className="mx-auto flex h-[calc(100svh-72px)] w-full max-w-lg flex-col px-4 pb-2 pt-[max(14px,env(safe-area-inset-top))]">
+    <main className="desktop-workspace mx-auto flex h-[calc(100svh-72px)] w-full max-w-lg flex-col px-4 pb-2 pt-[max(14px,env(safe-area-inset-top))]">
       <header className="flex shrink-0 items-center justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <Link

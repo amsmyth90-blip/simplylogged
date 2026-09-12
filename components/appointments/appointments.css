@@ -1,0 +1,22 @@
+.appointment-dialog { width: min(600px, calc(100% - 24px)); max-height: 90dvh; border: 1px solid #dce3d9; border-radius: 24px; padding: 24px; color: #20352a; background: #fffdf8; box-shadow: 0 24px 80px #20352a33; }
+.appointment-dialog::backdrop { background: #162c2588; }
+.appointment-dialog header { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+.appointment-dialog h2 { margin: 0; font: 28px Georgia, serif; }
+.appointment-dialog p { font-size: 14px; line-height: 1.6; margin: 12px 0; }
+.appointment-dialog header p { margin: 0 0 6px; font-size: 12px; color: #5e765d; }
+.appointment-dialog fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.appointment-dialog label { display: grid; gap: 7px; margin: 14px 0; font-size: 14px; }
+.appointment-dialog input, .appointment-dialog select, .appointment-dialog textarea { width: 100%; box-sizing: border-box; padding: 11px; border-radius: 10px; border: 1px solid #c4cec1; color: #20352a; background: white; font: inherit; }
+.appointment-dialog .appointment-check { display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+.appointment-dialog input[type=checkbox] { width: 20px; height: 20px; margin-top: 1px; flex-shrink: 0; accent-color: #365b42; }
+.appointment-dialog a { overflow-wrap: anywhere; text-decoration: underline; color: #365b42; font-size: 14px; }
+.appointment-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.appointment-fields-row input { min-width: 0; }
+.appointment-dialog button { padding: 11px 15px; min-height: 44px; border-radius: 12px; border: 1px solid #bdcbbb; background: #eaf0e5; color: #20352a; font: inherit; cursor: pointer; }
+.appointment-dialog button:disabled { opacity: .5; cursor: default; }
+.appointment-dialog button:focus-visible, .appointment-dialog input:focus-visible, .appointment-dialog select:focus-visible { outline: 3px solid #77916c; outline-offset: 2px; }
+.appointment-dialog footer, .appointment-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-top: 16px; }
+.appointment-dialog footer button:last-child { background: #365b42; color: white; }
+.appointment-status, .appointment-review { padding: 14px; border-radius: 12px; background: #eef2e9; }
+.appointment-review { padding-left: 30px; font-size: 14px; line-height: 1.5; }
+.appointment-dialog .appointment-hint { font-size: 12px; color: #647264; }

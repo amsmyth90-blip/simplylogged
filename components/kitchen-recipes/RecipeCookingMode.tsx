@@ -17,7 +17,7 @@ export function RecipeCookingMode({ controller }: Props) {
 
   return (
     <div className="fixed inset-0 z-[90] overflow-hidden bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.98),transparent_35%),linear-gradient(180deg,#edf4e9_0%,#faf9f5_52%,#f1eee6_100%)] px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-[max(12px,env(safe-area-inset-top))]">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col">
         <header className="flex h-12 shrink-0 items-center gap-3">
           <button type="button" onClick={() => setCookingMode(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-white text-slate-700 shadow-sm" aria-label="Exit cooking mode">
             <UiIcon name="arrow-left" className="h-4 w-4" />

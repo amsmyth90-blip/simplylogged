@@ -63,7 +63,7 @@ export function CaptureProposalsWorkspace() {
 
   return (
     <main className="min-h-[100svh] bg-[#f5f1e8] px-4 pb-28 pt-[max(1rem,env(safe-area-inset-top))] text-[#20352a]">
-      <div className="mx-auto max-w-2xl">
+      <div className="desktop-workspace mx-auto max-w-2xl">
         <PageHeader eyebrow="DiaryDock" title="Suggested next steps" subtitle="Nothing here changes your records until you choose it." backHref="/dashboard" />
         {message ? <p role="alert" className="mt-4 rounded-2xl bg-[#fbe5df] px-4 py-3 text-sm text-[#a4473d]">{message}</p> : null}
         {loading ? <p className="mt-5 rounded-3xl bg-white/80 p-6 text-sm text-[#667068]">Opening your suggestions…</p> : null}

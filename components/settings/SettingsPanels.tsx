@@ -62,7 +62,7 @@ export function SettingsStoragePanel({
           </p>
         </div>
         <span className="rounded-full bg-sage/55 px-3 py-1 text-xs font-semibold capitalize text-moss">
-          {summary.tier}
+          {summary.tier === "none" ? "No active plan" : summary.tier}
         </span>
       </div>
       <div
@@ -72,7 +72,7 @@ export function SettingsStoragePanel({
         <div
           className="h-full rounded-full bg-moss"
           style={{
-            width: `${Math.min(100, (summary.usedBytes / summary.limitBytes) * 100)}%`,
+            width: `${summary.limitBytes > 0 ? Math.min(100, (summary.usedBytes / summary.limitBytes) * 100) : 0}%`,
           }}
         />
       </div>

@@ -1,4 +1,6 @@
 "use client";
+import { PhotoFileInput } from "@/components/PhotoFileInput";
+
 
 import { useState, type ChangeEvent } from "react";
 import {
@@ -234,7 +236,7 @@ export function InsuranceClaims() {
                     {evidenceWorking === claim.id
                       ? "Storing evidence…"
                       : `Add evidence${claim.evidenceDocumentIds.length ? ` · ${claim.evidenceDocumentIds.length}` : ""}`}
-                    <input
+                    <PhotoFileInput
                       type="file"
                       accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
                       onChange={(event) => void addEvidence(claim, event)}

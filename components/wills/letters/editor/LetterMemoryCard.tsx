@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import { UiIcon } from "@/components/UiIcon";
 import { WillCard, WillSectionHeading } from "@/components/wills/WillUi";
 
@@ -29,7 +30,7 @@ export function LetterMemoryCard({ view }: { view: LetterEditorViewModel }) {
         <span className="text-sm font-semibold text-[#20352a]">
           Add a photo or PDF
         </span>
-        <input
+        <PhotoFileInput
           type="file"
           accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,application/pdf,image/jpeg,image/png,image/webp,image/heic"
           onChange={(event) =>

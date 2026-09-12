@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 
@@ -202,7 +203,7 @@ export function NewBill() {
           <span className="mt-1 text-[11px] text-[#667068]">
             You will check every extracted detail before it is confirmed.
           </span>
-          <input
+          <PhotoFileInput
             type="file"
             accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
             onChange={upload}

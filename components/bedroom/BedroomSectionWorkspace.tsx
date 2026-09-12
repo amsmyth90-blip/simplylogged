@@ -8,6 +8,7 @@ import { BedroomSectionContent } from "@/components/bedroom/section/BedroomSecti
 import { useBedroomSection } from "@/components/bedroom/section/useBedroomSection";
 import { UiIcon } from "@/components/UiIcon";
 import type { BedroomSectionId } from "@/lib/health-records";
+import { WebAppointmentLetterButton } from "@/components/appointments/WebAppointmentLetterButton";
 
 export function BedroomSectionWorkspace({
   section,
@@ -20,7 +21,7 @@ export function BedroomSectionWorkspace({
   if (!bedroom.hydrated) {
     return (
       <main className="min-h-screen bg-[#f5f2ea] p-4">
-        <div className="mx-auto max-w-[760px] animate-pulse space-y-4">
+        <div className="desktop-workspace mx-auto max-w-[760px] animate-pulse space-y-4">
           <div className="h-36 rounded-[28px] bg-white/70" />
           <div className="h-72 rounded-[24px] bg-white/70" />
         </div>
@@ -30,7 +31,7 @@ export function BedroomSectionWorkspace({
 
   return (
     <main className="min-h-screen bg-[#f5f2ea] pb-32 text-[#20352a]">
-      <div className="mx-auto max-w-[760px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
+      <div className="desktop-workspace mx-auto max-w-[760px] px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         <header className="rounded-[28px] border border-white/80 bg-[#fffdf8]/95 p-5 shadow-[0_24px_55px_-42px_rgba(32,53,42,0.6)]">
           <div className="flex items-start gap-3">
             <Link
@@ -72,6 +73,7 @@ export function BedroomSectionWorkspace({
           </p>
         ) : null}
         <div className="mt-5">
+          {section === "appointments" && <WebAppointmentLetterButton />}
           <BedroomSectionContent bedroom={bedroom} />
         </div>
         <p className="mt-5 rounded-2xl border border-[#20352a]/[0.07] bg-white/70 p-4 text-[11px] leading-5 text-[#667068]">

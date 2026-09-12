@@ -15,6 +15,7 @@ type DisplayRecord = {
   meta: string;
   notes: string;
   marker: string;
+  documentId?: string;
 };
 
 function date(value: string) {
@@ -46,6 +47,7 @@ function records(health: HealthRecord, view: HealthView): DisplayRecord[] {
       meta: [date(item.date), item.time, item.provider, item.status].filter(Boolean).join(" · "),
       notes: item.preparationNotes || item.followUpNotes,
       marker: "CAL",
+      documentId: item.documentId,
     }));
   }
   if (view === "allergies") {
@@ -134,15 +136,18 @@ export function HealthOverview({
   );
 }
 
-export function HealthRecordList({ health, view }: { health: HealthRecord;
-  view: "medications" | "appointments" | "allergies" | "history" }) {
+export function HealthRecordList({ health, view, onOpenLetter }: { health: HealthRecord;
+  view: "medications" | "appointments" | "allergies" | "history"; onOpenLetter?: (documentId: string) => void }) {
   const visible = records(health, view);
   const titles = { medications: "Medications", appointments: "Appointments", allergies: "Allergies & conditions", history: "Health timeline" };
   return (
     <section className="health-card health-record-card">
       <header><div><p>Private records</p><h2>{titles[view]}</h2></div><strong>{visible.length}</strong></header>
       <div className="health-record-list">
-        {visible.map((item) => <article key={item.id}><span>{item.marker}</span><div><strong>{item.title}</strong><small>{item.meta}</small>{item.notes ? <p>{item.notes}</p> : null}</div></article>)}
+        {visible.map((item) => <article key={item.id}><span>{item.marker}</span><div><strong>{item.title}</strong><small>{item.meta}</small>
+          {item.notes ? <p>{item.notes}</p> : null}
+          {item.documentId && onOpenLetter && <button type="button" onClick={() => onOpenLetter(item.documentId!)}>View appointment letter</button>}
+        </div></article>)}
         {!visible.length ? <div className="health-empty"><span>♡</span><strong>Nothing recorded here yet</strong><p>This private area begins empty and only contains information you add.</p></div> : null}
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { PhotoFileInput } from "@/components/PhotoFileInput";
 import type { RefObject } from "react";
 
 import { UiIcon } from "@/components/UiIcon";
@@ -52,7 +53,8 @@ export function NoticeCaptureActions({
       >
         <UiIcon name="file" className="h-5 w-5" /> Type
       </button>
-      <input
+      <PhotoFileInput
+        disabled={unavailable}
         ref={photoRef}
         type="file"
         accept="image/*"

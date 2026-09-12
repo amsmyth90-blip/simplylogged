@@ -17,7 +17,7 @@ test("the mobile entry document applies a restrictive content security policy", 
   assert.match(document, /default-src 'self'/);
   assert.match(document, /script-src 'self'/);
   assert.match(document, /object-src 'none'/);
-  assert.doesNotMatch(document, /unsafe-inline|unsafe-eval/);
+  assert.doesNotMatch(document, /unsafe-inline|(?<!wasm-)unsafe-eval/);
 });
 
 test("release workflows build the packaged application before Capacitor sync", async () => {

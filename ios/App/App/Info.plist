@@ -35,6 +35,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>DiaryDock adds appointments to your calendar when you choose Add to phone calendar.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>DiaryDock adds appointments to your calendar when you choose Add to phone calendar.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>DiaryDock uses the camera so you can scan household documents into your private records.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -12,10 +12,10 @@ import { hydrateLettersRecord, recipientLabel } from "@/lib/letter-records";
 export function LetterPreviewWorkspace({ letterId }: { letterId: string }) {
   const { state, hydrated } = useDiaryDockData();
   const letter = hydrateLettersRecord(state.willsWishes.lettersOfWishes).letters.find((item) => item.id === letterId) ?? null;
-  if (!hydrated) return <div className="mx-auto w-full max-w-[680px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068]">Preparing the envelope preview…</div>;
-  if (!letter) return <div className="mx-auto w-full max-w-[680px]"><WillPageHeader title="Letter not found" subtitle="This letter is not available in your private records." backHref="/wills/letters-of-wishes" /></div>;
+  if (!hydrated) return <div className="desktop-workspace mx-auto w-full max-w-[680px] rounded-[24px] bg-white/70 p-8 text-sm text-[#667068]">Preparing the envelope preview…</div>;
+  if (!letter) return <div className="desktop-workspace mx-auto w-full max-w-[680px]"><WillPageHeader title="Letter not found" subtitle="This letter is not available in your private records." backHref="/wills/letters-of-wishes" /></div>;
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
+    <div className="desktop-workspace mx-auto w-full max-w-[760px] space-y-5 pb-28 sm:max-w-[680px] xl:max-w-[760px]">
       <WillPageHeader title="Envelope preview" backHref={`/wills/letters-of-wishes/${letterId}`} />
       <LetterSubpageNav letterId={letterId} />
       <section className="relative overflow-hidden rounded-[28px] border border-[#20352a]/10 bg-[#ece7db] px-5 py-12 text-center shadow-[0_28px_60px_-42px_rgba(32,53,42,0.6)] sm:px-10 sm:py-16">

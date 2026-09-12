@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useAppointmentNotifications, disconnectAppointmentNotifications } from "@mobile/appointments/use-appointment-notifications";
 import { roomProfiles } from "@diarydock/home";
 import type { LifeCheckTarget } from "@diarydock/life-check";
 import type { MobileDestination } from "@mobile/components/MobileBottomNav";
@@ -19,6 +20,7 @@ import {
   LifeCheckScreen,
   OnboardingScreen,
   PhysicalLinksScreen,
+  PasswordVaultScreen,
   ReminderBoard,
   SearchScreen,
   SettingsScreen,
@@ -51,6 +53,8 @@ export function SignedInApp({
     setRoomId(null); setCaptureRoom(undefined); setDestination("SCAN");
   }, []);
   useNativeShareNavigation(openSharedImport);
+  const openAppointments = useCallback(() => { setRoomId("bedroom"); setDestination("HOME"); }, []);
+  useAppointmentNotifications(state.session.access_token, openAppointments);
   if (inviteToken) return <HouseholdInviteScreen accessToken={state.session.access_token}
     token={inviteToken} onClose={onInviteHandled}
     onAccepted={() => { onInviteHandled(); setDestination("FAMILY"); }} />;
@@ -93,6 +97,8 @@ export function SignedInApp({
       "Signing out removes DiaryDock’s encrypted offline data from this device. Changes that have not synced will be lost. Continue?",
     );
     if (!confirmed) return;
+    try { await disconnectAppointmentNotifications(state.session.access_token); }
+    catch { window.alert("Phone alerts could not be disconnected. Connect to the internet and try signing out again."); return; }
     await sync.synchronize(); try { await onSignOut(); }
     catch { window.alert("DiaryDock could not finish secure sign-out. Please try again or close and reopen the app."); }
   }
@@ -199,6 +205,15 @@ export function SignedInApp({
         accessToken={state.session.access_token}
         store={state.store}
         syncStatus={sync.status}
+        onBack={() => { setRoomId("front-gate"); setDestination("HOME"); }}
+        onNavigate={navigate}
+      />
+    );
+  if (destination === "PASSWORDS")
+    return (
+      <PasswordVaultScreen
+        accessToken={state.session.access_token}
+        accountId={state.session.user.id}
         onBack={() => { setRoomId("front-gate"); setDestination("HOME"); }}
         onNavigate={navigate}
       />

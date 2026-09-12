@@ -122,7 +122,7 @@ export function KidsSchedulesWorkspace({ previewEditable = false }: { previewEdi
 
   return (
     <div className="fixed inset-0 z-30 overflow-hidden bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.98),transparent_34%),linear-gradient(180deg,#edf3e9_0%,#fbfaf6_46%,#eef3ea_100%)] text-slate-900">
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
+      <div className="desktop-workspace mx-auto flex h-full w-full max-w-lg flex-col px-4 pb-[82px] pt-[max(12px,env(safe-area-inset-top))]">
         <KidsScheduleChrome
           editable={editable}
           householdLabel={householdLabelFor(householdStyle)}
