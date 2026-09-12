@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
+import { VaultPassphraseForm } from "@diarydock/password-vault/passphrase-form";
 import { VaultMfaGate } from "@diarydock/password-vault/mfa";
 import { getMobileSupabase } from "@mobile/auth/supabase-client";
 import type { VaultCredential } from "@diarydock/password-vault";
@@ -44,10 +45,7 @@ function PasswordVaultContent({
   };
   vault: ReturnType<typeof useMobilePasswordVault>;
 }) {
-  const [passphrase, setPassphrase] = useState(""),
-    [confirm, setConfirm] = useState("");
-  const [gateError, setGateError] = useState(""),
-    [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<VaultCredential | null | undefined>(),
     [shown, setShown] = useState<Set<string>>(new Set());
   const filtered = useMemo(() => {
@@ -59,26 +57,6 @@ function PasswordVaultContent({
       : vault.credentials;
   }, [search, vault.credentials]);
 
-  async function submitGate(event: FormEvent) {
-    event.preventDefault();
-    setGateError("");
-    if (!vault.snapshot?.setup && passphrase !== confirm) {
-      setGateError("The two passphrases do not match.");
-      return;
-    }
-    if (passphrase.length < 15) {
-      setGateError("Use at least 15 characters.");
-      return;
-    }
-    try {
-      if (vault.snapshot?.setup) await vault.open(passphrase);
-      else await vault.create(passphrase);
-      setPassphrase("");
-      setConfirm("");
-    } catch {
-      /* vault error is shown below */
-    }
-  }
   async function copy(value: string) {
     try {
       await navigator.clipboard.writeText(value);
@@ -117,7 +95,7 @@ function PasswordVaultContent({
         ) : !vault.snapshot ? (
           <p className="password-vault-error">Password Vault could not be loaded.</p>
         ) : !vault.unlocked ? (
-          <form className="password-vault-gate" onSubmit={submitGate}>
+          <div className="password-vault-gate">
             <div className="password-vault-lock-mark" aria-hidden="true">
               ⌾
             </div>
@@ -127,37 +105,9 @@ function PasswordVaultContent({
                 ? "Enter your separate vault passphrase. DiaryDock never receives it."
                 : "Choose a separate passphrase you can remember. It cannot be recovered by DiaryDock."}
             </p>
-            <label>
-              Vault passphrase
-              <input
-                type="password"
-                value={passphrase}
-                onChange={(event) => setPassphrase(event.target.value)}
-                maxLength={256}
-                autoComplete={vault.snapshot.setup ? "current-password" : "new-password"}
-              />
-            </label>
-            {!vault.snapshot.setup ? (
-              <label>
-                Confirm passphrase
-                <input
-                  type="password"
-                  value={confirm}
-                  onChange={(event) => setConfirm(event.target.value)}
-                  maxLength={256}
-                  autoComplete="new-password"
-                />
-              </label>
-            ) : null}
-            {gateError ? (
-              <p className="password-vault-error" role="alert">
-                {gateError}
-              </p>
-            ) : null}
-            <button className="password-vault-primary" disabled={vault.busy}>
-              {vault.busy ? "Securing…" : vault.snapshot.setup ? "Unlock vault" : "Create encrypted vault"}
-            </button>
-          </form>
+            <VaultPassphraseForm exists={Boolean(vault.snapshot.setup)} busy={vault.busy}
+              onUnlock={vault.open} onCreate={vault.create} />
+          </div>
         ) : (
           <>
             <div className="password-vault-tools">

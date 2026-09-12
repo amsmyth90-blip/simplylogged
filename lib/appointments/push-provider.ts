@@ -20,7 +20,7 @@ export class PushDeliveryError extends Error {
   constructor(readonly invalidToken = false) { super("Push delivery failed."); }
 }
 
-async function apple(token: string, id: string, body: string) {
+async function apple(token: string, id: string, body: string, route: string) {
   const bearer = jwt({ alg: "ES256", kid: process.env.APNS_KEY_ID },
     { iss: process.env.APNS_TEAM_ID, iat: Math.floor(Date.now() / 1000) }, process.env.APNS_PRIVATE_KEY!, "SHA256", true);
   const client = connect(process.env.APNS_ENVIRONMENT === "sandbox" ? "https://api.sandbox.push.apple.com" : "https://api.push.apple.com");
@@ -41,7 +41,7 @@ async function apple(token: string, id: string, body: string) {
         if (status === 200) resolve();
         else reject(new PushDeliveryError(status === 410 || /BadDeviceToken|DeviceTokenNotForTopic/.test(response)));
       });
-      req.end(JSON.stringify({ aps: { alert: { title: "DiaryDock", body }, sound: "default" }, route: "appointments" }));
+      req.end(JSON.stringify({ aps: { alert: { title: "DiaryDock", body }, sound: "default" }, route }));
     });
   } finally { client.close(); }
 }
@@ -62,17 +62,21 @@ async function googleToken() {
 }
 
 export async function sendAppointmentPush(device: { platform: string; token: string }, job: { id: string; kind: string }) {
-  if (!pushConfigured(device.platform)) throw new PushDeliveryError();
   // Deliberately omit medical details and identifiers from lock-screen content.
   const body = job.kind === "added" ? "Your appointment has been added. Open DiaryDock to view it."
     : "You have an upcoming appointment. Open DiaryDock for the details.";
-  if (device.platform === "ios") return apple(device.token, job.id, body);
+  return sendDiaryDockPush(device, job.id, body, "appointments");
+}
+
+export async function sendDiaryDockPush(device: { platform: string; token: string }, id: string, body: string, route: "appointments" | "recaps" | "recaps-weekly") {
+  if (!pushConfigured(device.platform)) throw new PushDeliveryError();
+  if (device.platform === "ios") return apple(device.token, id, body, route);
   const response = await fetch(`https://fcm.googleapis.com/v1/projects/${encodeURIComponent(process.env.FCM_PROJECT_ID!)}/messages:send`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
     headers: { Authorization: `Bearer ${await googleToken()}`, "Content-Type": "application/json" },
     body: JSON.stringify({ message: { token: device.token, notification: { title: "DiaryDock", body },
-      data: { route: "appointments" }, android: { priority: "high", ttl: "3600s",
-        notification: { tag: job.id, channel_id: "appointments" } } } }),
+      data: { route }, android: { priority: "high", ttl: "3600s",
+        notification: { tag: id, channel_id: route.startsWith("recaps") ? "recaps" : route } } } }),
   });
   if (!response.ok) {
     const result = await response.json().catch(() => ({}));

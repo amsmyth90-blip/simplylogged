@@ -1,0 +1,47 @@
+.vault-passphrase-form { display: grid; gap: 14px; margin-top: 24px; }
+.vault-passphrase-form .vault-passphrase-field label {
+  display: block; margin: 0 0 8px; color: #294536; font-size: 14px; font-weight: 600;
+}
+.vault-passphrase-input { position: relative; }
+.vault-passphrase-form .vault-passphrase-input input {
+  box-sizing: border-box; width: 100%; min-height: 50px; margin: 0;
+  padding: 12px 54px 12px 14px; border: 1px solid #aebfad;
+  border-radius: 12px; background: #fff; color: #20352a; font-size: 16px;
+}
+.vault-passphrase-input input:focus-visible { outline: 2px solid #47745b; outline-offset: 2px; }
+.vault-passphrase-eye {
+  position: absolute; top: 3px; right: 3px; display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 9px;
+  color: #315443; background: transparent; cursor: pointer;
+}
+.vault-passphrase-eye svg { width: 21px; height: 21px; }
+.vault-passphrase-eye:hover, .vault-passphrase-eye[aria-pressed="true"] { background: #e3eddf; }
+.vault-passphrase-eye:active { background: #cbdcc6; transform: scale(0.95); }
+.vault-passphrase-form .vault-passphrase-hint {
+  display: flex; align-items: baseline; gap: 7px; margin: -5px 0 0;
+  font-size: 13px; line-height: 1.5; font-weight: 600; color: #b42318;
+}
+.vault-passphrase-form .vault-passphrase-hint[data-valid="true"] { color: #247035; }
+.vault-passphrase-hint span { flex-shrink: 0; }
+.vault-passphrase-error { margin: 0; color: #b42318; font-size: 14px; line-height: 1.5; }
+.vault-passphrase-submit {
+  display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%;
+  min-height: 50px; margin-top: 4px; padding: 12px 18px; border: 0; border-radius: 12px;
+  color: #fff; background: #274c39; font-size: 15px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 3px 0 #163121; transition: background 120ms, transform 120ms, box-shadow 120ms;
+}
+.vault-passphrase-submit:hover { background: #37694d; }
+.vault-passphrase-submit:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #163121; background: #163121; }
+.vault-passphrase-submit:disabled { cursor: wait; background: #526b5b; box-shadow: none; }
+.vault-passphrase-eye:disabled { cursor: wait; opacity: 0.6; }
+.vault-passphrase-form button:focus-visible { outline: 3px solid #6d956b; outline-offset: 3px; }
+.vault-passphrase-spinner {
+  width: 17px; height: 17px; border: 2px solid #ffffff55; border-top-color: #fff;
+  border-radius: 50%; animation: vault-passphrase-spin 800ms linear infinite;
+}
+.vault-passphrase-progress { margin: 0; color: #526a57; font-size: 13px; text-align: center; }
+@keyframes vault-passphrase-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .vault-passphrase-submit { transition: none; }
+  .vault-passphrase-spinner { animation: none; border-top-color: #fff; }
+}

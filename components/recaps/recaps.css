@@ -1,0 +1,39 @@
+.recaps-panel { max-width:1200px; margin:0 auto; color:#173c2d; font:15px/1.45 system-ui,sans-serif; }
+.recaps-panel * { box-sizing:border-box; }
+.recaps-panel h1 { margin:0; font-size:30px; font-weight:650; }
+.recaps-panel h2 { font-size:19px; font-weight:650; margin:0 0 12px; }
+.recaps-panel p { margin:6px 0 10px; }
+.recaps-panel header { margin-bottom:12px; }
+.recaps-grid { display:grid; grid-template-columns:310px minmax(0,1fr); gap:20px; align-items:start; }
+.recaps-settings,.recaps-content { background:white; border:1px solid #dce5d9; padding:16px; border-radius:16px; }
+.recaps-content { min-width:0; }
+.recaps-panel button { font:inherit; cursor:pointer; padding:8px 12px; border:1px solid #b8c7b3; border-radius:8px; background:white; color:#173c2d; min-height:36px; }
+.recaps-panel button:active:not(:disabled) { transform:translateY(1px); background:#e2ecdf; }
+.recaps-panel button:focus-visible,.recaps-panel input:focus-visible { outline:3px solid #9c741c; outline-offset:3px; }
+.recaps-panel button:disabled { opacity:.45; cursor:default; }
+.recaps-toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #e9eee7; cursor:pointer; }
+.recaps-panel small { display:block; color:#54665b; font-size:12px; }
+.recaps-toggle input { width:20px; height:20px; accent-color:#275740; flex-shrink:0; }
+.recaps-zone { display:block; margin-top:12px; font-weight:600; }
+.recaps-zone input { display:block; margin:6px 0; width:100%; padding:8px; border:1px solid #b8c7b3; border-radius:8px; color:#173c2d; background:white; font:inherit; }
+.recaps-panel .recaps-text-button { border:0; padding:4px 0; font-size:12px; text-decoration:underline; }
+.recaps-panel .recaps-save { width:100%; margin-top:12px; background:#275740; color:white; }
+.recaps-tabs { display:flex; gap:6px; margin-bottom:10px; }
+.recaps-tabs button[aria-pressed=true] { color:white; background:#275740; }
+.recaps-date,.recaps-note { font-size:12px; color:#54665b; }
+.recaps-panel ul { list-style:none; padding:0; margin:12px 0; }
+.recaps-panel li + li { border-top:1px solid #e9eee7; }
+.recaps-panel li button { display:flex; align-items:center; justify-content:space-between; text-align:left; width:100%; gap:12px; padding:8px 0; border:0; }
+.recaps-panel li strong { overflow-wrap:anywhere; }
+.recaps-panel li small { margin-top:3px; }
+.recaps-overdue { font-size:12px; color:#a33124; flex-shrink:0; }
+.recaps-due { font-size:12px; color:#375c41; flex-shrink:0; }
+.recaps-empty { padding:28px 16px; margin:15px 0; background:#f1f5ee; border-radius:12px; }
+.recaps-pagination { display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+.recaps-error { background:#fff0ed; color:#992e23; padding:12px; border-radius:8px; margin-bottom:12px; }
+.recaps-success { color:#24643a; }
+@media(max-width:760px) { .recaps-grid { grid-template-columns:1fr; } .recaps-content { grid-row:1; } .recaps-settings,.recaps-content { padding:16px; } }
+
+.recaps-schedule { display:grid; grid-template-columns:minmax(0,1fr) 104px; gap:8px; align-items:center; border-bottom:1px solid #e9eee7; }
+.recaps-schedule .recaps-toggle { border:0; gap:6px; }
+.recaps-schedule input[type=time] { min-width:0; width:100%; min-height:36px; padding:5px; border:1px solid #b8c7b3; border-radius:8px; color:#173c2d; background:white; font:inherit; font-size:13px; }

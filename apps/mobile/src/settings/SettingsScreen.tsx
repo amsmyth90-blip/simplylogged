@@ -115,6 +115,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
       </section>
 
       <section className="settings-card settings-menu">
+        <button type="button" className="settings-link-row" onClick={() => props.onNavigate("RECAPS")}><span><strong>Daily &amp; Sunday recaps</strong><small>Choose your recap times</small></span><b>›</b></button>
         <h2>App</h2>
         <button type="button" className="settings-link-row" onClick={() => setShowSubscriptions(true)}>
           <span><strong>Plans &amp; storage</strong><small>Explore Starter, Plus and Family</small></span><b>›</b>

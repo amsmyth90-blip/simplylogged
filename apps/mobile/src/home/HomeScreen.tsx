@@ -76,6 +76,7 @@ export function HomeScreen(props: HomeScreenProps) {
             <span><strong>Today</strong><small>{props.reminderCount} action{props.reminderCount === 1 ? "" : "s"}</small></span>
           </button>
         ) : null}
+        <button type="button" className="home-quick" onClick={() => props.onNavigate("RECAPS")}><span className="home-quick-icon"><MobileIcon name="calendar" /></span><span><strong>Recaps</strong></span></button>
         <button type="button" className="home-quick" onClick={() => props.onNavigate("GUARDIAN")}>
           <span className="home-quick-icon"><MobileIcon name="shield" /></span>
           <span><strong>Guardian</strong></span>

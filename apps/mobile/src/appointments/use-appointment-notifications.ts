@@ -6,7 +6,7 @@ import { getMobileSupabase } from "@mobile/auth/supabase-client";
 import { getSecureRuntime } from "@mobile/platform/runtime-security";
 import { enableAppointmentPush, disableAppointmentPush } from "./phone-notifications";
 
-export function useAppointmentNotifications(accessToken: string, onOpen: () => void) {
+export function useAppointmentNotifications(accessToken: string, onOpen: () => void, onRecaps?: (kind: "daily" | "weekly") => void) {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     const handles: PluginListenerHandle[] = [];
@@ -18,6 +18,8 @@ export function useAppointmentNotifications(accessToken: string, onOpen: () => v
     void Promise.all([
       add(PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
         if (action.notification.data?.route === "appointments") onOpen();
+        if (action.notification.data?.route === "recaps") onRecaps?.("daily");
+        if (action.notification.data?.route === "recaps-weekly") onRecaps?.("weekly");
       })),
       add(LocalNotifications.addListener("localNotificationActionPerformed", (action) => {
         if (action.notification.extra?.route === "appointments") onOpen();
@@ -25,7 +27,7 @@ export function useAppointmentNotifications(accessToken: string, onOpen: () => v
       enableAppointmentPush({ accessToken, apiOrigin: getSecureRuntime().apiOrigin, supabase: getMobileSupabase() }, false),
     ]).catch(() => undefined);
     return () => { disposed = true; void Promise.all(handles.map((handle) => handle.remove())); };
-  }, [accessToken, onOpen]);
+  }, [accessToken, onOpen, onRecaps]);
 }
 
 export async function disconnectAppointmentNotifications(accessToken: string) {

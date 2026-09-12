@@ -1,5 +1,5 @@
 -- Private appointment creation and per-device notification outbox.
-create table public.appointment_devices (
+create table if not exists public.appointment_devices (
   id uuid primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
   platform text not null check (platform in ('ios', 'android')),

@@ -152,7 +152,9 @@ export function SettingsGroups({
         <section key={group.title} className="space-y-3">
           <SectionHeader title={group.title} />
           <div className="estate-sheet divide-y divide-white/60 overflow-hidden">
-            {group.rows.map((row) => {
+            {group.rows.map((originalRow) => {
+              const row: SettingGroup["rows"][number] = originalRow.label === "Weekly digest"
+                ? { kind: "link", label: "Daily & Sunday recaps", hint: "Choose your recap times", href: "/recaps" } : originalRow;
               const body = (
                 <>
                   <div className="min-w-0 flex-1">

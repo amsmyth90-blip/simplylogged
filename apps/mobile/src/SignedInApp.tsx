@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { lazy, useCallback, useState } from "react";
 import { useAppointmentNotifications, disconnectAppointmentNotifications } from "@mobile/appointments/use-appointment-notifications";
 import { roomProfiles } from "@diarydock/home";
 import type { LifeCheckTarget } from "@diarydock/life-check";
@@ -31,6 +31,8 @@ import { SignedInKitchen } from "@mobile/SignedInKitchen";
 import { useBackgroundSync } from "@mobile/sync/use-background-sync";
 import { signedInFirstName, type SignedInState } from "@mobile/signed-in-identity";
 
+const RecapsScreen = lazy(() => import("@mobile/recaps/RecapsScreen").then((m) => ({ default: m.RecapsScreen })));
+
 export function SignedInApp({
   state,
   onSignOut,
@@ -47,6 +49,7 @@ export function SignedInApp({
   const onboarding = useMobileOnboarding({ accessToken: state.session.access_token,
     store: state.store, syncStatus: sync.status });
   const [destination, setDestination] = useState<MobileDestination>("HOME");
+  const [recapKind, setRecapKind] = useState<"daily" | "weekly">("daily");
   const [roomId, setRoomId] = useState<string | null>(null);
   const [captureRoom, setCaptureRoom] = useState<string | undefined>();
   const openSharedImport = useCallback(() => {
@@ -54,7 +57,8 @@ export function SignedInApp({
   }, []);
   useNativeShareNavigation(openSharedImport);
   const openAppointments = useCallback(() => { setRoomId("bedroom"); setDestination("HOME"); }, []);
-  useAppointmentNotifications(state.session.access_token, openAppointments);
+  const openRecaps = useCallback((kind: "daily" | "weekly") => { setRecapKind(kind); setRoomId(null); setDestination("RECAPS"); }, []);
+  useAppointmentNotifications(state.session.access_token, openAppointments, openRecaps);
   if (inviteToken) return <HouseholdInviteScreen accessToken={state.session.access_token}
     token={inviteToken} onClose={onInviteHandled}
     onAccepted={() => { onInviteHandled(); setDestination("FAMILY"); }} />;
@@ -172,6 +176,7 @@ export function SignedInApp({
         onOpenArea={openRoom}
       />
     );
+  if (destination === "RECAPS") return <RecapsScreen key={recapKind} initialKind={recapKind} accessToken={state.session.access_token} onNavigate={navigate} onAppointments={openAppointments} />;
   if (destination === "GUARDIAN")
     return (
       <GuardianScreen

@@ -59,7 +59,7 @@ export function DesktopDashboard({ greeting, guardianCount }: { greeting: string
   }).format(new Date());
 
   return (
-    <main className="hidden h-[100svh] overflow-y-auto bg-[#f3f0e7] text-[#20352a] lg:block">
+    <main className="forest-dashboard hidden h-[100svh] overflow-y-auto bg-[#f3f0e7] text-[#20352a] lg:block">
       <div className="relative min-h-full overflow-hidden bg-[radial-gradient(circle_at_50%_-15%,rgba(255,255,255,0.95),transparent_35%),linear-gradient(115deg,rgba(207,196,167,0.12),transparent_32%,rgba(111,142,114,0.08))]">
         <header className="relative z-10 flex min-h-[86px] items-center justify-between border-b border-[#345143]/10 bg-[#fffdf8]/80 px-8 backdrop-blur-xl xl:px-12">
           <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] focus-visible:ring-offset-4">
@@ -73,6 +73,7 @@ export function DesktopDashboard({ greeting, guardianCount }: { greeting: string
           <nav aria-label="Desktop navigation" className="flex items-center gap-1 rounded-full border border-[#345143]/10 bg-white/65 p-1.5 shadow-sm">
             <Link href="/dashboard" aria-current="page" className="rounded-full bg-[#e5ecdf] px-4 py-2 text-xs font-bold text-[#315443]">Home</Link>
             <Link href="/files" className="rounded-full px-4 py-2 text-xs font-semibold text-[#667068] transition hover:bg-white hover:text-[#20352a]">Files</Link>
+            <Link href="/recaps" className="rounded-full px-4 py-2 text-xs font-semibold text-[#667068]">Recaps</Link>
             <Link href="/reminders" className="rounded-full px-4 py-2 text-xs font-semibold text-[#667068] transition hover:bg-white hover:text-[#20352a]">Reminders</Link>
             <Link href="/intake" className="rounded-full px-4 py-2 text-xs font-semibold text-[#667068] transition hover:bg-white hover:text-[#20352a]">Inbox</Link>
             <Link href="/features" className="rounded-full px-4 py-2 text-sm font-semibold text-[#315443] transition hover:bg-white">All features</Link>

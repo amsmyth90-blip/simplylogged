@@ -28,6 +28,7 @@ async function register(connection: AppointmentConnection, prompt: boolean) {
   if (permission.receive !== "granted" && prompt) permission = await PushNotifications.requestPermissions();
   if (permission.receive !== "granted") return false;
   if (platform === "android") await PushNotifications.createChannel({ id: "appointments", name: "Appointments", importance: 4 });
+  if (platform === "android") await PushNotifications.createChannel({ id: "recaps", name: "Daily and weekly recaps", importance: 3 });
   const listeners: PluginListenerHandle[] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
