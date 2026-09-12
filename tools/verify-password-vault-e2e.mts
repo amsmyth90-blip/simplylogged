@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import env from "@next/env";
+import { enrollQaFactor, verifyQaFactor, removeQaFactor } from "./vault-qa-totp.mjs";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { createVault, decryptCredential, encryptCredential, parseVaultSnapshot,
@@ -52,9 +53,29 @@ function snapshot(result: Awaited<ReturnType<typeof request>>) {
   assert.ok(parsed, "Valid ciphertext snapshot required");
   return parsed;
 }
+const factors: Array<{ actor: typeof a; id: string }> = [];
 let created = false;
 try {
   assert.equal((await request(null)).status, 401); pass("anonymous vault access denied");
+  for (const actor of [a, b]) {
+    const aal1Token = actor.token;
+    const aal1Cookie = actor.cookie();
+    const deniedActions = [undefined, { action: "SETUP" }, { action: "PUT_ENTRY" }, { action: "DELETE_ENTRY" }];
+    for (const action of deniedActions) for (const cookie of [false, true])
+      assert.equal((await request(actor, action, cookie)).status, 403);
+    const factor = await enrollQaFactor(actor.client, actor);
+    factors.push({ actor, id: factor.id });
+    actor.token = (await verifyQaFactor(actor.client, factor))!.access_token;
+    assert.equal((await request(actor, undefined, false, { Authorization: "Bearer " + aal1Token })).status, 403);
+    assert.equal((await request(actor, undefined, true, { Cookie: aal1Cookie })).status, 403);
+  }
+  pass("password-only cookie and bearer sessions cannot read or mutate the vault, even after MFA enrollment");
+  const forgedParts = a.token.split(".");
+  const claims = JSON.parse(Buffer.from(forgedParts[1], "base64url").toString());
+  claims.sub = b.id;
+  forgedParts[1] = Buffer.from(JSON.stringify(claims)).toString("base64url");
+  assert.equal((await request(a, undefined, false, { Authorization: "Bearer " + forgedParts.join(".") })).status, 401);
+  pass("forged assurance and account claims are rejected");
   const initial = snapshot(await request(a));
   assert.equal(initial.setup, null, "Refusing to overwrite an existing QA vault");
   const bInitial = snapshot(await request(b));
@@ -106,6 +127,7 @@ try {
   const removed: PasswordVaultSnapshot = snapshot(await request(a, { action: "DELETE_ENTRY", id: credential.id, expectedRevision: 2 }));
   assert.equal(removed.entries.length, 0); pass("delete persists across clients");
 } finally {
+  for (const { actor, id } of factors) await removeQaFactor(admin, actor, id);
   if (created) {
     const result = await admin.from("password_vaults").delete().eq("user_id", a.id);
     assert.equal(result.error, null, "Synthetic vault cleanup failed");

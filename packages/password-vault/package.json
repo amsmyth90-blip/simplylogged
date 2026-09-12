@@ -6,12 +6,14 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/use-vault-session.ts",
-    "./session": "./src/session.ts"
+    "./session": "./src/session.ts",
+    "./mfa": "./src/VaultMfaGate.tsx"
   },
   "dependencies": {
     "hash-wasm": "4.12.0"
   },
   "peerDependencies": {
-    "react": "^19.1.0"
+    "react": "^19.1.0",
+    "@supabase/supabase-js": "^2.110.7"
   }
 }

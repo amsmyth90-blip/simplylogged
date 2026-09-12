@@ -115,7 +115,7 @@ test("records completed actions through one atomic service-only RPC", async () =
 });
 
 test("does not permit unsafe eval in the production CSP", async () => {
-  const config = await source("../next.config.ts");
-  assert.match(config, /isDevelopment \? " 'unsafe-eval'" : ""/);
+  const config = await source("../lib/http/content-security-policy.ts");
+  assert.match(config, /development \? " 'unsafe-eval'" : ""/);
   assert.doesNotMatch(config, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
 });

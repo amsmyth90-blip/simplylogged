@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 
 import { AccountDataBoundary } from "@/components/AccountDataBoundary";
 import { getAuthenticatedUser } from "@/lib/auth";
@@ -37,6 +38,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  await connection();
   const user = await getAuthenticatedUser();
   return (
     <html lang="en">

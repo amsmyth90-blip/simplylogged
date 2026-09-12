@@ -1,0 +1,87 @@
+.vault-mfa {
+  box-sizing: border-box;
+  width: min(100% - 2rem, 36rem);
+  margin: 3rem auto;
+  padding: 2rem;
+  border: 1px solid #d5dfd2;
+  border-radius: 24px;
+  background: #f4f7ef;
+  color: #20352a;
+  font-family: inherit;
+}
+.vault-mfa h1 {
+  font-size: 1.8rem;
+  margin: 0.5rem 0 1rem;
+}
+.vault-mfa p {
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+.vault-mfa-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+}
+.vault-mfa button {
+  cursor: pointer;
+  background: #274c39;
+  color: white;
+  border: 0;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-weight: 600;
+}
+.vault-mfa button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.vault-mfa input,
+.vault-mfa select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0.5rem 0 1rem;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid #a8b9a6;
+  border-radius: 10px;
+  background: white;
+  color: #20352a;
+  font: inherit;
+}
+.vault-mfa input:focus-visible,
+.vault-mfa button:focus-visible,
+.vault-mfa summary:focus-visible {
+  outline: 3px solid #7b9c78;
+  outline-offset: 3px;
+}
+.vault-mfa label {
+  display: block;
+  font-weight: 600;
+}
+.vault-mfa-setup img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem auto;
+  background: white;
+}
+.vault-mfa summary {
+  cursor: pointer;
+}
+.vault-mfa code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 1rem 0;
+  user-select: all;
+}
+.vault-mfa .vault-mfa-error {
+  color: #923f36;
+}
+.vault-mfa .vault-mfa-back {
+  background: transparent;
+  color: #274c39;
+  padding-left: 0;
+}

@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { VaultMfaGate } from "@diarydock/password-vault/mfa";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { VaultCredential } from "@diarydock/password-vault";
 import { PasswordVaultEditor } from "./PasswordVaultEditor";
 import { PasswordVaultGate } from "./PasswordVaultGate";
@@ -8,6 +10,16 @@ import { PasswordVaultList } from "./PasswordVaultList";
 import { usePasswordVault } from "./usePasswordVault";
 
 export function PasswordVaultWorkspace({ accountId }: { accountId: string }) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return <p role="alert">Secure authentication is unavailable.</p>;
+  return (
+    <VaultMfaGate client={client} accountId={accountId}>
+      <AuthenticatedVault accountId={accountId} />
+    </VaultMfaGate>
+  );
+}
+
+function AuthenticatedVault({ accountId }: { accountId: string }) {
   const vault = usePasswordVault(accountId);
   return <PasswordVaultContent key={String(vault.unlocked) + vault.lockVersion} vault={vault} />;
 }

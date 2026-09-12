@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { parseEncryptedEntry, parseVaultSetup } from "@diarydock/password-vault";
 
+import { hasVaultAssurance } from "@/lib/password-vault/assurance";
 import { hasRecentAuthentication } from "@/lib/auth/recent-auth";
 import { readBoundedJson, RequestBodyError } from "@/lib/http/bounded-json";
 import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
@@ -40,6 +41,15 @@ async function authorize(request: Request, action: string, limit: number) {
     return { response: respond(request, { error: "Password Vault is unavailable." }, 503) };
   if (auth.error || !auth.user)
     return { response: respond(request, { error: "Please sign in again to open Password Vault." }, 401) };
+  const token = request.headers.get("authorization")?.match(/^Bearer ([^\s]{20,4096})$/)?.[1];
+  if (!(await hasVaultAssurance(auth.supabase, auth.user, token)))
+    return {
+      response: respond(
+        request,
+        { error: "Complete two-factor authentication to access Password Vault.", code: "MFA_REQUIRED" },
+        403,
+      ),
+    };
   const expectedAccount = request.headers.get("X-DiaryDock-Account");
   if (
     (expectedAccount && expectedAccount !== auth.user.id) ||

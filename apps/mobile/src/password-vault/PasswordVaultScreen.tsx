@@ -1,4 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { VaultMfaGate } from "@diarydock/password-vault/mfa";
+import { getMobileSupabase } from "@mobile/auth/supabase-client";
 import type { VaultCredential } from "@diarydock/password-vault";
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
 import { PasswordVaultEditor } from "./PasswordVaultEditor";
@@ -6,6 +8,19 @@ import { useMobilePasswordVault } from "./use-password-vault";
 import "./password-vault.css";
 
 export function PasswordVaultScreen(props: {
+  accessToken: string;
+  accountId: string;
+  onBack: () => void;
+  onNavigate: (destination: MobileDestination) => void;
+}) {
+  return (
+    <VaultMfaGate client={getMobileSupabase()} accountId={props.accountId} onBack={props.onBack}>
+      <AuthenticatedVault {...props} />
+    </VaultMfaGate>
+  );
+}
+
+function AuthenticatedVault(props: {
   accessToken: string;
   accountId: string;
   onBack: () => void;

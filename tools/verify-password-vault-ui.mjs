@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import env from '@next/env';
+import { totp, removeQaFactor } from './vault-qa-totp.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { build } from 'esbuild';
@@ -40,6 +41,8 @@ page.on('request', request => { if (request.url().endsWith('/api/password-vault'
 const passphrase = 'Synthetic vault passphrase for UI QA';
 const secret = 'Synthetic-UI-secret-Only!';
 let created = false;
+let qaFactorId, qaFactorSecret;
+const originalFactors = new Set(user.data.user.factors?.map(f => f.id) ?? []);
 const pass = name => console.log(`PASS ${name}`);
 async function unlock(target) {
   await target.getByLabel('Vault passphrase', { exact: true }).fill(passphrase);
@@ -47,7 +50,35 @@ async function unlock(target) {
   await target.getByRole('button', { name: /^(Add account|Add)$/ }).waitFor();
 }
 try {
-  await page.goto(`${base}/passwords`);
+  const response = await page.goto(`${base}/passwords`);
+  const cspHeader = response.headers()['content-security-policy'];
+  assert.ok(cspHeader && !cspHeader.split(';').find(s => s.trim().startsWith('script-src ')).includes("'unsafe-inline'"));
+  const nonce = /'nonce-([^']+)'/.exec(cspHeader)[1];
+  const html = await response.text();
+  const scriptTags = [...html.matchAll(/<script\b[^>]*>/g)].map(match => match[0]);
+  assert.ok(scriptTags.length > 0 && scriptTags.every(tag => tag.includes('nonce="' + nonce + '"')));
+  // strict-dynamic also permits chunks loaded by those trusted bootstrap scripts.
+  const again = await context.request.get(`${base}/passwords`, { headers: { 'x-nonce': 'attacker' } });
+  assert.notEqual(/'nonce-([^']+)'/.exec(again.headers()['content-security-policy'])[1], nonce);
+  await context.route(base + '/passwords?vault-injection-check=1', async route => {
+    const original = await route.fetch();
+    const injected = (await original.text()).replace('</head>', '<script>window.__injectedVaultScript = true</script></head>');
+    await route.fulfill({ response: original, body: injected });
+  });
+  const injectionPage = await context.newPage();
+  await injectionPage.goto(base + '/passwords?vault-injection-check=1');
+  assert.equal(await injectionPage.evaluate(() => Boolean(window.__injectedVaultScript)), false);
+  await injectionPage.close();
+  pass('fresh CSP nonces protect framework scripts and block injected inline scripts');
+  await page.getByRole('button', { name: 'Set up authenticator', exact: true }).click();
+  await page.locator('.vault-mfa-setup code').waitFor({ state: 'attached' });
+  qaFactorSecret = await page.locator('.vault-mfa-setup code').textContent();
+  const factors = (await admin.auth.admin.getUserById(actor.id)).data.user.factors;
+  qaFactorId = factors.find(f => !originalFactors.has(f.id)).id;
+  await page.getByLabel('Six-digit authentication code').fill(totp(qaFactorSecret));
+  await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+  await page.getByLabel('Vault passphrase', { exact: true }).waitFor();
+  pass('actual web authenticator enrollment and MFA verification succeed');
   await page.getByLabel('Vault passphrase', { exact: true }).fill(passphrase);
   await page.getByLabel('Confirm passphrase', { exact: true }).fill(passphrase);
   await page.getByRole('button', { name: 'Create encrypted vault', exact: true }).click();
@@ -77,16 +108,37 @@ try {
     import '@diarydock/design-system/theme.css';
     import './apps/mobile/src/mobile.css';
     import './apps/mobile/src/components/mobile-navigation.css';
-    createRoot(document.getElementById('root')).render(React.createElement(PasswordVaultScreen,
-      {...window.__vaultQA,onBack:()=>{},onNavigate:()=>{}}));`, loader: 'tsx', resolveDir: process.cwd() },
+    import {getMobileSupabase} from './apps/mobile/src/auth/supabase-client';
+    const client = getMobileSupabase();
+    function Harness() {
+      const [token,setToken] = React.useState(window.__vaultQA.access_token);
+      React.useEffect(() => {
+        const {data} = client.auth.onAuthStateChange((_event,session) => setToken(session?.access_token ?? ''));
+        return () => data.subscription.unsubscribe();
+      },[]);
+      return React.createElement(PasswordVaultScreen,{accessToken:token,accountId:window.__vaultQA.user.id,onBack:()=>{},onNavigate:()=>{}});
+    }
+    await client.auth.setSession(window.__vaultQA);
+    window.__qaDowngrade = () => client.auth.signInWithPassword(window.__vaultQACredentials);
+    createRoot(document.getElementById('root')).render(React.createElement(Harness));`, loader: 'tsx', resolveDir: process.cwd() },
     bundle: true, minify: true, format: 'esm', outfile: `${out}/mobile.js`,
     alias: { '@mobile': path.resolve('apps/mobile/src') },
-    define: { 'import.meta.env.VITE_API_ORIGIN': JSON.stringify(base), 'import.meta.env.PROD': 'false' },
+    define: { 'import.meta.env.VITE_API_ORIGIN': JSON.stringify(base), 'import.meta.env.PROD': 'false',
+      'import.meta.env.NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      'import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) },
     loader: { '.png': 'dataurl', '.webp': 'dataurl' } });
   const nativeHtml = await fs.readFile('apps/mobile/index.html', 'utf8');
   const csp = /content="(default-src[^"]+)"/.exec(nativeHtml)[1];
   const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-  await mobileContext.addInitScript(value => { window.__vaultQA = value; }, { accessToken: signedIn.data.session.access_token, accountId: actor.id });
+  const mobileAuth = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {auth:{persistSession:false,autoRefreshToken:false}});
+  const mobileLogin = await mobileAuth.auth.signInWithPassword({email:actor.email,password:actor.password});
+  assert.equal(mobileLogin.error,null);
+  await mobileContext.addInitScript(value => {
+    window.__vaultQA = value.session;
+    window.__vaultQACredentials = value.credentials;
+  }, {session:mobileLogin.data.session,credentials:{email:actor.email,password:actor.password}});
   await mobileContext.route(`${base}/__qa-vault-mobile*`, async route => {
     const url = route.request().url();
     if (url.endsWith('.js')) return route.fulfill({ contentType: 'text/javascript', body: await fs.readFile(`${out}/mobile.js`) });
@@ -97,7 +149,14 @@ try {
   await mobile.clock.install();
   mobile.on('pageerror', error => errors.push(error.message));
   mobile.on('request', request => { if (request.url().endsWith('/api/password-vault') && request.method() === 'POST') transmitted.push(request.postData()); });
-  await mobile.goto(`${base}/__qa-vault-mobile`); await unlock(mobile);
+  await mobile.goto(`${base}/__qa-vault-mobile`);
+  await mobile.getByLabel('Six-digit authentication code').fill('000000');
+  await mobile.getByRole('button',{name:'Verify and continue',exact:true}).click();
+  await mobile.getByRole('alert').filter({hasText:'could not be verified'}).waitFor();
+  await mobile.getByLabel('Six-digit authentication code').fill(totp(qaFactorSecret));
+  await mobile.getByRole('button',{name:'Verify and continue',exact:true}).click();
+  await unlock(mobile);
+  pass('actual mobile MFA rejects a wrong code and accepts the authenticator code');
   await mobile.getByRole('heading', { name: 'Synthetic UI login', exact: true }).waitFor();
   pass('actual mobile screen decrypts the web-created login');
   await mobile.getByRole('button', { name: 'Edit', exact: true }).click();
@@ -118,10 +177,18 @@ try {
     assert.equal(await target.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   }
   pass('both clients remove open editors and plaintext on automatic lock');
+  await unlock(mobile);
+  await mobile.getByRole('button',{name:'Edit',exact:true}).click();
+  await mobile.evaluate(() => window.__qaDowngrade());
+  await mobile.getByLabel('Six-digit authentication code').waitFor();
+  assert.equal(await mobile.getByRole('dialog').count(),0);
+  assert.equal(await mobile.getByText('Synthetic UI login',{exact:true}).count(),0);
+  pass('same-account downgrade to password-only session immediately removes decrypted content');
   assert.equal(transmitted.some(body => [passphrase, secret, 'Synthetic-mobile-update!', 'Synthetic UI login'].some(s => body.includes(s))), false);
   assert.deepEqual(errors, []); pass('no plaintext in vault requests or uncaught browser errors');
 } finally {
   await browser.close();
+  if (qaFactorId) await removeQaFactor(admin, actor, qaFactorId);
   if (created) {
     const cleanup = await admin.from('password_vaults').delete().eq('user_id', actor.id);
     assert.equal(cleanup.error, null); pass('synthetic UI vault cleaned up');
