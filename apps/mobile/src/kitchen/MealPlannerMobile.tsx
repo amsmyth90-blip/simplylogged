@@ -9,12 +9,12 @@ import {
 import type { OfflineStore } from "@diarydock/offline-store";
 
 import tableImage from "../../../../public/images/meal-planner-family-table.png";
-import thumbnailsImage from "../../../../public/images/weekly-meal-thumbnails.png";
 import { MobileIcon } from "@mobile/components/MobileIcon";
 import { defaultKitchenAppliances, loadKitchenAppliances,
   saveKitchenAppliances } from "./appliance-preferences";
 import type { KitchenPlanningDraftMutation } from "./planning-client";
 import { SmartMealPlanner } from "./SmartMealPlanner";
+import { MealPlannerPhoto } from "./MealPlannerPhoto";
 
 type Props = {
   busy: boolean;
@@ -67,6 +67,10 @@ export function MealPlannerMobile(props: Props) {
   const [selectedIndex, setSelectedIndex] = useState(todayIndex);
   const selectedDate = key(dates[selectedIndex]!);
   const selectedMeal = meal(props.snapshot, selectedDate);
+  const selectedRecipe = selectedMeal?.cookTime === "No cooking" ? undefined
+    : props.snapshot.recipes.find(recipe => selectedMeal?.recipeId
+      ? recipe.id === selectedMeal.recipeId
+      : recipe.name.toLowerCase() === selectedMeal?.name.toLowerCase());
   const [editing, setEditing] = useState(false);
   const [smartOpen, setSmartOpen] = useState(false);
   const [appliances, setAppliances] = useState<KitchenAppliance[]>(defaultKitchenAppliances);
@@ -134,11 +138,8 @@ export function MealPlannerMobile(props: Props) {
       </header>
       <section className="meal-family-table" aria-label="Meals planned for this week">
         <img src={tableImage} alt="" aria-hidden="true" />
-        {selectedMeal ? <span className="meal-selected-plate" aria-hidden="true" style={{
-          ...platePositions[selectedIndex], backgroundImage: `url(${thumbnailsImage})`,
-          backgroundSize: "100% 700%",
-          backgroundPosition: `center ${(selectedMeal.imageIndex / 6) * 100}%`,
-        }} /> : null}
+        {selectedMeal ? <MealPlannerPhoto meal={selectedMeal} recipe={selectedRecipe}
+          position={platePositions[selectedIndex]!} /> : null}
         {dates.map((date, index) => {
           const planned = meal(props.snapshot, key(date));
           return <button type="button" key={key(date)}
