@@ -80,6 +80,10 @@
         </service>
     </application>
 
+    <!-- In-app grocery capture; optional so devices without a camera can still install. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />

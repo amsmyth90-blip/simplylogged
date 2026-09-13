@@ -81,7 +81,7 @@ test("saving a generated shopping list opens the complete Kitchen list", async (
     "../apps/mobile/src/kitchen/MealPlannerMobile.tsx", import.meta.url), "utf8");
   assert.match(source, /addToShopping \? "Save & view list" : "Save my week"/);
   assert.match(source, /if \(addToShopping\) props\.onOpenShopping\(\)/);
-  assert.match(parent, /onOpenShopping=\{props\.onBack\}/);
+  assert.match(parent, /onOpenShopping=\{props\.onOpenShopping \?\? props\.onBack\}/);
 });
 
 test("starter recipes use matched provider photos and refresh legacy blank records", () => {

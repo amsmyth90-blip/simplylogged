@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import {
   defaultKitchenMealForDate,
@@ -24,6 +24,8 @@ type Props = {
   store: OfflineStore;
   mutate: (mutation: KitchenPlanningDraftMutation) => Promise<unknown>;
   onBack: () => void;
+  groceryDates?: ReactNode;
+  onOpenShopping?: () => void;
   onManageRecipes?: () => void;
 };
 
@@ -63,6 +65,7 @@ function emptyMeal(): KitchenMeal {
 }
 
 export function MealPlannerMobile(props: Props) {
+  const [shoppingOpen, setShoppingOpen] = useState(false);
   const todayIndex = (new Date().getDay() + 6) % 7;
   const [offset, setOffset] = useState(0);
   const dates = useMemo(() => week(offset), [offset]);
@@ -109,7 +112,9 @@ export function MealPlannerMobile(props: Props) {
       .then((value) => { if (value) setEditing(false); });
   }
   function shopWeek() {
-    void props.mutate({ operation: "ADD_WEEK_TO_SHOPPING", dates: dates.map(key) });
+    void props.mutate({ operation: "ADD_WEEK_TO_SHOPPING", dates: dates.map(key) }).then(saved => {
+      if (saved) { setShoppingOpen(false); props.onOpenShopping?.(); }
+    });
   }
   async function applySmartPlan(meals: KitchenPlanningSnapshot["meals"], addToShopping: boolean,
     starterRecipeIds: string[], selectedAppliances: KitchenAppliance[]) {
@@ -132,7 +137,7 @@ export function MealPlannerMobile(props: Props) {
       <aside className="meal-header-actions"><button type="button" className="meal-plan-button"
         onClick={() => setSmartOpen(true)}>Plan for me</button>
         <button type="button" className="meal-shop-button" disabled={!props.online || props.busy}
-          onClick={shopWeek}><MobileIcon name="plus" />Shop</button></aside>
+          onClick={() => setShoppingOpen(true)}><MobileIcon name="plus" />Shop</button></aside>
     </header>
     <div className="meal-planner-mobile">
       <header className="meal-week-nav">
@@ -179,6 +184,12 @@ export function MealPlannerMobile(props: Props) {
         </div>
       </article>
     </div>
+    {shoppingOpen ? <div className="planning-overlay"><section className="planning-dialog" role="dialog" aria-modal="true" aria-label="Weekly shopping list">
+      <header><h2>Shopping for the week</h2><button onClick={() => setShoppingOpen(false)} aria-label="Close weekly shopping">×</button></header>
+      {props.groceryDates}
+      <p>Add the missing ingredients from this week’s linked recipes to your shopping list.</p>
+      <button className="planning-primary" disabled={props.busy || !props.online} onClick={shopWeek}>Add week to shopping list</button>
+    </section></div> : null}
     {editing ? <div className="planning-overlay" role="presentation"><form className="planning-dialog meal-editor"
       onSubmit={save} aria-label="Edit planned meal"><header><div><small>Meal planner</small>
         <h2>{bookOpen ? "Choose a meal" : selectedMeal ? "Edit meal" : "Add meal"}</h2></div>
@@ -203,6 +214,6 @@ export function MealPlannerMobile(props: Props) {
     {smartOpen ? <SmartMealPlanner busy={props.busy} dates={dates} online={props.online}
       recipes={props.snapshot.recipes} initialAppliances={appliances}
       onClose={() => setSmartOpen(false)}
-      onApply={applySmartPlan} onOpenShopping={props.onBack} /> : null}
+      onApply={applySmartPlan} onOpenShopping={props.onOpenShopping ?? props.onBack} /> : null}
   </>;
 }

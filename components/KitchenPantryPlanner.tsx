@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { WebGroceryExpiry } from "./groceries/WebGroceryExpiry";
 import { PhotoFileInput } from "@/components/PhotoFileInput";
 
 
@@ -113,8 +113,8 @@ export function KitchenPantryPlanner() {
         <PantryHeader onBack={stage === "capture" ? undefined : () => setStage(stage === "meals" ? "confirm" : stage === "shopping" ? "meals" : "capture")} />
 
         {stage === "capture" ? (
-          <main className="mt-3 flex min-h-0 flex-1 flex-col gap-3">
-            <Link href="/kitchen/groceries" className="rounded-xl bg-[#263b35] px-4 py-3 text-center text-sm font-semibold text-white">Scan groceries &amp; track expiry dates</Link>
+          <main className="mt-3 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+            <WebGroceryExpiry />
             <section className="relative shrink-0 overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#243d35_0%,#3f6454_56%,#839d73_100%)] p-4 text-white shadow-[0_20px_45px_-28px_rgba(26,52,42,0.75)]">
               <span className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/10 blur-xl" />
               <div className="relative flex items-start gap-3">

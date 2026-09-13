@@ -1,3 +1,4 @@
+import { GroceryExpiry } from "./GroceryExpiry";
 import { useState } from "react";
 
 import type { KitchenPlanningSnapshot } from "@diarydock/kitchen";
@@ -34,7 +35,9 @@ export function KitchenPlanningScreen(props: {
           loadRecipe={planning.loadRecipe} mutate={planning.mutate} onBack={props.onBack} />
         : <MealPlannerMobile snapshot={planning.snapshot} online={planning.online}
           busy={planning.busy} mutate={planning.mutate} store={props.store}
-          onBack={props.onBack} onManageRecipes={() => props.onNavigate("KITCHEN_RECIPES")} /> : null}
+          onBack={props.onBack} onOpenShopping={() => props.onNavigate("KITCHEN")}
+          groceryDates={<GroceryExpiry accessToken={props.accessToken} onOpen={() => props.onNavigate("KITCHEN_GROCERIES")} />}
+          onManageRecipes={() => props.onNavigate("KITCHEN_RECIPES")} /> : null}
       <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
     </main>
   );

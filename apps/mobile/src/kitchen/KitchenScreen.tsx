@@ -1,3 +1,4 @@
+import { GroceryExpiry } from "./GroceryExpiry";
 import type { KitchenItem, KitchenSnapshot } from "@diarydock/kitchen";
 import type { OfflineStore } from "@diarydock/offline-store";
 
@@ -57,7 +58,8 @@ export function KitchenScreen(props: KitchenScreenProps) {
       </header>
       {kitchen.loading && !kitchen.snapshot ? <p className="pantry-alert">Opening your Kitchen securely…</p> : null}
       {kitchen.message && planner.stage === "capture" ? <p className="pantry-alert" role="status">{kitchen.message}</p> : null}
-      {planner.stage === "capture" ? <button type="button" onClick={() => props.onNavigate("KITCHEN_GROCERIES")} style={{ minHeight:44, padding:12, borderRadius:12, background:"#263b35", color:"white" }}>Scan groceries &amp; track expiry dates</button> : null}
+      {!["checking", "confirm"].includes(planner.stage) ? <GroceryExpiry accessToken={props.accessToken}
+        onOpen={() => props.onNavigate("KITCHEN_GROCERIES")} /> : null}
       <PantryCaptureStage
         addItem={addShoppingItem}
         busy={kitchen.busy}
