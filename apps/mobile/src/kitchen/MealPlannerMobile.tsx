@@ -15,6 +15,7 @@ import { defaultKitchenAppliances, loadKitchenAppliances,
 import type { KitchenPlanningDraftMutation } from "./planning-client";
 import { SmartMealPlanner } from "./SmartMealPlanner";
 import { MealPlannerPhoto } from "./MealPlannerPhoto";
+import { RecipeBookPicker } from "../../../../components/kitchen-shared/RecipeBookPicker";
 
 type Props = {
   busy: boolean;
@@ -23,6 +24,7 @@ type Props = {
   store: OfflineStore;
   mutate: (mutation: KitchenPlanningDraftMutation) => Promise<unknown>;
   onBack: () => void;
+  onManageRecipes?: () => void;
 };
 
 const dayPositions = [
@@ -72,6 +74,7 @@ export function MealPlannerMobile(props: Props) {
       ? recipe.id === selectedMeal.recipeId
       : recipe.name.toLowerCase() === selectedMeal?.name.toLowerCase());
   const [editing, setEditing] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
   const [smartOpen, setSmartOpen] = useState(false);
   const [appliances, setAppliances] = useState<KitchenAppliance[]>(defaultKitchenAppliances);
   const [draft, setDraft] = useState<KitchenMeal>(selectedMeal ?? emptyMeal());
@@ -90,7 +93,9 @@ export function MealPlannerMobile(props: Props) {
     });
     setEditing(false);
   }
-  function beginEdit() { setDraft(selectedMeal ? { ...selectedMeal } : emptyMeal()); setEditing(true); }
+  function beginEdit() {
+    setDraft(selectedMeal ? { ...selectedMeal } : emptyMeal()); setBookOpen(false); setEditing(true);
+  }
   function selectRecipe(recipeId: string) {
     const recipe = props.snapshot.recipes.find((item) => item.id === recipeId);
     if (!recipe) { setDraft((current) => ({ ...current, recipeId: null })); return; }
@@ -98,7 +103,7 @@ export function MealPlannerMobile(props: Props) {
       note: recipe.instructions, imageIndex: 0, recipeId: recipe.id });
   }
   function save(event: FormEvent) {
-    event.preventDefault(); if (!draft.name.trim()) return;
+    event.preventDefault(); if (bookOpen || props.busy || !props.online || !draft.name.trim()) return;
     void props.mutate({ operation: "SET_MEAL", date: selectedDate,
       meal: { ...draft, name: draft.name.trim(), note: draft.note.trim() } })
       .then((value) => { if (value) setEditing(false); });
@@ -161,6 +166,8 @@ export function MealPlannerMobile(props: Props) {
         <div className="meal-actions">
           <button type="button" disabled={!props.online || props.busy} onClick={beginEdit}>
             {selectedMeal ? "Edit meal" : "Add meal"}</button>
+          <button type="button" disabled={!props.online || props.busy}
+            onClick={() => { beginEdit(); setBookOpen(true); }}>My recipe book</button>
           {selectedMeal ? <button type="button" disabled={!props.online || props.busy}
             onClick={() => void props.mutate({ operation: "SET_MEAL", date: selectedDate, meal: null })}>Clear</button> : null}
           <select aria-label="Move or swap meal" disabled={!props.online || props.busy} defaultValue=""
@@ -174,12 +181,14 @@ export function MealPlannerMobile(props: Props) {
     </div>
     {editing ? <div className="planning-overlay" role="presentation"><form className="planning-dialog meal-editor"
       onSubmit={save} aria-label="Edit planned meal"><header><div><small>Meal planner</small>
-        <h2>{selectedMeal ? "Edit meal" : "Add meal"}</h2></div>
+        <h2>{bookOpen ? "Choose a meal" : selectedMeal ? "Edit meal" : "Add meal"}</h2></div>
         <button type="button" onClick={() => setEditing(false)}>×</button></header>
-      <label>Saved recipe<select value={draft.recipeId ?? ""}
-        onChange={(event) => selectRecipe(event.target.value)}><option value="">Custom meal</option>
-        {props.snapshot.recipes.map((recipe) => <option key={recipe.id}
-          value={recipe.id}>{recipe.name}</option>)}</select></label>
+      {bookOpen ? <RecipeBookPicker recipes={props.snapshot.recipes} disabled={props.busy || !props.online}
+        onBack={() => setBookOpen(false)}
+        onChoose={recipe => { selectRecipe(recipe.id); setBookOpen(false); }}
+        manageRecipes={props.onManageRecipes ? <button type="button" onClick={props.onManageRecipes}>
+          Add or manage recipes</button> : undefined} /> : <>
+      <button type="button" onClick={() => setBookOpen(true)}>My recipe book</button>
       <label>Meal name<input value={draft.name} maxLength={160} required
         onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} /></label>
       <div className="planning-field-pair"><label>Cooking time<input value={draft.cookTime} maxLength={80}
@@ -189,7 +198,8 @@ export function MealPlannerMobile(props: Props) {
             servings: Number(event.target.value) || 1 }))} /></label></div>
       <label>Notes<textarea rows={5} value={draft.note} maxLength={2_000}
         onChange={(event) => setDraft((current) => ({ ...current, note: event.target.value }))} /></label>
-      <button className="planning-primary" type="submit">Save meal</button></form></div> : null}
+      <button className="planning-primary" type="submit" disabled={props.busy || !props.online}>Save meal</button>
+      </>}</form></div> : null}
     {smartOpen ? <SmartMealPlanner busy={props.busy} dates={dates} online={props.online}
       recipes={props.snapshot.recipes} initialAppliances={appliances}
       onClose={() => setSmartOpen(false)}
