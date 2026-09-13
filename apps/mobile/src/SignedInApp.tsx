@@ -58,7 +58,8 @@ export function SignedInApp({
   useNativeShareNavigation(openSharedImport);
   const openAppointments = useCallback(() => { setRoomId("bedroom"); setDestination("HOME"); }, []);
   const openRecaps = useCallback((kind: "daily" | "weekly") => { setRecapKind(kind); setRoomId(null); setDestination("RECAPS"); }, []);
-  useAppointmentNotifications(state.session.access_token, openAppointments, openRecaps);
+  const openGroceries = useCallback(() => { setRoomId(null); setDestination("KITCHEN_GROCERIES"); }, []);
+  useAppointmentNotifications(state.session.access_token, openAppointments, openRecaps, openGroceries);
   if (inviteToken) return <HouseholdInviteScreen accessToken={state.session.access_token}
     token={inviteToken} onClose={onInviteHandled}
     onAccepted={() => { onInviteHandled(); setDestination("FAMILY"); }} />;

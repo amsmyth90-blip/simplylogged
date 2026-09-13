@@ -68,7 +68,7 @@ export async function sendAppointmentPush(device: { platform: string; token: str
   return sendDiaryDockPush(device, job.id, body, "appointments");
 }
 
-export async function sendDiaryDockPush(device: { platform: string; token: string }, id: string, body: string, route: "appointments" | "recaps" | "recaps-weekly") {
+export async function sendDiaryDockPush(device: { platform: string; token: string }, id: string, body: string, route: "appointments" | "recaps" | "recaps-weekly" | "groceries") {
   if (!pushConfigured(device.platform)) throw new PushDeliveryError();
   if (device.platform === "ios") return apple(device.token, id, body, route);
   const response = await fetch(`https://fcm.googleapis.com/v1/projects/${encodeURIComponent(process.env.FCM_PROJECT_ID!)}/messages:send`, {

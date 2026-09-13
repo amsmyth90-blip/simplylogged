@@ -1,0 +1,31 @@
+.grocery-panel {max-width:1200px;margin:auto;color:#263e30;font:15px/1.5 system-ui,sans-serif;}
+.grocery-panel * {box-sizing:border-box;}
+.grocery-panel h1 {font:650 30px/1.2 system-ui,sans-serif;margin:0;}
+.grocery-panel h2 {font:600 19px/1.3 system-ui,sans-serif;margin:0 0 12px;}
+.grocery-panel p {margin:5px 0 12px;}
+.grocery-panel>header,.grocery-panel article>header,.grocery-stock article,.grocery-stock nav {display:flex;gap:12px;align-items:center;justify-content:space-between;}
+.grocery-panel>header {margin-bottom:18px;}
+.grocery-layout {display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grocery-capture,.grocery-stock,.grocery-review article {background:#fff;border:1px solid #d5dfd3;border-radius:16px;padding:18px;min-width:0;}
+.grocery-panel button {min-height:44px;padding:10px 14px;background:#edf3e9;border:1px solid #bacbb6;border-radius:10px;color:#263e30;font:600 13px/1.3 system-ui,sans-serif;cursor:pointer;}
+.grocery-panel button:disabled {opacity:.5;cursor:default;}
+.grocery-panel button:active:not(:disabled) {transform:translateY(1px);}
+.grocery-panel :is(button,input,select):focus-visible {outline:3px solid #719064;outline-offset:2px;}
+.grocery-actions {display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;}
+.grocery-small {font-size:13px;color:#53675c;}
+.grocery-message,.grocery-warning {padding:10px;border-radius:8px;background:#fff3d8;color:#6d4c10;}
+.grocery-stock article {padding:10px 0;border-bottom:1px solid #e4e9e1;}
+.grocery-stock article p {margin:2px 0;font-size:13px;}
+.grocery-stock article strong {overflow-wrap:anywhere;}
+.grocery-stock article button {flex:none;}
+.grocery-stock nav {margin-top:12px;}
+.grocery-review-section {margin-top:20px;}
+.grocery-review {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.grocery-review label {display:grid;gap:5px;margin-top:10px;font-size:13px;}
+.grocery-review input,.grocery-review select {width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid #bdcbbd;border-radius:8px;background:#fff;color:#263e30;font:16px system-ui,sans-serif;}
+.grocery-fields {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grocery-review article p {font-size:13px;margin-top:10px;}
+.grocery-confirm {display:flex;align-items:center;gap:10px;margin:16px 0;}
+.grocery-confirm input {width:22px;height:22px;flex:none;}
+.grocery-review-section>button {margin:0 8px 8px 0;}
+@media(max-width:700px){.grocery-layout,.grocery-review{grid-template-columns:1fr}.grocery-panel h1{font-size:25px}.grocery-capture,.grocery-stock{padding:14px}}

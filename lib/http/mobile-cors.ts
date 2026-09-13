@@ -9,7 +9,7 @@ const allowedOrigins = new Set([
 export function mobileCorsHeaders(request: Request) {
   const origin = request.headers.get("origin");
   const headers = new Headers({
-    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Grocery-Consent",
     "Access-Control-Expose-Headers": "Content-Disposition, Content-Length, Retry-After, Server-Timing, X-Content-SHA256, X-Request-Id",
     "Access-Control-Allow-Methods": "DELETE, GET, POST, OPTIONS",
     "Access-Control-Max-Age": "600",

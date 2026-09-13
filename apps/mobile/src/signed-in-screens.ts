@@ -140,3 +140,9 @@ export const TrustedAccessScreen = lazy(() =>
     default: module.TrustedAccessScreen,
   })),
 );
+
+export const GroceriesScreen = lazy(() =>
+  import("@mobile/kitchen/GroceriesScreen").then((module) => ({
+    default: module.GroceriesScreen,
+  })),
+);

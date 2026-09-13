@@ -1,7 +1,7 @@
 import type { OfflineStore } from "@diarydock/offline-store";
 
 import type { MobileDestination } from "@mobile/components/MobileBottomNav";
-import { KitchenCalendarScreen, KitchenNoticeboardScreen,
+import { GroceriesScreen, KitchenCalendarScreen, KitchenNoticeboardScreen,
   KitchenPlanningScreen, KitchenScreen } from "@mobile/signed-in-screens";
 
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
 };
 
 export function SignedInKitchen(props: Props) {
+  if (props.destination === "KITCHEN_GROCERIES") return <GroceriesScreen accessToken={props.accessToken} onBack={() => props.onNavigate("KITCHEN")} onReminders={() => props.onNavigate("REMINDERS")} />;
   if (props.destination === "KITCHEN") return <KitchenScreen
     accessToken={props.accessToken} store={props.store} syncStatus={props.syncStatus}
     onBack={props.onBackToRoom} onNavigate={props.onNavigate} />;
