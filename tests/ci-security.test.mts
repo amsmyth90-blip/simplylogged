@@ -45,10 +45,40 @@ test("security workflows use immutable first-party actions and narrow permission
 
 test("Dependabot maintains application and workflow dependencies", async () => {
   const source = await readFile(new URL("../.github/dependabot.yml", import.meta.url), "utf8");
-  const config = parse(source) as { updates?: Array<Record<string, unknown>> };
+  const config = parse(source) as {
+    updates?: Array<{
+      "package-ecosystem"?: string;
+      directory?: string;
+      "open-pull-requests-limit"?: number;
+      groups?: Record<
+        string,
+        {
+          patterns?: string[];
+          "update-types"?: string[];
+        }
+      >;
+    }>;
+  };
   assert.deepEqual(config.updates?.map((item) => item["package-ecosystem"]), [
     "github-actions",
     "npm",
   ]);
   assert.ok(config.updates?.every((item) => item.directory === "/"));
+
+  for (const update of config.updates ?? []) {
+    assert.ok(
+      (update["open-pull-requests-limit"] ?? Number.POSITIVE_INFINITY) <= 2,
+      `${update["package-ecosystem"]} must cap simultaneous update pull requests at two`,
+    );
+    assert.ok(
+      Object.values(update.groups ?? {}).some((group) => group.patterns?.includes("*")),
+      `${update["package-ecosystem"]} must group compatible updates to avoid duplicate checks`,
+    );
+  }
+
+  const npm = config.updates?.find((item) => item["package-ecosystem"] === "npm");
+  assert.deepEqual(npm?.groups?.["routine-compatible-updates"]?.["update-types"], [
+    "minor",
+    "patch",
+  ]);
 });
