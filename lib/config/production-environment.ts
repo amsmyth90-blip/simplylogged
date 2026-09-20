@@ -86,6 +86,14 @@ export function inspectProductionRuntimeEnvironment(environment: EnvironmentSour
   const scannerRequired = value(environment, "DIARYDOCK_CAPTURE_SCANNER_REQUIRED");
   const scannerUrl = value(environment, "DIARYDOCK_MALWARE_SCANNER_URL");
   const scannerToken = value(environment, "DIARYDOCK_MALWARE_SCANNER_TOKEN");
+  const distributedRateLimitRequired = value(environment, "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED");
+  const upstashCredentialsPresent = Boolean(value(environment, "UPSTASH_REDIS_REST_URL")
+    || value(environment, "UPSTASH_REDIS_REST_TOKEN"));
+  const redisUrlKey = upstashCredentialsPresent ? "UPSTASH_REDIS_REST_URL" : "KV_REST_API_URL";
+  const redisTokenKey = upstashCredentialsPresent ? "UPSTASH_REDIS_REST_TOKEN" : "KV_REST_API_TOKEN";
+  const redisUrl = value(environment, redisUrlKey);
+  const redisToken = value(environment, redisTokenKey);
+  const rateLimitNamespace = value(environment, "DIARYDOCK_RATE_LIMIT_NAMESPACE");
 
   if (!httpsOriginIsValid(supabaseUrl)) {
     issues.push(issue("NEXT_PUBLIC_SUPABASE_URL", "must be a credential-free HTTPS origin"));
@@ -110,8 +118,28 @@ export function inspectProductionRuntimeEnvironment(environment: EnvironmentSour
       issues.push(issue("DIARYDOCK_MALWARE_SCANNER_TOKEN", "must contain 32 to 512 characters"));
     }
   }
-  if ([serviceKey, cursorSecret, scannerToken].filter(Boolean).length
-    !== new Set([serviceKey, cursorSecret, scannerToken].filter(Boolean)).size) {
+  if (distributedRateLimitRequired !== "true" && distributedRateLimitRequired !== "false") {
+    issues.push(issue(
+      "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED",
+      "must be explicitly true or false",
+    ));
+  }
+  if (distributedRateLimitRequired === "true" || redisUrl || redisToken) {
+    if (!httpsOriginIsValid(redisUrl)) {
+      issues.push(issue(redisUrlKey, "must be a credential-free HTTPS origin"));
+    }
+    if (redisToken.length < 20 || redisToken.length > 2_048) {
+      issues.push(issue(redisTokenKey, "must contain 20 to 2,048 characters"));
+    }
+    if (!/^[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$/.test(rateLimitNamespace)) {
+      issues.push(issue(
+        "DIARYDOCK_RATE_LIMIT_NAMESPACE",
+        "must contain 1 to 32 lowercase letters, numbers or interior hyphens",
+      ));
+    }
+  }
+  if ([serviceKey, cursorSecret, scannerToken, redisToken].filter(Boolean).length
+    !== new Set([serviceKey, cursorSecret, scannerToken, redisToken].filter(Boolean)).size) {
     issues.push(issue("server secrets", "must use separate credentials for separate trust boundaries"));
   }
   return issues;
@@ -122,6 +150,8 @@ export function inspectProductionReleaseEnvironment(environment: EnvironmentSour
   const deletionToken = value(environment, "ACCOUNT_DELETION_ADMIN_TOKEN");
   const cronSecret = value(environment, "CRON_SECRET");
   const inboundReady = value(environment, "DIARYDOCK_INBOUND_EMAIL_PROVIDER_READY");
+  const distributedRateLimitRequired = value(environment, "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED");
+  const rateLimitNamespace = value(environment, "DIARYDOCK_RATE_LIMIT_NAMESPACE");
 
   if (!secretIsValid(deletionToken)) {
     issues.push(issue("ACCOUNT_DELETION_ADMIN_TOKEN", "must contain 32 to 512 characters"));
@@ -137,6 +167,18 @@ export function inspectProductionReleaseEnvironment(environment: EnvironmentSour
   }
   if (inboundReady !== "true" && inboundReady !== "false") {
     issues.push(issue("DIARYDOCK_INBOUND_EMAIL_PROVIDER_READY", "must be explicitly true or false"));
+  }
+  if (distributedRateLimitRequired === "false") {
+    issues.push(issue(
+      "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED",
+      "must be true for production releases",
+    ));
+  }
+  if (rateLimitNamespace !== "production") {
+    issues.push(issue(
+      "DIARYDOCK_RATE_LIMIT_NAMESPACE",
+      "must be production for production releases",
+    ));
   }
   if (inboundReady === "true") {
     for (const key of ["RESEND_API_KEY", "RESEND_WEBHOOK_SECRET", "DIARYDOCK_INBOUND_EMAIL_SECRET"]) {

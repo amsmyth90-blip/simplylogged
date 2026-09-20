@@ -58,6 +58,9 @@ test("health checks are bounded and never return dependency error details", asyn
   assert.match(ready, /AbortController/);
   assert.match(ready, /TIMEOUT_MS = 3_000/);
   assert.match(ready, /inspectProductionRuntimeEnvironment/);
+  assert.match(ready, /distributedRateLimitReady/);
+  assert.match(ready, /select\("key_hash"\)/);
+  assert.doesNotMatch(ready, /select\("bucket_key"\)/);
   assert.match(ready, /status: "unavailable"/);
   assert.doesNotMatch(ready, /error\.message|String\(.*error/);
 });

@@ -1,5 +1,10 @@
 import "server-only";
 
+import {
+  checkDistributedRateLimit,
+  selectServerRateLimitBackend,
+  type ServerRateLimitResult,
+} from "@/lib/distributed-rate-limit";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 import {
   checkRateLimit,
@@ -13,7 +18,16 @@ export { createRateLimitKey, getForwardedClientIp };
 export async function checkServerRateLimit(
   key: string,
   options: { limit: number; windowMs: number },
-) {
+): Promise<ServerRateLimitResult> {
+  const backend = selectServerRateLimitBackend();
+  if (backend === "distributed") {
+    return await checkDistributedRateLimit(key, options)
+      ?? { allowed: false, remaining: 0, retryAfterSeconds: 60, unavailable: true };
+  }
+  if (backend === "unavailable") {
+    return { allowed: false, remaining: 0, retryAfterSeconds: 60, unavailable: true };
+  }
+
   if (!isSupabaseAdminConfigured()) {
     if (process.env.NODE_ENV === "production") {
       return { allowed: false, remaining: 0, retryAfterSeconds: 60 };

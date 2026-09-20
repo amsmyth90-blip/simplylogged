@@ -8,7 +8,7 @@ import type {
 } from "../packages/offline-store/src/types.ts";
 import { SyncEngine } from "../apps/mobile/src/sync/sync-engine.ts";
 import { syncRetryDelaySeconds } from "../apps/mobile/src/sync/retry-policy.ts";
-import { nextBackgroundSyncDelay } from "../apps/mobile/src/sync/sync-schedule.ts";
+import { nextBackgroundSyncDelay, nextWakeSyncDelay } from "../apps/mobile/src/sync/sync-schedule.ts";
 import { SyncTransportError } from "../apps/mobile/src/sync/transport-error.ts";
 
 const mutation: PendingMutation = {
@@ -131,6 +131,29 @@ test("a failed push releases the claimed batch with a bounded retry time", async
   assert.match(released.retryAfter ?? "", /^\d{4}-\d{2}-\d{2}T/);
 });
 
+test("idle sync performs one pull instead of issuing a redundant second read", async () => {
+  let pullCount = 0;
+  const store = fakeStore({ claimPendingBatch: async () => [] });
+  const transport = {
+    pull: async () => {
+      pullCount += 1;
+      return {
+        apiVersion: SYNC_API_VERSION,
+        records: [],
+        nextCursor: "cursor",
+        hasMore: false,
+        activeHouseholdId: null,
+      };
+    },
+    push: async () => { throw new Error("idle sync must not push"); },
+  };
+  const engine = new SyncEngine(store, transport, async () => "f330a7d2-8ef1-4f6e-a6ec-118ea3a14f51");
+
+  await engine.synchronize("a".repeat(32));
+
+  assert.equal(pullCount, 1);
+});
+
 test("sync retry timing honours the server and adds bounded exponential jitter", () => {
   assert.equal(syncRetryDelaySeconds(new SyncTransportError("Busy", 429, 45), 1), 45);
   assert.equal(syncRetryDelaySeconds(new Error("Offline"), 1, () => 0), 5);
@@ -142,4 +165,7 @@ test("background sync is staggered to avoid fleet-wide request spikes", () => {
   assert.equal(nextBackgroundSyncDelay(() => 0), 4 * 60_000);
   assert.equal(nextBackgroundSyncDelay(() => 0.5), 5 * 60_000);
   assert.equal(nextBackgroundSyncDelay(() => 1), 6 * 60_000);
+  assert.equal(nextWakeSyncDelay(() => 0), 0);
+  assert.equal(nextWakeSyncDelay(() => 0.5), 15_000);
+  assert.equal(nextWakeSyncDelay(() => 1), 30_000);
 });

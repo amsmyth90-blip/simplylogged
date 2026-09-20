@@ -60,11 +60,13 @@ export class SyncEngine {
     const summary: SyncSummary = { pulled: 0, pushed: 0, conflicts: 0 };
     await this.pullPages(accessToken, summary);
     const deviceId = await this.deviceId();
+    let sentMutations = false;
 
     for (let batchNumber = 0; batchNumber < 10; batchNumber += 1) {
       const batchId = crypto.randomUUID();
       const pending = await this.store.claimPendingBatch(batchId, 100);
       if (!pending.length) break;
+      sentMutations = true;
       try {
         const response = await this.transport.push(accessToken, {
           apiVersion: SYNC_API_VERSION,
@@ -82,7 +84,9 @@ export class SyncEngine {
       }
     }
 
-    await this.pullPages(accessToken, summary);
+    // A second read is only useful after a write. Idle clients otherwise double
+    // the fleet-wide polling load without observing any additional local change.
+    if (sentMutations) await this.pullPages(accessToken, summary);
     return summary;
   }
 
