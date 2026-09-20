@@ -8,7 +8,7 @@ import { UploadTransportError } from "@mobile/capture/upload-transport-error";
 import { getDeviceId } from "@mobile/platform/device-id";
 
 import { HttpSyncClient, SyncTransportError } from "./http-sync-client";
-import { nextBackgroundSyncDelay } from "./sync-schedule";
+import { nextBackgroundSyncDelay, nextWakeSyncDelay } from "./sync-schedule";
 import { SyncEngine } from "./sync-engine";
 
 export type BackgroundSyncStatus = "OFFLINE" | "READY" | "SIGN_IN_REQUIRED" | "SYNCING";
@@ -42,27 +42,44 @@ export function useBackgroundSync(store: OfflineStore, session: Session) {
 
   useEffect(() => {
     let cancelled = false;
-    let timer: number | null = null;
-    const schedule = () => {
+    let backgroundTimer: number | null = null;
+    let wakeTimer: number | null = null;
+    const scheduleBackground = () => {
       if (cancelled) return;
-      timer = window.setTimeout(async () => {
+      if (backgroundTimer !== null) window.clearTimeout(backgroundTimer);
+      backgroundTimer = window.setTimeout(async () => {
+        backgroundTimer = null;
         if (document.visibilityState === "visible") await synchronize();
-        schedule();
+        scheduleBackground();
       }, nextBackgroundSyncDelay());
     };
-    const onOnline = () => void synchronize();
-    const onOffline = () => setStatus("OFFLINE");
+    const scheduleWake = () => {
+      if (cancelled || !navigator.onLine) return;
+      if (wakeTimer !== null) window.clearTimeout(wakeTimer);
+      wakeTimer = window.setTimeout(async () => {
+        wakeTimer = null;
+        if (document.visibilityState === "visible") await synchronize();
+        scheduleBackground();
+      }, nextWakeSyncDelay());
+    };
+    const onOnline = () => scheduleWake();
+    const onOffline = () => {
+      if (wakeTimer !== null) window.clearTimeout(wakeTimer);
+      wakeTimer = null;
+      setStatus("OFFLINE");
+    };
     const onVisibility = () => {
-      if (document.visibilityState === "visible") void synchronize();
+      if (document.visibilityState === "visible") scheduleWake();
     };
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
     document.addEventListener("visibilitychange", onVisibility);
-    void synchronize().finally(schedule);
+    scheduleWake();
 
     return () => {
       cancelled = true;
-      if (timer !== null) window.clearTimeout(timer);
+      if (backgroundTimer !== null) window.clearTimeout(backgroundTimer);
+      if (wakeTimer !== null) window.clearTimeout(wakeTimer);
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
       document.removeEventListener("visibilitychange", onVisibility);
