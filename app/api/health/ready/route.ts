@@ -1,5 +1,6 @@
 import { healthResponse } from "@/lib/observability/health-response";
 import { inspectProductionRuntimeEnvironment } from "@/lib/config/production-environment";
+import { distributedRateLimitReady } from "@/lib/distributed-rate-limit";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ async function databaseReady() {
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const result = await getSupabaseAdminClient().from("rate_limit_buckets")
-      .select("bucket_key")
+      .select("key_hash")
       .limit(1)
       .abortSignal(controller.signal);
     return !result.error;
@@ -30,8 +31,19 @@ function configurationReady() {
 }
 
 export async function GET(request: Request) {
-  const ready = configurationReady() && await databaseReady();
+  const configuration = configurationReady();
+  const [database, distributedRateLimit] = configuration
+    ? await Promise.all([databaseReady(), distributedRateLimitReady(process.env, TIMEOUT_MS)])
+    : [false, false];
+  const checks = { configuration, database, distributedRateLimit };
+  const ready = Object.values(checks).every(Boolean);
   return ready
-    ? healthResponse(request, "/api/health/ready", { status: "ready" })
-    : healthResponse(request, "/api/health/ready", { status: "unavailable" }, 503, "dependency-unavailable");
+    ? healthResponse(request, "/api/health/ready", { status: "ready", checks })
+    : healthResponse(
+      request,
+      "/api/health/ready",
+      { status: "unavailable", checks },
+      503,
+      "dependency-unavailable",
+    );
 }

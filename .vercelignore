@@ -2,3 +2,16 @@
 node_modules/
 promo-video/
 public/promo-video/
+.env*
+.qa-*/
+tmp/
+output/
+*.log
+.git/
+.codex/
+.claude/
+supabase/.temp/
+ios/
+android/
+apps/*/dist/
+services/*/dist/

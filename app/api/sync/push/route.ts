@@ -9,7 +9,7 @@ import { mobileCorsHeaders, mobilePreflight } from "@/lib/http/mobile-cors";
 import { SyncObservation } from "@/lib/observability/sync-observation";
 import { checkServerRateLimit, createRateLimitKey } from "@/lib/rate-limit-server";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
-import { authenticateApiRequest } from "@/lib/supabase/request";
+import { authenticateSyncApiRequest } from "@/lib/supabase/request";
 
 export const runtime = "nodejs";
 
@@ -22,7 +22,7 @@ export function OPTIONS(request: Request) {
 export async function POST(request: Request) {
   const observation = new SyncObservation("push", request);
   const headers = mobileCorsHeaders(request);
-  const auth = await authenticateApiRequest(request);
+  const auth = await authenticateSyncApiRequest(request);
   if (auth.error === "UNAVAILABLE") {
     observation.finish(headers, { outcome: "auth-unavailable", status: 503 });
     return NextResponse.json({ error: "Secure sync is unavailable." }, { status: 503, headers });
@@ -36,6 +36,10 @@ export async function POST(request: Request) {
     limit: 120,
     windowMs: 5 * 60_000,
   });
+  if (rate.unavailable) {
+    observation.finish(headers, { outcome: "rate-limit-unavailable", status: 503 });
+    return NextResponse.json({ error: "Secure sync is temporarily unavailable." }, { status: 503, headers });
+  }
   if (!rate.allowed) {
     headers.set("Retry-After", String(rate.retryAfterSeconds));
     observation.finish(headers, { outcome: "rate-limited", status: 429 });

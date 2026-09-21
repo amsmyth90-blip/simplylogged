@@ -18,6 +18,7 @@ const migrationNames = [
   "20260904213000_household_reminder_scope.sql",
   "20260904214000_household_reminder_mutations.sql",
   "20260904215000_preserve_household_reminders_on_deletion.sql",
+  "20260919190000_sync_pull_page.sql",
 ] as const;
 
 const bootstrapSql = String.raw`

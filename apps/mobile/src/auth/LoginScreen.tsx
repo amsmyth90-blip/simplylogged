@@ -46,7 +46,7 @@ export function LoginScreen({ error, message, onCreateAccount, onForgotPassword,
     <main className="login-shell" style={background}>
       <section className="login-panel" aria-labelledby="login-title">
         <header className="login-header">
-          <p className="login-wordmark">DiaryDock</p>
+          <p className="login-wordmark"><span className="login-logo-mark" aria-hidden="true" />DiaryDock</p>
           <h1 id="login-title">Welcome back</h1>
           <span className="login-ornament" aria-hidden="true" />
         </header>

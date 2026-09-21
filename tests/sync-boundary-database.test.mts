@@ -12,6 +12,8 @@ import {
 } from "./support/sync-database-fixture.mts";
 
 const userId = "11111111-1111-4111-8111-111111111111";
+const otherUserId = "22222222-2222-4222-8222-222222222222";
+const householdId = "33333333-3333-4333-8333-333333333333";
 
 function request(entityType: string, seed: number) {
   const suffix = String(seed).padStart(12, "0");
@@ -165,6 +167,47 @@ test("the sync database caps retained idempotency work atomically", async () => 
       [userId],
     );
     assert.equal(retained.rows[0]?.count, 10000);
+  } finally {
+    await database.close();
+  }
+});
+
+test("pull_sync_page returns only rows admitted by sync RLS", async () => {
+  const database = await createSyncDatabase();
+  try {
+    await database.query("insert into auth.users(id) values ($1), ($2)", [userId, otherUserId]);
+    await database.query("insert into public.households(id, owner_id) values ($1, $2)", [householdId, userId]);
+    await database.query(
+      `insert into public.household_memberships(household_id, user_id, role, status)
+       values ($1, $2, 'owner', 'active')`,
+      [householdId, userId],
+    );
+    await database.query(
+      `insert into public.sync_records(
+        record_id, entity_type, owner_id, source_id, scope_kind, scope_id,
+        revision, schema_version, payload, change_sequence
+      ) values
+        ('40000000-0000-4000-8000-000000000001', 'reminder', $1, 'private-current', 'USER', $1, 1, 1, '{"title":"mine"}', 101),
+        ('40000000-0000-4000-8000-000000000002', 'reminder', $2, 'household-shared', 'HOUSEHOLD', $3, 1, 1, '{"title":"shared"}', 102),
+        ('40000000-0000-4000-8000-000000000003', 'reminder', $2, 'private-other', 'USER', $2, 1, 1, '{"title":"hidden"}', 103)`,
+      [userId, otherUserId, householdId],
+    );
+
+    await setAuthenticatedUser(database, userId);
+    const result = await database.query<{ page: {
+      active_household_id: string | null;
+      household_joined_at: string | null;
+      records: Array<{ record_id: string; change_sequence: string }>;
+    } }>("select public.pull_sync_page(0, 251) as page");
+    const page = result.rows[0]?.page;
+
+    assert.equal(page?.active_household_id, householdId);
+    assert.ok(page?.household_joined_at);
+    assert.deepEqual(page?.records.map((record) => record.record_id), [
+      "40000000-0000-4000-8000-000000000001",
+      "40000000-0000-4000-8000-000000000002",
+    ]);
+    assert.deepEqual(page?.records.map((record) => record.change_sequence), ["101", "102"]);
   } finally {
     await database.close();
   }

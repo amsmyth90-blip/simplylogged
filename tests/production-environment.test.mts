@@ -15,6 +15,10 @@ const validEnvironment: EnvironmentSource = {
   DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "true",
   DIARYDOCK_MALWARE_SCANNER_URL: "https://scanner.internal.example/v1/scan",
   DIARYDOCK_MALWARE_SCANNER_TOKEN: "scanner-credential-that-is-long-enough-01",
+  DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED: "true",
+  DIARYDOCK_RATE_LIMIT_NAMESPACE: "production",
+  UPSTASH_REDIS_REST_URL: "https://diarydock-rate-limit.upstash.io",
+  UPSTASH_REDIS_REST_TOKEN: "redis-credential-that-is-long-enough-01",
   ACCOUNT_DELETION_ADMIN_TOKEN: "deletion-credential-that-is-long-enough-01",
   CRON_SECRET: "cron-credential-that-is-long-enough-0001",
   ACCOUNT_DELETION_ADMIN_EMAILS: "security@example.com",
@@ -27,7 +31,7 @@ test("production runtime configuration accepts distinct bounded credentials", ()
   assert.deepEqual(inspectProductionReleaseEnvironment(validEnvironment), []);
 });
 
-test("production runtime configuration accepts an explicit scanner waiver", () => {
+test("production runtime can use an explicit scanner waiver outside release builds", () => {
   const environment = {
     ...validEnvironment,
     DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "false",
@@ -35,7 +39,9 @@ test("production runtime configuration accepts an explicit scanner waiver", () =
     DIARYDOCK_MALWARE_SCANNER_TOKEN: "",
   };
   assert.deepEqual(inspectProductionRuntimeEnvironment(environment), []);
-  assert.deepEqual(inspectProductionReleaseEnvironment(environment), []);
+  assert.deepEqual(inspectProductionReleaseEnvironment(environment).map(({ key }) => key), [
+    "DIARYDOCK_CAPTURE_SCANNER_REQUIRED",
+  ]);
 });
 
 test("production runtime configuration rejects public server keys and unsafe endpoints", () => {
@@ -56,6 +62,50 @@ test("production runtime configuration rejects an ambiguous scanner mode", () =>
     DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "sometimes",
   });
   assert.deepEqual(issues.map(({ key }) => key), ["DIARYDOCK_CAPTURE_SCANNER_REQUIRED"]);
+});
+
+test("production release configuration requires the distributed limiter", () => {
+  const issues = inspectProductionReleaseEnvironment({
+    ...validEnvironment,
+    DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED: "false",
+    UPSTASH_REDIS_REST_URL: "",
+    UPSTASH_REDIS_REST_TOKEN: "",
+  });
+  assert.deepEqual(issues.map(({ key }) => key), [
+    "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED",
+  ]);
+});
+
+test("production runtime configuration rejects incomplete distributed credentials", () => {
+  const issues = inspectProductionRuntimeEnvironment({
+    ...validEnvironment,
+    UPSTASH_REDIS_REST_URL: "http://redis.example.com/path?token=visible",
+    UPSTASH_REDIS_REST_TOKEN: "short",
+  });
+  assert.deepEqual(issues.map(({ key }) => key), [
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+  ]);
+});
+
+test("production runtime accepts legacy Vercel Redis credentials", () => {
+  const environment = {
+    ...validEnvironment,
+    UPSTASH_REDIS_REST_URL: "",
+    UPSTASH_REDIS_REST_TOKEN: "",
+    KV_REST_API_URL: "https://diarydock-rate-limit.upstash.io",
+    KV_REST_API_TOKEN: "redis-credential-that-is-long-enough-01",
+  };
+  assert.deepEqual(inspectProductionRuntimeEnvironment(environment), []);
+  assert.deepEqual(inspectProductionReleaseEnvironment(environment), []);
+});
+
+test("production release requires an isolated production namespace", () => {
+  const issues = inspectProductionReleaseEnvironment({
+    ...validEnvironment,
+    DIARYDOCK_RATE_LIMIT_NAMESPACE: "staging",
+  });
+  assert.deepEqual(issues.map(({ key }) => key), ["DIARYDOCK_RATE_LIMIT_NAMESPACE"]);
 });
 
 test("release configuration requires complete enabled inbound-email credentials", () => {
