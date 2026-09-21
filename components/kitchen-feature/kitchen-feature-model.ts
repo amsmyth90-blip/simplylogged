@@ -26,12 +26,11 @@ export const calendarCategories: Array<{
   icon: "calendar" | "briefcase" | "leaf" | "users";
   surface: string;
   iconSurface: string;
-  examples: Array<{ title: string; time: string }>;
 }> = [
-  { id: "appointments", label: "Appointments", icon: "calendar", surface: "border-[#cfdfc8]", iconSurface: "bg-[#e6f0e1] text-[#5f7855]", examples: [{ title: "Dentist", time: "10:30" }, { title: "Eye test", time: "14:00" }] },
-  { id: "school", label: "School", icon: "briefcase", surface: "border-[#ead7c5]", iconSurface: "bg-[#f5e8dc] text-[#9a6a47]", examples: [{ title: "School pickup", time: "15:15" }, { title: "Parent meeting", time: "18:00" }] },
-  { id: "meals", label: "Meals", icon: "leaf", surface: "border-[#e7d8b9]", iconSurface: "bg-[#f4ead3] text-[#96743d]", examples: [{ title: "Family dinner", time: "18:30" }, { title: "Plan tomorrow", time: "19:30" }] },
-  { id: "family", label: "Family", icon: "users", surface: "border-[#cfddea]", iconSurface: "bg-[#e3edf5] text-[#567795]", examples: [{ title: "Movie night", time: "20:00" }, { title: "Call Grandma", time: "17:00" }] },
+  { id: "appointments", label: "Appointments", icon: "calendar", surface: "border-[#cfdfc8]", iconSurface: "bg-[#e6f0e1] text-[#5f7855]" },
+  { id: "school", label: "School", icon: "briefcase", surface: "border-[#ead7c5]", iconSurface: "bg-[#f5e8dc] text-[#9a6a47]" },
+  { id: "meals", label: "Meals", icon: "leaf", surface: "border-[#e7d8b9]", iconSurface: "bg-[#f4ead3] text-[#96743d]" },
+  { id: "family", label: "Family", icon: "users", surface: "border-[#cfddea]", iconSurface: "bg-[#e3edf5] text-[#567795]" },
 ];
 
 export const dayPositions = [

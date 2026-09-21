@@ -158,9 +158,6 @@ export function FamilyCalendar() {
               const categoryEvents = selectedEvents.filter(
                 (event) => event.category === category.id,
               );
-              const previewEvents = categoryEvents.length
-                ? categoryEvents
-                : category.examples;
               return (
                 <button
                   key={category.id}
@@ -183,7 +180,7 @@ export function FamilyCalendar() {
                     />
                   </span>
                   <span className="flex flex-1 flex-col px-2.5 py-1.5">
-                    {previewEvents.slice(0, 2).map((event, index) => (
+                    {categoryEvents.slice(0, 2).map((event, index) => (
                       <span
                         key={`${event.title}-${index}`}
                         className="flex items-center gap-1.5 border-b border-slate-100 py-1 text-[9px] last:border-0"
@@ -196,10 +193,15 @@ export function FamilyCalendar() {
                         </span>
                       </span>
                     ))}
+                    {!categoryEvents.length ? (
+                      <span className="flex flex-1 items-center text-[10px] text-slate-400">
+                        Nothing planned
+                      </span>
+                    ) : null}
                     <span className="mt-auto pt-1 text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
                       {categoryEvents.length
                         ? `${categoryEvents.length} planned`
-                        : `View all for ${selected}`}
+                        : `Add for ${selected}`}
                     </span>
                   </span>
                 </button>
