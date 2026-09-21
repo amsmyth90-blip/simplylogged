@@ -27,20 +27,23 @@ async function generateIosAssets(icon, splash) {
   ].map((name) => writeFile(path.join(splashDirectory, name), splash)));
 }
 
-async function generateAndroidIcons(icon, mark) {
+async function generateAndroidIcons(icon) {
   const sizes = { ldpi: 36, mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
   const androidResources = path.join(ROOT, "android", "app", "src", "main", "res");
   for (const [density, size] of Object.entries(sizes)) {
     const directory = path.join(androidResources, `mipmap-${density}`);
     await mkdir(directory, { recursive: true });
     const adaptiveSize = Math.round(size * 2.25);
-    const foregroundMark = await sharp(mark)
-      .resize({ width: Math.round(adaptiveSize * 0.68), height: Math.round(adaptiveSize * 0.68), fit: "inside" })
+    // Modern Android launchers render the adaptive foreground rather than the
+    // legacy bitmap. Keep the full icon, including the DiaryDock wordmark,
+    // inside Android's safe zone so every launcher mode carries the same brand.
+    const foregroundIcon = await sharp(icon)
+      .resize({ width: Math.round(adaptiveSize * 0.8), height: Math.round(adaptiveSize * 0.8), fit: "inside" })
       .png()
       .toBuffer();
     const foreground = await sharp({
       create: { width: adaptiveSize, height: adaptiveSize, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
-    }).composite([{ input: foregroundMark, gravity: "center" }]).png().toBuffer();
+    }).composite([{ input: foregroundIcon, gravity: "center" }]).png().toBuffer();
     const background = await sharp({
       create: { width: adaptiveSize, height: adaptiveSize, channels: 3, background: BACKGROUND }
     }).png().toBuffer();
@@ -121,7 +124,7 @@ async function main() {
 
   await Promise.all([
     generateIosAssets(flattened, splash),
-    generateAndroidIcons(flattened, sourceMark),
+    generateAndroidIcons(flattened),
     generateAndroidSplashes(splash),
   ]);
 
