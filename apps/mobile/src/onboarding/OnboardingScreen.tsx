@@ -54,7 +54,7 @@ function SetupForm({ model, onBack, onComplete }: { model: MobileOnboardingModel
     <header className="setup-hero">
       <span aria-hidden="true" className="setup-botanical" />
       {onBack ? <button type="button" onClick={onBack} aria-label="Back to Settings">‹</button> : null}
-      <strong className="setup-wordmark">DiaryDock</strong>
+      <strong className="setup-wordmark"><span className="setup-logo-mark" aria-hidden="true" />DiaryDock</strong>
       <div><p>Welcome to DiaryDock</p><h1>Let’s make it yours</h1></div>
       <b>🔒 Private setup</b>
     </header>

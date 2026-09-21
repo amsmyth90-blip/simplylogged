@@ -39,7 +39,10 @@
 }
 
 .login-wordmark {
+  display: flex;
   margin: 0;
+  align-items: center;
+  justify-content: center;
   color: #d7aa5c;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 8vw, 2.75rem);
@@ -47,6 +50,16 @@
   letter-spacing: 0.18em;
   line-height: 1;
   text-transform: uppercase;
+  gap: 0.65rem;
+}
+
+.login-logo-mark {
+  display: block;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 2.8rem;
+  background: url("../../../../public/brand/diarydock-mark.png") center / contain no-repeat;
+  filter: drop-shadow(0 0.125rem 0.45rem rgb(0 0 0 / 35%));
 }
 
 .login-header h1 {

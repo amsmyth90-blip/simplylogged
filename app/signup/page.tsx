@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { signUpAction } from "@/app/login/actions";
+import { AuthBrand } from "@/components/AuthBrand";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { isSupabaseConfiguredServer } from "@/lib/supabase/server";
 
@@ -27,7 +28,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
     <section className="flex flex-1 items-center justify-center py-8">
       <div className="w-full max-w-md overflow-hidden rounded-[32px] border border-white/75 bg-[#fffdf8]/90 shadow-[0_30px_80px_-40px_rgba(32,53,42,0.45)] backdrop-blur-xl">
         <div className="border-b border-[#20352a]/10 bg-[radial-gradient(circle_at_top,_rgba(255,253,248,0.98),_rgba(245,244,237,0.92)_58%,_rgba(221,230,216,0.7))] px-6 pb-7 pt-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#667068]">DiaryDock</p>
+          <AuthBrand />
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#20352a]">Create your account</h1>
         </div>
 
