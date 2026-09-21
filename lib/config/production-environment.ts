@@ -150,6 +150,7 @@ export function inspectProductionReleaseEnvironment(environment: EnvironmentSour
   const deletionToken = value(environment, "ACCOUNT_DELETION_ADMIN_TOKEN");
   const cronSecret = value(environment, "CRON_SECRET");
   const inboundReady = value(environment, "DIARYDOCK_INBOUND_EMAIL_PROVIDER_READY");
+  const scannerRequired = value(environment, "DIARYDOCK_CAPTURE_SCANNER_REQUIRED");
   const distributedRateLimitRequired = value(environment, "DIARYDOCK_DISTRIBUTED_RATE_LIMIT_REQUIRED");
   const rateLimitNamespace = value(environment, "DIARYDOCK_RATE_LIMIT_NAMESPACE");
 
@@ -167,6 +168,12 @@ export function inspectProductionReleaseEnvironment(environment: EnvironmentSour
   }
   if (inboundReady !== "true" && inboundReady !== "false") {
     issues.push(issue("DIARYDOCK_INBOUND_EMAIL_PROVIDER_READY", "must be explicitly true or false"));
+  }
+  if (scannerRequired === "false") {
+    issues.push(issue(
+      "DIARYDOCK_CAPTURE_SCANNER_REQUIRED",
+      "must be true for production releases",
+    ));
   }
   if (distributedRateLimitRequired === "false") {
     issues.push(issue(

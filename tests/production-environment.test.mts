@@ -31,7 +31,7 @@ test("production runtime configuration accepts distinct bounded credentials", ()
   assert.deepEqual(inspectProductionReleaseEnvironment(validEnvironment), []);
 });
 
-test("production runtime configuration accepts an explicit scanner waiver", () => {
+test("production runtime can use an explicit scanner waiver outside release builds", () => {
   const environment = {
     ...validEnvironment,
     DIARYDOCK_CAPTURE_SCANNER_REQUIRED: "false",
@@ -39,7 +39,9 @@ test("production runtime configuration accepts an explicit scanner waiver", () =
     DIARYDOCK_MALWARE_SCANNER_TOKEN: "",
   };
   assert.deepEqual(inspectProductionRuntimeEnvironment(environment), []);
-  assert.deepEqual(inspectProductionReleaseEnvironment(environment), []);
+  assert.deepEqual(inspectProductionReleaseEnvironment(environment).map(({ key }) => key), [
+    "DIARYDOCK_CAPTURE_SCANNER_REQUIRED",
+  ]);
 });
 
 test("production runtime configuration rejects public server keys and unsafe endpoints", () => {
