@@ -54,19 +54,16 @@ export function FamilySchedulesScreen({
   return <main className="family-schedule-screen">
     <header className="family-schedule-header">
       <button type="button" onClick={onBack} aria-label="Back to Family Room">‹</button>
-      <div><p>Family Room</p><h1>Family Schedules</h1>
-        <span>Repeating routines and weekly plans.</span></div>
+      <div><h1>Schedules</h1></div>
       <button type="button" className="family-schedule-add"
         disabled={!model.online || !model.snapshot}
         onClick={() => setEditing(null)}>＋ Add</button>
     </header>
     <section className="family-schedule-toolbar">
-      <label>Show schedules for<select aria-label="Show schedules for" value={person}
+      <label>Person<select aria-label="Show schedules for" value={person}
         onChange={(event) => setPerson(event.target.value)}>
         <option>All</option>{people.map((item) => <option key={item}>{item}</option>)}
       </select></label>
-      <span className={model.online ? "is-online" : "is-offline"}>{
-        model.online ? "Ready to update" : "Encrypted offline copy"}</span>
     </section>
     <nav className="family-schedule-days" aria-label="Schedule day">
       {familyScheduleDays.map((label, index) => <button key={label} type="button"
@@ -74,22 +71,16 @@ export function FamilySchedulesScreen({
         <span>{label.slice(0, 1)}</span><small>{label.slice(0, 3)}</small></button>)}
     </nav>
     <section className="family-schedule-list">
-      <div className="family-schedule-list-title"><div><p>{familyScheduleDays[day]}</p>
-        <h2>{person === "All" ? "Everyone" : person}</h2></div><span>{visible.length}</span></div>
       {model.loading && !model.snapshot
-        ? <p className="family-schedule-empty">Opening the encrypted weekly plan…</p>
+        ? <p className="family-schedule-empty">Opening…</p>
         : visible.length ? visible.map((routine) => <button type="button" key={routine.id}
           className={`family-schedule-row is-${routine.colour}${routine.paused ? " is-paused" : ""}`}
           onClick={() => setEditing(routine)}>
           <time>{familyScheduleTime(routine.startTime)}<small>to {
             familyScheduleTime(routine.endTime)}</small></time>
-          <span><strong>{routine.title}</strong><small>{routine.childName}{
-            routine.location ? ` · ${routine.location}` : ""}</small><small>{
-            routine.responsibleAdult ? `With ${routine.responsibleAdult}` : routine.repeat === "term-time"
-              ? "Term time" : "Weekly"}</small></span>
+          <span><strong>{routine.title}</strong><small>{routine.childName}</small></span>
           <b>{routine.paused ? "Paused" : "›"}</b>
-        </button>) : <div className="family-schedule-empty"><strong>No routines for this day</strong>
-          <span>Add a repeating activity or choose another day.</span></div>}
+        </button>) : <div className="family-schedule-empty"><strong>No routines</strong></div>}
     </section>
     {model.message ? <p className="family-schedule-status" role="status">{model.message}</p> : null}
     {editing !== undefined ? <FamilyScheduleEditor busy={model.busy} people={people}

@@ -51,7 +51,7 @@ export function KitchenScreen(props: KitchenScreenProps) {
     <div className="pantry-shell">
       <header className="pantry-header">
         <button type="button" onClick={back} aria-label="Back"><MobileIcon name="arrow-left" /></button>
-        <div><small>Kitchen</small><h1>Pantry &amp; shopping</h1></div>
+        <div><h1>Pantry &amp; shopping</h1></div>
         <span className={kitchen.source === "NETWORK" ? "is-live" : "is-cached"}>
           {kitchen.source === "NETWORK" ? "Live" : "Offline"}</span>
       </header>

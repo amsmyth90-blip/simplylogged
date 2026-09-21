@@ -46,13 +46,11 @@ export function PhysicalLinksScreen(props: { accessToken: string; disableOnline?
 
   return <main className="physical-screen"><header className="physical-header">
     <button type="button" onClick={props.onBack} aria-label="Back to the Front Gate">‹</button>
-    <div><small>Private smart labels</small><h1>Physical Links</h1>
-      <p>Connect a QR code or NFC tag without exposing the private item ID.</p></div>
+    <div><h1>Physical Links</h1></div>
     <span className={physical.online ? "is-live" : "is-cached"}>
       {physical.online ? "Live" : "Offline copy"}</span></header>
     {physical.message ? <p className="physical-message" role="status">{physical.message}</p> : null}
-    <section className="physical-intro"><div><small>Smart items</small><h2>Your household items</h2>
-      <p>Tags open through DiaryDock’s normal permission check. The secret itself is shown once.</p></div>
+    <section className="physical-intro"><div><h2>Household items</h2></div>
       <button type="button" disabled={!physical.online || physical.busy}
         onClick={() => setEditing(true)}>＋ Add item</button></section>
     {newLink ? <PhysicalLinkOutput link={newLink} onDone={() => setNewLink(null)}

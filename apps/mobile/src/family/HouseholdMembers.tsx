@@ -17,7 +17,7 @@ export function HouseholdMembers({ household, busy, onRemove, onRole }: Props) {
   const canManage = household.role === "owner";
   return (
     <section className="family-card">
-      <div className="family-section-title"><h2>Household members</h2><span>{household.members.length}</span></div>
+      <div className="family-section-title"><h2>App users</h2><span>{household.members.length}</span></div>
       <div className="family-member-list">
         {household.members.map((member) => {
           const isCurrent = member.userId === household.currentUserId;

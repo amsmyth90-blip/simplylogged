@@ -52,8 +52,7 @@ export function KitchenCalendarScreen(props: Props) {
       <header className="kitchen-calendar-header">
         <button type="button" onClick={props.onBack} aria-label="Back to Kitchen">
           <MobileIcon name="arrow-left" /></button>
-        <div><small>Kitchen · Wall calendar</small><h1>Family calendar</h1>
-          <p>Appointments, school dates, meals and family plans.</p></div>
+        <div><h1>Calendar</h1></div>
         <span className={calendar.online ? "is-online" : "is-offline"}>
           {calendar.online ? "Synced" : "Offline"}</span>
       </header>

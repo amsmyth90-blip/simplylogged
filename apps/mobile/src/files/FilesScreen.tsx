@@ -70,7 +70,7 @@ export function FilesScreen(props: FilesScreenProps) {
       <header className="files-header">
         <div className="app-brand">
           <BrandMark />
-          <div><strong>DiaryDock</strong><span>Your digital home</span></div>
+          <div><strong>DiaryDock</strong></div>
         </div>
         <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
@@ -78,9 +78,7 @@ export function FilesScreen(props: FilesScreenProps) {
       </header>
 
       <section className="files-hero">
-        <p className="eyebrow">All Files</p>
-        <h1>Everything, safely organised</h1>
-        <p>Browse the secure document index even when this device is offline.</p>
+        <h1>All Files</h1>
         <div className="file-summary" aria-label="File totals">
           <span><strong>{documents.length}</strong> files</span>
           <span><strong>{documents.filter((item) => item.reviewStatus === "needs-review").length}</strong> to review</span>

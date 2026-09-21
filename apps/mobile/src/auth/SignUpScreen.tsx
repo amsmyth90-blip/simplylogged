@@ -49,9 +49,7 @@ export function SignUpScreen({ error, onBack, onForgotPassword, onSignUp }: Sign
         <section className="auth-card" aria-labelledby="signup-confirmation-title">
           <header className="auth-card-header">
             <BrandMark />
-            <p className="eyebrow">One secure step</p>
-            <h1 id="signup-confirmation-title">Check your inbox or sign in</h1>
-            <p>We processed the request for {confirmationEmail}.</p>
+            <h1 id="signup-confirmation-title">Check your email</h1>
           </header>
           <div className="auth-confirmation">
             {error ? <p className="form-message form-error" role="alert">{error}</p> : null}
@@ -71,9 +69,7 @@ export function SignUpScreen({ error, onBack, onForgotPassword, onSignUp }: Sign
       <section className="auth-card" aria-labelledby="signup-title">
         <header className="auth-card-header">
           <BrandMark />
-          <p className="eyebrow">DiaryDock</p>
           <h1 id="signup-title">Create your account</h1>
-          <p>Start setting up your private digital home for everyday life.</p>
         </header>
         <form className="auth-form" onSubmit={submit}>
           {localError || error ? <p className="form-message form-error" role="alert">
@@ -87,7 +83,6 @@ export function SignUpScreen({ error, onBack, onForgotPassword, onSignUp }: Sign
             <span>Password</span>
             <input type="password" name="password" autoComplete="new-password"
               minLength={8} maxLength={128} required />
-            <small>Use at least 8 characters.</small>
           </label>
           <label>
             <span>Confirm password</span>

@@ -107,8 +107,7 @@ export function OfficeOverview(props: Props) {
         aria-label="Back to the estate map">‹</button>
       <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
         {props.syncStatus.toLowerCase().replaceAll("_", " ")}</span>
-      <div className="office-heading"><p>Household administration</p><h1>Office</h1>
-        <strong>Keep bills, policies and household records clear.</strong></div>
+      <div className="office-heading"><h1>Office</h1></div>
     </header>
     <section className="office-sheet">
       <div className="office-totals">{totals.map(([value, label]) =>
@@ -119,9 +118,7 @@ export function OfficeOverview(props: Props) {
       <div className="office-actions">
         <button type="button" onClick={props.onAdd}>＋ Add {addLabel}</button>
         <button type="button" onClick={props.onScan}>Scan into Office</button>
-        <button className="office-safe-room" type="button" onClick={props.onOpenSafeRoom}>
-          Open Safe Room · Wills & wishes
-        </button>
+        <button className="office-safe-room" type="button" onClick={props.onOpenSafeRoom}>Wills & Wishes</button>
       </div>
     </section>
   </>;

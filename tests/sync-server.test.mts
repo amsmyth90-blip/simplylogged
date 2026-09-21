@@ -4,7 +4,7 @@ import test from "node:test";
 
 import { readBoundedJson, RequestBodyError } from "../lib/http/bounded-json.ts";
 import { mobileCorsHeaders, mobilePreflight } from "../lib/http/mobile-cors.ts";
-import { decodeSyncCursor, encodeSyncCursor } from "../lib/sync/cursor-codec.ts";
+import { decodeSyncCursor, decodeSyncCursorSequence, encodeSyncCursor } from "../lib/sync/cursor-codec.ts";
 
 const secret = "0123456789abcdef0123456789abcdef";
 const subject = "9e152506-4667-42e8-84df-47a87956aef9";
@@ -19,10 +19,13 @@ test("sync cursors are opaque, authenticated and bounded", () => {
   assert.throws(() => decodeSyncCursor(cursor, otherSubject, secret), /cursor is invalid/);
   const tampered = `${cursor.slice(0, -1)}${cursor.endsWith("a") ? "b" : "a"}`;
   assert.throws(() => decodeSyncCursor(tampered, subject, secret), /cursor is invalid/);
+  assert.throws(() => decodeSyncCursorSequence(tampered, subject, secret), /cursor is invalid/);
+  assert.throws(() => decodeSyncCursorSequence(cursor, otherSubject, secret), /cursor is invalid/);
   assert.throws(() => encodeSyncCursor(BigInt(-1), subject, secret), /sequence is invalid/);
   assert.throws(() => encodeSyncCursor(BigInt(1), subject, "short"), /not configured securely/);
 
   const householdCursor = encodeSyncCursor(BigInt(90), subject, secret, scopeKey);
+  assert.equal(decodeSyncCursorSequence(householdCursor, subject, secret), BigInt(90));
   assert.equal(decodeSyncCursor(householdCursor, subject, secret, scopeKey), BigInt(90));
   assert.equal(decodeSyncCursor(householdCursor, subject, secret, `${scopeKey}:new`), BigInt(0));
   assert.equal(decodeSyncCursor(householdCursor, subject, secret, null), BigInt(0));
@@ -82,13 +85,14 @@ test("mobile CORS admits only installed and first-party origins", () => {
 });
 
 test("the server sync projection is owner-derived, bounded and tombstone-preserving", async () => {
-  const [foundation, validation, mutation, maintenance, boundary, contraction, pushRoute, pullRoute, observation, requestObservation] = await Promise.all([
+  const [foundation, validation, mutation, maintenance, boundary, contraction, pullPage, pushRoute, pullRoute, observation, requestObservation] = await Promise.all([
     read("supabase/migrations/20260901233000_sync_projection_foundation.sql"),
     read("supabase/migrations/20260901233100_sync_contract_validation.sql"),
     read("supabase/migrations/20260901233200_sync_mutation_rpc.sql"),
     read("supabase/migrations/20260901233300_sync_maintenance.sql"),
     read("supabase/migrations/20260902150000_secure_sync_mutation_boundary.sql"),
     read("supabase/migrations/20260902151000_revoke_legacy_sync_mutations.sql"),
+    read("supabase/migrations/20260919190000_sync_pull_page.sql"),
     read("app/api/sync/push/route.ts"),
     read("app/api/sync/pull/route.ts"),
     read("lib/observability/sync-observation.ts"),
@@ -115,13 +119,18 @@ test("the server sync projection is owner-derived, bounded and tombstone-preserv
   assert.match(boundary, /revoke all on function public\.apply_sync_mutations_core/);
   assert.match(boundary, /grant execute on function public\.apply_sync_mutations_server[\s\S]*to service_role/);
   assert.match(contraction, /revoke all on function public\.apply_sync_mutations\(jsonb\)[\s\S]*authenticated/);
+  assert.match(pullPage, /security invoker/);
+  assert.match(pullPage, /current_user_id uuid := auth\.uid\(\)/);
+  assert.match(pullPage, /least\(coalesce\(input_limit, 251\), 251\)/);
+  assert.match(pullPage, /grant execute on function public\.pull_sync_page\(bigint, integer\) to authenticated/);
   assert.match(pushRoute, /readBoundedJson/);
   assert.match(pushRoute, /SyncObservation/);
   assert.match(pushRoute, /getSupabaseAdminClient/);
   assert.match(pushRoute, /apply_sync_mutations_server/);
   assert.match(pushRoute, /input_user_id: auth\.user\.id/);
   assert.match(pullRoute, /decodeSyncCursor/);
-  assert.match(pullRoute, /household_memberships/);
+  assert.match(pullRoute, /decodeSyncCursorSequence/);
+  assert.match(pullRoute, /rpc\("pull_sync_page"/);
   assert.match(pullRoute, /activeHouseholdId/);
   assert.doesNotMatch(pullRoute, /\.eq\("owner_id"/);
   assert.match(requestObservation, /DIARYDOCK_OBSERVABILITY_SAMPLE_RATE/);

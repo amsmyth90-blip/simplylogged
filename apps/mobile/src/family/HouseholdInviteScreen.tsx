@@ -55,11 +55,10 @@ export function HouseholdInviteScreen({ accessToken, initialInvite, token, onAcc
       <header style={{ backgroundImage: `url(${familyImage})` }}>
         <div />
         <button type="button" onClick={onClose} aria-label="Close invitation">×</button>
-        <section><p>Secure invitation</p><h1>Join a household</h1></section>
+        <section><h1>Join household</h1></section>
       </header>
       <section className="family-card family-invite-acceptance">
         {loading ? <p>Checking this invitation securely…</p> : invite ? <>
-          <p className="eyebrow">You have been invited to</p>
           <h2>{invite.householdName}</h2>
           <dl>
             <div><dt>Name</dt><dd>{invite.name}</dd></div>

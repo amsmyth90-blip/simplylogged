@@ -32,7 +32,7 @@ async function shareInvite(invite: HouseholdDirectoryInvite) {
 export function HouseholdInvites({ busy, invites, onCancel, onRenew }: Props) {
   return (
     <section className="family-card">
-      <div className="family-section-title"><div><p>Email-bound access</p><h2>Pending invitations</h2></div><span>{invites.length}</span></div>
+      <div className="family-section-title"><h2>Invitations</h2><span>{invites.length}</span></div>
       {invites.length ? <div className="family-invite-list">{invites.map((invite) => (
         <article key={invite.token}>
           <div><strong>{invite.name}</strong><span>{invite.email}</span><small>Expires {friendlyDate(invite.expiresAt)}</small></div>

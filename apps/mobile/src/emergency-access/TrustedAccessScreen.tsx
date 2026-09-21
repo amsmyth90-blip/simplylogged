@@ -53,7 +53,6 @@ export function TrustedAccessScreen(props: {
           <BrandMark />
           <span>
             <strong>Trusted access</strong>
-            <small>Limited and revocable</small>
           </span>
         </div>
         <span className={model.online ? "trusted-online" : "trusted-offline"}>
@@ -61,12 +60,7 @@ export function TrustedAccessScreen(props: {
         </span>
       </header>
       <section className="trusted-hero">
-        <p className="trusted-kicker">Emergency sharing</p>
-        <h1>A narrow view for people you trust.</h1>
-        <p>
-          Choose each item individually. Trusted people never receive your whole
-          account or Vault.
-        </p>
+        <h1>Emergency sharing</h1>
         <div>
           <span>Nothing shared by default</span>
           <span>14-day invitations</span>

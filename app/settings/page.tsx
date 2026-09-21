@@ -8,11 +8,11 @@ import { requireUser } from "@/lib/auth";
 export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  await requireUser();
+  const user = await requireUser();
 
   return (
     <>
-      <SettingsWorkspace />
+      <SettingsWorkspace accountCreatedAt={user.created_at} accountEmail={user.email} />
       <SignOutPanel />
       <BottomNav />
     </>

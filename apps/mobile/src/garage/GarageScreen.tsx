@@ -69,7 +69,6 @@ export function GarageScreen(props: Props) {
         </button>
         <div>
           <strong>Garage</strong>
-          <small>Vehicles & running costs</small>
         </div>
         <span className={garage.source === "NETWORK" ? "is-live" : "is-cached"}>
           {garage.source === "NETWORK" ? "Live" : "Offline copy"}
@@ -82,15 +81,9 @@ export function GarageScreen(props: Props) {
       >
         <div />
         <article>
-          <p>Everything road-ready</p>
           <h1>{vehicle?.displayName ?? "Your vehicles"}</h1>
-          <span>
-            {vehicle
-              ? [vehicle.year, vehicle.make, vehicle.model]
-                  .filter(Boolean)
-                  .join(" · ")
-              : "Keep legal dates, maintenance and costs together."}
-          </span>
+          {vehicle ? <span>{[vehicle.year, vehicle.make, vehicle.model]
+            .filter(Boolean).join(" · ")}</span> : null}
         </article>
       </section>
 
@@ -153,10 +146,7 @@ export function GarageScreen(props: Props) {
               <span>▤</span>
               <div>
                 <strong>Vehicle documents</strong>
-                <small>
-                  {vehicle.documentCount} linked · policies, receipts and
-                  certificates
-                </small>
+                <small>{vehicle.documentCount} linked</small>
               </div>
               <button type="button" onClick={() => props.onNavigate("FILES")}>
                 Open

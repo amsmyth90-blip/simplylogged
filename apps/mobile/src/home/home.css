@@ -91,19 +91,15 @@
   top: max(4.75rem, calc(env(safe-area-inset-top) + 3.625rem));
   right: 0;
   left: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
   gap: 0.5rem;
   padding: 0 0.8rem 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-
-.home-quick-row::-webkit-scrollbar { display: none; }
 
 .home-quick {
   display: flex;
-  min-width: 7.75rem;
-  flex: 0 0 auto;
+  min-width: 0;
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 0.625rem;
@@ -125,7 +121,7 @@
 
 .home-quick-icon.is-today { color: #0369a1; background: #e5f0f4; }
 .home-quick-icon.is-ask { color: #fff; background: #315443; }
-.home-ask { min-width: 10.75rem; }
+.home-ask { min-width: 0; }
 .home-quick-icon svg { width: 0.875rem; height: 0.875rem; }
 
 .home-quick strong,

@@ -12,13 +12,6 @@ type Props = {
   onOpen: (action: RoomSceneAction) => void;
 };
 
-function labelEdge(left: string) {
-  const position = Number.parseFloat(left);
-  if (position <= 22.5) return "left";
-  if (position >= 77.5) return "right";
-  return undefined;
-}
-
 export function RoomSceneScreen(props: Props) {
   const scene = roomScenes[props.profile.id];
   if (!scene) return null;
@@ -40,7 +33,6 @@ export function RoomSceneScreen(props: Props) {
               type="button"
               key={`${item.id}-${index}`}
               className="native-room-label"
-              data-edge={labelEdge(item.left)}
               style={{ left: item.left, top: item.top }}
               aria-label={`Open ${item.label}: ${item.description}`}
               onClick={() => props.onOpen(item)}
@@ -54,7 +46,7 @@ export function RoomSceneScreen(props: Props) {
         <button type="button" onClick={props.onBack} aria-label="Back to the estate map">
           <MobileIcon name="arrow-left" />
         </button>
-        <div className="native-room-title"><small>{scene.eyebrow}</small><strong>{scene.name}</strong></div>
+        <div className="native-room-title"><strong>{scene.name}</strong></div>
         <span className="native-room-header-spacer" aria-hidden="true" />
         <span className="native-room-sync-status" aria-live="polite">
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}

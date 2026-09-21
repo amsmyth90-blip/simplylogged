@@ -70,9 +70,7 @@ export function RoomScreen(props: RoomScreenProps) {
           {props.syncStatus.toLowerCase().replaceAll("_", " ")}
         </span>
         <div className="room-heading">
-          <p>{props.profile.domain}</p>
           <h1>{props.profile.name}</h1>
-          <strong>{props.profile.headline}</strong>
         </div>
       </header>
 
@@ -93,15 +91,14 @@ export function RoomScreen(props: RoomScreenProps) {
       {props.profile.id === "kitchen" ? (
         <section className="room-content-section room-feature-callout">
           <div className="room-section-heading">
-            <div><p>Everyday kitchen</p><h2>Pantry & shopping</h2></div>
+            <div><h2>Pantry & shopping</h2></div>
             <button type="button" onClick={props.onOpenKitchen}>Open</button>
           </div>
-          <p className="room-empty">Keep the pantry and shopping list together, with an encrypted copy available offline.</p>
         </section>
       ) : null}
 
       <section className="room-content-section">
-        <div className="room-section-heading"><div><p>Secure records</p><h2>Documents</h2></div><button type="button" onClick={() => props.onNavigate("FILES")}>All Files</button></div>
+        <div className="room-section-heading"><div><h2>Documents</h2></div><button type="button" onClick={() => props.onNavigate("FILES")}>All Files</button></div>
         {documents.length ? documents.slice(0, 6).map((document) => (
           <button className="room-document" type="button" key={document.syncId} onClick={() => setViewingId(document.syncId)}>
             <span>{document.kind === "PDF" ? "PDF" : "DOC"}</span>
@@ -112,7 +109,7 @@ export function RoomScreen(props: RoomScreenProps) {
       </section>
 
       <section className="room-content-section">
-        <div className="room-section-heading"><div><p>Next steps</p><h2>Reminders</h2></div><button type="button" onClick={() => props.onNavigate("REMINDERS")}>See all</button></div>
+        <div className="room-section-heading"><div><h2>Reminders</h2></div><button type="button" onClick={() => props.onNavigate("REMINDERS")}>See all</button></div>
         {roomReminders.length ? roomReminders.slice(0, 5).map((reminder) => (
           <label className="room-reminder" key={reminder.id}>
             <input type="checkbox" checked={reminder.group === "done"} onChange={() => void reminders.toggle(reminder)} />

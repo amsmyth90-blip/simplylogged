@@ -104,7 +104,7 @@ export function ReminderBoard(props: ReminderBoardProps) {
       <header className="app-header">
         <div className="app-brand">
           <BrandMark />
-          <div><strong>DiaryDock</strong><span>Your digital home</span></div>
+          <div><strong>DiaryDock</strong></div>
         </div>
         <button type="button" className="quiet-button" disabled={signingOut} onClick={() => void signOut()}>
           {signingOut ? "Please wait…" : "Sign out"}
@@ -112,9 +112,7 @@ export function ReminderBoard(props: ReminderBoardProps) {
       </header>
 
       <section className="reminder-hero">
-        <p className="eyebrow">Reminders</p>
-        <h1>What Matters, When It Matters</h1>
-        <p>Gentle reminders to keep your life in order.</p>
+        <h1>Reminders</h1>
         <div className="hero-actions">
           <span className={`sync-pill sync-${props.syncStatus.toLowerCase()}`}>
             {props.syncStatus.toLowerCase().replaceAll("_", " ")}
@@ -125,20 +123,17 @@ export function ReminderBoard(props: ReminderBoardProps) {
 
       <section className="highlight-grid">
         <article className="reminder-panel">
-          <h2>Today’s focus</h2>
-          <p>The next things to move forward</p>
+          <h2>Important</h2>
           <HighlightList items={views.focus} empty="No high-priority reminders waiting." />
         </article>
         <article className="reminder-panel">
-          <h2>Steady rhythms</h2>
-          <p>Repeating jobs that keep DiaryDock current</p>
+          <h2>Repeating</h2>
           <HighlightList items={views.repeating} empty="No repeating reminders yet." />
         </article>
       </section>
 
       <section className="document-panel reminder-panel">
         <h2>Document follow-ups</h2>
-        <p>Renewals and dates linked to saved files</p>
         <HighlightList items={views.documents} empty="Linked document reminders will appear here." />
       </section>
 

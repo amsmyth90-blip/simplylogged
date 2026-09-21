@@ -41,15 +41,14 @@ export function MailboxScreen(props: Props) {
   return <main className="mailbox-screen">
     <header className="mailbox-hero" style={{ backgroundImage: `url(${mailboxImage})` }}>
       <div /><button type="button" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
-      <span>{mailbox.online ? "Ready" : "Offline copy"}</span><article><p>Mailbox</p>
-        <h1>Intake Queue</h1><strong>A calm place to review and file incoming items.</strong></article>
+      <span>{mailbox.online ? "Ready" : "Offline copy"}</span><article><h1>Inbox</h1></article>
     </header>
     <section className="mailbox-sheet">
       <div className="mailbox-totals"><span><b>{counts.total}</b>Incoming</span>
         <span><b>{counts.fresh}</b>Needs filing</span><span><b>{counts.filed}</b>Filed</span>
         <span><b>{counts.reminders}</b>Follow-ups</span></div>
       {mailbox.message ? <p className="mailbox-message" role="status">{mailbox.message}</p> : null}
-      <div className="mailbox-toolbar"><div><p>To be filed</p><h2>Incoming items</h2></div>
+      <div className="mailbox-toolbar"><div><h2>Items</h2></div>
         <div>{(["new", "all"] as const).map((value) => <button type="button" key={value}
           className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{
             value === "new" ? "Needs filing" : "All"}</button>)}</div></div>

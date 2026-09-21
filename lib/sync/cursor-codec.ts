@@ -27,6 +27,36 @@ function assertSubject(subject: string) {
   return subject.toLowerCase();
 }
 
+function verifiedCursor(cursor: string | null, subject: string, secret: string) {
+  const expectedSubject = assertSubject(subject);
+  const checkedSecret = assertSecret(secret);
+  if (!cursor) return null;
+  if (cursor.length > 2_048) throw new Error("The sync cursor is invalid.");
+  const [payload, supplied, extra] = cursor.split(".");
+  if (!payload || !supplied || extra) throw new Error("The sync cursor is invalid.");
+  const expected = signature(payload, checkedSecret);
+  const suppliedBytes = Buffer.from(supplied, "base64url");
+  const expectedBytes = Buffer.from(expected, "base64url");
+  if (suppliedBytes.length !== expectedBytes.length || !timingSafeEqual(suppliedBytes, expectedBytes)) {
+    throw new Error("The sync cursor is invalid.");
+  }
+  try {
+    const value = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as unknown;
+    if (!value || typeof value !== "object") throw new Error();
+    const parsed = value as { v?: unknown; s?: unknown; u?: unknown; h?: unknown };
+    if ((parsed.v !== 2 && parsed.v !== 3) || parsed.u !== expectedSubject
+      || typeof parsed.s !== "string" || !/^(0|[1-9][0-9]{0,18})$/.test(parsed.s)) {
+      throw new Error();
+    }
+    const sequence = BigInt(parsed.s);
+    if (sequence > maximumSequence) throw new Error();
+    if (parsed.v === 3 && (typeof parsed.h !== "string" || parsed.h.length !== 43)) throw new Error();
+    return { scope: parsed.v === 3 ? parsed.h as string : null, sequence, version: parsed.v };
+  } catch {
+    throw new Error("The sync cursor is invalid.");
+  }
+}
+
 export function encodeSyncCursor(
   sequence: bigint,
   subject: string,
@@ -50,36 +80,16 @@ export function decodeSyncCursor(
   secret: string,
   scopeKey: string | null = null,
 ) {
-  const expectedSubject = assertSubject(subject);
   const checkedSecret = assertSecret(secret);
   const expectedScope = scopeFingerprint(scopeKey, checkedSecret);
-  if (!cursor) return zero;
-  if (cursor.length > 2_048) throw new Error("The sync cursor is invalid.");
-  const [payload, supplied, extra] = cursor.split(".");
-  if (!payload || !supplied || extra) throw new Error("The sync cursor is invalid.");
-  const expected = signature(payload, checkedSecret);
-  const suppliedBytes = Buffer.from(supplied, "base64url");
-  const expectedBytes = Buffer.from(expected, "base64url");
-  if (suppliedBytes.length !== expectedBytes.length || !timingSafeEqual(suppliedBytes, expectedBytes)) {
-    throw new Error("The sync cursor is invalid.");
-  }
-  try {
-    const value = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as unknown;
-    if (!value || typeof value !== "object") throw new Error();
-    const parsed = value as { v?: unknown; s?: unknown; u?: unknown; h?: unknown };
-    if ((parsed.v !== 2 && parsed.v !== 3) || parsed.u !== expectedSubject
-      || typeof parsed.s !== "string" || !/^(0|[1-9][0-9]{0,18})$/.test(parsed.s)) {
-      throw new Error();
-    }
-    const sequence = BigInt(parsed.s);
-    if (sequence > maximumSequence) throw new Error();
-    if (parsed.v === 2) return scopeKey === null ? sequence : zero;
-    if (typeof parsed.h !== "string" || parsed.h.length !== expectedScope.length) throw new Error();
-    if (parsed.h !== expectedScope) return zero;
-    return sequence;
-  } catch {
-    throw new Error("The sync cursor is invalid.");
-  }
+  const parsed = verifiedCursor(cursor, subject, checkedSecret);
+  if (!parsed) return zero;
+  if (parsed.version === 2) return scopeKey === null ? parsed.sequence : zero;
+  return parsed.scope === expectedScope ? parsed.sequence : zero;
+}
+
+export function decodeSyncCursorSequence(cursor: string | null, subject: string, secret: string) {
+  return verifiedCursor(cursor, subject, secret)?.sequence ?? zero;
 }
 
 export function assertSyncCursorSecret(secret: string) {

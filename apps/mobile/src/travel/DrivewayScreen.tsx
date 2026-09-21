@@ -66,8 +66,7 @@ export function DrivewayScreen(props: Props) {
         <button type="button" onClick={props.onBack} aria-label="Back to the estate map">‹</button>
         <span className={travel.online ? "is-online" : "is-offline"}>{
           travel.online ? "Ready" : "Offline copy"}</span>
-        <article><p>Travel & access</p><h1>Driveway</h1>
-          <strong>Trips and travel preparation, kept simple.</strong></article>
+        <article><h1>Travel</h1></article>
       </header>
       <section className="travel-sheet">
         {travel.message ? <p className="travel-message" role="status">{travel.message}</p> : null}

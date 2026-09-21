@@ -25,15 +25,13 @@ export function ResetPasswordScreen(props: { error: string | null; onCancel: () 
 
   return <main className="mobile-shell"><section className="auth-card"
     aria-labelledby="reset-password-title"><header className="auth-card-header">
-      <BrandMark /><p className="eyebrow">Secure recovery</p>
+      <BrandMark />
       <h1 id="reset-password-title">Choose a new password</h1>
-      <p>Your reset link has been verified. Set the password for this account.</p>
     </header><form className="auth-form" onSubmit={submit}>
       {localError || props.error ? <p className="form-message form-error" role="alert">
         {localError ?? props.error}</p> : null}
       <label><span>New password</span><input type="password" name="password"
-        autoComplete="new-password" minLength={8} maxLength={128} required />
-        <small>Use at least 8 characters.</small></label>
+        autoComplete="new-password" minLength={8} maxLength={128} required /></label>
       <label><span>Confirm new password</span><input type="password" name="confirmPassword"
         autoComplete="new-password" minLength={8} maxLength={128} required /></label>
       <button type="submit" disabled={busy}>{busy ? "Updating securely…" : "Update password"}</button>

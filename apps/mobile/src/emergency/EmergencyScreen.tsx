@@ -32,13 +32,11 @@ export function EmergencyScreen(props: {
     <main className="emergency-screen">
       <header className="emergency-header">
         <button type="button" onClick={props.onBack} aria-label="Back">‹</button>
-        <div><BrandMark /><span><strong>Emergency</strong><small>Private owner view</small></span></div>
+        <div><BrandMark /><span><strong>Emergency</strong></span></div>
         <span className={model.source === "NETWORK" ? "emergency-live" : "emergency-cached"}>{model.source === "NETWORK" ? "Live" : "Offline"}</span>
       </header>
       <section className="emergency-hero">
-        <p className="emergency-kicker">When it matters most</p>
-        <h1>Everything important, close at hand.</h1>
-        <p>Contacts, household plans, key home details and approved documents remain available from this encrypted device.</p>
+        <h1>Emergency</h1>
         <div><span><strong>{snapshot?.contacts.length ?? 0}</strong> contacts</span><span><strong>{snapshot?.plans.length ?? 0}</strong> plans</span><span><strong>{model.documents.length}</strong> documents</span></div>
       </section>
       <section className="emergency-actions" aria-label="Add Emergency information">
@@ -55,7 +53,7 @@ export function EmergencyScreen(props: {
         <EmergencyDocuments documents={model.documents} onOpen={setViewer} />
       </div> : null}
       {!model.loading && !snapshot ? <section className="emergency-unavailable"><h2>Emergency is not available yet</h2><p>{model.message ?? "Connect and try again."}</p><button type="button" onClick={() => void model.refresh()}>Try again</button></section> : null}
-      <button type="button" className="emergency-trusted" onClick={props.onTrustedAccess}><span>♢</span><div><strong>Manage trusted emergency access</strong><small>Choose a person and share only specific approved items.</small></div><b>›</b></button>
+      <button type="button" className="emergency-trusted" onClick={props.onTrustedAccess}><span>♢</span><div><strong>Trusted access</strong></div><b>›</b></button>
       <footer className="emergency-footer"><span>⌾</span><p><strong>Encrypted on this device</strong><br />Only information you approve appears here. In a life-threatening emergency, contact the appropriate emergency service.</p></footer>
       {editor ? <EmergencyEditor busy={model.busy} mode={editor} onCancel={() => setEditor(null)} onSave={model.mutate} /> : null}
       {viewer ? <DocumentViewer accessToken={props.accessToken} document={viewer} store={props.store} onClose={() => setViewer(null)} /> : null}

@@ -74,10 +74,10 @@ export function HouseholdPeople(props: {
   return (
     <section className="family-card">
       <div className="family-section-title">
-        <h2>People</h2>
+        <h2>Other people</h2>
         {props.canManage ? (
           <button type="button" onClick={() => setAdding((value) => !value)}>
-            {adding ? "Cancel" : "Add someone"}
+            {adding ? "Cancel" : "Add person"}
           </button>
         ) : null}
       </div>

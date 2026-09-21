@@ -14,8 +14,8 @@ The reviewed web and packaged-mobile implementation is merged into `main` and it
 - Handwritten source is limited to 300 lines, with no exceptions accepted by the strict checker.
 - `npm run build` now runs a production-environment preflight automatically when Vercel sets `VERCEL_ENV=production`.
 - `npm run release:preflight` performs the same check explicitly without printing secret values.
-- The preflight requires valid, separate Supabase public/server credentials, a strong mobile-sync cursor secret, mandatory malware scanning with an HTTPS endpoint and separate credential, separate account-deletion and scheduled-cleanup credentials, the OpenAI feature credential and an explicit inbound-email state.
-- `/api/health/ready` checks both the production security configuration and a bounded live database query, returning only an aggregate ready/unavailable result.
+- The preflight requires valid, separate Supabase public/server credentials, a strong mobile-sync cursor secret, a required distributed rate limiter, mandatory malware scanning with an HTTPS endpoint and separate credential, separate account-deletion and scheduled-cleanup credentials, the OpenAI feature credential and an explicit inbound-email state.
+- `/api/health/ready` checks the production security configuration, a bounded live database query and the distributed limiter, returning only ready/unavailable plus dependency-level booleans without provider errors or credentials.
 - Mobile production builds independently reject missing or privileged Supabase client credentials, non-HTTPS backends and non-allowlisted production API hosts.
 - Codemagic release workflows run the complete repository gate before native unit tests, lint, signing and package creation.
 - GitHub pull requests run the complete repository gate, moderate-or-higher dependency review and extended CodeQL analysis for TypeScript/Java. Workflow dependencies are immutable-commit pinned and maintained by Dependabot.

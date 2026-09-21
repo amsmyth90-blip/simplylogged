@@ -26,9 +26,7 @@ export function OfflineStorageErrorScreen(props: OfflineStorageErrorScreenProps)
       <section className="auth-card" aria-labelledby="offline-storage-title">
         <header className="auth-card-header">
           <BrandMark />
-          <p className="eyebrow">Secure storage</p>
           <h1 id="offline-storage-title">DiaryDock could not finish opening</h1>
-          <p>Retry the encrypted storage check or return to sign in.</p>
         </header>
         <div className="auth-confirmation">
           <p className="form-message form-error" role="alert">{props.message}</p>
