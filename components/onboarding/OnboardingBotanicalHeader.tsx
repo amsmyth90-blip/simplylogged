@@ -7,6 +7,7 @@ export function OnboardingBotanicalHeader({ badge }: { badge: string }) {
         aria-hidden="true"
         alt=""
         height={360}
+        loading="eager"
         src="/images/onboarding-botanical-sprig.svg"
         width={240}
         className="pointer-events-none absolute -right-7 -top-14 h-[270px] w-[180px] opacity-[0.35] sm:right-2 sm:h-[320px] sm:w-[210px]"

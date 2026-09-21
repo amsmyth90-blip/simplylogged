@@ -1,9 +1,7 @@
-import { signOutAction } from "@/app/login/actions";
-
 export function SignOutPanel() {
   return (
     <section className="space-y-3 pb-2">
-      <form action={signOutAction}>
+      <form action="/api/auth/signout" method="post">
         <button
           type="submit"
           className="w-full rounded-[24px] border border-ink/10 bg-white/70 px-5 py-3.5 text-sm font-semibold text-ink/70 shadow-soft transition hover:bg-white"

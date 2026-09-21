@@ -45,6 +45,7 @@ export function DocumentCaptureWorkspace() {
         src="/images/estate-dashboard-country.png"
         alt=""
         fill
+        loading="eager"
         sizes="100vw"
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 h-full w-full object-cover object-center transition duration-700 ${activeStage || (capture.draft && capture.stage === "complete") ? "opacity-72" : "scale-105 opacity-32 blur-[2px]"}`}

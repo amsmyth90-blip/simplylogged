@@ -14,13 +14,27 @@ import {
   SettingsSupport
 } from "@/components/settings/SettingsPanels";
 import { SettingsPrivacySection } from "@/components/settings/SettingsPrivacySection";
-import { toggleSettingRows, type DataModalMode, type ProfileDraft } from "@/components/settings/settings-model";
+import {
+  settingsProfileForDisplay,
+  toggleSettingRows,
+  type DataModalMode,
+  type ProfileDraft,
+} from "@/components/settings/settings-model";
 import { useSettingsRemoteState } from "@/components/settings/use-settings-remote-state";
 import { OPTIONAL_DASHBOARD_AREAS, normaliseDashboardAreaIds } from "@/lib/dashboard-areas";
 
-export function SettingsWorkspace() {
+export function SettingsWorkspace({
+  accountCreatedAt,
+  accountEmail,
+}: {
+  accountCreatedAt?: string | null;
+  accountEmail?: string | null;
+}) {
   const { state, repositoryMode, updateState } = useDiaryDockData();
-  const profile = state.settingsProfile;
+  const profile = useMemo(() => settingsProfileForDisplay(state.settingsProfile, {
+    createdAt: accountCreatedAt,
+    email: accountEmail,
+  }), [accountCreatedAt, accountEmail, state.settingsProfile]);
   const [modal, setModal] = useState<DataModalMode>(null);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleteRequestBusy, setDeleteRequestBusy] = useState(false);

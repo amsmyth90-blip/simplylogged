@@ -84,6 +84,7 @@ export function CaptureIdleView({
               alt="A secure stack of household documents ready to add"
               width={160}
               height={160}
+              loading="eager"
               className="relative z-10 h-40 w-40 rounded-[24px] object-contain mix-blend-multiply drop-shadow-[0_18px_18px_rgba(71,85,105,0.18)]"
             />
           )}

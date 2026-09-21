@@ -62,6 +62,27 @@ async function mapLimited(items, concurrency, task) {
   return results;
 }
 
+function missingUser(error) {
+  return error?.status === 404 || /invalid account|user not found/i.test(error?.message ?? "");
+}
+
+async function deleteSyntheticUser(admin, userId) {
+  const prepared = await admin.rpc("prepare_account_deletion", { input_user_id: userId });
+  if (prepared.error) {
+    if (missingUser(prepared.error)) return null;
+    return prepared.error;
+  }
+  const deleted = await admin.auth.admin.deleteUser(userId);
+  return deleted.error && !missingUser(deleted.error) ? deleted.error : null;
+}
+
+async function removeSyntheticUsers(admin, userIds) {
+  const settled = await Promise.allSettled(
+    userIds.map((userId) => deleteSyntheticUser(admin, userId)),
+  );
+  return settled.filter((result) => result.status === "rejected" || result.value).length;
+}
+
 async function signInWithRetry(publicClient, email, password) {
   for (let attempt = 0; attempt < 10; attempt++) {
     const result = await publicClient.auth.signInWithPassword({ email, password });
@@ -104,7 +125,7 @@ async function provision(count) {
     });
     console.log(JSON.stringify({ count: users.length, runId, usersPath }));
   } catch (error) {
-    await Promise.allSettled(created.map((id) => admin.auth.admin.deleteUser(id)));
+    await removeSyntheticUsers(admin, created);
     throw error;
   }
 }
@@ -116,8 +137,7 @@ async function cleanup() {
   if (fixture.projectUrl !== config.url || fixture.purpose !== purpose || !Array.isArray(fixture.users)) {
     throw new Error("Refusing to clean up an unrecognised load-test fixture.");
   }
-  const settled = await Promise.allSettled(fixture.users.map(({ userId }) => admin.auth.admin.deleteUser(userId)));
-  const failures = settled.filter((result) => result.status === "rejected").length;
+  const failures = await removeSyntheticUsers(admin, fixture.users.map(({ userId }) => userId));
   if (failures) throw new Error(`Failed to remove ${failures} synthetic users.`);
   await rm(usersPath, { force: true });
   console.log(JSON.stringify({ removed: fixture.users.length, runId: fixture.runId }));
