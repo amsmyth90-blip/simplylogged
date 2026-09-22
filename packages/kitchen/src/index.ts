@@ -1,6 +1,7 @@
 export * from "./mutation.ts";
 export * from "./calendar-parser.ts";
 export * from "./calendar-types.ts";
+export * from "./grocery-analysis.ts";
 export * from "./notice-capture.ts";
 export * from "./notice-mutation.ts";
 export * from "./notice-parser.ts";

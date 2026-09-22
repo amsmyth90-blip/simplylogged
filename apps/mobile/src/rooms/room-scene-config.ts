@@ -84,7 +84,7 @@ export const roomScenes: Record<string, RoomScene> = {
     actions: [
       action("calendar", "Calendar", "Family dates and plans", "47%", "26%"),
       action("meal-planner", "Meal planner", "Plan the week’s meals", "79%", "52%"),
-      action("pantry", "Pantry", "Food, staples and shopping", "18%", "28%"),
+      action("pantry", "Groceries & dates", "Pantry, shopping and use-by scans", "18%", "28%"),
       action("noticeboard", "Noticeboard", "Notes for the household", "46.5%", "44.5%"),
       action("recipes", "Recipes", "Find, save and cook favourites", "65%", "58%"),
       action("documents", "Documents", "Appliance and kitchen records", "80%", "73.5%"),

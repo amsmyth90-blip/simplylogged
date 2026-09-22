@@ -14,11 +14,19 @@ export function PantryCaptureStage(props: {
   setCaptures: () => void;
   onAddPhoto: (source: "camera" | "library") => void;
   onAnalyse: () => void;
+  onOpenGroceryScanner: () => void;
   onToggle: (item: KitchenItem) => void;
   stage: PantryStage;
 }) {
   if (props.stage !== "capture") return null;
   return <main className="pantry-capture-stage">
+    <button className="grocery-scan-entry" type="button" disabled={!props.online}
+      onClick={props.onOpenGroceryScanner}>
+      <span><MobileIcon name="calendar" /></span>
+      <span><strong>Scan groceries &amp; use-by dates</strong>
+        <small>Save food to your Pantry and make reminders from clear date labels</small></span>
+      <b aria-hidden="true">›</b>
+    </button>
     <section className="pantry-capture-card">
       <div className="pantry-capture-intro">
         <span><MobileIcon name="camera" /></span>

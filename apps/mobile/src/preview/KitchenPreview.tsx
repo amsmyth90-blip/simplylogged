@@ -23,10 +23,10 @@ export function KitchenPreview() {
   return (
     <KitchenScreen
       accessToken="preview-access-token-that-is-never-sent"
-      disableOnline
       initialSnapshot={snapshot}
       store={store}
       syncStatus="READY"
+      synchronize={async () => undefined}
       onBack={() => undefined}
       onNavigate={() => undefined}
     />
