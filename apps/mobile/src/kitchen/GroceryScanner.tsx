@@ -1,13 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { GroceryDateType, ScannedGrocery } from "@diarydock/kitchen";
+import {
+  MAX_GROCERY_PHOTO_COUNT,
+  MAX_GROCERY_TOTAL_PHOTO_BYTES,
+  type GroceryDateType,
+  type ScannedGrocery,
+} from "@diarydock/kitchen";
 import type { OfflineStore } from "@diarydock/offline-store";
 import { ReminderService } from "@diarydock/reminders";
 
-import { chooseDocumentPhoto, takeDocumentPhoto,
+import { chooseDocumentPhotos, takeDocumentPhoto,
   type CapturedDocument } from "@mobile/capture/capture-source";
 import { MobileIcon } from "@mobile/components/MobileIcon";
 import { analyseGroceryPhotos } from "./grocery-analysis-client";
+import { extractGroceryVideoFrames, MAX_GROCERY_VIDEO_FRAMES } from "./grocery-video-frames";
 
 type Stage = "capture" | "checking" | "review" | "saved";
 
@@ -47,6 +53,8 @@ export function GroceryScanner(props: Props) {
   );
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [adding, setAdding] = useState<"" | "camera" | "library" | "video">("");
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const previews = useMemo(() => captures.map((capture) => capture.previewUrl
     ?? URL.createObjectURL(new Blob([capture.bytes as BlobPart], { type: capture.mimeType }))), [captures]);
 
@@ -54,27 +62,69 @@ export function GroceryScanner(props: Props) {
     if (!captures[index]?.previewUrl) URL.revokeObjectURL(url);
   }), [captures, previews]);
 
+  function appendCaptures(candidates: CapturedDocument[]) {
+    setCaptures((current) => {
+      const available = MAX_GROCERY_PHOTO_COUNT - current.length;
+      if (available <= 0) {
+        setError("You already have the maximum of eight images.");
+        return current;
+      }
+      let totalBytes = current.reduce((total, item) => total + item.bytes.byteLength, 0);
+      const accepted: CapturedDocument[] = [];
+      for (const capture of candidates.slice(0, available)) {
+        if (totalBytes + capture.bytes.byteLength > MAX_GROCERY_TOTAL_PHOTO_BYTES) break;
+        accepted.push(capture);
+        totalBytes += capture.bytes.byteLength;
+      }
+      if (accepted.length < candidates.length) {
+        setError(accepted.length
+          ? "Some images were left out. Use up to eight images totalling 16 MB."
+          : "Keep the combined grocery images under 16 MB.");
+      }
+      return accepted.length ? [...current, ...accepted] : current;
+    });
+  }
+
   async function add(source: "camera" | "library") {
     setError("");
     if (!props.online) { setError("Connect to scan grocery labels."); return; }
+    if (captures.length >= MAX_GROCERY_PHOTO_COUNT) {
+      setError("You already have the maximum of eight images."); return;
+    }
+    setAdding(source);
     try {
-      const capture = await (source === "camera" ? takeDocumentPhoto() : chooseDocumentPhoto());
-      if (!capture) return;
-      setCaptures((current) => {
-        if (current.length >= 8) { setError("Choose up to eight grocery photos."); return current; }
-        if (current.reduce((total, item) => total + item.bytes.byteLength, capture.bytes.byteLength)
-          > 16 * 1024 * 1024) {
-          setError("Keep the combined grocery photos under 16 MB."); return current;
-        }
-        return [...current, capture];
-      });
+      const candidates = source === "camera"
+        ? [await takeDocumentPhoto()].filter((item): item is CapturedDocument => Boolean(item))
+        : await chooseDocumentPhotos(MAX_GROCERY_PHOTO_COUNT - captures.length);
+      appendCaptures(candidates);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "That photo could not be opened.");
+    } finally {
+      setAdding("");
+    }
+  }
+
+  async function addVideo(file: File | undefined) {
+    if (!file) return;
+    setError("");
+    if (!props.online) { setError("Connect to scan grocery labels."); return; }
+    const remaining = MAX_GROCERY_PHOTO_COUNT - captures.length;
+    if (remaining <= 0) { setError("Clear an image before adding a video."); return; }
+    setAdding("video");
+    try {
+      appendCaptures(await extractGroceryVideoFrames(
+        file, Math.min(remaining, MAX_GROCERY_VIDEO_FRAMES),
+      ));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "That video could not be scanned.");
+    } finally {
+      setAdding("");
     }
   }
 
   async function analyse() {
-    if (!captures.length) return;
+    if (!captures.length) { setError("Take or choose at least one grocery image first."); return; }
+    if (!props.online) { setError("Connect to scan grocery labels."); return; }
     setStage("checking"); setError("");
     try {
       const result = await analyseGroceryPhotos(captures, props.accessToken);
@@ -138,7 +188,8 @@ export function GroceryScanner(props: Props) {
 
   if (stage === "checking") return <section className="grocery-centred" aria-live="polite">
     <span><MobileIcon name="camera" /></span><h2>Reading grocery labels</h2>
-    <p>Finding products and checking use-by and best-before dates.</p>
+    <p>Securely reading {captures.length} image{captures.length === 1 ? "" : "s"} for products,
+      use-by dates and best-before dates.</p>
   </section>;
 
   if (stage === "saved") return <section className="grocery-centred grocery-saved">
@@ -176,19 +227,34 @@ export function GroceryScanner(props: Props) {
     <div className="grocery-capture-hero"><span><MobileIcon name="calendar" /></span>
       <div><h2>Scan groceries &amp; dates</h2><p>Photograph the front and date label after shopping.
         DiaryDock will find use-by and best-before dates for you to confirm.</p></div></div>
-    <div className="pantry-photo-actions"><button type="button" disabled={!props.online}
-      onClick={() => void add("camera")}>Take label photos</button>
-      <button type="button" disabled={!props.online}
-        onClick={() => void add("library")}>Choose photos</button></div>
+    <div className="pantry-photo-actions"><button type="button" disabled={!props.online || Boolean(adding)}
+      onClick={() => void add("camera")}>{adding === "camera" ? "Opening camera…"
+        : captures.length ? "Take another photo" : "Take a photo"}</button>
+      <button type="button" disabled={!props.online || Boolean(adding)}
+        onClick={() => void add("library")}>{adding === "library" ? "Opening photos…" : "Choose several photos"}</button>
+      <button className="grocery-video-button" type="button"
+        disabled={!props.online || Boolean(adding)} onClick={() => videoInputRef.current?.click()}>
+        {adding === "video" ? "Preparing video frames…" : "Record a slow video"}</button>
+      <input ref={videoInputRef} className="grocery-video-input" type="file" accept="video/*"
+        capture="environment" onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = "";
+          void addVideo(file);
+        }} /></div>
+    {adding ? <p className="grocery-capture-status" role="status">{
+      adding === "video" ? "Making clear label images from your video…" : "Adding grocery photos…"
+    }</p> : null}
     {captures.length ? <div className="pantry-photo-tray"><header>
       <strong>{captures.length} photo{captures.length === 1 ? "" : "s"} ready</strong>
       <button type="button" onClick={() => setCaptures([])}>Clear</button></header>
       <div>{previews.map((url, index) => <img src={url} key={`${url}-${index}`}
         alt={`Grocery label ${index + 1}`} />)}</div>
-      <button className="pantry-check-button" type="button" onClick={() => void analyse()}>
+      <button className="pantry-check-button" type="button" disabled={Boolean(adding)}
+        onClick={() => void analyse()}>
         Read groceries &amp; dates</button></div> : null}
     <aside className="grocery-tips"><strong>For the best result</strong>
-      <p>Use one clear photo of the product name and one close-up of the printed date. Always check the pack before eating.</p></aside>
+      <p>Use a clear photo of each product and its printed date, or record for up to 30 seconds while moving slowly
+        and holding each label still. Always check the pack before eating.</p></aside>
     {error ? <p className="pantry-alert" role="alert">{error}</p> : null}
   </section>;
 }

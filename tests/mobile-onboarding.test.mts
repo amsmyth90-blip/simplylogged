@@ -142,6 +142,9 @@ test("mobile onboarding is authenticated, bounded, encrypted offline and special
   assert.match(client, /could not reach its secure service/);
   assert.match(hook, /tryPutReadModel\(store, CACHE_KEY/);
   assert.match(hook, /tryRemoveReadModel\(store, CACHE_KEY/);
+  assert.match(screen, /model\.loading && !model\.snapshot/);
+  assert.match(screen, /Opening DiaryDock securely/);
+  assert.doesNotMatch(screen, /model\.loading \? "Preparing your DiaryDock/);
   assert.doesNotMatch(`${client}\n${hook}\n${screen}`, /localStorage|sessionStorage/);
   assert.match(signedIn, /destination === "ONBOARDING"/); assert.match(settings, /onNavigate\("ONBOARDING"\)/);
   assert.match(home, /visibleAreaIds/); assert.match(dashboard, /@diarydock\/onboarding/);

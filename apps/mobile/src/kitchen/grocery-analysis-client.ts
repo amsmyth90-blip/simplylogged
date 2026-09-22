@@ -26,15 +26,15 @@ export async function analyseGroceryPhotos(
 ): Promise<GroceryAnalysisResult> {
   const form = new FormData();
   captures.forEach((capture, index) => {
-    form.append("files", new File([capture.bytes as BlobPart],
-      capture.fileName || `grocery-${index + 1}.jpg`, { type: capture.mimeType }));
+    form.append("files", new Blob([capture.bytes as BlobPart], { type: capture.mimeType }),
+      capture.fileName || `grocery-${index + 1}.jpg`);
   });
   const response = await fetch(new URL(
     "/api/mobile/kitchen/groceries/analyse", getSecureRuntime().apiOrigin,
   ), {
     method: "POST",
     cache: "no-store",
-    headers: { Accept: "application/json", Authorization: authorization(accessToken) },
+    headers: { Authorization: authorization(accessToken) },
     body: form,
     signal: requestDeadline(55_000),
   });
