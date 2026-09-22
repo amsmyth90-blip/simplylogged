@@ -10,9 +10,24 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const SOURCE_ICON = path.join(ROOT, "public/brand/diarydock-app-icon.png");
 const SOURCE_MARK = path.join(ROOT, "public/brand/diarydock-mark.png");
 const BACKGROUND = "#fcfcfb";
+
+async function createLockOnlyIcon(sourceMark) {
+  const mark = await sharp(sourceMark)
+    .resize({ width: 700, height: 800, fit: "inside", withoutEnlargement: false })
+    .png()
+    .toBuffer();
+
+  return sharp({
+    create: { width: 1024, height: 1024, channels: 3, background: BACKGROUND },
+  })
+    .composite([{ input: mark, gravity: "center" }])
+    .flatten({ background: BACKGROUND })
+    .removeAlpha()
+    .png()
+    .toBuffer();
+}
 
 async function generateIosAssets(icon, splash) {
   const assets = path.join(ROOT, "ios", "App", "App", "Assets.xcassets");
@@ -27,18 +42,17 @@ async function generateIosAssets(icon, splash) {
   ].map((name) => writeFile(path.join(splashDirectory, name), splash)));
 }
 
-async function generateAndroidIcons(icon) {
+async function generateAndroidIcons(icon, sourceMark) {
   const sizes = { ldpi: 36, mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
   const androidResources = path.join(ROOT, "android", "app", "src", "main", "res");
   for (const [density, size] of Object.entries(sizes)) {
     const directory = path.join(androidResources, `mipmap-${density}`);
     await mkdir(directory, { recursive: true });
     const adaptiveSize = Math.round(size * 2.25);
-    // Modern Android launchers render the adaptive foreground rather than the
-    // legacy bitmap. Keep the full icon, including the DiaryDock wordmark,
-    // inside Android's safe zone so every launcher mode carries the same brand.
-    const foregroundIcon = await sharp(icon)
-      .resize({ width: Math.round(adaptiveSize * 0.8), height: Math.round(adaptiveSize * 0.8), fit: "inside" })
+    // Android applies a launcher-specific mask to adaptive icons. Keep the
+    // lock-and-waves mark inside the central safe zone so no part is cropped.
+    const foregroundIcon = await sharp(sourceMark)
+      .resize({ width: Math.round(adaptiveSize * 0.58), height: Math.round(adaptiveSize * 0.66), fit: "inside" })
       .png()
       .toBuffer();
     const foreground = await sharp({
@@ -76,15 +90,12 @@ async function main() {
 
   const sourceMark = await sharp(SOURCE_MARK).png().toBuffer();
 
-  // Apple rejects App Store icons that carry an alpha channel, so flatten the
-  // supplied artwork onto its warm-white background before generating assets.
-  const flattened = await sharp(SOURCE_ICON)
-    .resize(1024, 1024, { fit: "cover" })
-    .flatten({ background: BACKGROUND })
-    .removeAlpha()
-    .png()
-    .toBuffer();
+  // The phone already displays the application name below its icon. Keep the
+  // icon itself to the lock-and-waves mark, with enough padding for iOS masks.
+  // Apple also rejects App Store icons that carry an alpha channel.
+  const flattened = await createLockOnlyIcon(sourceMark);
 
+  await sharp(flattened).toFile(path.join(ROOT, "public/brand/diarydock-app-icon.png"));
   await sharp(flattened).toFile(path.join(ROOT, "resources/icon.png"));
 
   // Splash source: warm-white canvas with the transparent mark centred at
@@ -124,7 +135,7 @@ async function main() {
 
   await Promise.all([
     generateIosAssets(flattened, splash),
-    generateAndroidIcons(flattened),
+    generateAndroidIcons(flattened, sourceMark),
     generateAndroidSplashes(splash),
   ]);
 
