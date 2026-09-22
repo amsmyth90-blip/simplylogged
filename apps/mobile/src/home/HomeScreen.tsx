@@ -50,6 +50,11 @@ export function HomeScreen(props: HomeScreenProps) {
       </header>
 
       <div className="home-overlay home-quick-row">
+        <button type="button" className="home-quick home-groceries"
+          onClick={() => props.onNavigate("KITCHEN")}>
+          <span className="home-quick-icon is-groceries"><MobileIcon name="calendar" /></span>
+          <span><strong>Groceries &amp; dates</strong><small>Scan use-by labels</small></span>
+        </button>
         <button type="button" className="home-quick home-ask" onClick={props.onAsk}>
           <span className="home-quick-icon is-ask"><MobileIcon name="message" /></span>
           <span><strong>Ask DiaryDock</strong><small>Questions about your records</small></span>

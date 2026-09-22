@@ -46,9 +46,12 @@ workflows:
       - name: Build debug APK
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+          APP_VERSION=$(node -p "require('./package.json').version")
           cd android
           chmod +x ./gradlew
-          ./gradlew testDebugUnitTest lintDebug assembleDebug
+          ./gradlew testDebugUnitTest lintDebug assembleDebug \
+            -PversionCode="$BUILD_NUMBER" \
+            -PversionName="$APP_VERSION-dev.$BUILD_NUMBER"
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
       - android/app/build/reports/lint-results-debug.html
