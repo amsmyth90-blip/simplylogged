@@ -218,6 +218,7 @@ export function SignedInApp({
   if (destination.startsWith("KITCHEN")) return <SignedInKitchen
     accessToken={state.session.access_token} destination={destination}
     store={state.store} syncStatus={sync.status}
+    synchronize={sync.synchronize}
     onBackToRoom={() => { setRoomId("kitchen"); setDestination("HOME"); }}
     onNavigate={navigate} />;
   if (destination === "FAMILY")

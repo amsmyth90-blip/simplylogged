@@ -109,6 +109,9 @@ async function start() {
   } else if (previewEnabled && preview === "kitchen") {
     Application = (await import("@mobile/preview/KitchenPreview"))
       .KitchenPreview;
+  } else if (previewEnabled && preview === "grocery-scanner") {
+    Application = (await import("@mobile/preview/GroceryScannerPreview"))
+      .GroceryScannerPreview;
   } else if (previewEnabled && preview === "kitchen-noticeboard") {
     Application = (await import("@mobile/preview/KitchenNoticeboardPreview"))
       .KitchenNoticeboardPreview;

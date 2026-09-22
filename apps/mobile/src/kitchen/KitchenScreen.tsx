@@ -1,8 +1,11 @@
+import { useState } from "react";
+
 import type { KitchenItem, KitchenSnapshot } from "@diarydock/kitchen";
 import type { OfflineStore } from "@diarydock/offline-store";
 
 import { MobileBottomNav, type MobileDestination } from "@mobile/components/MobileBottomNav";
 import { MobileIcon } from "@mobile/components/MobileIcon";
+import { GroceryScanner } from "./GroceryScanner";
 import { PantryCaptureStage } from "./PantryCaptureStage";
 import { PantryFlowStages } from "./PantryFlowStages";
 import { useKitchen } from "./use-kitchen";
@@ -14,11 +17,13 @@ type KitchenScreenProps = {
   initialSnapshot?: KitchenSnapshot;
   store: OfflineStore;
   syncStatus: string;
+  synchronize: () => Promise<unknown>;
   onBack: () => void;
   onNavigate: (destination: MobileDestination) => void;
 };
 
 export function KitchenScreen(props: KitchenScreenProps) {
+  const [groceryScannerOpen, setGroceryScannerOpen] = useState(false);
   const kitchen = useKitchen(props);
   const planner = usePantryPlanner({ accessToken: props.accessToken,
     mutate: kitchen.mutate, online: kitchen.online });
@@ -47,6 +52,27 @@ export function KitchenScreen(props: KitchenScreenProps) {
     await kitchen.mutate({ operation: "ADD_ITEM", name, section: "Shopping" });
   }
 
+  async function saveGroceries(names: string[]) {
+    if (!names.length) return false;
+    return kitchen.mutate({ operation: "ADD_ITEMS", names, section: "Pantry" });
+  }
+
+  if (groceryScannerOpen) return <main className="pantry-screen">
+    <div className="pantry-shell">
+      <header className="pantry-header">
+        <button type="button" onClick={() => setGroceryScannerOpen(false)} aria-label="Back to Pantry">
+          <MobileIcon name="arrow-left" />
+        </button>
+        <div><small>Kitchen</small><h1>Groceries &amp; use-by dates</h1></div>
+        <span className={kitchen.online ? "is-live" : "is-cached"}>{kitchen.online ? "Live" : "Offline"}</span>
+      </header>
+      <GroceryScanner accessToken={props.accessToken} online={kitchen.online} store={props.store}
+        synchronize={props.synchronize} onBack={() => setGroceryScannerOpen(false)}
+        onSavePantry={saveGroceries} />
+    </div>
+    <MobileBottomNav active="HOME" onNavigate={props.onNavigate} />
+  </main>;
+
   return <main className="pantry-screen">
     <div className="pantry-shell">
       <header className="pantry-header">
@@ -68,6 +94,7 @@ export function KitchenScreen(props: KitchenScreenProps) {
         setCaptures={() => planner.setCaptures([])}
         onAddPhoto={(source) => void planner.add(source)}
         onAnalyse={() => void planner.analyse()}
+        onOpenGroceryScanner={() => setGroceryScannerOpen(true)}
         onToggle={toggleItem}
         stage={planner.stage}
       />

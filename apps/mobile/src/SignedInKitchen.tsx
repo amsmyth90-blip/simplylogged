@@ -9,6 +9,7 @@ type Props = {
   destination: MobileDestination;
   store: OfflineStore;
   syncStatus: string;
+  synchronize: () => Promise<unknown>;
   onBackToRoom: () => void;
   onNavigate: (destination: MobileDestination) => void;
 };
@@ -16,6 +17,7 @@ type Props = {
 export function SignedInKitchen(props: Props) {
   if (props.destination === "KITCHEN") return <KitchenScreen
     accessToken={props.accessToken} store={props.store} syncStatus={props.syncStatus}
+    synchronize={props.synchronize}
     onBack={props.onBackToRoom} onNavigate={props.onNavigate} />;
   if (props.destination === "KITCHEN_CALENDAR") return <KitchenCalendarScreen
     accessToken={props.accessToken} store={props.store} syncStatus={props.syncStatus}
