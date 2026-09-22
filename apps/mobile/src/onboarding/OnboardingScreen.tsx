@@ -22,10 +22,16 @@ function SetupUnavailable({ model, onSignOut }: { model: MobileOnboardingModel;
   return <main className="setup-screen setup-unavailable">
     <span aria-hidden="true" className="setup-unavailable-image" />
     <section className="setup-card"><p className="setup-eyebrow">Private setup</p>
-      <h1>{model.loading ? "Preparing your DiaryDock…" : "Connect to continue"}</h1>
+      <h1>Connect to continue</h1>
       <p>{model.message ?? "Your setup could not be opened safely."}</p>
-      {!model.loading ? <button type="button" onClick={() => void model.refresh()}>Try again</button> : null}
+      <button type="button" onClick={() => void model.refresh()}>Try again</button>
       <button type="button" className="quiet" onClick={onSignOut}>Sign out</button></section>
+  </main>;
+}
+
+function SetupOpening() {
+  return <main className="mobile-shell" aria-busy="true" aria-live="polite">
+    <p>Opening DiaryDock securely…</p>
   </main>;
 }
 
@@ -75,6 +81,7 @@ function SetupForm({ model, onBack, onComplete }: { model: MobileOnboardingModel
 
 export function OnboardingScreen({ model, onBack, onComplete, onSignOut }: {
   model: MobileOnboardingModel; onBack?: () => void; onComplete: () => void; onSignOut: () => void }) {
+  if (model.loading && !model.snapshot) return <SetupOpening />;
   if (!model.snapshot) return <SetupUnavailable model={model} onSignOut={onSignOut} />;
   return <SetupForm key={model.snapshot.revision ?? "new"} model={model}
     onBack={onBack} onComplete={onComplete} />;

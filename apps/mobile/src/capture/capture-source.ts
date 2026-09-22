@@ -165,3 +165,27 @@ export async function chooseDocumentPhoto() {
     throw error;
   }
 }
+
+export async function chooseDocumentPhotos(limit = 8) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 8) {
+    throw new Error("Choose between one and eight photos.");
+  }
+  try {
+    const selected = await Camera.chooseFromGallery({
+      allowMultipleSelection: true,
+      correctOrientation: true,
+      editable: "no",
+      includeMetadata: true,
+      limit,
+      mediaType: MediaTypeSelection.Photo,
+      quality: 88,
+      targetHeight: 2400,
+      targetWidth: 2400,
+      webUseInput: true,
+    });
+    return Promise.all(selected.results.slice(0, limit).map(capturedDocumentFromMedia));
+  } catch (error) {
+    if (cancelled(error)) return [];
+    throw error;
+  }
+}

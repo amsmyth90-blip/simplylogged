@@ -16,6 +16,16 @@ export const MAX_GROCERY_PHOTO_COUNT = 8;
 export const MAX_GROCERY_PHOTO_BYTES = 8 * 1024 * 1024;
 export const MAX_GROCERY_TOTAL_PHOTO_BYTES = 16 * 1024 * 1024;
 
+export function groceryVideoFrameTimes(duration: number, maximumFrames = 6) {
+  if (!Number.isFinite(duration) || duration <= 0 || !Number.isInteger(maximumFrames)
+    || maximumFrames < 1) return [];
+  const count = Math.min(maximumFrames, Math.max(1, Math.ceil(duration / 3)));
+  if (count === 1) return [duration / 2];
+  const start = Math.min(0.5, duration / 4);
+  const end = Math.max(start, duration - Math.min(0.5, duration / 4));
+  return Array.from({ length: count }, (_, index) => start + ((end - start) * index) / (count - 1));
+}
+
 export const groceryAnalysisSchema = {
   type: "object",
   additionalProperties: false,
