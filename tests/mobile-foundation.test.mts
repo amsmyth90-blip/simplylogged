@@ -12,6 +12,20 @@ test("the mobile application packages local assets instead of a remote website",
   assert.doesNotMatch(config, /server:\s*\{[^}]*url:/s);
 });
 
+test("every mobile brand mark uses the current DiaryDock lock-and-waves artwork", async () => {
+  const [brandMark, loginStyles, iconGenerator] = await Promise.all([
+    read("apps/mobile/src/components/BrandMark.tsx"),
+    read("apps/mobile/src/auth/login.css"),
+    read("tools/generate-app-icons.mjs"),
+  ]);
+  assert.match(brandMark, /public\/brand\/diarydock-mark\.png/);
+  assert.match(brandMark, /<img src=\{diaryDockMark\}/);
+  assert.doesNotMatch(brandMark, /<svg|M5 12c0-4\.5/);
+  assert.match(loginStyles, /public\/brand\/diarydock-mark\.png/);
+  assert.match(iconGenerator, /SOURCE_MARK = path\.join\(ROOT, "public\/brand\/diarydock-mark\.png"\)/);
+  assert.doesNotMatch(`${brandMark}\n${loginStyles}\n${iconGenerator}`, /lifedock-mark/);
+});
+
 test("the mobile entry document applies a restrictive content security policy", async () => {
   const document = await read("apps/mobile/index.html");
   assert.match(document, /default-src 'self'/);

@@ -37,8 +37,9 @@
   border-radius: 0.75rem;
 }
 
-.search-brand .brand-mark svg {
-  width: 1.25rem;
+.search-brand .brand-mark img {
+  width: 1.75rem;
+  height: auto;
 }
 
 .search-brand strong,
