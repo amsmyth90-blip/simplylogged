@@ -47,8 +47,9 @@
   border-radius: 0.8rem;
 }
 
-.guardian-header .brand-mark svg {
-  width: 1.3rem;
+.guardian-header .brand-mark img {
+  width: 1.9rem;
+  height: auto;
 }
 
 .guardian-header strong,

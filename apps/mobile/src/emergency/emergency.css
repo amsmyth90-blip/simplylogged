@@ -72,10 +72,9 @@
   height: 2.5rem;
   flex: 0 0 auto;
   border-radius: 0.8rem;
-  background: linear-gradient(145deg, #925247, #713c35);
 }
 
-.emergency-header .brand-mark svg { width: 1.3rem; }
+.emergency-header .brand-mark img { width: 1.9rem; height: auto; }
 .emergency-header strong,
 .emergency-header small { display: block; }
 .emergency-header strong { font-family: Georgia, serif; font-size: 1.1rem; }

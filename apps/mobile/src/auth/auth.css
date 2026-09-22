@@ -20,8 +20,9 @@
   border-radius: 1rem;
 }
 
-.auth-card-header .brand-mark svg {
-  width: 1.5rem;
+.auth-card-header .brand-mark img {
+  width: 2.25rem;
+  height: auto;
 }
 
 .auth-card-header .eyebrow {
