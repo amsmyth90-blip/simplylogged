@@ -48,10 +48,21 @@ test("the mobile Kitchen exposes a clear grocery-date entry and review-before-sa
   const room = await readFile(new URL(
     "../apps/mobile/src/rooms/room-scene-config.ts", import.meta.url,
   ), "utf8");
+  const home = await readFile(new URL(
+    "../apps/mobile/src/home/HomeScreen.tsx", import.meta.url,
+  ), "utf8");
   assert.match(capture, /Scan groceries &amp; use-by dates/);
   assert.match(room, /Groceries & dates/);
+  assert.match(home, /Groceries &amp; dates/);
+  assert.match(home, /onNavigate\("KITCHEN"\)/);
   assert.match(scanner, /Check before saving/);
   assert.match(scanner, /Save groceries & reminders/);
   assert.match(scanner, /ReminderService/);
   assert.match(scanner, /Check the original packaging/);
+});
+
+test("Codemagic developer APKs receive distinct Android build versions", async () => {
+  const workflow = await readFile(new URL("../codemagic.yaml", import.meta.url), "utf8");
+  assert.match(workflow, /-PversionCode="\$BUILD_NUMBER"/);
+  assert.match(workflow, /-PversionName="\$APP_VERSION-dev\.\$BUILD_NUMBER"/);
 });

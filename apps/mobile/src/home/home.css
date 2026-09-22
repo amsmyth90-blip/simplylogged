@@ -125,6 +125,8 @@
 
 .home-quick-icon.is-today { color: #0369a1; background: #e5f0f4; }
 .home-quick-icon.is-ask { color: #fff; background: #315443; }
+.home-quick-icon.is-groceries { color: #725019; background: #f4e8c9; }
+.home-groceries { min-width: 10.5rem; }
 .home-ask { min-width: 10.75rem; }
 .home-quick-icon svg { width: 0.875rem; height: 0.875rem; }
 
