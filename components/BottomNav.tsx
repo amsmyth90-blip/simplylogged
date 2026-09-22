@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { DiaryDockBrand } from "@/components/DiaryDockBrand";
 import { UiIcon, type IconName } from "@/components/UiIcon";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 
@@ -99,11 +99,7 @@ export function BottomNav() {
 
       {showDesktopSidebar ? <aside className="desktop-primary-nav fixed inset-y-0 left-0 z-[70] hidden w-[17rem] flex-col border-r border-[#20352a]/10 bg-[#fffdf8]/[0.97] px-4 py-5 shadow-[20px_0_60px_-48px_rgba(32,53,42,0.42)] backdrop-blur-2xl lg:flex">
         <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2">
-          <Image src="/icons/icon-192.png" alt="" width={44} height={44} className="rounded-[13px] shadow-sm" />
-          <span>
-            <span className="block font-serif text-[25px] leading-none text-[#20352a]">DiaryDock</span>
-            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6f8e72]">Your digital home</span>
-          </span>
+          <DiaryDockBrand />
         </Link>
 
         <nav aria-label="Desktop primary navigation" className="mt-8 flex-1">

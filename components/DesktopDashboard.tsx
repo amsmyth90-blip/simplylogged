@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { DiaryDockBrand } from "@/components/DiaryDockBrand";
 import { useDiaryDockData } from "@/components/DiaryDockDataProvider";
 import { UiIcon } from "@/components/UiIcon";
 import { isDashboardAreaVisible } from "@/lib/dashboard-areas";
@@ -63,11 +64,7 @@ export function DesktopDashboard({ greeting, guardianCount }: { greeting: string
       <div className="relative min-h-full overflow-hidden bg-[radial-gradient(circle_at_50%_-15%,rgba(255,255,255,0.95),transparent_35%),linear-gradient(115deg,rgba(207,196,167,0.12),transparent_32%,rgba(111,142,114,0.08))]">
         <header className="relative z-10 flex min-h-[86px] items-center justify-between border-b border-[#345143]/10 bg-[#fffdf8]/80 px-8 backdrop-blur-xl xl:px-12">
           <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f8e72] focus-visible:ring-offset-4">
-            <Image src="/icons/icon-192.png" alt="" width={44} height={44} className="rounded-[14px] shadow-sm" preload />
-            <span>
-              <span className="block font-serif text-[27px] leading-none">DiaryDock</span>
-              <span className="mt-1 block text-[9px] font-bold uppercase tracking-[0.25em] text-[#789078]">Your digital home</span>
-            </span>
+            <DiaryDockBrand priority />
           </Link>
 
           <nav aria-label="Desktop navigation" className="flex items-center gap-1 rounded-full border border-[#345143]/10 bg-white/65 p-1.5 shadow-sm">
