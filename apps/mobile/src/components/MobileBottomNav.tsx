@@ -18,7 +18,7 @@ const destinations: ReadonlyArray<{
   label: string;
 }> = [
   { id: "HOME", icon: "home", label: "Home" },
-  { id: "SCAN", icon: "plus", label: "Scan" },
+  { id: "SCAN", icon: "scan", label: "Scan" },
   { id: "FILES", icon: "folder", label: "All Files" },
 ];
 

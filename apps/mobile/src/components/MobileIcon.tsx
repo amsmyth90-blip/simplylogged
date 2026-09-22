@@ -13,6 +13,7 @@ export type MobileIconName =
   | "message"
   | "phone"
   | "plus"
+  | "scan"
   | "search"
   | "shield"
   | "users";
@@ -36,6 +37,7 @@ export function MobileIcon({ className, name }: Props) {
     message: <><path d="M5 5h14v11H9l-4 3z" /><path d="M8 9h8M8 12h5" /></>,
     phone: <path d="M6 4h3.5l1.5 4-2.2 1.7a12.5 12.5 0 0 0 5.5 5.5L16 13l4 1.5V18a2 2 0 0 1-2 2A14 14 0 0 1 4 6a2 2 0 0 1 2-2Z" />,
     plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
+    scan: <><path d="M4 8V6a2 2 0 0 1 2-2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M20 16v2a2 2 0 0 1-2 2h-2" /><path d="M8 20H6a2 2 0 0 1-2-2v-2" /><path d="M7 12h10" /><path d="M9 9.5v5" /><path d="M12 9.5v5" /><path d="M15 9.5v5" /></>,
     search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
     shield: <path d="M12 4c3 2 5 2.5 7 3v5c0 4-2.5 6.5-7 8-4.5-1.5-7-4-7-8V7c2-.5 4-1 7-3Z" />,
     users: <><circle cx="8" cy="9" r="3" /><circle cx="16" cy="9" r="3" /><path d="M3.5 19a4.5 4.5 0 0 1 9 0" /><path d="M11.5 19a4.5 4.5 0 0 1 9 0" /></>,

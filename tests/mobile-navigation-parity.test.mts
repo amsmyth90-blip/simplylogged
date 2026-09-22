@@ -56,19 +56,20 @@ test("native navigation keeps only the three primary destinations", async () => 
   for (const label of ["Home", "Scan", "All Files"]) {
     assert.ok(navigation.includes(`label: "${label}"`));
   }
-  for (const icon of ["home", "plus", "folder"]) {
+  for (const icon of ["home", "scan", "folder"]) {
     assert.ok(navigation.includes(`icon: "${icon}"`));
   }
   assert.doesNotMatch(navigation, /label: "(?:Reminders|Family Room)"/);
   assert.match(styles, /grid-template-columns: repeat\(3,/);
   assert.doesNotMatch(navigation, /[⌂▱＋◷♙]/);
   assert.match(icons, /viewBox="0 0 24 24"/);
-  assert.match(styles, /border: 1px solid rgb\(201 155 61 \/ 72%\)/);
-  assert.match(styles, /rgb\(255 253 248 \/ 72%\)/);
-  assert.match(styles, /backdrop-filter: blur\(18px\) saturate\(145%\)/);
-  assert.match(styles, /-webkit-backdrop-filter: blur\(18px\) saturate\(145%\)/);
-  assert.match(styles, /radial-gradient\(circle at 35% 25%, #fff4c8/);
-  assert.match(styles, /button \+ button::before/);
+  assert.match(styles, /--nav-aqua: #24d1c4/);
+  assert.match(styles, /--nav-blue: #3e7be8/);
+  assert.match(styles, /--nav-violet: #9c52f4/);
+  assert.match(styles, /backdrop-filter: blur\(20px\) saturate\(155%\)/);
+  assert.match(styles, /-webkit-backdrop-filter: blur\(20px\) saturate\(155%\)/);
+  assert.match(styles, /linear-gradient\(145deg, var\(--nav-aqua\), var\(--nav-blue\) 56%, var\(--nav-violet\)\)/);
+  assert.match(styles, /\.mobile-bottom-nav::after/);
 });
 
 test("native scan entry reproduces the wrapper capture experience", async () => {
