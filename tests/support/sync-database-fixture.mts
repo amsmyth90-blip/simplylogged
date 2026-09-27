@@ -19,6 +19,8 @@ const migrationNames = [
   "20260904214000_household_reminder_mutations.sql",
   "20260904215000_preserve_household_reminders_on_deletion.sql",
   "20260919190000_sync_pull_page.sql",
+  "20260927103000_document_room_sections.sql",
+  "20260927103001_document_room_section_upload.sql",
 ] as const;
 
 const bootstrapSql = String.raw`
@@ -91,11 +93,31 @@ const bootstrapSql = String.raw`
     due_date text,
     storage_bucket text,
     storage_path text,
+    original_file_name text,
+    mime_type text,
+    extraction_summary text,
+    extracted_text text,
+    action_items jsonb not null default '[]'::jsonb,
+    confidence numeric,
     review_status text not null default 'reviewed',
+    review_reasons jsonb not null default '[]'::jsonb,
     reviewed_at text,
     emergency_visible boolean not null default false,
     created_at timestamptz not null default timezone('utc', now()),
     updated_at timestamptz not null default timezone('utc', now())
+  );
+
+  create table public.document_upload_reservations (
+    id uuid primary key,
+    user_id uuid not null,
+    document_id text not null,
+    expected_bytes bigint not null,
+    quarantine_path text not null,
+    final_path text not null,
+    mime_type text not null,
+    expires_at timestamptz not null,
+    committed_at timestamptz,
+    cancelled_at timestamptz
   );
 
   create table public.reminders (

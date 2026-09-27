@@ -20,6 +20,7 @@ export type StructuredDocumentInput = {
   reviewedAt: string | null;
   roomId: string | null;
   roomName: string | null;
+  sectionId: string | null;
   size: string;
   storageBucket: string | null;
   storagePath: string | null;
@@ -30,7 +31,7 @@ const inputKeys = [
   "actionItems", "category", "confidence", "dueDate", "emergencyVisible",
   "extractedText", "extractionSummary", "id", "issuer", "kind", "mimeType",
   "originalFileName", "reviewReasons", "reviewStatus", "reviewedAt", "roomId",
-  "roomName", "size", "storageBucket", "storagePath", "title",
+  "roomName", "sectionId", "size", "storageBucket", "storagePath", "title",
 ] as const;
 
 function object(value: unknown): value is Record<string, unknown> {
@@ -59,6 +60,14 @@ function optionalText(value: unknown, maximum: number, label: string) {
     throw new Error(`Invalid document ${label}.`);
   }
   return value.trim() || null;
+}
+
+function optionalSectionId(value: unknown) {
+  const sectionId = optionalText(value, 64, "section");
+  if (sectionId && !/^[a-z0-9-]+$/.test(sectionId)) {
+    throw new Error("Invalid document section.");
+  }
+  return sectionId;
 }
 
 function stringList(value: unknown, label: string) {
@@ -94,14 +103,16 @@ export function structuredDocumentInput(document: VaultDocument): StructuredDocu
     reviewReasons: document.reviewReasons ?? [],
     reviewStatus: document.reviewStatus ?? "reviewed",
     reviewedAt: document.reviewedAt ?? null, roomId: document.roomId ?? null,
-    roomName: document.roomName ?? null, size: document.size,
+    roomName: document.roomName ?? null, sectionId: document.sectionId ?? null,
+    size: document.size,
     storageBucket: document.storageBucket ?? null,
     storagePath: document.storagePath ?? null, title: document.title,
   };
 }
 
 export function parseStructuredDocumentMutation(value: unknown): StructuredDocumentInput {
-  if (!object(value) || !exactKeys(value, inputKeys)) {
+  if (!object(value) || (!exactKeys(value, inputKeys)
+    && !exactKeys(value, inputKeys.filter((key) => key !== "sectionId")))) {
     throw new Error("Invalid document update.");
   }
   const kind = value.kind;
@@ -134,6 +145,7 @@ export function parseStructuredDocumentMutation(value: unknown): StructuredDocum
     reviewedAt: optionalText(value.reviewedAt, 64, "reviewed label"),
     roomId: optionalText(value.roomId, 128, "room"),
     roomName: optionalText(value.roomName, 160, "room name"),
+    sectionId: optionalSectionId(value.sectionId ?? null),
     size: text(value.size, 80, "size"),
     storageBucket: optionalText(value.storageBucket, 64, "storage bucket"),
     storagePath: optionalText(value.storagePath, 1_024, "storage path"),

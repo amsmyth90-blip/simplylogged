@@ -97,6 +97,7 @@ function mutableRow(input: StructuredDocumentInput) {
     reviewed_at: input.reviewedAt,
     room_id: input.roomId,
     room_name: input.roomName,
+    section_id: input.sectionId,
     title: input.title,
   };
 }

@@ -40,6 +40,7 @@ export type VaultDocument = {
   mimeType?: string;
   roomId?: string;
   roomName?: string;
+  sectionId?: string;
   issuer?: string;
   dueDate?: string;
   extractionSummary?: string;

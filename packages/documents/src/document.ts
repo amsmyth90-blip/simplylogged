@@ -13,6 +13,7 @@ export type DocumentSummary = {
   size: string;
   roomId?: string;
   roomName?: string;
+  sectionId?: string;
   issuer?: string;
   dueDate?: string;
   reviewStatus: DocumentReviewStatus;
@@ -33,6 +34,7 @@ export type EditableDocument = Pick<
   | "reviewStatus"
   | "roomId"
   | "roomName"
+  | "sectionId"
   | "title"
 >;
 
@@ -96,6 +98,7 @@ export function parseDocument(record: LocalRecord): DocumentSummary {
     size: requiredText(record.payload, "size", 80),
     roomId: optionalText(record.payload, "roomId", 128),
     roomName: optionalText(record.payload, "roomName", 160),
+    sectionId: optionalText(record.payload, "sectionId", 64),
     issuer: optionalText(record.payload, "issuer", 240),
     dueDate: dueDate(record.payload),
     reviewStatus: reviewStatus(record.payload),
@@ -126,6 +129,7 @@ export function documentPayload(existing: DocumentSummary, draft: EditableDocume
   put(payload, "fileVersion", existing.fileVersion);
   put(payload, "roomId", draft.roomId?.trim());
   put(payload, "roomName", draft.roomName?.trim());
+  put(payload, "sectionId", draft.sectionId?.trim());
   put(payload, "issuer", draft.issuer?.trim());
   put(payload, "dueDate", draft.dueDate);
   parseDocument({
