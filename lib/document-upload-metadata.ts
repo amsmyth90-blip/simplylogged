@@ -5,6 +5,7 @@ export type MobileUploadMetadata = {
   title: string;
   category: DocumentCategory;
   roomName: EstateRoom;
+  sectionId?: string;
   issuer?: string;
   dueDate?: string;
   summary?: string;
@@ -18,7 +19,7 @@ export type MobileUploadMetadata = {
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const allowedKeys = new Set(["actionItems", "captureJobId", "category", "confidence", "confirmedFields",
-  "dueDate", "extractedText", "issuer", "reminder", "roomName", "summary", "title"]);
+  "dueDate", "extractedText", "issuer", "reminder", "roomName", "sectionId", "summary", "title"]);
 
 function optionalText(input: Record<string, unknown>, key: string, maximum: number) {
   const value = input[key];
@@ -88,8 +89,10 @@ export function parseMobileUploadMetadata(value: unknown): MobileUploadMetadata 
   const title = requiredText(input, "title", 240);
   const category = requiredText(input, "category", 160);
   const roomName = requiredText(input, "roomName", 160);
+  const sectionId = optionalText(input, "sectionId", 64);
   if (!documentCategories.includes(category as DocumentCategory)) throw new Error("The document category is invalid.");
   if (!estateRooms.includes(roomName as EstateRoom)) throw new Error("The document area is invalid.");
+  if (sectionId && !/^[a-z0-9-]+$/.test(sectionId)) throw new Error("The document section is invalid.");
   const dueDate = optionalText(input, "dueDate", 32);
   if (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) throw new Error("The document date is invalid.");
   const confidence = input.confidence;
@@ -107,6 +110,7 @@ export function parseMobileUploadMetadata(value: unknown): MobileUploadMetadata 
     title,
     category: category as DocumentCategory,
     roomName: roomName as EstateRoom,
+    sectionId,
     issuer: optionalText(input, "issuer", 240),
     dueDate,
     summary: optionalText(input, "summary", 2_000),
@@ -124,6 +128,7 @@ export function persistedMobileUploadMetadata(metadata: MobileUploadMetadata) {
     title: metadata.title,
     category: metadata.category,
     roomName: metadata.roomName,
+    sectionId: metadata.sectionId,
     issuer: metadata.issuer,
     dueDate: metadata.dueDate,
     summary: metadata.summary,

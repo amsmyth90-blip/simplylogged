@@ -16,7 +16,7 @@ import {
 } from "./diarydock-record-projection.ts";
 
 const pageSize = (kind: DiaryDockRecordKind) => kind === "documents" ? 25 : 200;
-const documentColumns = "id,user_id,title,category,kind,size_label,room_id,room_name,issuer,due_date,storage_bucket,storage_path,original_file_name,mime_type,extraction_summary,extracted_text,action_items,confidence,review_status,review_reasons,reviewed_at,emergency_visible,shared_with,created_at";
+const documentColumns = "id,user_id,title,category,kind,size_label,room_id,room_name,section_id,issuer,due_date,storage_bucket,storage_path,original_file_name,mime_type,extraction_summary,extracted_text,action_items,confidence,review_status,review_reasons,reviewed_at,emergency_visible,shared_with,created_at";
 const reminderColumns = "id,title,note,room_id,room_name,reminder_group,time_label,priority,repeat,document_id,document_title,assigned_to,due_at,source_due_at,origin,reminder_type,source_resource_type,source_resource_id,source_date_key,rule_id,rule_version,dedupe_key,schedule_offset_days,time_zone,created_at";
 
 async function queryRows(

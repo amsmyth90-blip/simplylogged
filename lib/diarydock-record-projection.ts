@@ -59,6 +59,7 @@ export function projectDocuments(
       mimeType: row.mime_type ? String(row.mime_type) : undefined,
       roomId: row.room_id ? String(row.room_id) : undefined,
       roomName: row.room_name ? String(row.room_name) : undefined,
+      sectionId: row.section_id ? String(row.section_id) : undefined,
       issuer: row.issuer ? String(row.issuer) : undefined,
       dueDate: row.due_date ? String(row.due_date) : undefined,
       extractionSummary: row.extraction_summary ? String(row.extraction_summary) : undefined,

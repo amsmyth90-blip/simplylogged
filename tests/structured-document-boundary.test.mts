@@ -26,12 +26,68 @@ test("structured document requests are exact and bounded", () => {
   });
   assert.equal(parseStructuredDocumentMutation(input).title, "Home cover");
   assert.equal(parseStructuredDocumentMutation(input).reviewedAt, "Just now");
+  const { sectionId: _legacySectionId, ...legacyInput } = input;
+  assert.equal(parseStructuredDocumentMutation(legacyInput).sectionId, null);
+  assert.throws(() => parseStructuredDocumentMutation({ ...input, sectionId: "../office" }), /section/i);
   assert.equal(parseStructuredDocumentDelete({ documentId }), documentId);
   assert.throws(() => parseStructuredDocumentMutation({ ...input, extra: true }), /Invalid/);
   assert.throws(() => parseStructuredDocumentMutation({
     ...input, extractedText: "x".repeat(64_001),
   }), /extracted text/i);
   assert.throws(() => parseStructuredDocumentDelete({ documentId, ownerId: userId }), /Invalid/);
+});
+
+test("a room section is projected with its document and validated for sync", async () => {
+  const database = await createSyncDatabase();
+  try {
+    await database.query("insert into auth.users(id) values ($1)", [userId]);
+    await database.query(
+      `insert into public.documents (id, user_id, title, category, kind, size_label,
+        room_id, room_name, section_id)
+       values ($1, $2::uuid, 'Breakdown policy', 'Home & Property', 'Scan', '20 KB',
+        'garage', 'Garage', 'breakdown')`,
+      [documentId, userId],
+    );
+    const result = await database.query<{ section_id: string; valid: boolean }>(
+      `select payload ->> 'sectionId' as section_id,
+        public.is_valid_document_sync_payload(payload) as valid
+       from public.sync_records where source_id = $1 and entity_type = 'document'`,
+      [documentId],
+    );
+    assert.deepEqual(result.rows[0], { section_id: "breakdown", valid: true });
+  } finally {
+    await database.close();
+  }
+});
+
+test("mobile upload commit files a scan in the selected section", async () => {
+  const database = await createSyncDatabase();
+  const reservationId = "33333333-3333-4333-8333-333333333333";
+  try {
+    await database.query("insert into auth.users(id) values ($1)", [userId]);
+    await database.query(
+      `insert into public.document_upload_reservations
+        (id, user_id, document_id, expected_bytes, quarantine_path, final_path,
+          mime_type, expires_at)
+       values ($1::uuid, $2::uuid, $3, 1024, 'quarantine', 'stored', 'image/jpeg',
+        timezone('utc', now()) + interval '1 hour')`,
+      [reservationId, userId, documentId],
+    );
+    const committed = await database.query<{ saved: boolean }>(
+      `select public.commit_mobile_document_upload($1::uuid, $2::uuid, $3::jsonb) as saved`,
+      [userId, reservationId, JSON.stringify({
+        title: "Breakdown policy", category: "Home & Property", roomName: "Garage",
+        sectionId: "breakdown", actionItems: [],
+      })],
+    );
+    assert.equal(committed.rows[0]?.saved, true);
+    const filed = await database.query<{ room_id: string; section_id: string }>(
+      "select room_id, section_id from public.documents where id = $1", [documentId],
+    );
+    assert.deepEqual(filed.rows[0], { room_id: "garage", section_id: "breakdown" });
+  } finally {
+    await database.close();
+  }
 });
 
 test("document deletion is owner-scoped and leaves a durable storage cleanup job", async () => {
@@ -92,8 +148,8 @@ test("desktop document helpers use the authenticated service route", async () =>
   assert.match(cleanupRoute, /export async function POST/);
   assert.match(cleanupWorker, /isOwnedDocumentStoragePath/);
   assert.match(cleanupWorker, /nextAttempt/);
-  const vercel = JSON.parse(vercelSource) as { crons?: unknown };
-  assert.deepEqual(vercel.crons, [{
+  const vercel = JSON.parse(vercelSource) as { crons: Array<{ path: string; schedule: string }> };
+  assert.deepEqual(vercel.crons.filter((job) => job.path === "/api/internal/document-cleanup"), [{
     path: "/api/internal/document-cleanup",
     schedule: "17 3 * * *",
   }]);
