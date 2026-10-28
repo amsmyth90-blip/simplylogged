@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 function safeNextPath(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+  // Browsers treat a backslash as a slash, so "/\evil.com" would leave the site.
+  if (!value || !/^\/(?![/\\])[A-Za-z0-9\-._~/?=&%]*$/.test(value)) {
     return "/dashboard";
   }
   return value;

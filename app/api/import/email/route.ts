@@ -42,25 +42,29 @@ class EmailRateLimitError extends Error {
 
 async function authenticateAndParse(
   request: NextRequest,
-  webhookSecret: string,
+  resendWebhookSecret: string | undefined,
+  inboundWebhookSecret: string | undefined,
   resendApiKey: string | undefined,
   beforeAttachments: (recipientText: string) => Promise<void>
 ) {
   if (hasAnyResendSignature(request)) {
     if (!hasCompleteResendSignature(request)) throw new EmailAuthorizationError("DiaryDock could not verify this Resend webhook.");
-    if (!resendApiKey) throw new EmailConfigurationError("Resend API access is not configured yet.");
-    return parseResendPayload(request, new Resend(resendApiKey), webhookSecret, beforeAttachments);
+    if (!resendApiKey || !resendWebhookSecret) throw new EmailConfigurationError("Resend API access is not configured yet.");
+    return parseResendPayload(request, new Resend(resendApiKey), resendWebhookSecret, beforeAttachments);
   }
+  // The Resend signing key never doubles as a bearer token; direct posts need their own secret.
+  if (!inboundWebhookSecret) throw new EmailAuthorizationError();
   const suppliedSecret = request.headers.get("x-diarydock-webhook-secret") ?? request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!secretsMatch(suppliedSecret, webhookSecret)) throw new EmailAuthorizationError();
+  if (!secretsMatch(suppliedSecret, inboundWebhookSecret)) throw new EmailAuthorizationError();
   return parseInboundPayload(request, beforeAttachments);
 }
 
 export async function POST(request: NextRequest) {
-  const webhookSecret = process.env.RESEND_WEBHOOK_SECRET?.trim() ?? process.env.DIARYDOCK_INBOUND_WEBHOOK_SECRET?.trim();
+  const resendWebhookSecret = process.env.RESEND_WEBHOOK_SECRET?.trim() || undefined;
+  const inboundWebhookSecret = process.env.DIARYDOCK_INBOUND_WEBHOOK_SECRET?.trim() || undefined;
   const inboundSecret = getInboundEmailSecret();
   const resendApiKey = process.env.RESEND_API_KEY?.trim();
-  if (!webhookSecret || !inboundSecret || !isSupabaseAdminConfigured()) {
+  if ((!resendWebhookSecret && !inboundWebhookSecret) || !inboundSecret || !isSupabaseAdminConfigured()) {
     return NextResponse.json({ error: "DiaryDock email forwarding is not fully configured yet." }, { status: 503 });
   }
 
@@ -75,7 +79,7 @@ export async function POST(request: NextRequest) {
 
   let parsedPayload: Awaited<ReturnType<typeof parseInboundPayload>> | null;
   try {
-    parsedPayload = await authenticateAndParse(request, webhookSecret, resendApiKey, authorizeRecipient);
+    parsedPayload = await authenticateAndParse(request, resendWebhookSecret, inboundWebhookSecret, resendApiKey, authorizeRecipient);
   } catch (error) {
     if (error instanceof EmailConfigurationError) return NextResponse.json({ error: error.message }, { status: 503 });
     if (error instanceof EmailAuthorizationError) return unauthorized(error.message || undefined);

@@ -44,7 +44,20 @@ final class ShareImportFiles {
                 if (uri != null) uniqueUris.add(uri);
             }
         }
-        return new ArrayList<>(uniqueUris);
+        ArrayList<Uri> sharedUris = new ArrayList<>();
+        for (Uri uri : uniqueUris) {
+            if (isExternalContentUri(uri)) sharedUris.add(uri);
+        }
+        return sharedUris;
+    }
+
+    // Only another app's content provider may supply files; file:// and our own
+    // provider would let a caller make DiaryDock read its private storage.
+    private boolean isExternalContentUri(Uri uri) {
+        if (!"content".equalsIgnoreCase(uri.getScheme())) return false;
+        String authority = uri.getAuthority();
+        return authority != null
+            && !authority.equalsIgnoreCase(context.getPackageName() + ".fileprovider");
     }
 
     JSONArray copyToPrivateStorage(List<Uri> uris) throws Exception {

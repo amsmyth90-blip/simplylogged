@@ -80,6 +80,8 @@ test("Android and iOS share receivers feed the bounded packaged capture flow", a
   assert.match(androidFiles, /MAX_TOTAL_BYTES = 4L \* 1024L \* 1024L/);
   assert.match(androidFiles, /LinkedHashSet<Uri>/);
   assert.doesNotMatch(androidFiles, /subList\(0, MAX_FILES\)/);
+  assert.match(androidFiles, /isExternalContentUri\(uri\)/);
+  assert.match(androidFiles, /getPackageName\(\) \+ "\.fileprovider"/);
   assert.match(androidPlugin, /uris\.size\(\) > ShareImportFiles\.MAX_FILES/);
   assert.match(androidPlugin, /"content"\.equalsIgnoreCase\(data\.getScheme\(\)\)/);
   assert.doesNotMatch(androidManifest, /android:scheme="file"/);

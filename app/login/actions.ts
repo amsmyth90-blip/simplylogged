@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { hasRecentPasswordRecovery } from "@/lib/auth/recent-auth";
 import { checkServerRateLimit, createRateLimitKey, getForwardedClientIp } from "@/lib/rate-limit-server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -141,6 +142,11 @@ export async function updatePasswordAction(formData: FormData) {
   }
 
   const supabase = await getSupabaseServerClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  if (!hasRecentPasswordRecovery(claimsData?.claims)) {
+    redirect("/forgot-password?error=Please%20use%20a%20new%20password%20reset%20link%20to%20change%20your%20password");
+  }
+
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
