@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { updatePasswordAction } from "@/app/login/actions";
 import { AuthBrand } from "@/components/AuthBrand";
 import { getAuthenticatedUser } from "@/lib/auth";
+import { hasRecentPasswordRecovery } from "@/lib/auth/recent-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 type ResetPasswordPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -17,6 +19,11 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
   const user = await getAuthenticatedUser();
   if (!user) {
     redirect("/login?message=Please%20open%20the%20password%20reset%20link%20from%20your%20email.");
+  }
+  const supabase = await getSupabaseServerClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  if (!hasRecentPasswordRecovery(claimsData?.claims)) {
+    redirect("/forgot-password?error=Please%20use%20a%20new%20password%20reset%20link%20to%20change%20your%20password");
   }
 
   const params = searchParams ? await searchParams : {};
